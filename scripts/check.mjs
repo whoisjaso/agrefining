@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const root = new URL("..", import.meta.url).pathname;
-const required = ["package.json", "vercel.json", "src/style.css", "src/site.js", "scripts/build.mjs", "assets/ag-mark.svg", "assets/ag-silver-hero.png"];
+const required = ["package.json", "vercel.json", "src/style.css", "src/site.js", "scripts/build.mjs", "assets/ag-mark.svg", "assets/ag-silver-hero.webp", "assets/ag-silver-social.jpg"];
 const failures = required.filter((file) => !existsSync(join(root, file))).map((file) => `Missing ${file}`);
 const banned = [/\u2014/u, /[\u{1F300}-\u{1FAFF}]/u];
 

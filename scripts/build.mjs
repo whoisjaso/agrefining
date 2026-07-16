@@ -134,7 +134,7 @@ const footer = `
 
 function document({ title, description, path = "", content, schema = "" }) {
   const canonical = `https://agrefining.com/${path}`.replace(/\/$/, path ? "" : "/");
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><meta name="description" content="${description}"><link rel="canonical" href="${canonical}"><meta name="robots" content="index,follow,max-image-preview:large"><link rel="icon" href="/assets/ag-mark.svg" type="image/svg+xml"><link rel="stylesheet" href="/style.css">${schema}</head><body><a class="skip" href="#main">Skip to content</a>${nav}<main id="main">${content}</main>${footer}<script src="/site.js" defer></script></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><meta name="description" content="${description}"><link rel="canonical" href="${canonical}"><meta name="robots" content="index,follow,max-image-preview:large"><meta name="theme-color" content="#10231b"><meta property="og:type" content="website"><meta property="og:site_name" content="AG Refining"><meta property="og:title" content="${title}"><meta property="og:description" content="${description}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="https://agrefining.com/assets/ag-silver-social.jpg"><meta property="og:image:width" content="1672"><meta property="og:image:height" content="941"><meta name="twitter:card" content="summary_large_image"><link rel="icon" href="/assets/ag-mark.svg" type="image/svg+xml"><link rel="preload" as="image" href="/assets/ag-silver-hero.webp" type="image/webp"><link rel="stylesheet" href="/style.css">${schema}</head><body><a class="skip" href="#main">Skip to content</a>${nav}<main id="main">${content}</main>${footer}<script src="/site.js" defer></script></body></html>`;
 }
 
 function form() {
@@ -152,7 +152,7 @@ function form() {
 }
 
 const home = `
-  <section class="hero"><div class="hero-media"><img src="/assets/ag-silver-hero.png" alt="Molten silver in a ceramic crucible on a controlled assay surface"></div><div class="shell hero-inner"><div class="hero-copy" data-reveal>
+  <section class="hero"><div class="hero-media"><img src="/assets/ag-silver-hero.webp" alt="Molten silver in a ceramic crucible on a controlled assay surface" width="1672" height="941" fetchpriority="high"></div><div class="shell hero-inner"><div class="hero-copy" data-reveal>
     <p class="eyebrow">Family-owned silver recovery</p><h1>Turn silver-bearing material into a clear next step.</h1>
     <p class="hero-lede">AG Refining helps individuals, businesses, and organizations review qualifying silver scrap, dental material, silver-oxide batteries, and X-ray film.</p>
     <div class="hero-actions"><a class="button button-light" href="/contact">Request a material review ${arrow}</a><a class="button button-ghost" href="tel:${phoneHref}">Call ${phoneDisplay}</a></div>
