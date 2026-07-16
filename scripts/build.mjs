@@ -100,6 +100,19 @@ const pages = [
     ]
   },
   {
+    path: "espanol",
+    lang: "es",
+    title: "AG Refining en Español | Revisión de materiales de plata",
+    eyebrow: "Atención en español",
+    heading: "Orientación clara antes de enviar su material.",
+    intro: "AG Refining ayuda a personas, empresas y organizaciones a solicitar una revisión preliminar de materiales que pueden contener plata.",
+    body: [
+      ["Materiales que revisamos", "Podemos revisar información sobre plata esterlina, joyería, cubiertos, material dental, baterías de óxido de plata, película de rayos X y ciertos materiales industriales."],
+      ["Antes de enviar", "No envíe objetos de valor ni materiales desconocidos, contaminados o regulados hasta recibir instrucciones escritas de AG Refining."],
+      ["Cómo comenzar", `Llame al ${phoneDisplay} o envíe un correo a ${email}. Describa el tipo de material, la cantidad aproximada, su condición y su ubicación.`]
+    ]
+  },
+  {
     path: "contact",
     title: "Contact AG Refining | Request a Material Review",
     eyebrow: "Begin here",
@@ -112,12 +125,13 @@ const pages = [
 const arrow = '<span class="icon-arrow" aria-hidden="true"></span>';
 const nav = `
   <header class="site-header">
+    <div class="utility-bar"><div class="shell utility-inner"><p>Family-owned silver recovery</p><div><a href="tel:${phoneHref}">${phoneDisplay}</a><span></span><a href="mailto:${email}">${email}</a><span></span><a href="/espanol">Español</a></div></div></div>
     <nav class="nav shell" aria-label="Primary navigation">
-      <a class="brand" href="/" aria-label="AG Refining home"><img src="/assets/ag-mark.svg" alt=""><span class="brand-word">AG Refining</span></a>
+      <a class="brand" href="/" aria-label="AG Refining home"><img src="/assets/ag-mark.svg" alt=""><span class="brand-word">AG <strong>Refining</strong></span></a>
       <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-links" aria-label="Open navigation"><span></span><span></span></button>
       <div class="nav-links" id="primary-links" data-nav>
-        <a href="/accepted-materials">Materials</a><a href="/how-it-works">How it works</a><a href="/about">About</a><a href="/contact">Contact</a>
-        <a class="button button-light" href="/contact">Request a material review ${arrow}</a>
+        <a href="/accepted-materials">Materials</a><a href="/how-it-works">How it works</a><a href="/accepted-materials#businesses">For businesses</a><a href="/about">About</a><a href="/how-it-works#resources">Resources</a><a href="/contact">Contact</a>
+        <a class="button button-navy nav-review" href="/contact">Review my material ${arrow}</a>
       </div>
     </nav>
   </header>`;
@@ -132,9 +146,14 @@ const footer = `
     <div class="shell footer-bottom"><p>Copyright 2026 AG Refining. Material eligibility and value require review. Do not ship valuables without approval.</p></div>
   </footer>`;
 
-function document({ title, description, path = "", content, schema = "" }) {
+const questionGuide = `<div class="question-guide" data-question-guide>
+  <button class="question-trigger" type="button" data-question-trigger aria-expanded="false" aria-controls="question-panel"><span class="question-icon" aria-hidden="true"></span><span>Questions?</span></button>
+  <section class="question-panel" id="question-panel" data-question-panel hidden aria-label="Quick material guidance"><button class="question-close" type="button" data-question-close aria-label="Close quick guidance"></button><p class="eyebrow">Quick guidance</p><h2>Start with the material.</h2><a href="/accepted-materials">See what we review ${arrow}</a><a href="/how-it-works">Understand the process ${arrow}</a><a href="/contact">Request a review ${arrow}</a><a href="tel:${phoneHref}">Call ${phoneDisplay}</a></section>
+</div>`;
+
+function document({ title, description, path = "", content, schema = "", lang = "en" }) {
   const canonical = `https://agrefining.com/${path}`.replace(/\/$/, path ? "" : "/");
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><meta name="description" content="${description}"><link rel="canonical" href="${canonical}"><meta name="robots" content="index,follow,max-image-preview:large"><meta name="theme-color" content="#10231b"><meta property="og:type" content="website"><meta property="og:site_name" content="AG Refining"><meta property="og:title" content="${title}"><meta property="og:description" content="${description}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="https://agrefining.com/assets/ag-silver-social.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="675"><meta name="twitter:card" content="summary_large_image"><link rel="icon" href="/assets/ag-mark.svg" type="image/svg+xml"><link rel="preload" as="image" href="/assets/ag-silver-hero.webp" type="image/webp"><link rel="stylesheet" href="/style.css">${schema}</head><body><a class="skip" href="#main">Skip to content</a>${nav}<main id="main">${content}</main>${footer}<script src="/site.js" defer></script></body></html>`;
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><meta name="description" content="${description}"><link rel="canonical" href="${canonical}"><meta name="robots" content="index,follow,max-image-preview:large"><meta name="theme-color" content="#061929"><meta property="og:type" content="website"><meta property="og:site_name" content="AG Refining"><meta property="og:title" content="${title}"><meta property="og:description" content="${description}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="https://agrefining.com/assets/ag-silver-social.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="675"><meta name="twitter:card" content="summary_large_image"><link rel="icon" href="/assets/ag-mark.svg" type="image/svg+xml"><link rel="stylesheet" href="/style.css">${schema}</head><body><a class="skip" href="#main">Skip to content</a>${nav}<main id="main">${content}</main>${footer}${questionGuide}<script src="/site.js" defer></script></body></html>`;
 }
 
 function form() {
@@ -152,11 +171,11 @@ function form() {
 }
 
 const home = `
-  <section class="hero"><div class="hero-media"><img src="/assets/ag-silver-hero.webp" alt="Molten silver in a ceramic crucible on a controlled assay surface" width="1672" height="941" fetchpriority="high"></div><div class="shell hero-inner"><div class="hero-copy" data-reveal>
-    <p class="eyebrow">Family-owned silver recovery</p><h1>Turn silver-bearing material into a clear next step.</h1>
-    <p class="hero-lede">AG Refining helps individuals, businesses, and organizations review qualifying silver scrap, dental material, silver-oxide batteries, and X-ray film.</p>
-    <div class="hero-actions"><a class="button button-light" href="/contact">Request a material review ${arrow}</a><a class="button button-ghost" href="tel:${phoneHref}">Call ${phoneDisplay}</a></div>
-    <div class="hero-proof"><img src="/assets/ag-mark.svg" alt="" width="46"><p><strong>A legacy carried forward</strong>Fairness, careful review, and relationships built to last.</p></div>
+  <section class="hero"><div class="hero-media"><img src="/assets/ag-silver-hero.webp" alt="Industrial silver offcuts, sheet, wire, and tubing arranged on a dark assay surface" width="1672" height="941" fetchpriority="high"></div><div class="shell hero-inner"><div class="hero-copy" data-reveal>
+    <p class="hero-kicker"><span>Ag</span> Family-owned silver specialists</p><h1>Silver recovery,<br>without guesswork.</h1>
+    <p class="hero-lede">Tell us what you have. We will confirm whether it fits, explain how evaluation works, and give you the right next step before you send anything.</p>
+    <div class="hero-actions"><a class="button button-blue" href="/contact">Review my material ${arrow}</a><a class="button button-outline" href="/how-it-works">How it works</a></div>
+    <p class="shipping-note"><span></span>Please wait for written shipping instructions.</p>
   </div></div></section>
   <div class="trust-line"><div class="shell trust-line-inner"><p>Material-specific review</p><p>Business and individual inquiries</p><p>Direct human guidance</p></div></div>
   <section class="section section-paper"><div class="shell"><div class="section-head" data-reveal><span class="section-index">01</span><div><p class="eyebrow">Start with what you have</p><h2>Four material paths. One considered process.</h2><p class="section-intro">Different material requires different questions. Choose the closest category and begin with a preliminary review before arranging shipment or pickup.</p></div></div>
@@ -176,9 +195,10 @@ writeFileSync(join(out, "index.html"), document({ title: "AG Refining | Silver M
 
 for (const page of pages) {
   const body = page.path === "contact" ? form() : page.body.map(([heading, text]) => `<section data-reveal><h3>${heading}</h3><p>${text}</p></section>`).join("");
-  const content = `<section class="page-hero"><div class="shell" data-reveal><p class="eyebrow">${page.eyebrow}</p><h1>${page.heading}</h1><p>${page.intro}</p></div></section><section class="section section-paper"><div class="shell content-grid"><aside class="content-nav"><a href="/accepted-materials">Accepted materials</a><a href="/how-it-works">How it works</a><a href="/contact">Request a review</a></aside><div class="prose"><h2>${page.path === "contact" ? "Preliminary material review" : "What to know"}</h2>${body}<div class="notice"><strong>Important:</strong> Do not ship material until AG Refining confirms eligibility and provides the appropriate next step.</div>${page.path === "contact" ? `<p>Prefer to speak directly? Call <a href="tel:${phoneHref}">${phoneDisplay}</a> or email <a href="mailto:${email}">${email}</a>.</p>` : `<a class="button button-dark" href="/contact">Request a material review ${arrow}</a>`}</div></div></section>`;
+  const sectionId = page.path === "accepted-materials" ? "businesses" : page.path === "how-it-works" ? "resources" : "";
+  const content = `<section class="page-hero"><div class="shell" data-reveal><p class="eyebrow">${page.eyebrow}</p><h1>${page.heading}</h1><p>${page.intro}</p></div></section><section class="section section-paper"${sectionId ? ` id="${sectionId}"` : ""}><div class="shell content-grid"><aside class="content-nav"><a href="/accepted-materials">Accepted materials</a><a href="/how-it-works">How it works</a><a href="/contact">Request a review</a></aside><div class="prose"><h2>${page.path === "contact" ? "Preliminary material review" : page.path === "espanol" ? "Información importante" : "What to know"}</h2>${body}<div class="notice"><strong>${page.path === "espanol" ? "Importante" : "Important"}:</strong> ${page.path === "espanol" ? "No envíe materiales hasta que AG Refining confirme el siguiente paso por escrito." : "Do not ship material until AG Refining confirms eligibility and provides the appropriate next step."}</div>${page.path === "contact" ? `<p>Prefer to speak directly? Call <a href="tel:${phoneHref}">${phoneDisplay}</a> or email <a href="mailto:${email}">${email}</a>.</p>` : `<a class="button button-dark" href="/contact">${page.path === "espanol" ? "Solicitar una revisión" : "Request a material review"} ${arrow}</a>`}</div></div></section>`;
   const dir = join(out, page.path); mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, "index.html"), document({ title: page.title, description: page.intro, path: page.path, content }));
+  writeFileSync(join(dir, "index.html"), document({ title: page.title, description: page.intro, path: page.path, content, lang: page.lang || "en" }));
 }
 
 writeFileSync(join(out, "robots.txt"), "User-agent: *\nAllow: /\nSitemap: https://agrefining.com/sitemap.xml\n");

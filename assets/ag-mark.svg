@@ -1,6 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
-  <title id="title">AG Refining mark</title>
-  <rect x="1" y="1" width="62" height="62" rx="2" fill="#f2f0ea" stroke="#a9a6a0"/>
-  <text x="32" y="31" text-anchor="middle" font-family="Georgia, serif" font-size="24" fill="#171917">Ag</text>
-  <text x="32" y="47" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" letter-spacing="1.2" fill="#666b67">47</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-labelledby="title">
+  <title id="title">AG Refining silver element mark</title>
+  <defs>
+    <linearGradient id="blue" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#168fd8"/>
+      <stop offset=".52" stop-color="#0875bd"/>
+      <stop offset="1" stop-color="#064d83"/>
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="70" height="70" rx="1.5" fill="url(#blue)" stroke="#9fd7f5"/>
+  <text x="11" y="15" font-family="Arial, sans-serif" font-size="8" font-weight="700" fill="#fff">47</text>
+  <text x="36" y="45" text-anchor="middle" font-family="Georgia, serif" font-size="31" fill="#fff">Ag</text>
+  <text x="36" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="6.5" letter-spacing=".65" fill="#d8f0ff">107.868</text>
 </svg>
