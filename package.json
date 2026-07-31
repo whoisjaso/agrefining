@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "node scripts/build.mjs",
-    "check": "node scripts/check.mjs"
+    "assets": "node scripts/fetch-assets.mjs",
+    "build": "npm run assets && node scripts/build.mjs",
+    "check": "node scripts/check.mjs",
+    "verify": "npm run build && npm run check && node scripts/verify.mjs"
   }
 }

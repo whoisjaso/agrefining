@@ -17,8 +17,11 @@
     { "source": "/home", "destination": "/", "permanent": true },
     { "source": "/about-us", "destination": "/about", "permanent": true },
     { "source": "/dental-scrap-buyer", "destination": "/dental-scrap", "permanent": true },
-    { "source": "/watch-battery-recycling", "destination": "/silver-oxide-watch-batteries", "permanent": true },
-    { "source": "/x-ray-recycling", "destination": "/x-ray-film-recycling", "permanent": true },
+    { "source": "/watch-battery-recycling", "destination": "/silver-oxide-battery-recycling", "permanent": true },
+    { "source": "/silver-oxide-watch-batteries", "destination": "/silver-oxide-battery-recycling", "permanent": true },
+    { "source": "/x-ray-recycling", "destination": "/industrial-x-ray-silver-recycling", "permanent": true },
+    { "source": "/x-ray-film-recycling", "destination": "/industrial-x-ray-silver-recycling", "permanent": true },
+    { "source": "/sell-scrap-silver", "destination": "/silver-scrap-buyer-houston", "permanent": true },
     { "source": "/contact-us", "destination": "/contact", "permanent": true }
   ]
 }
