@@ -1687,7 +1687,7 @@ function reviewForm() {
     <fieldset class="field field-wide preferred-contact"><legend>Preferred contact</legend><label><input type="radio" name="preferred_contact" value="phone" checked> Phone</label><label><input type="radio" name="preferred_contact" value="email"> Email</label></fieldset>
     <div class="honeypot" aria-hidden="true"><label for="company_url">Company website</label><input id="company_url" name="company_url" tabindex="-1" autocomplete="off"></div>
     <p class="form-note field-wide">This request is not a final quote or pickup promise. Free pickup and fast payment depend on the material, location, account type, and schedule. Do not send patient records, passwords, financial data, or identity documents. See our <a href="/privacy">privacy notice</a>.</p>
-    <div class="form-actions field-wide"><button class="button button-blue" type="submit" data-submit-button>Send pickup request ${arrow}</button><p class="form-status" data-form-status aria-live="polite"></p></div>
+    <div class="form-actions field-wide"><button class="button button-blue" type="submit" data-submit-button>Send request ${arrow}</button><p class="form-status" data-form-status aria-live="polite"></p></div>
   </form>`;
 }
 
