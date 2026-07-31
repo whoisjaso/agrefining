@@ -56,6 +56,82 @@ for (const expected of exactHomeChecks) {
   if (!home.includes(expected)) failures.push(`Homepage is missing: ${expected}`);
 }
 
+const seoPages = [
+  {
+    path: "sell-silver-coins-houston",
+    title: "Sell Silver Coins in Houston | Top Prices | AG Refining",
+    description: "Sell silver coins in Houston for top prices. AG Refining offers expert evaluations, fast payment, and trusted local service.",
+    h1: "Sell your silver coins in Houston."
+  },
+  {
+    path: "silver-flake-buyer-houston",
+    title: "Silver Flake Buyer in Houston, TX | AG Refining",
+    description: "Sell silver flake in Houston for competitive prices. AG Refining offers expert evaluations, fast payment, and trusted refining services.",
+    h1: "Sell silver flake in Houston."
+  },
+  {
+    path: "laboratory-silver-buyer-houston",
+    title: "Laboratory Silver Buyer in Houston, TX | AG Refining",
+    description: "Sell laboratory silver in Houston for top value. AG Refining offers expert evaluations, fair pricing, and fast payment for silver materials.",
+    h1: "Sell laboratory silver in Houston."
+  },
+  {
+    path: "silver-solder-buyer-houston",
+    title: "Silver Solder Buyer in Houston, TX | AG Refining",
+    description: "Sell silver solder in Houston for competitive prices. AG Refining offers expert evaluations, fast payment, and trusted refining services.",
+    h1: "Sell silver solder in Houston."
+  },
+  {
+    path: "silver-plated-materials-buyer-houston",
+    title: "Silver-Plated Materials Buyer in Houston, TX | AG Refining",
+    description: "Sell silver-plated materials in Houston. AG Refining offers fair pricing, expert evaluations, and fast payment for silver-plated scrap.",
+    h1: "Sell silver-plated materials in Houston."
+  },
+  {
+    path: "dental-scrap-buyer-houston",
+    title: "Dental Scrap Buyer Houston | Sell Dental Scrap | AG Refining",
+    description: "Sell dental scrap in Houston with AG Refining. Competitive pricing, free pickup, on-site service, and fast payment for dental practices.",
+    h1: "Sell your dental scrap with confidence."
+  },
+  {
+    path: "silver-oxide-watch-battery-recycling-houston",
+    title: "Silver Oxide Watch Battery Recycling Houston | AG Refining",
+    description: "Recycle silver oxide watch batteries in Houston with AG Refining. Competitive pricing, fast service, and professional precious metal recovery.",
+    h1: "Recycle silver oxide watch batteries in Houston."
+  },
+  {
+    path: "houston-silver-buyer",
+    title: "Houston Silver Buyer | Sell Scrap Silver in Houston | AG Refining",
+    description: "Sell silver in Houston with AG Refining. Free pickup, on-site weighing, immediate payment, and honest pricing for commercial accounts.",
+    h1: "Sell your silver with confidence."
+  },
+  {
+    path: "x-ray-recycling-services-houston",
+    title: "X-Ray Recycling Services Houston | X-Ray Film Recycling | AG Refining",
+    description: "Houston X-ray recycling services for medical and industrial film. Secure silver recovery, competitive pricing, and professional service.",
+    h1: "Secure X-ray film recycling in Houston."
+  },
+  {
+    path: "scrap-silver-buyer-houston",
+    title: "Scrap Silver Buyer Houston | Sell Scrap Silver | AG Refining",
+    description: "Sell scrap silver in Houston with AG Refining. Top prices, free pickup, on-site weighing, and immediate payment",
+    h1: "Turn your scrap silver into cash."
+  }
+];
+
+for (const page of seoPages) {
+  const source = readFileSync(join(out, page.path, "index.html"), "utf8");
+  const expected = [
+    `<title>${page.title}</title>`,
+    `<meta name="description" content="${page.description}">`,
+    `<link rel="canonical" href="https://agrefining.com/${page.path}">`,
+    `<h1>${page.h1}</h1>`
+  ];
+  for (const check of expected) {
+    if (!source.includes(check)) failures.push(`${page.path}: missing exact SEO field ${check}`);
+  }
+}
+
 const notFound = readFileSync(join(out, "404.html"), "utf8");
 if (!notFound.includes('<meta name="robots" content="noindex,follow">')) {
   failures.push("404 page must be noindex");
@@ -63,7 +139,25 @@ if (!notFound.includes('<meta name="robots" content="noindex,follow">')) {
 
 const sitemap = readFileSync(join(out, "sitemap.xml"), "utf8");
 const sitemapEntries = (sitemap.match(/<url>/g) || []).length;
-if (sitemapEntries !== 30) failures.push(`Expected 30 sitemap pages, found ${sitemapEntries}`);
+if (sitemapEntries !== 35) failures.push(`Expected 35 sitemap pages, found ${sitemapEntries}`);
+
+for (const page of seoPages) {
+  if (!sitemap.includes(`<loc>https://agrefining.com/${page.path}</loc>`)) {
+    failures.push(`Sitemap is missing ${page.path}`);
+  }
+}
+
+const replacedPaths = [
+  "silver-coin-buyers-houston",
+  "dental-scrap",
+  "silver-oxide-battery-recycling",
+  "silver-scrap-buyer-houston"
+];
+for (const path of replacedPaths) {
+  if (sitemap.includes(`<loc>https://agrefining.com/${path}</loc>`)) {
+    failures.push(`Sitemap still includes replaced route ${path}`);
+  }
+}
 
 if (failures.length) {
   console.error(failures.join("\n"));
