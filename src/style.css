@@ -2918,6 +2918,569 @@ h3 {
   margin: 0;
 }
 
+/* Long-form material and authority pages */
+
+.coin-hero-actions,
+.material-hero-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.service-hero-copy > .coin-hero-note,
+.service-hero-copy > .material-hero-note {
+  border-left: 2px solid var(--brass);
+  color: #5d6c74;
+  font-size: 0.72rem;
+  line-height: 1.65;
+  margin: 1.5rem 0 0;
+  max-width: 48ch;
+  padding-left: 0.9rem;
+}
+
+.coin-visual,
+.material-visual {
+  isolation: isolate;
+}
+
+.coin-visual::before,
+.material-visual::before {
+  background: linear-gradient(180deg, transparent 50%, rgba(2, 16, 26, 0.84));
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+.coin-visual figcaption,
+.material-visual figcaption {
+  align-items: end;
+  bottom: 2.7rem;
+  color: var(--white);
+  display: flex;
+  gap: 1rem;
+  left: 2.7rem;
+  position: absolute;
+  z-index: 2;
+}
+
+.coin-visual figcaption span,
+.material-visual figcaption span {
+  font-family: var(--display);
+  font-size: clamp(3.2rem, 6vw, 5.6rem);
+  font-weight: 350;
+  letter-spacing: -0.04em;
+  line-height: 0.75;
+}
+
+.coin-visual figcaption p,
+.material-visual figcaption p {
+  color: #d7e2e7;
+  font-size: 0.61rem;
+  font-weight: 720;
+  letter-spacing: 0.12em;
+  line-height: 1.55;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.coin-types-section,
+.material-types-section,
+.houston-advantages-section,
+.xray-industries-section {
+  background: var(--paper);
+}
+
+.coin-types-layout,
+.material-types-layout,
+.material-audience-grid,
+.material-reasons-layout,
+.coin-reasons-layout {
+  display: grid;
+  gap: clamp(3rem, 8vw, 8.5rem);
+  grid-template-columns: minmax(260px, 0.48fr) minmax(0, 1fr);
+}
+
+.coin-types-intro,
+.material-types-intro,
+.material-reasons-intro,
+.coin-reasons-intro {
+  align-self: start;
+  position: sticky;
+  top: 9rem;
+}
+
+.coin-types-intro h2,
+.material-types-intro h2,
+.material-reasons-intro h2,
+.coin-reasons-intro h2,
+.material-audience-grid h2 {
+  color: var(--midnight);
+  font-family: var(--display);
+  font-size: clamp(2.8rem, 4.6vw, 4.9rem);
+  font-weight: 360;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  margin: 0;
+}
+
+.coin-types-intro > p:last-child,
+.material-types-intro > p:last-child,
+.material-reasons-intro > p:last-child,
+.coin-reasons-intro > p:last-child,
+.material-audience-grid > div > p:last-child {
+  color: var(--slate);
+  font-size: 0.84rem;
+  line-height: 1.8;
+  margin: 1.5rem 0 0;
+  max-width: 54ch;
+}
+
+.coin-types-list,
+.material-types-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.coin-types-list li,
+.material-types-list li {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  color: var(--midnight);
+  display: grid;
+  font-family: var(--display);
+  font-size: clamp(1.2rem, 1.85vw, 1.68rem);
+  gap: 0.9rem;
+  grid-template-columns: 14px minmax(0, 1fr);
+  line-height: 1.2;
+  min-height: 92px;
+  padding: 1.2rem;
+}
+
+.coin-types-list li:nth-child(odd),
+.material-types-list li:nth-child(odd) {
+  border-right: 1px solid var(--line);
+  padding-left: 0;
+}
+
+.coin-types-list li span,
+.material-types-list li span {
+  background: var(--cobalt);
+  border-radius: 50%;
+  height: 5px;
+  width: 5px;
+}
+
+.coin-value-section,
+.material-guardrail-section,
+.xray-security-section {
+  background:
+    radial-gradient(circle at 11% 16%, rgba(8, 111, 174, 0.18), transparent 31%),
+    var(--midnight-raised);
+  color: var(--white);
+  padding-block: clamp(5rem, 9vw, 8rem);
+}
+
+.coin-value-grid,
+.material-guardrail-grid,
+.xray-security-grid {
+  align-items: center;
+  display: grid;
+  gap: clamp(3rem, 8vw, 9rem);
+  grid-template-columns: minmax(220px, 0.4fr) minmax(0, 1fr);
+}
+
+.coin-value-mark,
+.material-guardrail-mark,
+.xray-security-mark {
+  align-items: center;
+  aspect-ratio: 1;
+  border: 1px solid rgba(199, 206, 214, 0.58);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 310px;
+  position: relative;
+}
+
+.coin-value-mark::after,
+.material-guardrail-mark::after,
+.xray-security-mark::after {
+  border: 1px solid rgba(199, 206, 214, 0.18);
+  content: "";
+  inset: 12px;
+  position: absolute;
+}
+
+.coin-value-mark span,
+.material-guardrail-mark span,
+.xray-security-mark span {
+  align-self: flex-start;
+  font-size: 0.74rem;
+  font-weight: 750;
+  left: 1.5rem;
+  letter-spacing: 0.12em;
+  position: absolute;
+  text-transform: uppercase;
+  top: 1.3rem;
+}
+
+.coin-value-mark strong,
+.material-guardrail-mark strong,
+.xray-security-mark strong {
+  font-family: var(--display);
+  font-size: clamp(4rem, 8vw, 7.5rem);
+  font-weight: 350;
+  letter-spacing: -0.05em;
+  line-height: 0.8;
+}
+
+.coin-value-mark small,
+.material-guardrail-mark small,
+.xray-security-mark small {
+  color: #b8c8d0;
+  font-size: 0.68rem;
+  letter-spacing: 0.15em;
+  margin-top: 1.3rem;
+  text-transform: uppercase;
+}
+
+.xray-security-mark strong {
+  font-size: clamp(2.4rem, 5vw, 4.6rem);
+}
+
+.coin-value-grid h2,
+.material-guardrail-grid h2,
+.xray-security-grid h2 {
+  font-family: var(--display);
+  font-size: clamp(3rem, 5.2vw, 5.4rem);
+  font-weight: 350;
+  letter-spacing: -0.045em;
+  line-height: 0.94;
+  margin: 0;
+  max-width: 14ch;
+}
+
+.coin-value-grid > div:last-child > p:not(.eyebrow),
+.material-guardrail-grid > div:last-child > p:not(.eyebrow),
+.xray-security-grid > div:last-child > p:not(.eyebrow) {
+  color: #bccbd2;
+  font-size: 0.88rem;
+  line-height: 1.85;
+  margin: 1.5rem 0 0;
+  max-width: 72ch;
+}
+
+.material-guardrail-grid .text-link {
+  color: #8ed0ed;
+  margin-top: 1.8rem;
+}
+
+.coin-caution {
+  border-left: 2px solid var(--brass);
+  padding-left: 1rem;
+}
+
+.material-audience-section {
+  background: #edf2f3;
+}
+
+.material-audience-grid {
+  align-items: start;
+}
+
+.material-audience-grid ul {
+  border-top: 1px solid var(--line);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.material-audience-grid li {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  color: var(--midnight);
+  display: grid;
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 2.5vw, 2.3rem);
+  gap: 1.2rem;
+  grid-template-columns: 42px minmax(0, 1fr);
+  min-height: 92px;
+}
+
+.material-audience-grid li span {
+  color: var(--cobalt);
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  font-weight: 780;
+  letter-spacing: 0.13em;
+}
+
+.coin-reasons-section,
+.material-reasons-section,
+.xray-benefits-section {
+  background: var(--white);
+}
+
+.coin-reasons-list,
+.material-reasons-list {
+  border-top: 1px solid var(--line);
+}
+
+.coin-reasons-list article,
+.material-reasons-list article {
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: minmax(180px, 0.45fr) minmax(0, 1fr);
+  padding-block: clamp(1.8rem, 3.3vw, 2.8rem);
+}
+
+.coin-reasons-list h3,
+.material-reasons-list h3 {
+  color: var(--midnight);
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 2.3vw, 2.1rem);
+  font-weight: 400;
+  line-height: 1.06;
+  margin: 0;
+}
+
+.coin-reasons-list p,
+.material-reasons-list p {
+  color: var(--slate);
+  font-size: 0.82rem;
+  line-height: 1.78;
+  margin: 0;
+}
+
+.coin-process-section,
+.material-process-section,
+.houston-process-section {
+  background: var(--paper);
+}
+
+.coin-process,
+.material-process,
+.houston-process {
+  border-bottom: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  margin: 3rem 0 0;
+  padding: 0;
+}
+
+.houston-process {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.coin-process li,
+.material-process li,
+.houston-process li {
+  border-right: 1px solid var(--line);
+  min-height: 300px;
+  padding: clamp(1.4rem, 2.5vw, 2.2rem);
+}
+
+.coin-process li:last-child,
+.material-process li:last-child,
+.houston-process li:last-child {
+  border-right: 0;
+}
+
+.coin-process li > span,
+.material-process li > span,
+.houston-process li > span {
+  color: var(--cobalt);
+  font-size: 0.63rem;
+  font-weight: 780;
+  letter-spacing: 0.16em;
+}
+
+.coin-process h3,
+.material-process h3,
+.houston-process h3 {
+  color: var(--midnight);
+  font-family: var(--display);
+  font-size: clamp(1.65rem, 2.4vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1;
+  margin: 4rem 0 1rem;
+}
+
+.coin-process p,
+.material-process p,
+.houston-process p {
+  color: var(--slate);
+  font-size: 0.78rem;
+  line-height: 1.75;
+  margin: 0;
+}
+
+.coin-trust-section {
+  background: #edf2f3;
+}
+
+.coin-trust-grid {
+  display: grid;
+  gap: clamp(3rem, 8vw, 8rem);
+  grid-template-columns: minmax(0, 0.8fr) minmax(280px, 0.55fr);
+}
+
+.coin-trust-grid h2 {
+  color: var(--midnight);
+  font-family: var(--display);
+  font-size: clamp(3rem, 5vw, 5.2rem);
+  font-weight: 360;
+  line-height: 0.96;
+  margin: 0;
+}
+
+.coin-trust-grid > div:last-child > p {
+  color: var(--slate);
+  line-height: 1.85;
+  margin: 0;
+}
+
+.coin-trust-grid .text-link {
+  margin-top: 1.7rem;
+}
+
+.xray-path-section,
+.houston-services-section {
+  background: var(--paper);
+}
+
+.xray-path-grid,
+.houston-services-grid {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 3rem;
+}
+
+.houston-services-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.xray-path-grid a,
+.houston-services-grid a {
+  background: var(--white);
+  border: 1px solid var(--line);
+  min-height: 350px;
+  padding: clamp(1.6rem, 3vw, 2.8rem);
+  position: relative;
+  transition: background 240ms ease, transform 280ms var(--ease);
+}
+
+.houston-services-grid a {
+  min-height: 330px;
+}
+
+.xray-path-grid a:hover,
+.houston-services-grid a:hover {
+  background: var(--midnight);
+  transform: translateY(-3px);
+}
+
+.xray-path-grid span,
+.houston-services-grid span {
+  color: var(--cobalt);
+  font-size: 0.62rem;
+  font-weight: 780;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.xray-path-grid h3,
+.houston-services-grid h3 {
+  color: var(--midnight);
+  font-family: var(--display);
+  font-size: clamp(2rem, 3.3vw, 3.2rem);
+  font-weight: 380;
+  line-height: 0.96;
+  margin: 4rem 0 1rem;
+}
+
+.xray-path-grid p,
+.houston-services-grid p {
+  color: var(--slate);
+  font-size: 0.8rem;
+  line-height: 1.75;
+  margin: 0;
+}
+
+.xray-path-grid b,
+.houston-services-grid b {
+  bottom: 2rem;
+  color: var(--cobalt);
+  font-size: 0.72rem;
+  position: absolute;
+  right: 2rem;
+}
+
+.xray-path-grid a:hover h3,
+.xray-path-grid a:hover p,
+.xray-path-grid a:hover b,
+.houston-services-grid a:hover h3,
+.houston-services-grid a:hover p,
+.houston-services-grid a:hover b {
+  color: var(--white);
+}
+
+.houston-area-section {
+  background:
+    linear-gradient(120deg, rgba(8, 111, 174, 0.16), transparent 46%),
+    var(--midnight-raised);
+  color: var(--white);
+  padding-block: clamp(5rem, 9vw, 8rem);
+}
+
+.houston-area-grid {
+  display: grid;
+  gap: clamp(3rem, 8vw, 8rem);
+  grid-template-columns: minmax(280px, 0.55fr) minmax(0, 1fr);
+}
+
+.houston-area-grid h2 {
+  font-family: var(--display);
+  font-size: clamp(3rem, 5.2vw, 5.4rem);
+  font-weight: 350;
+  letter-spacing: -0.045em;
+  line-height: 0.94;
+  margin: 0;
+}
+
+.houston-area-grid > div > p:last-child {
+  color: #bdcbd1;
+  font-size: 0.86rem;
+  line-height: 1.8;
+  margin: 1.5rem 0 0;
+}
+
+.houston-area-grid ul {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.houston-area-grid li {
+  border-bottom: 1px solid rgba(199, 206, 214, 0.17);
+  color: #e4ecef;
+  font-family: var(--display);
+  font-size: clamp(1.1rem, 1.7vw, 1.45rem);
+  padding: 1rem 0.6rem;
+}
+
 /* Progressive, selective motion */
 
 [data-reveal] {
@@ -2957,6 +3520,22 @@ h3 {
 
   .service-visual {
     min-height: 560px;
+  }
+
+  .houston-services-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .houston-process {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .houston-process li:nth-child(3) {
+    border-right: 0;
+  }
+
+  .houston-process li:nth-child(n + 4) {
+    border-top: 1px solid var(--line);
   }
 
   .detail-copy article {
@@ -3056,7 +3635,17 @@ h3 {
   .detail-grid,
   .faq-grid,
   .contact-grid,
-  .legal-grid {
+  .legal-grid,
+  .coin-types-layout,
+  .material-types-layout,
+  .material-audience-grid,
+  .material-reasons-layout,
+  .coin-reasons-layout,
+  .coin-value-grid,
+  .material-guardrail-grid,
+  .xray-security-grid,
+  .coin-trust-grid,
+  .houston-area-grid {
     grid-template-columns: 1fr;
   }
 
@@ -3080,6 +3669,38 @@ h3 {
   .service-visual {
     aspect-ratio: 16 / 10;
     min-height: 0;
+  }
+
+  .coin-types-intro,
+  .material-types-intro,
+  .material-reasons-intro,
+  .coin-reasons-intro {
+    position: static;
+  }
+
+  .coin-value-mark,
+  .material-guardrail-mark,
+  .xray-security-mark {
+    max-width: 240px;
+  }
+
+  .coin-process,
+  .material-process {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .coin-process li:nth-child(2),
+  .material-process li:nth-child(2) {
+    border-right: 0;
+  }
+
+  .coin-process li:nth-child(n + 3),
+  .material-process li:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+
+  .houston-area-grid ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .answer-index {
@@ -3472,6 +4093,54 @@ h3 {
     min-height: 290px;
   }
 
+  .coin-types-list,
+  .material-types-list,
+  .xray-path-grid,
+  .houston-services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .coin-types-list li:nth-child(odd),
+  .material-types-list li:nth-child(odd) {
+    border-right: 0;
+    padding-left: 1.2rem;
+  }
+
+  .coin-reasons-list article,
+  .material-reasons-list article {
+    gap: 0.8rem;
+    grid-template-columns: 1fr;
+  }
+
+  .coin-process li,
+  .material-process li,
+  .houston-process li {
+    min-height: 250px;
+  }
+
+  .houston-process {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .houston-process li,
+  .houston-process li:nth-child(3) {
+    border-right: 1px solid var(--line);
+  }
+
+  .houston-process li:nth-child(2n),
+  .houston-process li:last-child {
+    border-right: 0;
+  }
+
+  .houston-process li:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+
+  .xray-path-grid a,
+  .houston-services-grid a {
+    min-height: 300px;
+  }
+
   .process-rail li {
     gap: 1.2rem;
     grid-template-columns: 42px minmax(0, 1fr);
@@ -3744,6 +4413,62 @@ h3 {
 
   .hero-actions .button {
     width: 100%;
+  }
+
+  .coin-hero-actions,
+  .material-hero-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .coin-hero-actions .button,
+  .material-hero-actions .button {
+    width: 100%;
+  }
+
+  .coin-visual figcaption,
+  .material-visual figcaption {
+    bottom: 2rem;
+    left: 2rem;
+  }
+
+  .coin-process,
+  .material-process,
+  .houston-process {
+    grid-template-columns: 1fr;
+  }
+
+  .coin-process li,
+  .material-process li,
+  .houston-process li,
+  .coin-process li:nth-child(2),
+  .material-process li:nth-child(2),
+  .houston-process li:nth-child(3),
+  .houston-process li:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .coin-process li,
+  .material-process li,
+  .houston-process li {
+    border-top: 1px solid var(--line);
+    min-height: 220px;
+  }
+
+  .coin-process li:first-child,
+  .material-process li:first-child,
+  .houston-process li:first-child {
+    border-top: 0;
+  }
+
+  .coin-process h3,
+  .material-process h3,
+  .houston-process h3 {
+    margin-top: 2.8rem;
+  }
+
+  .houston-area-grid ul {
+    grid-template-columns: 1fr;
   }
 
   .hero-kicker {
