@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const source = "https://agrefining-9ot1qdivq-whoisjasos-projects.vercel.app/assets";
+const source = "https://agrefining.vercel.app/assets";
 const manifest = {
   "ag-silver-hero-1600.webp": "f0dd368191d0aa662e5edd61948d5b59a1a1da59ad08cc7b325c65ce924f0b37",
   "ag-silver-hero-mobile.webp": "07e416764613a6f5cd7bf9e06eee0d695955e7cb81c7411128ebf286ffbdec87",
