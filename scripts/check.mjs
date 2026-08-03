@@ -29,6 +29,9 @@ if (!css.includes("--canvas: #f1ede4")) failures.push("Silver Atelier canvas tok
 if (!css.includes("--graphite: #171815")) failures.push("Silver Atelier graphite token is missing");
 if (/prefers-color-scheme\s*:\s*dark/.test(css)) failures.push("Automatic dark mode remains in the stylesheet");
 if (/mesh[^\n{]*drift|gradient-text/i.test(css)) failures.push("Legacy decorative effects remain in the stylesheet");
+if (/\.motion-ready\s+\[data-reveal\]\s*\{[^}]*opacity\s*:\s*0\s*;/s.test(css)) {
+  failures.push("Reveal motion must not hide editorial content before intersection");
+}
 if (clientScript.includes("page-leaving")) failures.push("Legacy page-exit animation remains in the client script");
 
 function files(dir) {
