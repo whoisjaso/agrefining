@@ -24,6 +24,7 @@ const failures = required.filter((file) => !existsSync(join(root, file))).map((f
 const banned = [/\u2014/u, /[\u{1F300}-\u{1FAFF}]/u];
 const css = readFileSync(join(root, "src", "style.css"), "utf8");
 const clientScript = readFileSync(join(root, "src", "site.js"), "utf8");
+const buildScript = readFileSync(join(root, "scripts", "build.mjs"), "utf8");
 
 if (!css.includes("--canvas: #f1ede4")) failures.push("Silver Atelier canvas token is missing");
 if (!css.includes("--navy: #102a43")) failures.push("Silver Atelier navy token is missing");
@@ -36,6 +37,7 @@ if (/\.motion-ready\s+\[data-reveal\]\s*\{[^}]*opacity\s*:\s*0\s*;/s.test(css)) 
   failures.push("Reveal motion must not hide editorial content before intersection");
 }
 if (clientScript.includes("page-leaving")) failures.push("Legacy page-exit animation remains in the client script");
+if (buildScript.includes("www.google.com/maps?q=")) failures.push("Homepage still depends on the blank-prone map iframe");
 
 function files(dir) {
   return readdirSync(dir).flatMap((name) => {

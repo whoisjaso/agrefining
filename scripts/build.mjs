@@ -1059,7 +1059,11 @@ const home = `
 
   <section class="section location-section">
     <div class="shell location-grid">
-      <div class="location-map"><iframe title="Map of ${street} in Houston, Texas" src="https://www.google.com/maps?q=${encodeURIComponent(`${street}, ${cityLine}`)}&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>
+      <a class="location-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${street}, ${cityLine}`)}" target="_blank" rel="noopener" aria-label="Open ${street}, ${cityLine} in Google Maps">
+        <span class="location-map-kicker"><b>Ag / 47</b><span>Houston, Texas</span></span>
+        <span class="location-map-city" aria-hidden="true">HOU</span>
+        <span class="location-map-detail"><span>${street}<br>${cityLine}</span><strong>Open in Google Maps ${arrow}</strong></span>
+      </a>
       <div class="location-copy">
         <p class="eyebrow">Contact and location</p>
         <h2>Call before shipping or visiting.</h2>

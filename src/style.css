@@ -1404,17 +1404,99 @@ blockquote {
 }
 
 .location-map {
-  background: var(--steel-soft);
+  background: var(--navy);
   border: 1px solid var(--line);
+  color: var(--paper);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  isolation: isolate;
   min-height: 34rem;
   overflow: hidden;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  position: relative;
+  transition: background var(--medium) var(--ease);
 }
 
-.location-map iframe {
-  border: 0;
-  filter: grayscale(1) contrast(0.92) sepia(0.08);
-  height: 100%;
-  width: 100%;
+.location-map::before {
+  border: 1px solid var(--line-inverse);
+  border-radius: 50%;
+  content: "";
+  height: clamp(12rem, 27vw, 23rem);
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(12rem, 27vw, 23rem);
+  z-index: -1;
+}
+
+.location-map::after {
+  background: var(--mineral-blue);
+  border: 0.35rem solid rgba(250, 248, 242, 0.16);
+  border-radius: 50%;
+  content: "";
+  height: 1.15rem;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 1.15rem;
+}
+
+.location-map:hover {
+  background: color-mix(in srgb, var(--navy) 92%, var(--focus));
+}
+
+.location-map-kicker,
+.location-map-detail {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.location-map-kicker {
+  font-size: 0.69rem;
+  font-weight: 720;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.location-map-kicker b {
+  color: var(--focus-soft);
+  font-weight: 760;
+}
+
+.location-map-city {
+  align-self: center;
+  color: rgba(250, 248, 242, 0.12);
+  font-size: clamp(6.5rem, 14vw, 11rem);
+  font-weight: 240;
+  letter-spacing: -0.08em;
+  line-height: 0.8;
+  position: relative;
+  z-index: -1;
+}
+
+.location-map-detail {
+  border-top: 1px solid var(--line-inverse);
+  gap: 2rem;
+  padding-top: 1.25rem;
+}
+
+.location-map-detail > span {
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.location-map-detail strong {
+  align-items: center;
+  display: inline-flex;
+  font-size: 0.73rem;
+  font-weight: 720;
+  gap: 0.65rem;
+  text-align: right;
 }
 
 .location-copy {
@@ -2873,6 +2955,16 @@ blockquote {
 
   .location-map {
     min-height: 23rem;
+  }
+
+  .location-map-detail {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .location-map-detail strong {
+    text-align: left;
   }
 
   .material-types-list,
