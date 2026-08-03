@@ -644,7 +644,9 @@ const industryPages = [
 const locationPages = [
   // The fourth column keeps the service-area index from repeating one photograph
   // seven times. Each city carries a different material from the set.
-  ["houston-silver-buyer", "Houston", "the City of Houston", "ag-silver-pour-1600.webp"],
+  // The 1280 variant, not the 1600 hero crop: service pages and taxonomy cards
+  // declare width="1280" height="819", so the file has to actually be that.
+  ["houston-silver-buyer", "Houston", "the City of Houston", "ag-silver-pour-1280.webp"],
   ["silver-buyer-pearland", "Pearland", "Pearland and nearby south Houston businesses", "material-sterling-hollowware-1280.webp"],
   ["silver-buyer-pasadena", "Pasadena", "Pasadena, Deer Park, and nearby industrial areas", "material-industrial-silver-1280.webp"],
   ["silver-buyer-sugar-land", "Sugar Land", "Sugar Land, Stafford, and nearby southwest Houston businesses", "material-silver-jewelry-1280.webp"],
