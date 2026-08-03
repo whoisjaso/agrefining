@@ -1,7 +1,8 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = new URL("..", import.meta.url).pathname;
+const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const required = [
   "package.json",
   "vercel.json",
@@ -29,7 +30,13 @@ function files(dir) {
   });
 }
 
-for (const path of files(root).filter((path) => !path.includes("/.git/") && !path.endsWith(".png"))) {
+const ignored = [`${sep}.git${sep}`, `${sep}node_modules${sep}`, `${sep}dist${sep}`];
+// Binary files are not text: decoding them as utf8 can produce byte sequences
+// that land in the banned emoji ranges and fail the build for no reason.
+const binary = [".png", ".webp", ".jpg", ".jpeg", ".gif", ".ico", ".woff", ".woff2", ".ttf", ".otf", ".pdf", ".zip", ".docx"];
+for (const path of files(root).filter(
+  (path) => !ignored.some((part) => path.includes(part)) && !binary.some((ext) => path.toLowerCase().endsWith(ext))
+)) {
   const source = readFileSync(path, "utf8");
   if (banned.some((pattern) => pattern.test(source))) failures.push(`Banned character in ${path.replace(root, "")}`);
 }

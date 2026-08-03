@@ -1,9 +1,19 @@
 const MAX_BODY_BYTES = 32_000;
 const DEFAULT_TO_EMAIL = "dennis@agrefining.com";
 const DEFAULT_FROM_EMAIL = "AG Refining <website@agrefining.com>";
+// Must stay in sync with the material options in reviewForm() in scripts/build.mjs.
+// Anything missing here is rejected as "Choose the closest material type." even
+// though the visitor picked it from the menu.
 const MATERIALS = new Set([
   "scrap_silver",
   "industrial_silver",
+  "silver_flake",
+  "laboratory_silver",
+  "silver_solder",
+  "silver_plated",
+  "silver_bars",
+  "silver_flatware",
+  "jewelry_scrap",
   "dental_material",
   "silver_oxide_batteries",
   "xray_film",

@@ -97,6 +97,27 @@ document.querySelectorAll("[data-reveal]").forEach((element) => {
   else element.classList.add("is-visible");
 });
 
+const siteHeader = document.querySelector("[data-site-header]");
+const actionDock = document.querySelector(".mobile-actions");
+let chromeTicking = false;
+
+function updateChrome() {
+  chromeTicking = false;
+  const offset = window.scrollY;
+  siteHeader?.setAttribute("data-stuck", offset > 12 ? "true" : "false");
+  if (!actionDock) return;
+  const atFoot = window.innerHeight + offset >= document.body.scrollHeight - 140;
+  actionDock.setAttribute("data-visible", offset > 320 && !atFoot ? "true" : "false");
+}
+
+window.addEventListener("scroll", () => {
+  if (chromeTicking) return;
+  chromeTicking = true;
+  window.requestAnimationFrame(updateChrome);
+}, { passive: true });
+window.addEventListener("resize", updateChrome, { passive: true });
+updateChrome();
+
 const materialGuide = document.querySelector(".material-guide");
 const materialGuideSummary = materialGuide?.querySelector("summary");
 document.addEventListener("click", (event) => {
