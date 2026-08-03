@@ -700,7 +700,7 @@ const nav = `
   <header class="site-header" data-site-header>
     <div class="utility-bar">
       <div class="shell utility-inner">
-        <p>Houston-based silver buyer</p>
+        <p>Houston, Texas <span aria-hidden="true">/</span> Silver buying and pickup</p>
         <div>
           <a href="tel:${phoneHref}">${phoneDisplay}</a><span></span>
           <a href="mailto:${email}">${email}</a><span></span>
@@ -711,7 +711,7 @@ const nav = `
     <nav class="nav shell" aria-label="Primary navigation">
       <a class="brand" href="/" aria-label="AG Refining home">
         <img src="/assets/ag-mark-path.svg" alt="" width="48" height="48">
-        <span class="brand-word">AG <strong>Refining</strong></span>
+        <span class="brand-word"><strong>AG</strong> Refining</span>
       </a>
       <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-links" aria-label="Open navigation"><span></span><span></span></button>
       <div class="nav-links" id="primary-links" data-nav>
@@ -720,7 +720,7 @@ const nav = `
         <a href="/service-areas">Service areas</a>
         <a href="/how-it-works">How it works</a>
         <a href="/about">Our story</a>
-        <a class="button button-navy nav-review" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
+        <a class="button button-primary nav-review" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
       </div>
     </nav>
     <button class="nav-scrim" type="button" data-nav-scrim aria-label="Close navigation" tabindex="-1"></button>
@@ -753,7 +753,7 @@ const footer = `
 
 const materialGuide = `
   <details class="material-guide">
-    <summary><span class="guide-mark" aria-hidden="true"></span><span>Not sure what you have?</span></summary>
+    <summary><span class="guide-mark" aria-hidden="true"></span><span>Identify your material</span></summary>
     <div class="material-guide-panel">
       <h2>Start with the material.</h2>
       <a href="/accepted-materials">See what we buy ${arrow}</a>
@@ -763,7 +763,7 @@ const materialGuide = `
     </div>
   </details>`;
 
-const mobileActions = `<nav class="mobile-actions" aria-label="Quick actions"><a href="tel:${phoneHref}">Call</a><a href="/contact?intent=pickup">${primaryCta} ${arrow}</a></nav>`;
+const mobileActions = `<nav class="mobile-actions" aria-label="Quick actions"><a href="tel:${phoneHref}">Call</a><a class="button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></nav>`;
 
 function schemaTag(data) {
   return `<script type="application/ld+json">${JSON.stringify(data).replaceAll("<", "\\u003c")}</script>`;
@@ -823,8 +823,7 @@ function document({
     <meta name="description" content="${description}">
     <link rel="canonical" href="${canonical}">
     <meta name="robots" content="${robots}">
-    <meta name="theme-color" content="#f2f5f8" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#070d13" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f1ede4">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AG Refining">
@@ -840,17 +839,17 @@ function document({
     <link rel="icon" href="/assets/ag-mark-path.svg" type="image/svg+xml">
     <link rel="preload" href="/assets/fonts/newsreader-latin-opsz.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/assets/fonts/manrope-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/style.css?v=20260802-lux-mesh">
+    <link rel="stylesheet" href="/style.css?v=20260803-silver-atelier">
     ${schemaTag({ "@context": "https://schema.org", "@graph": schema })}
   </head>
-  <body${bodyClass ? ` class="${bodyClass}"` : ""}>
+  <body data-design="silver-atelier"${bodyClass ? ` class="${bodyClass}"` : ""}>
     <a class="skip" href="#main">Skip to content</a>
     ${nav}
     <main id="main">${content}</main>
     ${mobileActions}
     ${footer}
     ${materialGuide}
-    <script src="/site.js?v=20260802-lux-mesh" defer></script>
+    <script src="/site.js?v=20260803-silver-atelier" defer></script>
   </body>
 </html>`;
 }
@@ -874,6 +873,10 @@ function faqSchema(items) {
   };
 }
 
+function assayLine(label = "Ag / 47") {
+  return `<div class="assay-line" aria-hidden="true"><span>${label}</span><i></i></div>`;
+}
+
 const featuredMaterials = [
   ["Scrap silver jewelry", "scrap-silver-jewelry", "material-silver-jewelry-1280.webp", "material-silver-jewelry-mobile.webp", "Jewelry, flatware, coins, and mixed silver items."],
   ["Industrial X-ray film", "industrial-x-ray-silver-recycling", "material-industrial-xray-1280.webp", "material-industrial-xray-mobile.webp", "Industrial radiography and NDT film from qualifying accounts."],
@@ -893,7 +896,7 @@ const homeFaqs = [
 ];
 
 const home = `
-  <section class="hero hero-commercial">
+  <section class="atelier-hero">
     <div class="hero-media">
       <picture>
         <source media="(max-width: 700px)" srcset="/assets/ag-silver-pour-mobile.webp">
@@ -902,49 +905,42 @@ const home = `
     </div>
     <div class="shell hero-commercial-grid">
       <div class="hero-copy" data-reveal>
+        <div class="assay-line" aria-hidden="true"><span>Ag / 47</span><i></i></div>
         <p class="hero-kicker"><span>Ag</span> Houston silver buyer</p>
         <h1>Turn silver-bearing material into cash.</h1>
         <p class="hero-lede">AG Refining turns silver-bearing material into cash for Houston businesses. Free pickup for qualifying accounts, on-site weighing you can watch, honest pricing, and immediate payment on most qualifying transactions.</p>
         <div class="hero-actions">
-          <a class="button button-blue" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
-          <a class="button button-outline" href="/contact?intent=quote">Request a quote</a>
+          <a class="button button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
+          <a class="phone-link" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
         </div>
         <p class="shipping-note"><span></span>Contact AG before shipping or visiting.</p>
       </div>
-      <form class="hero-review-card" action="/contact" method="get" data-reveal>
+      <form class="intake-panel" action="/contact" method="get" data-reveal>
         <input type="hidden" name="intent" value="pickup">
         <p class="hero-review-label">Start here</p>
         <h2>What silver do you have?</h2>
         <p>Choose the closest type. We will review the details and confirm the next step.</p>
-        <label for="hero-material">Material type</label>
-        <select id="hero-material" name="material" required>
-          <option value="">Select a material</option>
-          <option value="scrap_silver">Scrap silver</option>
-          <option value="industrial_silver">Industrial silver</option>
-          <option value="dental_material">Dental material</option>
-          <option value="silver_oxide_batteries">Watch batteries</option>
-          <option value="xray_film">X-ray film</option>
-          <option value="unknown">Not sure</option>
-        </select>
-        <label for="hero-quantity">Approximate amount <span>Optional</span></label>
-        <input id="hero-quantity" name="quantity" type="text" maxlength="120" placeholder="Weight, boxes, drums, or pallets">
-        <button class="button button-blue" type="submit">${primaryCta} ${arrow}</button>
+        <label for="hero-material">Material type
+          <select id="hero-material" name="material" required>
+            <option value="">Select a material</option>
+            <option value="scrap_silver">Scrap silver</option>
+            <option value="industrial_silver">Industrial silver</option>
+            <option value="dental_material">Dental material</option>
+            <option value="silver_oxide_batteries">Watch batteries</option>
+            <option value="xray_film">X-ray film</option>
+            <option value="unknown">Not sure</option>
+          </select>
+        </label>
+        <label for="hero-quantity">Approximate amount <span>Optional</span>
+          <input id="hero-quantity" name="quantity" type="text" maxlength="120" placeholder="Weight, boxes, drums, or pallets">
+        </label>
+        <button class="button button-primary" type="submit">${primaryCta} ${arrow}</button>
         <small>Free pickup depends on the material, location, account type, and schedule.</small>
       </form>
     </div>
   </section>
 
-  <section class="material-shortcuts" aria-label="Popular material pages">
-    <div class="shell material-shortcuts-grid">
-      <a href="/scrap-silver-buyer-houston"><span>01</span><div><strong>Silver scrap</strong><small>View material</small></div>${arrow}</a>
-      <a href="/industrial-x-ray-silver-recycling"><span>02</span><div><strong>Industrial X-ray</strong><small>View material</small></div>${arrow}</a>
-      <a href="/silver-oxide-watch-battery-recycling-houston"><span>03</span><div><strong>Watch batteries</strong><small>View material</small></div>${arrow}</a>
-      <a href="/medical-x-ray-recycling"><span>04</span><div><strong>Medical X-ray</strong><small>View material</small></div>${arrow}</a>
-      <a href="/industrial-silver-scrap"><span>05</span><div><strong>Industrial silver</strong><small>View material</small></div>${arrow}</a>
-    </div>
-  </section>
-
-  <div class="trust-line">
+  <div class="trust-ledger">
     <div class="shell trust-line-inner trust-line-four">
       <p>Houston-based</p>
       <p>Free qualifying pickup</p>
@@ -967,22 +963,40 @@ const home = `
     </div>
   </section>
 
-  <section class="section featured-section">
+  <section class="section material-editorial">
     <div class="shell">
       <div class="section-title-row">
         <div><p class="eyebrow">Materials we buy</p><h2>Start with what you have.</h2></div>
         <p class="section-intro-small">Each page explains what to share, what may qualify, and how pickup works.</p>
       </div>
       <div class="featured-materials-grid">
-        ${featuredMaterials.map(([name, path, desktop, mobile, copy], index) => `<a class="featured-material" href="/${path}" data-reveal>
+        ${featuredMaterials.map(([name, path, desktop, mobile, copy]) => `<a class="material-row" href="/${path}" data-reveal>
           <picture class="featured-material-image"><source media="(max-width: 700px)" srcset="/assets/${mobile}"><img src="/assets/${desktop}" alt="${name} prepared for review" width="1280" height="819" loading="lazy"></picture>
-          <div class="featured-material-copy"><span>${String(index + 1).padStart(2, "0")}</span><h3>${name}</h3><p>${copy}</p><strong>View material ${arrow}</strong></div>
+          <div class="featured-material-copy"><h3>${name}</h3><p>${copy}</p><strong>View material ${arrow}</strong></div>
         </a>`).join("")}
       </div>
     </div>
   </section>
 
-  <section class="industrial-feature">
+  <section class="section assay-process">
+    <div class="shell">
+      <div class="section-title-row">
+        <div><p class="eyebrow">A simple process</p><h2>Six steps from silver to cash.</h2></div>
+        <p class="section-intro-small">You stay informed from the first call to final payment.</p>
+      </div>
+      <div class="process process-six" data-reveal>
+        <article><span>01</span><h3>Contact us</h3><p>Tell us what silver you have.</p></article>
+        <article><span>02</span><h3>Schedule</h3><p>Choose a pickup time that works.</p></article>
+        <article><span>03</span><h3>We arrive</h3><p>Our team comes to your location.</p></article>
+        <article><span>04</span><h3>We weigh</h3><p>See the material weight on-site.</p></article>
+        <article><span>05</span><h3>Get an offer</h3><p>Review clear, market-based pricing.</p></article>
+        <article><span>06</span><h3>Get paid</h3><p>Receive fast payment when available.</p></article>
+      </div>
+      <a class="button button-secondary process-link" href="/how-it-works">See the full process ${arrow}</a>
+    </div>
+  </section>
+
+  <section class="facility-feature">
     <div class="industrial-feature-grid">
       <div class="industrial-feature-media">
         <picture class="industrial-feature-picture"><source media="(max-width: 700px)" srcset="/assets/ag-silver-hero-mobile.webp"><img src="/assets/ag-silver-hero-1600.webp" alt="Industrial silver material prepared for pickup and weighing" width="1600" height="900" loading="lazy"></picture>
@@ -999,30 +1013,12 @@ const home = `
           <li>Fast payment when available</li>
           <li>Commercial and industrial accounts welcome</li>
         </ul>
-        <a class="button button-light" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
+        <a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
       </div>
     </div>
   </section>
 
-  <section class="section process-premium">
-    <div class="shell">
-      <div class="section-title-row">
-        <div><p class="eyebrow">A simple process</p><h2>Six steps from silver to cash.</h2></div>
-        <p class="section-intro-small">You stay informed from the first call to final payment.</p>
-      </div>
-      <div class="process process-six" data-reveal>
-        <article><span>01</span><h3>Contact us</h3><p>Tell us what silver you have.</p></article>
-        <article><span>02</span><h3>Schedule</h3><p>Choose a pickup time that works.</p></article>
-        <article><span>03</span><h3>We arrive</h3><p>Our team comes to your location.</p></article>
-        <article><span>04</span><h3>We weigh</h3><p>See the material weight on-site.</p></article>
-        <article><span>05</span><h3>Get an offer</h3><p>Review clear, market-based pricing.</p></article>
-        <article><span>06</span><h3>Get paid</h3><p>Receive fast payment when available.</p></article>
-      </div>
-      <a class="button button-ghost process-link" href="/how-it-works">See the full process ${arrow}</a>
-    </div>
-  </section>
-
-  <section class="section related">
+  <section class="section industry-index">
     <div class="shell">
       <div class="section-title-row">
         <div><p class="eyebrow">Industries we serve</p><h2>Built for business accounts.</h2></div>
@@ -1040,7 +1036,7 @@ const home = `
         <p class="eyebrow">Serving the Houston Metro Area</p>
         <h2>Local pickup across Southeast Texas.</h2>
         <p>We serve Houston, Pearland, Pasadena, Sugar Land, Katy, Cypress, Spring, The Woodlands, Conroe, Humble, Baytown, League City, Friendswood, Missouri City, Richmond, Rosenberg, Tomball, Bellaire, Deer Park, La Porte, Texas City, Galveston, and nearby communities.</p>
-        <a class="button button-dark" href="/service-areas">View service areas ${arrow}</a>
+        <a class="button button-secondary" href="/service-areas">View service areas ${arrow}</a>
       </div>
       <div class="service-area-links">
         ${locationPages.map((page) => `<a href="/${page.path}">${page.heading.replace(" for commercial accounts.", "")} ${arrow}</a>`).join("")}
@@ -1048,7 +1044,7 @@ const home = `
     </div>
   </section>
 
-  <section class="section legacy-section">
+  <section class="section provenance-story">
     <div class="shell legacy-editorial">
       <div><p class="legacy-number">Ag</p><p class="legacy-caption">The Stevens family</p></div>
       <div>
@@ -1063,7 +1059,11 @@ const home = `
 
   <section class="section location-section">
     <div class="shell location-grid">
-      <div class="location-map"><iframe title="Map of ${street} in Houston, Texas" src="https://www.google.com/maps?q=${encodeURIComponent(`${street}, ${cityLine}`)}&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>
+      <a class="location-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${street}, ${cityLine}`)}" target="_blank" rel="noopener" aria-label="Open ${street}, ${cityLine} in Google Maps">
+        <span class="location-map-kicker"><b>Ag / 47</b><span>Houston, Texas</span></span>
+        <span class="location-map-city" aria-hidden="true">HOU</span>
+        <span class="location-map-detail"><span>${street}<br>${cityLine}</span><strong>Open in Google Maps ${arrow}</strong></span>
+      </a>
       <div class="location-copy">
         <p class="eyebrow">Contact and location</p>
         <h2>Call before shipping or visiting.</h2>
@@ -1074,8 +1074,8 @@ const home = `
           <div><dt>Email</dt><dd><a href="mailto:${email}">${email}</a></dd></div>
         </dl>
         <div class="location-actions">
-          <a class="button button-dark" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
-          <a class="button button-quiet" href="tel:${phoneHref}">Call AG Refining</a>
+          <a class="button button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
+          <a class="phone-link" href="tel:${phoneHref}">Call AG Refining</a>
         </div>
         <p class="location-note">Please call before visiting. Pickup and same-day service depend on the material and schedule.</p>
       </div>
@@ -1089,14 +1089,14 @@ const home = `
     </div>
   </section>
 
-  <section class="cta-band">
+  <section class="conversion-band">
     <div class="shell" data-reveal>
       <p class="eyebrow">Ready to sell your silver?</p>
       <h2>Let us come to you.</h2>
       <p>Tell us what you have, how much there is, and where it is located. We will confirm whether the lot qualifies for free pickup.</p>
       <div class="hero-actions hero-actions-center">
-        <a class="button button-light" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
-        <a class="button button-ghost" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
+        <a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
+        <a class="phone-link phone-link-inverse" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
       </div>
     </div>
   </section>`;
@@ -1123,15 +1123,16 @@ function servicePage(page) {
   };
   const materialQuery = materialByPath[page.path] ? `&material=${materialByPath[page.path]}` : "";
   const content = `
-    <section class="service-hero">
+    <section class="page-hero service-hero">
       <div class="shell">
         ${breadcrumbs([["Home", "/"], [page.eyebrow, null]])}
         <div class="service-hero-grid">
           <div class="service-hero-copy" data-reveal>
+            ${assayLine()}
             <p class="eyebrow">${page.eyebrow}</p>
             <h1>${page.heading}</h1>
             <p>${page.intro}</p>
-            <a class="button button-blue" href="/contact?intent=pickup${materialQuery}">${primaryCta} ${arrow}</a>
+            <a class="button button-primary" href="/contact?intent=pickup${materialQuery}">${primaryCta} ${arrow}</a>
           </div>
           <figure class="service-visual"><img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" fetchpriority="high"></figure>
         </div>
@@ -1146,7 +1147,7 @@ function servicePage(page) {
     <section class="section detail-section">
       <div class="shell detail-grid">
         <aside class="detail-rail"><p class="eyebrow">Simple next steps</p><h2>Know what happens next.</h2><a class="text-link" href="/how-it-works">See the full process ${arrow}</a></aside>
-        <div class="detail-copy">${page.details.map(([heading, text], index) => `<article data-reveal><span>${String(index + 1).padStart(2, "0")}</span><h3>${heading}</h3><p>${text}</p></article>`).join("")}</div>
+        <div class="detail-copy">${page.details.map(([heading, text]) => `<article data-reveal><h3>${heading}</h3><p>${text}</p></article>`).join("")}</div>
       </div>
     </section>
     <section class="section faq-section">
@@ -1154,10 +1155,10 @@ function servicePage(page) {
     </section>
     <section class="section related">
       <div class="shell"><div class="section-title-row"><div><p class="eyebrow">Keep exploring</p><h2>More ways we can help.</h2></div></div>
-        <div class="related-grid">${related.map((item) => `<a class="related-card" href="/${item.path}"><span>${item.eyebrow}</span><h3>${item.heading}</h3><p>${item.intro}</p><b>${arrow}</b></a>`).join("")}</div>
+        <div class="related-grid editorial-index">${related.map((item) => `<a class="related-card" href="/${item.path}"><span>${item.eyebrow}</span><h3>${item.heading}</h3><p>${item.intro}</p><b>${arrow}</b></a>`).join("")}</div>
       </div>
     </section>
-    <section class="cta-band"><div class="shell" data-reveal><p class="eyebrow">Start with the material</p><h2>Schedule a Houston pickup.</h2><p>Tell us what you have and where it is. We will confirm whether the lot qualifies.</p><a class="button button-light" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></div></section>`;
+    <section class="conversion-band"><div class="shell" data-reveal><p class="eyebrow">Start with the material</p><h2>Schedule a Houston pickup.</h2><p>Tell us what you have and where it is. We will confirm whether the lot qualifies.</p><a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></div></section>`;
   const dir = join(out, page.path);
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, "index.html"), document({
@@ -1204,17 +1205,18 @@ function coinServicePage(page) {
   ];
   const related = materialPages.filter((candidate) => candidate.path !== page.path).slice(0, 3);
   const content = `
-    <section class="service-hero coin-hero">
+    <section class="page-hero coin-hero">
       <div class="shell">
         ${breadcrumbs([["Home", "/"], ["Materials", "/accepted-materials"], ["Silver coins", null]])}
         <div class="service-hero-grid">
           <div class="service-hero-copy" data-reveal>
+            ${assayLine("Ag / Coin evaluation")}
             <p class="eyebrow">${page.eyebrow}</p>
             <h1>${page.heading}</h1>
             <p>${page.intro}</p>
             <div class="coin-hero-actions">
-              <a class="button button-blue" href="/contact?intent=quote&material=silver_coins">Request a Coin Evaluation ${arrow}</a>
-              <a class="button button-quiet" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
+              <a class="button button-primary" href="/contact?intent=pickup&material=silver_coins">${primaryCta} ${arrow}</a>
+              <a class="phone-link" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
             </div>
             <p class="coin-hero-note">No pressure to sell. We explain the offer before any transaction.</p>
           </div>
@@ -1296,18 +1298,18 @@ function coinServicePage(page) {
 
     <section class="section related">
       <div class="shell"><div class="section-title-row"><div><p class="eyebrow">Other silver materials</p><h2>More ways we can help.</h2></div></div>
-        <div class="related-grid">${related.map((item) => `<a class="related-card" href="/${item.path}"><span>${item.eyebrow}</span><h3>${item.heading}</h3><p>${item.intro}</p><b>${arrow}</b></a>`).join("")}</div>
+        <div class="related-grid editorial-index">${related.map((item) => `<a class="related-card" href="/${item.path}"><span>${item.eyebrow}</span><h3>${item.heading}</h3><p>${item.intro}</p><b>${arrow}</b></a>`).join("")}</div>
       </div>
     </section>
 
-    <section class="cta-band coin-cta">
+    <section class="conversion-band coin-cta">
       <div class="shell" data-reveal>
         <p class="eyebrow">Ready to sell silver coins?</p>
         <h2>Request your coin evaluation.</h2>
         <p>Tell us what coins you have. We will confirm the right next step before you travel or move the collection.</p>
         <div class="hero-actions hero-actions-center">
-          <a class="button button-light" href="/contact?intent=quote&material=silver_coins">Request a Coin Evaluation ${arrow}</a>
-          <a class="button button-ghost" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
+          <a class="button button-inverse" href="/contact?intent=pickup&material=silver_coins">${primaryCta} ${arrow}</a>
+          <a class="phone-link phone-link-inverse" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
         </div>
       </div>
     </section>`;
@@ -1335,17 +1337,18 @@ function longMaterialPage(page) {
     .sort((a, b) => Number(Boolean(b.layout)) - Number(Boolean(a.layout)))
     .slice(0, 3);
   const content = `
-    <section class="service-hero material-hero">
+    <section class="page-hero material-hero">
       <div class="shell">
         ${breadcrumbs([["Home", "/"], ["Materials", "/accepted-materials"], [page.eyebrow, null]])}
         <div class="service-hero-grid">
           <div class="service-hero-copy" data-reveal>
+            ${assayLine("Ag / Material review")}
             <p class="eyebrow">${page.eyebrow}</p>
             <h1>${page.heading}</h1>
             <p>${page.intro}</p>
             <div class="material-hero-actions">
-              <a class="button button-blue" href="/contact?intent=quote&material=${page.materialQuery}">Request a Material Review ${arrow}</a>
-              <a class="button button-quiet" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
+              <a class="button button-primary" href="/contact?intent=pickup&material=${page.materialQuery}">${primaryCta} ${arrow}</a>
+              <a class="phone-link" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
             </div>
             <p class="material-hero-note">Nothing moves until the material and next step are confirmed.</p>
           </div>
@@ -1377,7 +1380,7 @@ function longMaterialPage(page) {
       </div>
     </section>
 
-    <section class="material-guardrail-section">
+    <section class="handling-inset material-guardrail-section">
       <div class="shell material-guardrail-grid">
         <div class="material-guardrail-mark" aria-hidden="true"><span>47</span><strong>Ag</strong><small>Review first</small></div>
         <div>
@@ -1396,7 +1399,7 @@ function longMaterialPage(page) {
           <h2>${page.audienceHeading}</h2>
           <p>${page.audienceText}</p>
         </div>
-        <ul>${page.audiences.map((audience, index) => `<li><span>${String(index + 1).padStart(2, "0")}</span>${audience}</li>`).join("")}</ul>
+        <ul>${page.audiences.map((audience) => `<li>${audience}</li>`).join("")}</ul>
       </div>
     </section>
 
@@ -1431,18 +1434,18 @@ function longMaterialPage(page) {
 
     <section class="section related">
       <div class="shell"><div class="section-title-row"><div><p class="eyebrow">Other silver materials</p><h2>Find the right review path.</h2></div></div>
-        <div class="related-grid">${related.map((item) => `<a class="related-card" href="/${item.path}"><span>${item.eyebrow}</span><h3>${item.heading}</h3><p>${item.intro}</p><b>${arrow}</b></a>`).join("")}</div>
+        <div class="related-grid editorial-index">${related.map((item) => `<a class="related-card" href="/${item.path}"><span>${item.eyebrow}</span><h3>${item.heading}</h3><p>${item.intro}</p><b>${arrow}</b></a>`).join("")}</div>
       </div>
     </section>
 
-    <section class="cta-band material-cta">
+    <section class="conversion-band material-cta">
       <div class="shell" data-reveal>
         <p class="eyebrow">Start with the facts</p>
         <h2>${page.ctaHeading}</h2>
         <p>${page.ctaText}</p>
         <div class="hero-actions hero-actions-center">
-          <a class="button button-light" href="/contact?intent=quote&material=${page.materialQuery}">Request a Material Review ${arrow}</a>
-          <a class="button button-ghost" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
+          <a class="button button-inverse" href="/contact?intent=pickup&material=${page.materialQuery}">${primaryCta} ${arrow}</a>
+          <a class="phone-link phone-link-inverse" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
         </div>
       </div>
     </section>`;
@@ -1490,7 +1493,7 @@ function xrayHubPage(page) {
     ["Schedule local service", "Qualifying Houston projects may be eligible for pickup and a market-based offer."]
   ];
   const content = `
-    <section class="service-hero xray-hub-hero">
+    <section class="page-hero xray-hub-hero">
       <div class="shell">
         ${breadcrumbs([["Home", "/"], ["Materials", "/accepted-materials"], ["X-ray recycling", null]])}
         <div class="service-hero-grid">
@@ -1499,8 +1502,8 @@ function xrayHubPage(page) {
             <h1>${page.heading}</h1>
             <p>${page.intro}</p>
             <div class="material-hero-actions">
-              <a class="button button-blue" href="/contact?intent=pickup&material=xray_film">Request an X-Ray Film Review ${arrow}</a>
-              <a class="button button-quiet" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
+              <a class="button button-primary" href="/contact?intent=pickup&material=xray_film">${primaryCta} ${arrow}</a>
+              <a class="phone-link" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
             </div>
             <p class="material-hero-note">Do not upload patient information, private records, or readable X-ray images.</p>
           </div>
@@ -1525,13 +1528,13 @@ function xrayHubPage(page) {
           <div><p class="eyebrow">Choose the film type</p><h2>Two paths. One clear first step.</h2></div>
           <p class="section-intro-small">Choose the page that best matches your organization and material.</p>
         </div>
-        <div class="xray-path-grid">
-          ${filmPaths.map((item, index) => `<a href="${item.href}" data-reveal><span>${String(index + 1).padStart(2, "0")} · ${item.label}</span><h3>${item.title}</h3><p>${item.text}</p><b>View service ${arrow}</b></a>`).join("")}
+        <div class="pathway-list xray-path-grid">
+          ${filmPaths.map((item) => `<a href="${item.href}" data-reveal><span>${item.label}</span><h3>${item.title}</h3><p>${item.text}</p><b>View service ${arrow}</b></a>`).join("")}
         </div>
       </div>
     </section>
 
-    <section class="xray-security-section">
+    <section class="handling-inset xray-security-section">
       <div class="shell xray-security-grid">
         <div class="xray-security-mark" aria-hidden="true"><span>Chain</span><strong>of</strong><small>custody</small></div>
         <div>
@@ -1571,14 +1574,14 @@ function xrayHubPage(page) {
       <div class="shell faq-grid"><div><p class="eyebrow">Common questions</p><h2>Answers before pickup.</h2></div>${faqMarkup(page.faqs)}</div>
     </section>
 
-    <section class="cta-band">
+    <section class="conversion-band">
       <div class="shell" data-reveal>
         <p class="eyebrow">Houston X-ray recycling</p>
         <h2>Start with a film and records review.</h2>
         <p>Tell us the film type, box count or weight, date range, storage method, location, and security needs. Do not send private records.</p>
         <div class="hero-actions hero-actions-center">
-          <a class="button button-light" href="/contact?intent=pickup&material=xray_film">Request an X-Ray Film Review ${arrow}</a>
-          <a class="button button-ghost" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
+          <a class="button button-inverse" href="/contact?intent=pickup&material=xray_film">${primaryCta} ${arrow}</a>
+          <a class="phone-link phone-link-inverse" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
         </div>
       </div>
     </section>`;
@@ -1626,17 +1629,18 @@ function houstonHubPage(page) {
     ["Get paid", "Payment timing is confirmed with the approved offer and transaction."]
   ];
   const content = `
-    <section class="service-hero houston-hub-hero">
+    <section class="page-hero houston-hub-hero">
       <div class="shell">
         ${breadcrumbs([["Home", "/"], ["Service areas", "/service-areas"], ["Houston", null]])}
         <div class="service-hero-grid">
           <div class="service-hero-copy" data-reveal>
+            ${assayLine("Ag / Houston")}
             <p class="eyebrow">${page.eyebrow}</p>
             <h1>${page.heading}</h1>
             <p>${page.intro}</p>
             <div class="material-hero-actions">
-              <a class="button button-blue" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
-              <a class="button button-quiet" href="/contact?intent=quote">Request a Quote</a>
+              <a class="button button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
+              <a class="phone-link" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
             </div>
             <p class="material-hero-note">Pickup, on-site weighing, and prompt payment depend on the material, account, location, and schedule.</p>
           </div>
@@ -1673,7 +1677,7 @@ function houstonHubPage(page) {
           <a class="text-link" href="/accepted-materials">View all materials ${arrow}</a>
         </div>
         <div class="houston-services-grid">
-          ${services.map(([title, text, href], index) => `<a href="${href}" data-reveal><span>${String(index + 1).padStart(2, "0")}</span><h3>${title}</h3><p>${text}</p><b>View page ${arrow}</b></a>`).join("")}
+          ${services.map(([title, text, href]) => `<a href="${href}" data-reveal><h3>${title}</h3><p>${text}</p><b>View page ${arrow}</b></a>`).join("")}
         </div>
       </div>
     </section>
@@ -1705,14 +1709,14 @@ function houstonHubPage(page) {
       <div class="shell faq-grid"><div><p class="eyebrow">Frequently asked questions</p><h2>Clear answers before pickup.</h2></div>${faqMarkup(page.faqs)}</div>
     </section>
 
-    <section class="cta-band">
+    <section class="conversion-band">
       <div class="shell" data-reveal>
         <p class="eyebrow">Ready to sell your silver?</p>
         <h2>Schedule your Houston material review.</h2>
         <p>Tell us what you have and where it is. We will confirm the right next step.</p>
         <div class="hero-actions hero-actions-center">
-          <a class="button button-light" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
-          <a class="button button-ghost" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
+          <a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
+          <a class="phone-link phone-link-inverse" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
         </div>
       </div>
     </section>`;
@@ -1749,14 +1753,14 @@ allServicePages.forEach((page) => {
 });
 
 function taxonomyPage({ path, title, description, eyebrow, heading, intro, items }) {
-  const cards = items.map((page, index) => `<a class="taxonomy-card" href="/${page.path}" data-reveal>
+  const cards = items.map((page) => `<a class="taxonomy-card" href="/${page.path}" data-reveal>
     <figure class="taxonomy-image"><img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" loading="lazy"></figure>
-    <div><p class="eyebrow">${String(index + 1).padStart(2, "0")}</p><h2>${page.heading}</h2><p>${page.intro}<b>View page ${arrow}</b></p></div>
+    <div><p class="eyebrow">${page.eyebrow}</p><h2>${page.heading}</h2><p>${page.intro}<b>View page ${arrow}</b></p></div>
   </a>`).join("");
   const content = `
-    <section class="page-intro"><div class="shell">${breadcrumbs([["Home", "/"], [eyebrow, null]])}<div class="page-intro-grid"><div><p class="eyebrow">${eyebrow}</p><h1>${heading}</h1></div><p>${intro}</p></div></div></section>
-    <section class="section decision-section"><div class="shell"><div class="taxonomy-grid">${cards}</div></div></section>
-    <section class="cta-band"><div class="shell"><p class="eyebrow">Not sure?</p><h2>Tell us what you have.</h2><p>We will help you find the right material page and pickup path.</p><a class="button button-light" href="/contact">${primaryCta} ${arrow}</a></div></section>`;
+    <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], [eyebrow, null]])}<div class="page-intro-grid"><div><p class="eyebrow">${eyebrow}</p><h1>${heading}</h1></div><p>${intro}</p></div></div></section>
+    <section class="section decision-section"><div class="shell"><div class="editorial-index taxonomy-grid">${cards}</div></div></section>
+    <section class="conversion-band"><div class="shell"><p class="eyebrow">Not sure?</p><h2>Tell us what you have.</h2><p>We will help you find the right material page and pickup path.</p><a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></div></section>`;
   const dir = join(out, path);
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, "index.html"), document({ title, description, path, content }));
@@ -1793,8 +1797,8 @@ taxonomyPage({
 });
 
 const howItWorks = `
-  <section class="page-intro page-intro-dark"><div class="shell">${breadcrumbs([["Home", "/"], ["How it works", null]])}<div class="page-intro-grid"><div><p class="eyebrow">How it works</p><h1>Six clear steps from silver to cash.</h1></div><p>You know what happens before the material moves.</p></div></div></section>
-  <section class="section process-page"><div class="shell"><ol class="process-rail">
+  <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["How it works", null]])}<div class="page-intro-grid"><div><p class="eyebrow">How it works</p><h1>Six clear steps from silver to cash.</h1></div><p>You know what happens before the material moves.</p></div></div></section>
+  <section class="section process-page"><div class="shell"><ol class="assay-process process-rail">
     <li><span>01</span><div><h2>Tell us what you have.</h2><p>Call or use the form. Share the material type, amount, condition, location, and whether it is a one-time or repeat lot.</p></div></li>
     <li><span>02</span><div><h2>We review the details.</h2><p>We may ask for markings, weights, photos, box counts, or other simple facts needed to understand the lot.</p></div></li>
     <li><span>03</span><div><h2>Schedule the pickup.</h2><p>If the lot qualifies, we choose a time that works for your facility. Free pickup is available for qualifying Houston Metro commercial accounts.</p></div></li>
@@ -1802,7 +1806,7 @@ const howItWorks = `
     <li><span>05</span><div><h2>Review the offer.</h2><p>The offer depends on the confirmed material, recoverable silver, weight, condition, and current silver market values.</p></div></li>
     <li><span>06</span><div><h2>Get paid.</h2><p>Fast payment is available for qualifying transactions. Timing depends on the material and agreed terms.</p></div></li>
   </ol></div></section>
-  <section class="cta-band"><div class="shell"><p class="eyebrow">Start now</p><h2>Schedule a free pickup.</h2><p>Tell us what silver you have and where it is.</p><a class="button button-light" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></div></section>`;
+  <section class="conversion-band"><div class="shell"><p class="eyebrow">Start now</p><h2>Schedule a free pickup.</h2><p>Tell us what silver you have and where it is.</p><a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></div></section>`;
 mkdirSync(join(out, "how-it-works"), { recursive: true });
 writeFileSync(join(out, "how-it-works", "index.html"), document({
   title: "How to Sell Silver in Houston | AG Refining",
@@ -1812,9 +1816,9 @@ writeFileSync(join(out, "how-it-works", "index.html"), document({
 }));
 
 const about = `
-  <section class="page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["Our story", null]])}<div class="page-intro-grid"><div><p class="eyebrow">The Stevens family</p><h1>Built on fairness and hard work.</h1></div><p>AG Refining is a Houston-based family business with a direct promise: treat people fairly and make the silver-selling process clear.</p></div></div></section>
-  <section class="section about-story"><div class="shell legacy-editorial"><div><p class="legacy-number">Ag</p><p class="legacy-caption">Silver, atomic number 47</p></div><div><p class="eyebrow">The family story</p><blockquote>“My father taught us the importance of honesty, hard work, and respect.”</blockquote><cite>Dennis Stevens</cite><p>John Stevens built his reputation by working hard and treating customers fairly. Years later, Dennis returned to silver refining after his youngest son asked him to melt a small amount of old silver. The work felt familiar. It also showed him what the family could build next.</p><p>Today, AG Refining helps Houston businesses turn silver-bearing material into cash through clear pickup, weighing, pricing, and payment.</p></div></div></section>
-  <section class="cta-band"><div class="shell"><p class="eyebrow">Work with AG Refining</p><h2>Let us earn your business.</h2><p>Start with a clear review of your material.</p><a class="button button-light" href="/contact">${primaryCta} ${arrow}</a></div></section>`;
+  <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["Our story", null]])}<div class="page-intro-grid"><div><p class="eyebrow">The Stevens family</p><h1>Built on fairness and hard work.</h1></div><p>AG Refining is a Houston-based family business with a direct promise: treat people fairly and make the silver-selling process clear.</p></div></div></section>
+  <section class="section provenance-story about-story"><div class="shell legacy-editorial"><div><p class="legacy-number">Ag</p><p class="legacy-caption">Silver, atomic number 47</p></div><div><p class="eyebrow">The family story</p><blockquote>“My father taught us the importance of honesty, hard work, and respect.”</blockquote><cite>Dennis Stevens</cite><p>John Stevens built his reputation by working hard and treating customers fairly. Years later, Dennis returned to silver refining after his youngest son asked him to melt a small amount of old silver. The work felt familiar. It also showed him what the family could build next.</p><p>Today, AG Refining helps Houston businesses turn silver-bearing material into cash through clear pickup, weighing, pricing, and payment.</p></div></div></section>
+  <section class="conversion-band"><div class="shell"><p class="eyebrow">Work with AG Refining</p><h2>Let us earn your business.</h2><p>Start with a clear review of your material.</p><a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></div></section>`;
 mkdirSync(join(out, "about"), { recursive: true });
 writeFileSync(join(out, "about", "index.html"), document({
   title: "About AG Refining | Houston Family-Owned Silver Buyer",
@@ -1829,28 +1833,28 @@ function reviewForm() {
     <input type="hidden" name="intent" value="pickup">
     <input type="hidden" name="form_started" value="">
     <input type="hidden" name="submission_key" value="">
-    <div class="field"><label for="name">Name <span>Required</span></label><input id="name" name="name" autocomplete="name" required></div>
-    <div class="field"><label for="business">Business</label><input id="business" name="business" autocomplete="organization"></div>
+    <div class="field"><label for="name">Name <span>Required</span></label><input id="name" name="name" type="text" autocomplete="name" required></div>
+    <div class="field"><label for="business">Business</label><input id="business" name="business" type="text" autocomplete="organization"></div>
     <div class="field"><label for="phone">Phone <span>Required</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" required></div>
     <div class="field"><label for="email">Email <span>Required</span></label><input id="email" name="email" type="email" autocomplete="email" required></div>
     <div class="field"><label for="material">Material <span>Required</span></label><select id="material" name="material" required>
       <option value="">Select one</option><option value="scrap_silver">Scrap silver</option><option value="industrial_silver">Industrial silver</option><option value="silver_flake">Silver flake</option><option value="laboratory_silver">Laboratory silver</option><option value="silver_solder">Silver solder</option><option value="silver_plated">Silver-plated material</option><option value="silver_bars">Silver bars</option><option value="silver_flatware">Silver flatware</option><option value="jewelry_scrap">Jewelry store scrap</option><option value="dental_material">Dental material</option><option value="silver_oxide_batteries">Watch batteries</option><option value="xray_film">X-ray film</option><option value="silver_coins">Silver coins</option><option value="unknown">Not sure</option>
     </select></div>
-    <div class="field"><label for="quantity">Approximate amount</label><input id="quantity" name="quantity" maxlength="120" placeholder="Weight, boxes, drums, or pallets"></div>
-    <div class="field"><label for="location">Pickup location <span>Required</span></label><input id="location" name="location" maxlength="180" placeholder="City or business address" required></div>
+    <div class="field"><label for="quantity">Approximate amount</label><input id="quantity" name="quantity" type="text" maxlength="120" placeholder="Weight, boxes, drums, or pallets"></div>
+    <div class="field"><label for="location">Pickup location <span>Required</span></label><input id="location" name="location" type="text" maxlength="180" placeholder="City or business address" required></div>
     <div class="field"><label for="frequency">How often?</label><select id="frequency" name="frequency"><option value="one_time">One-time lot</option><option value="recurring">Recurring material</option><option value="unknown">Not sure</option></select></div>
     <div class="field field-wide"><label for="details">What should we know? <span>Required</span></label><textarea id="details" name="details" required minlength="20" placeholder="Describe the material, condition, source, and anything that may affect pickup."></textarea></div>
     <fieldset class="field field-wide preferred-contact"><legend>Preferred contact</legend><label><input type="radio" name="preferred_contact" value="phone" checked> Phone</label><label><input type="radio" name="preferred_contact" value="email"> Email</label></fieldset>
-    <div class="honeypot" aria-hidden="true"><label for="company_url">Company website</label><input id="company_url" name="company_url" tabindex="-1" autocomplete="off"></div>
+    <div class="honeypot" aria-hidden="true"><label for="company_url">Company website</label><input id="company_url" name="company_url" type="text" tabindex="-1" autocomplete="off"></div>
     <p class="form-note field-wide">This request is not a final quote or pickup promise. Free pickup and fast payment depend on the material, location, account type, and schedule. Do not send patient records, passwords, financial data, or identity documents. See our <a href="/privacy">privacy notice</a>.</p>
-    <div class="form-actions field-wide"><button class="button button-blue" type="submit" data-submit-button>Send request ${arrow}</button><p class="form-status" data-form-status aria-live="polite"></p></div>
+    <div class="form-actions field-wide"><button class="button button-primary" type="submit" data-submit-button>Send request ${arrow}</button><p class="form-status" data-form-status aria-live="polite"></p></div>
   </form>`;
 }
 
 const contact = `
-  <section class="page-intro page-intro-contact"><div class="shell">${breadcrumbs([["Home", "/"], ["Contact", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Schedule pickup</p><h1>Tell us what silver you have.</h1></div><p>Share the material, amount, and location. We will confirm whether it qualifies and explain the next step.</p></div></div></section>
+  <section class="page-hero page-intro page-intro-contact"><div class="shell">${breadcrumbs([["Home", "/"], ["Contact", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Schedule pickup</p><h1>Tell us what silver you have.</h1></div><p>Share the material, amount, and location. We will confirm whether it qualifies and explain the next step.</p></div></div></section>
   <section class="section contact-section"><div class="shell contact-grid">
-    <aside class="contact-aside"><p class="eyebrow">Contact AG Refining</p><h2>Prefer to talk first?</h2>
+    <aside class="expectation-rail contact-aside"><p class="eyebrow">Contact AG Refining</p><h2>Prefer to talk first?</h2>
       <a class="contact-line" href="tel:${phoneHref}"><span>Phone</span><strong>${phoneDisplay}</strong></a>
       <a class="contact-line" href="mailto:${email}"><span>Email</span><strong>${email}</strong></a>
       <div class="contact-line"><span>Address</span><strong>${street}<br>${cityLine}</strong></div>
@@ -1867,14 +1871,14 @@ writeFileSync(join(out, "contact", "index.html"), document({
 }));
 
 const spanish = `
-  <section class="page-intro"><div class="shell">${breadcrumbs([["Inicio", "/"], ["Español", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Servicio en español</p><h1>Venda su plata en Houston.</h1></div><p>AG Refining ofrece recogida gratis para cuentas comerciales que califican, pesaje en su local y precios claros.</p></div></div></section>
+  <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Inicio", "/"], ["Español", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Servicio en español</p><h1>Venda su plata en Houston.</h1></div><p>AG Refining ofrece recogida gratis para cuentas comerciales que califican, pesaje en su local y precios claros.</p></div></div></section>
   <section class="section"><div class="shell spanish-materials">
     <article><h2>Recogida</h2><p>Cuéntenos qué material tiene, cuánto pesa y dónde está. Confirmaremos si la recogida califica.</p></article>
     <article><h2>Pesaje</h2><p>Pesamos el material en su presencia para que pueda ver el peso antes del pago.</p></article>
     <article><h2>Pago inmediato</h2><p>El pago inmediato está disponible para la mayoría de las transacciones que califican. El tiempo depende del material y los términos acordados.</p></article>
     <article><h2>Llame primero</h2><p>No envíe material ni visite sin confirmar el siguiente paso. Llame al ${phoneDisplay}.</p></article>
   </div></section>
-  <section class="cta-band"><div class="shell"><p class="eyebrow">Comience hoy</p><h2>Solicite una recogida.</h2><a class="button button-light" href="/contact">Enviar solicitud ${arrow}</a></div></section>`;
+  <section class="conversion-band"><div class="shell"><p class="eyebrow">Comience hoy</p><h2>Solicite una recogida.</h2><a class="button button-inverse" href="/contact?intent=pickup">Enviar solicitud ${arrow}</a></div></section>`;
 mkdirSync(join(out, "espanol"), { recursive: true });
 writeFileSync(join(out, "espanol", "index.html"), document({
   title: "Comprador de Plata en Houston | AG Refining",
@@ -1885,8 +1889,8 @@ writeFileSync(join(out, "espanol", "index.html"), document({
 }));
 
 const privacy = `
-  <section class="page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["Privacy", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Privacy</p><h1>How we handle website requests.</h1></div><p>This page explains the information collected through the AG Refining website.</p></div></div></section>
-  <section class="section"><div class="shell legal-grid"><nav><a href="#collect">What we collect</a><a href="#use">How we use it</a><a href="#avoid">What not to send</a><a href="#contact-privacy">Contact</a></nav><div>
+  <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["Privacy", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Privacy</p><h1>How we handle website requests.</h1></div><p>This page explains the information collected through the AG Refining website.</p></div></div></section>
+  <section class="section"><div class="shell legal-grid"><nav aria-label="Privacy sections"><a href="#collect">What we collect</a><a href="#use">How we use it</a><a href="#avoid">What not to send</a><a href="#contact-privacy">Contact</a></nav><div>
     <section id="collect"><h2>What we collect</h2><p>The pickup form asks for your name, business, phone, email, material, amount, location, preferred contact method, and details you choose to provide. Basic website attribution may also be stored to understand how you found the site.</p></section>
     <section id="use"><h2>How we use it</h2><p>AG Refining uses the information to review your request, contact you, plan a possible pickup, and improve the website. We do not promise a quote or pickup from a form submission alone.</p></section>
     <section id="avoid"><h2>What not to send</h2><p>Do not send patient records, passwords, financial account data, identity documents, controlled records, or other sensitive information through the public form.</p></section>
@@ -1912,7 +1916,7 @@ writeFileSync(join(out, "404.html"), document({
   description: "The requested AG Refining page could not be found.",
   path: "404",
   robots: "noindex,follow",
-  content: `<section class="page-intro"><div class="shell"><p class="eyebrow">404</p><h1>That page is not here.</h1><p>View the materials we buy or schedule a pickup.</p><p><a class="button button-dark" href="/accepted-materials">View materials ${arrow}</a></p></div></section>`
+  content: `<section class="page-hero page-intro"><div class="shell"><p class="eyebrow">404</p><h1>That page is not here.</h1><p>View the materials we buy or schedule a pickup.</p><p><a class="button button-primary" href="/accepted-materials">View materials ${arrow}</a></p></div></section>`
 }));
 
 console.log(`Built ${sitemapPaths.length} public pages in dist`);

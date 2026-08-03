@@ -33,6 +33,10 @@ for (const path of htmlFiles) {
   if (descriptions.length !== 1) failures.push(`${displayPath}: expected one meta description`);
   if (h1s.length !== 1) failures.push(`${displayPath}: expected one h1`);
   if (/\b(?:undefined|NaN)\b/.test(source)) failures.push(`${displayPath}: contains unresolved output`);
+  if (!source.includes('data-design="silver-atelier"')) failures.push(`${displayPath}: missing Silver Atelier document marker`);
+  if (!source.includes('<meta name="theme-color" content="#f1ede4">')) failures.push(`${displayPath}: missing light browser chrome`);
+  if ((source.match(/class="site-header"/g) || []).length !== 1) failures.push(`${displayPath}: expected one shared header`);
+  if ((source.match(/class="footer"/g) || []).length !== 1) failures.push(`${displayPath}: expected one shared footer`);
 
   const ids = [...source.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
   const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
@@ -55,6 +59,49 @@ const exactHomeChecks = [
 for (const expected of exactHomeChecks) {
   if (!home.includes(expected)) failures.push(`Homepage is missing: ${expected}`);
 }
+
+const heroMatch = home.match(/<section class="atelier-hero"[\s\S]*?<\/section>/);
+if (!heroMatch) failures.push("Homepage is missing the atelier hero");
+else {
+  const hero = heroMatch[0];
+  if ((hero.match(/href="\/contact\?intent=pickup"/g) || []).length !== 1) failures.push("Homepage hero must have one pickup action");
+  if (!hero.includes('href="tel:+12818982719"')) failures.push("Homepage hero must keep the phone fallback");
+  if (hero.includes("Request a quote")) failures.push("Homepage hero contains a competing quote action");
+}
+if (!home.includes('class="intake-panel"')) failures.push("Homepage is missing the separate material intake panel");
+if (!/<label for="hero-material">(?:(?!<\/label>)[\s\S])*<select id="hero-material"(?:(?!<\/label>)[\s\S])*<\/select>\s*<\/label>/.test(home)) {
+  failures.push("Homepage material intake control must be nested inside its label");
+}
+if (!/<label for="hero-quantity">(?:(?!<\/label>)[\s\S])*<input id="hero-quantity"[^>]*>\s*<\/label>/.test(home)) {
+  failures.push("Homepage quantity intake control must be nested inside its label");
+}
+if (home.includes('class="hero-review-card"')) failures.push("Homepage still contains the floating glass intake card");
+const homepageJourney = [
+  "atelier-hero",
+  "intake-panel",
+  "trust-ledger",
+  "material-editorial",
+  "assay-process",
+  "facility-feature",
+  "industry-index",
+  "service-area-section",
+  "provenance-story",
+  "location-section",
+  "faq-section",
+  "conversion-band"
+];
+let previousHomeSection = -1;
+for (const className of homepageJourney) {
+  const position = home.indexOf(className);
+  if (position < 0) failures.push(`Homepage is missing ${className}`);
+  else if (position < previousHomeSection) failures.push(`Homepage places ${className} outside the approved journey`);
+  previousHomeSection = Math.max(previousHomeSection, position);
+}
+if ((home.match(/class="material-row"/g) || []).length !== 6) {
+  failures.push("Homepage must render all six featured materials as editorial rows");
+}
+if (home.includes("material-shortcuts")) failures.push("Homepage still contains the duplicate material shortcut rail");
+if (/featured-material-copy"><span>\d{2}<\/span>/.test(home)) failures.push("Homepage material rows still use decorative numbering");
 
 const seoPages = [
   {
@@ -132,9 +179,52 @@ for (const page of seoPages) {
   }
 }
 
+const atelierFamilies = [
+  ["scrap-silver-jewelry", ["page-hero", "assay-line", "conversion-band"]],
+  ["sell-silver-coins-houston", ["page-hero", "assay-line", "conversion-band"]],
+  ["silver-flake-buyer-houston", ["page-hero", "handling-inset", "conversion-band"]],
+  ["x-ray-recycling-services-houston", ["page-hero", "pathway-list", "conversion-band"]],
+  ["houston-silver-buyer", ["page-hero", "assay-line", "conversion-band"]],
+  ["accepted-materials", ["page-hero", "editorial-index", "conversion-band"]],
+  ["how-it-works", ["page-hero", "assay-process", "conversion-band"]],
+  ["about", ["page-hero", "provenance-story", "conversion-band"]],
+  ["contact", ["page-hero", "review-form", "expectation-rail"]],
+  ["espanol", ["page-hero", "conversion-band"]],
+  ["privacy", ["page-hero", "legal-grid"]]
+];
+for (const [route, classes] of atelierFamilies) {
+  const source = readFileSync(join(out, route, "index.html"), "utf8");
+  for (const className of classes) {
+    if (!source.includes(className)) failures.push(`${route}: missing ${className}`);
+  }
+}
+
+const generatedMarkup = htmlFiles.map((path) => readFileSync(path, "utf8")).join("\n");
+if (/<input(?![^>]*\btype=)[^>]*>/.test(generatedMarkup)) {
+  failures.push("Generated form markup contains an input without an explicit type");
+}
+const decorativeNumberPatterns = [
+  /<article data-reveal><span>\d{2}<\/span><h3>/,
+  /<li><span>\d{2}<\/span>[^<]+<\/li>/,
+  /<a href="[^"]+" data-reveal><span>\d{2}<\/span><h3>/,
+  /<a href="[^"]+" data-reveal><span>\d{2} ·/,
+  /class="taxonomy-card"[\s\S]{0,500}<p class="eyebrow">\d{2}<\/p>/
+];
+if (decorativeNumberPatterns.some((pattern) => pattern.test(generatedMarkup))) {
+  failures.push("Non-sequential editorial content still uses decorative numbering");
+}
+if (/class="button [^"]*\b(?:button-blue|button-navy|button-dark|button-light|button-ghost|button-quiet|button-outline)\b/.test(generatedMarkup)) {
+  failures.push("Generated pages still use legacy button variants");
+}
+
 const notFound = readFileSync(join(out, "404.html"), "utf8");
 if (!notFound.includes('<meta name="robots" content="noindex,follow">')) {
   failures.push("404 page must be noindex");
+}
+
+const privacy = readFileSync(join(out, "privacy", "index.html"), "utf8");
+if (!privacy.includes('<nav aria-label="Privacy sections">')) {
+  failures.push("Privacy section navigation needs a unique accessible name");
 }
 
 const sitemap = readFileSync(join(out, "sitemap.xml"), "utf8");
