@@ -790,6 +790,15 @@ const organizationSchema = {
   }
 };
 
+// og:image dimensions have to match the file actually referenced, or link
+// previews crop to the wrong ratio. Sizes come from the presets in
+// scripts/optimize-asset.mjs.
+function ogSize(image) {
+  if (image.endsWith("-1600.webp")) return { w: 1600, h: 900 };
+  if (image.endsWith("-1280.webp")) return { w: 1280, h: 819 };
+  return { w: 1200, h: 675 };
+}
+
 function document({
   title,
   description,
@@ -823,8 +832,8 @@ function document({
     <meta property="og:description" content="${description}">
     <meta property="og:url" content="${canonical}">
     <meta property="og:image" content="${siteUrl}/assets/${image}">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="675">
+    <meta property="og:image:width" content="${ogSize(image).w}">
+    <meta property="og:image:height" content="${ogSize(image).h}">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="/assets/ag-mark-path.svg" type="image/svg+xml">
     <link rel="preload" href="/assets/fonts/newsreader-latin-opsz.woff2" as="font" type="font/woff2" crossorigin>
