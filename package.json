@@ -8,5 +8,8 @@
     "build": "npm run assets && node scripts/build.mjs",
     "check": "node scripts/check.mjs",
     "verify": "npm run build && npm run check && node scripts/verify.mjs"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.3"
   }
 }

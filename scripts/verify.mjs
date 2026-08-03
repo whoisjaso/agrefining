@@ -139,7 +139,7 @@ if (!notFound.includes('<meta name="robots" content="noindex,follow">')) {
 
 const sitemap = readFileSync(join(out, "sitemap.xml"), "utf8");
 const sitemapEntries = (sitemap.match(/<url>/g) || []).length;
-if (sitemapEntries !== 35) failures.push(`Expected 35 sitemap pages, found ${sitemapEntries}`);
+if (sitemapEntries !== 38) failures.push(`Expected 38 sitemap pages, found ${sitemapEntries}`);
 
 for (const page of seoPages) {
   if (!sitemap.includes(`<loc>https://agrefining.com/${page.path}</loc>`)) {

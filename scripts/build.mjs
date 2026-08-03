@@ -28,7 +28,7 @@ const materialPages = [
     eyebrow: "Scrap silver jewelry",
     heading: "Sell scrap silver jewelry with a clear process.",
     intro: "AG Refining buys qualifying silver jewelry from Houston businesses and commercial accounts. Tell us what you have, and we will explain the next step.",
-    image: "material-scrap-silver-1280.webp",
+    image: "material-silver-jewelry-1280.webp",
     imageAlt: "Sorted silver jewelry, flatware, wire, and silver scrap",
     answerHeading: "We buy silver for its recoverable metal.",
     answerText: "Broken, worn, outdated, or mixed silver jewelry may still have value. The amount depends on the material, weight, silver content, and current market price.",
@@ -50,7 +50,7 @@ const materialPages = [
     eyebrow: "Industrial X-ray film",
     heading: "Recover silver from industrial X-ray film.",
     intro: "AG Refining works with Houston companies that have qualifying industrial X-ray film, NDT film, and related silver-bearing imaging material.",
-    image: "material-xray-film-1280.webp",
+    image: "material-industrial-xray-1280.webp",
     imageAlt: "Industrial radiographic film and archive boxes prepared for review",
     answerHeading: "Old film can hold recoverable silver.",
     answerText: "The type, age, condition, quantity, and storage method can affect the review. Start with a clear count or weight and a short description.",
@@ -72,7 +72,7 @@ const materialPages = [
     eyebrow: "Silver coins buyer in Houston, Texas",
     heading: "Sell your silver coins in Houston.",
     intro: "AG Refining buys silver coins from collectors, investors, estates, businesses, and individuals. Whether you have one coin or a full collection, we will explain the value and make a clear offer.",
-    image: "material-scrap-silver-1280.webp",
+    image: "material-silver-coins-1280.webp",
     imageAlt: "Silver coins arranged for a professional evaluation",
     answerHeading: "Know what your coins are worth before you sell.",
     answerText: "We inspect the coin type, silver content, weight, condition, and current silver market. Some rare or graded coins may be worth more to a collector than for their silver, so we explain the difference before you decide.",
@@ -97,7 +97,7 @@ const materialPages = [
     eyebrow: "Silver flake buyer Houston",
     heading: "Sell silver flake in Houston.",
     intro: "AG Refining buys qualifying silver flake from manufacturers, electronics companies, laboratories, metal finishers, and industrial facilities. We review the material, explain the offer, and make the process easy to follow.",
-    image: "ag-silver-hero-1600.webp",
+    image: "material-silver-flake-1280.webp",
     imageAlt: "Silver flake and clean silver-bearing production material prepared for review",
     answerHeading: "Unused silver flake may still hold strong value.",
     answerText: "Silver flake is used in electronics, coatings, solar products, medical devices, aerospace work, and specialty manufacturing. Its value depends on silver content, purity, weight, condition, and the current market.",
@@ -142,7 +142,7 @@ const materialPages = [
     eyebrow: "Laboratory silver buyer Houston",
     heading: "Sell laboratory silver in Houston.",
     intro: "AG Refining reviews silver-bearing material from laboratories, research facilities, universities, medical facilities, and industrial companies. We help approved customers recover value from unused, outdated, or excess material.",
-    image: "material-xray-film-1280.webp",
+    image: "material-laboratory-silver-1280.webp",
     imageAlt: "Labeled laboratory silver materials arranged for a professional review",
     answerHeading: "Start with clear labels and records.",
     answerText: "Laboratory silver may come as clean metal, powder, compound, solution, coated parts, or research material. The form and condition decide how the material must be reviewed.",
@@ -187,7 +187,7 @@ const materialPages = [
     eyebrow: "Silver solder buyer Houston",
     heading: "Sell silver solder in Houston.",
     intro: "AG Refining buys qualifying silver solder from manufacturers, machine shops, HVAC and plumbing companies, electrical contractors, jewelers, fabricators, and industrial businesses.",
-    image: "ag-silver-hero-1600.webp",
+    image: "material-silver-solder-1280.webp",
     imageAlt: "Silver solder rods, wire, and clean fabrication offcuts prepared for review",
     answerHeading: "Silver solder can contain more than silver.",
     answerText: "The alloy, silver percentage, weight, condition, and current market all affect value. Labels and alloy markings help us review the lot correctly.",
@@ -232,7 +232,7 @@ const materialPages = [
     eyebrow: "Silver-plated materials buyer Houston",
     heading: "Sell silver-plated materials in Houston.",
     intro: "AG Refining reviews silver-plated items from businesses, estates, restaurants, hotels, antique dealers, recyclers, and individuals. We identify the material and explain whether the lot has recoverable value.",
-    image: "material-scrap-silver-1280.webp",
+    image: "material-silver-plated-1280.webp",
     imageAlt: "Silver-plated flatware and serving pieces arranged for evaluation",
     answerHeading: "Silver-plated is not the same as sterling.",
     answerText: "Silver-plated items have a thin silver layer over another metal. Value depends on the item, base metal, plating, weight, quantity, condition, and recovery cost.",
@@ -277,7 +277,7 @@ const materialPages = [
     eyebrow: "Silver oxide watch battery recycling Houston",
     heading: "Recycle silver oxide watch batteries in Houston.",
     intro: "AG Refining reviews commercial quantities of qualifying silver oxide button cells from watch shops, jewelers, distributors, hospitals, manufacturers, and recyclers.",
-    image: "material-watch-batteries-1280.webp",
+    image: "material-watch-batteries-real-1280.webp",
     imageAlt: "Sorted silver oxide watch batteries arranged by code and size",
     answerHeading: "Sorting protects the value of the lot.",
     answerText: "Not every button cell contains silver. Clear battery codes, careful storage, and separation by chemistry make the lot easier to review.",
@@ -319,7 +319,7 @@ const materialPages = [
     eyebrow: "Medical X-ray film",
     heading: "Clear old film and recover qualifying silver.",
     intro: "Hospitals, clinics, dental offices, and imaging centers can request a review of qualifying silver-bearing X-ray film.",
-    image: "material-xray-film-1280.webp",
+    image: "material-medical-xray-1280.webp",
     imageAlt: "Medical X-ray film and storage sleeves organized for review",
     answerHeading: "Patient privacy comes before pickup.",
     answerText: "Do not send patient names, birth dates, medical record numbers, or readable patient images through this website. Contact AG Refining for the correct review path.",
@@ -342,7 +342,7 @@ const materialPages = [
     eyebrow: "Scrap silver buyer Houston",
     heading: "Turn your scrap silver into cash.",
     intro: "AG Refining buys qualifying scrap silver from commercial, industrial, medical, and manufacturing businesses across Houston. We make the process simple, clear, and easy to follow.",
-    image: "ag-silver-hero-1600.webp",
+    image: "material-sterling-hollowware-1280.webp",
     imageAlt: "Industrial scrap silver wire, sheet, contacts, and clean offcuts",
     answerHeading: "Know the material and weight before you sell.",
     answerText: "We review the silver content, type, weight, condition, and current market. Qualifying pickups may include on-site weighing so you can see the weight before you accept the offer.",
@@ -390,7 +390,7 @@ const materialPages = [
     eyebrow: "Dental scrap buyer Houston",
     heading: "Sell your dental scrap with confidence.",
     intro: "AG Refining reviews qualifying precious-metal dental scrap from dental offices, dental laboratories, orthodontic practices, oral surgeons, universities, and approved healthcare facilities in Houston.",
-    image: "material-dental-1280.webp",
+    image: "material-dental-scrap-1280.webp",
     imageAlt: "Clean dental alloy pieces sorted for a professional material review",
     answerHeading: "Dental scrap can contain several precious metals.",
     answerText: "Crowns, bridges, inlays, sprues, buttons, and lab scrap may contain gold, silver, platinum, or palladium. The material must be clean, identified, and safe to handle.",
@@ -436,7 +436,7 @@ const materialPages = [
     eyebrow: "X-ray recycling services Houston",
     heading: "Secure X-ray film recycling in Houston.",
     intro: "AG Refining reviews qualifying medical, dental, and industrial X-ray film for silver recovery. We help Houston organizations plan a clear, secure, and responsible recycling process.",
-    image: "material-xray-film-1280.webp",
+    image: "material-industrial-xray-1280.webp",
     imageAlt: "Medical and industrial X-ray film organized in archive boxes for recycling",
     answerHeading: "Traditional X-ray film may contain recoverable silver.",
     answerText: "Digital images do not contain recoverable silver film. Tell us the film type, quantity, date range, storage method, and whether the records are cleared for destruction.",
@@ -455,7 +455,7 @@ const materialPages = [
     eyebrow: "Industrial silver",
     heading: "A repeatable way to sell industrial silver.",
     intro: "AG Refining helps Houston plants, shops, and manufacturers sell qualifying silver-bearing production material.",
-    image: "ag-silver-hero-1600.webp",
+    image: "material-industrial-silver-1280.webp",
     imageAlt: "Industrial silver wire, tubing, sheet, and contacts",
     answerHeading: "Recurring material needs a clear plan.",
     answerText: "Tell us what process creates the material, how often it is produced, how it is stored, and the normal lot size.",
@@ -469,16 +469,155 @@ const materialPages = [
       ["Can you handle repeat pickups?", "Repeat pickup plans can be discussed after the material and normal volume are reviewed."],
       ["How is the offer set?", "The offer depends on the material, recoverable silver, weight, condition, and current market values."]
     ]
+  },
+  {
+    layout: "long-material",
+    path: "sell-silver-bars-houston",
+    title: "Sell Silver Bars in Houston | AG Refining",
+    description: "Sell silver bars in Houston for top prices. AG Refining offers honest evaluations, fast payment, and outstanding customer service.",
+    eyebrow: "Sell silver bars Houston",
+    heading: "Turn your silver bars into cash.",
+    intro: "AG Refining buys silver bars from investors, businesses, estates, jewelers, and industrial companies across the Houston Metro Area. Whether you have one bar or an entire collection, we evaluate it against the current silver market and pay you quickly.",
+    image: "material-silver-bars-1280.webp",
+    imageAlt: "Poured and minted silver bars prepared for weighing and evaluation",
+    answerHeading: "Old, tarnished, or unpackaged bars still carry value.",
+    answerText: "We price silver bars from confirmed weight, fineness, and the current silver market. Bars that are scratched, tarnished, or no longer in original packaging are still bought on their silver content.",
+    typesHeading: "Silver bars we buy.",
+    typesIntro: "Any size and any brand. Bring the full lot so we can weigh and evaluate it together.",
+    types: [
+      "1 oz, 5 oz, and 10 oz silver bars",
+      "20 oz, 50 oz, and 100 oz silver bars",
+      "1 kilogram silver bars",
+      "1,000 oz commercial silver bars",
+      "Cast and minted silver bars",
+      "Investment grade and vintage bars",
+      "Industrial and sterling silver bars",
+      "Fine silver bars (.999 and .9999)"
+    ],
+    audienceHeading: "Who sells silver bars to AG Refining.",
+    audienceText: "We buy from individual investors, collectors, estate executors, trust companies, businesses, manufacturers, jewelry stores, and financial institutions throughout Houston.",
+    audiences: ["Investors and collectors", "Estate executors", "Businesses and manufacturers", "Jewelry stores"],
+    guardrailHeading: "Call before you travel with a collection.",
+    guardrailText: "Tell us the bar sizes, approximate total weight, and where the lot is stored. We will confirm the right next step, and for larger holdings we can discuss an on-site evaluation instead of you moving the silver.",
+    reasons: [
+      ["Competitive prices", "Offers are based on the current silver market, which moves throughout the day."],
+      ["Honest evaluations", "Every bar is inspected, weighed, and tested when needed. We explain how the value was reached."],
+      ["Fast payment", "Once your bars are evaluated, we complete the transaction quickly and accurately."],
+      ["No pressure to sell", "We answer your questions and make the offer. The decision stays yours."]
+    ],
+    faqs: [
+      ["Do you buy a single silver bar?", "Yes. We evaluate one bar or thousands of ounces with the same process."],
+      ["Are tarnished or scratched bars worth less?", "Condition matters far less than silver content. Tarnished, scratched, and unpackaged bars are still bought on weight and fineness."],
+      ["Do you buy 1,000 oz commercial bars?", "Yes. For large commercial bars, call first so we can plan handling and confirm the next step."],
+      ["How is my offer calculated?", "From confirmed weight, fineness, and current silver market values. We explain the math before you decide."]
+    ],
+    materialQuery: "silver_bars",
+    ctaHeading: "Request a silver bar evaluation.",
+    ctaText: "Tell us the bar sizes, how many you have, and where they are. We will confirm the next step before anything moves."
+  },
+  {
+    layout: "long-material",
+    path: "silver-flatware-buyer-houston",
+    title: "Silver Flatware Buyer in Houston, TX | AG Refining",
+    description: "Sell silver flatware in Houston for top prices. AG Refining offers honest evaluations, fast payment, and trusted service.",
+    eyebrow: "Silver flatware buyer Houston",
+    heading: "Turn unused silver flatware into cash.",
+    intro: "AG Refining buys sterling flatware, antique silverware, serving pieces, and complete sets from homeowners, estates, collectors, and dealers. From a single serving spoon to a full family collection, we price it against the current silver market.",
+    image: "material-sterling-hollowware-1280.webp",
+    imageAlt: "Sterling silver flatware and serving pieces laid out for evaluation",
+    answerHeading: "Not sure whether it is sterling?",
+    answerText: "That is a normal question. Our team identifies your pieces, explains what they are, and tells you what they are worth before you decide to sell anything.",
+    typesHeading: "Silver flatware we buy.",
+    typesIntro: "Polished or tarnished, complete or mismatched, purchased or inherited.",
+    types: [
+      "Sterling silver flatware sets",
+      "Antique silverware",
+      "Silver serving trays",
+      "Serving spoons and forks",
+      "Butter knives",
+      "Tea and coffee service pieces",
+      "Hollowware",
+      "Individual sterling utensils",
+      "Estate silver collections",
+      "Damaged or mismatched pieces"
+    ],
+    audienceHeading: "Who we serve.",
+    audienceText: "We work with individuals, estate executors, antique dealers, jewelers, and businesses across Houston and the surrounding metro area.",
+    audiences: ["Homeowners", "Estate executors", "Antique dealers", "Jewelers"],
+    guardrailHeading: "Ask about mobile service for large collections.",
+    guardrailText: "If you have a full estate collection, do not move it before calling. We can come to your location, evaluate the silver, weigh the material, and pay on the spot once you accept the offer.",
+    reasons: [
+      ["Competitive prices", "Offers follow the current silver market, which changes daily."],
+      ["Accurate evaluations", "Each piece is examined and weighed, and we explain what is sterling and what is not."],
+      ["Fast, secure payment", "No hidden fees and no unnecessary delays once you accept the offer."],
+      ["Respectful service", "Inherited silver carries history. We treat every collection and every customer with respect."]
+    ],
+    faqs: [
+      ["How do I know if my flatware is sterling?", "Bring it in or send photos of the markings. Our team identifies your items and explains their value before you sell."],
+      ["Do you buy incomplete sets?", "Yes. Mismatched, incomplete, and damaged pieces are all evaluated on silver content."],
+      ["Do you buy silver-plated flatware?", "Plated flatware is handled differently from sterling. See our silver-plated materials page, or ask and we will point you to the right path."],
+      ["Can you come to me?", "Mobile service may be available for larger collections after we confirm the material, location, and schedule."]
+    ],
+    materialQuery: "silver_flatware",
+    ctaHeading: "Request a silver flatware evaluation.",
+    ctaText: "Tell us what you have and roughly how much. We will confirm whether to visit us or send our team to you."
+  },
+  {
+    layout: "long-material",
+    path: "jewelry-store-silver-recycling-houston",
+    title: "Jewelry Store Silver Recycling in Houston, TX | AG Refining",
+    description: "AG Refining helps Houston jewelry stores recycle silver scrap with expert service, fair pricing, accurate evaluations, and fast payment.",
+    eyebrow: "Jewelry store silver recycling Houston",
+    heading: "Turn bench scrap into working capital.",
+    intro: "Jewelry stores handle silver every day. Damaged pieces, customer trade-ins, bench scrap, and outdated inventory build up fast. AG Refining helps Houston jewelers recover the full value of that material with accurate evaluations and fast payment.",
+    image: "material-silver-jewelry-1280.webp",
+    imageAlt: "Sterling silver jewelry scrap, findings, and bench material collected for refining",
+    answerHeading: "The silver you already own is working capital.",
+    answerText: "Broken jewelry, polishing dust, casting scrap, and inventory that never sold still contain recoverable silver. We evaluate each lot on silver content, weight, purity, and current market conditions.",
+    typesHeading: "Jewelry store materials we buy.",
+    typesIntro: "One small lot or an ongoing refining relationship. Both work the same way.",
+    types: [
+      "Sterling silver jewelry scrap",
+      "Silver rings, bracelets, necklaces, and earrings",
+      "Repair and bench scrap",
+      "Silver filings and polishing dust",
+      "Silver casting scrap",
+      "Silver wire and sheet",
+      "Silver settings and findings",
+      "Broken or damaged silver jewelry",
+      "Outdated silver inventory",
+      "Silver manufacturing leftovers"
+    ],
+    audienceHeading: "Built for the Houston jewelry trade.",
+    audienceText: "Houston has a deep jewelry industry: retail stores, custom benches, repair shops, wholesalers, and manufacturers. All of them generate silver worth recovering.",
+    audiences: ["Retail jewelry stores", "Custom and bench jewelers", "Repair shops", "Wholesalers and manufacturers"],
+    guardrailHeading: "Set up a routine instead of a one-time cleanout.",
+    guardrailText: "If your bench produces scrap every month, tell us your volume and schedule. We can agree on a recurring pickup so the material never piles up and the value never sits idle.",
+    reasons: [
+      ["Competitive pricing", "Offers follow current silver market values, not a flat shop rate."],
+      ["Accurate content evaluations", "Experienced precious metal specialists assess silver content and explain the result."],
+      ["Professional and confidential", "Your inventory and volumes stay between us."],
+      ["Convenient pickup", "For larger quantities we come to your store, evaluate, weigh, and make the offer on site."]
+    ],
+    faqs: [
+      ["Do you buy polishing dust and filings?", "Yes. Sweeps, filings, and polishing waste often hold meaningful silver and are evaluated with the rest of your lot."],
+      ["Is there a minimum quantity?", "Small lots are welcome. For larger volumes, ask about pickup and we will plan a visit."],
+      ["Can we set up recurring service?", "Yes. Tell us your typical monthly volume and we will discuss a simple recurring schedule."],
+      ["How fast is payment?", "Once the lot is evaluated and you accept the offer, we pay quickly. Timing depends on the material and agreed terms."]
+    ],
+    materialQuery: "jewelry_scrap",
+    ctaHeading: "Request a jewelry scrap evaluation.",
+    ctaText: "Tell us what your bench produces and how much is waiting. We will confirm pickup and the next step."
   }
 ];
 
 const industryPages = [
-  ["hospital-silver-recycling", "Hospital Silver Recycling in Houston", "Hospitals", "medical X-ray film, dental material, lab material, and other qualifying silver-bearing items", "material-xray-film-1280.webp"],
-  ["dental-lab-silver-recycling", "Dental Lab Silver Recycling in Houston", "Dental laboratories", "qualifying crowns, bridges, inlays, filings, and silver-bearing dental material", "material-dental-1280.webp"],
-  ["oil-gas-silver-recovery", "Oil and Gas Silver Recovery in Houston", "Oil and gas companies", "industrial X-ray film, NDT film, contacts, and qualifying silver-bearing maintenance or production material", "material-xray-film-1280.webp"],
-  ["manufacturing-silver-recovery", "Manufacturing Silver Recovery in Houston", "Manufacturers", "wire, contacts, sheet, solder, clean offcuts, parts, and recurring production scrap", "ag-silver-hero-1600.webp"],
-  ["university-silver-recycling", "University Silver Recycling in Houston", "Universities", "qualifying lab material, old X-ray film, electronics, batteries, and approved silver-bearing inventory", "material-xray-film-1280.webp"],
-  ["electronics-silver-recovery", "Electronics Silver Recovery in Houston", "Electronics companies", "qualifying contacts, switches, components, solder, and silver-bearing production scrap", "ag-silver-hero-1600.webp"]
+  ["hospital-silver-recycling", "Hospital Silver Recycling in Houston", "Hospitals", "medical X-ray film, dental material, lab material, and other qualifying silver-bearing items", "material-medical-xray-1280.webp"],
+  ["dental-lab-silver-recycling", "Dental Lab Silver Recycling in Houston", "Dental laboratories", "qualifying crowns, bridges, inlays, filings, and silver-bearing dental material", "material-dental-scrap-1280.webp"],
+  ["oil-gas-silver-recovery", "Oil and Gas Silver Recovery in Houston", "Oil and gas companies", "industrial X-ray film, NDT film, contacts, and qualifying silver-bearing maintenance or production material", "material-industrial-xray-1280.webp"],
+  ["manufacturing-silver-recovery", "Manufacturing Silver Recovery in Houston", "Manufacturers", "wire, contacts, sheet, solder, clean offcuts, parts, and recurring production scrap", "material-industrial-silver-1280.webp"],
+  ["university-silver-recycling", "University Silver Recycling in Houston", "Universities", "qualifying lab material, old X-ray film, electronics, batteries, and approved silver-bearing inventory", "material-laboratory-silver-1280.webp"],
+  ["electronics-silver-recovery", "Electronics Silver Recovery in Houston", "Electronics companies", "qualifying contacts, switches, components, solder, and silver-bearing production scrap", "material-silver-solder-1280.webp"]
 ].map(([path, heading, audience, materials, image]) => ({
   path,
   title: `${heading} | AG Refining`,
@@ -503,21 +642,23 @@ const industryPages = [
 }));
 
 const locationPages = [
-  ["houston-silver-buyer", "Houston", "the City of Houston"],
-  ["silver-buyer-pearland", "Pearland", "Pearland and nearby south Houston businesses"],
-  ["silver-buyer-pasadena", "Pasadena", "Pasadena, Deer Park, and nearby industrial areas"],
-  ["silver-buyer-sugar-land", "Sugar Land", "Sugar Land, Stafford, and nearby southwest Houston businesses"],
-  ["silver-buyer-katy", "Katy", "Katy and west Houston businesses"],
-  ["silver-buyer-the-woodlands", "The Woodlands", "The Woodlands, Spring, and north Houston businesses"],
-  ["silver-buyer-conroe", "Conroe", "Conroe and nearby Montgomery County businesses"]
-].map(([path, city, area]) => ({
+  // The fourth column keeps the service-area index from repeating one photograph
+  // seven times. Each city carries a different material from the set.
+  ["houston-silver-buyer", "Houston", "the City of Houston", "ag-silver-pour-1600.webp"],
+  ["silver-buyer-pearland", "Pearland", "Pearland and nearby south Houston businesses", "material-sterling-hollowware-1280.webp"],
+  ["silver-buyer-pasadena", "Pasadena", "Pasadena, Deer Park, and nearby industrial areas", "material-industrial-silver-1280.webp"],
+  ["silver-buyer-sugar-land", "Sugar Land", "Sugar Land, Stafford, and nearby southwest Houston businesses", "material-silver-jewelry-1280.webp"],
+  ["silver-buyer-katy", "Katy", "Katy and west Houston businesses", "material-silver-coins-1280.webp"],
+  ["silver-buyer-the-woodlands", "The Woodlands", "The Woodlands, Spring, and north Houston businesses", "material-silver-bars-1280.webp"],
+  ["silver-buyer-conroe", "Conroe", "Conroe and nearby Montgomery County businesses", "material-industrial-xray-1280.webp"]
+].map(([path, city, area, image]) => ({
   path,
   title: `Silver Buyer in ${city}, TX | Free Qualifying Pickup | AG Refining`,
   description: `Sell qualifying silver in ${city}. AG Refining offers free commercial pickup, on-site weighing, honest pricing, and fast payment.`,
   eyebrow: "Houston Metro service",
   heading: `${city} silver buyer for commercial accounts.`,
   intro: `AG Refining serves ${area}. Qualifying commercial accounts can ask for free pickup, on-site weighing, and fast payment.`,
-  image: "ag-silver-hero-1600.webp",
+  image,
   imageAlt: `Silver-bearing commercial material for pickup near ${city}, Texas`,
   answerHeading: `We come to qualifying businesses in ${city}.`,
   answerText: "You do not have to move a large lot before you know the process. Tell us what you have, and we will confirm whether the pickup qualifies.",
@@ -657,7 +798,7 @@ function document({
   lang = "en",
   bodyClass = "",
   pageSchema = [],
-  image = "ag-silver-social.jpg",
+  image = "ag-silver-social.webp",
   robots = "index,follow,max-image-preview:large"
 }) {
   const canonical = path ? `${siteUrl}/${path}` : `${siteUrl}/`;
@@ -671,7 +812,11 @@ function document({
     <meta name="description" content="${description}">
     <link rel="canonical" href="${canonical}">
     <meta name="robots" content="${robots}">
-    <meta name="theme-color" content="#061724">
+    <meta name="theme-color" content="#f2f5f8" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#070d13" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AG Refining">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="AG Refining">
     <meta property="og:title" content="${title}">
@@ -684,7 +829,7 @@ function document({
     <link rel="icon" href="/assets/ag-mark-path.svg" type="image/svg+xml">
     <link rel="preload" href="/assets/fonts/newsreader-latin-opsz.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/assets/fonts/manrope-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/style.css?v=20260730-houston-buyer">
+    <link rel="stylesheet" href="/style.css?v=20260802-lux-mesh">
     ${schemaTag({ "@context": "https://schema.org", "@graph": schema })}
   </head>
   <body${bodyClass ? ` class="${bodyClass}"` : ""}>
@@ -694,7 +839,7 @@ function document({
     ${mobileActions}
     ${footer}
     ${materialGuide}
-    <script src="/site.js?v=20260730-houston-buyer" defer></script>
+    <script src="/site.js?v=20260802-lux-mesh" defer></script>
   </body>
 </html>`;
 }
@@ -719,12 +864,12 @@ function faqSchema(items) {
 }
 
 const featuredMaterials = [
-  ["Scrap silver jewelry", "scrap-silver-jewelry", "material-scrap-silver-1280.webp", "material-scrap-silver-mobile.webp", "Jewelry, flatware, coins, and mixed silver items."],
-  ["Industrial X-ray film", "industrial-x-ray-silver-recycling", "material-xray-film-1280.webp", "material-xray-film-mobile.webp", "Industrial radiography and NDT film from qualifying accounts."],
-  ["Silver coins", "sell-silver-coins-houston", "material-scrap-silver-1280.webp", "material-scrap-silver-mobile.webp", "Single coins, mixed lots, and estate collections evaluated with care."],
-  ["Silver oxide batteries", "silver-oxide-watch-battery-recycling-houston", "material-watch-batteries-1280.webp", "material-watch-batteries-mobile.webp", "Sorted commercial lots from watch and jewelry businesses."],
-  ["Medical X-ray film", "medical-x-ray-recycling", "material-xray-film-1280.webp", "material-xray-film-mobile.webp", "Qualifying film from medical, dental, and imaging facilities."],
-  ["Industrial silver scrap", "industrial-silver-scrap", "ag-silver-hero-1600.webp", "ag-silver-hero-mobile.webp", "Wire, contacts, sheet, solder, offcuts, and production material."]
+  ["Scrap silver jewelry", "scrap-silver-jewelry", "material-silver-jewelry-1280.webp", "material-silver-jewelry-mobile.webp", "Jewelry, flatware, coins, and mixed silver items."],
+  ["Industrial X-ray film", "industrial-x-ray-silver-recycling", "material-industrial-xray-1280.webp", "material-industrial-xray-mobile.webp", "Industrial radiography and NDT film from qualifying accounts."],
+  ["Silver coins", "sell-silver-coins-houston", "material-silver-coins-1280.webp", "material-silver-coins-mobile.webp", "Single coins, mixed lots, and estate collections evaluated with care."],
+  ["Silver oxide batteries", "silver-oxide-watch-battery-recycling-houston", "material-watch-batteries-real-1280.webp", "material-watch-batteries-real-mobile.webp", "Sorted commercial lots from watch and jewelry businesses."],
+  ["Medical X-ray film", "medical-x-ray-recycling", "material-medical-xray-1280.webp", "material-medical-xray-mobile.webp", "Qualifying film from medical, dental, and imaging facilities."],
+  ["Sterling and hollowware", "silver-flatware-buyer-houston", "material-sterling-hollowware-1280.webp", "material-sterling-hollowware-mobile.webp", "Sterling flatware, serving pieces, trays, and estate collections."]
 ];
 
 const homeFaqs = [
@@ -740,15 +885,15 @@ const home = `
   <section class="hero hero-commercial">
     <div class="hero-media">
       <picture>
-        <source media="(max-width: 700px)" srcset="/assets/ag-silver-hero-mobile.webp">
-        <img src="/assets/ag-silver-hero-1600.webp" alt="Industrial silver wire, sheet, contacts, and clean offcuts" width="1600" height="900" fetchpriority="high">
+        <source media="(max-width: 700px)" srcset="/assets/ag-silver-pour-mobile.webp">
+        <img src="/assets/ag-silver-pour-1600.webp" alt="Molten silver poured from an induction furnace into a mold at AG Refining" width="1600" height="900" fetchpriority="high">
       </picture>
     </div>
     <div class="shell hero-commercial-grid">
       <div class="hero-copy" data-reveal>
         <p class="hero-kicker"><span>Ag</span> Houston silver buyer</p>
         <h1>Turn silver-bearing material into cash.</h1>
-        <p class="hero-lede">AG Refining helps Houston businesses sell silver-bearing material. We offer free pickup for qualifying accounts, on-site weighing, honest pricing, and fast payment.</p>
+        <p class="hero-lede">AG Refining turns silver-bearing material into cash for Houston businesses. Free pickup for qualifying accounts, on-site weighing you can watch, honest pricing, and immediate payment on most qualifying transactions.</p>
         <div class="hero-actions">
           <a class="button button-blue" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
           <a class="button button-outline" href="/contact?intent=quote">Request a quote</a>
@@ -793,7 +938,7 @@ const home = `
       <p>Houston-based</p>
       <p>Free qualifying pickup</p>
       <p>On-site weighing</p>
-      <p>Fast payment</p>
+      <p>Immediate payment</p>
     </div>
   </div>
 
@@ -1594,8 +1739,8 @@ allServicePages.forEach((page) => {
 
 function taxonomyPage({ path, title, description, eyebrow, heading, intro, items }) {
   const cards = items.map((page, index) => `<a class="taxonomy-card" href="/${page.path}" data-reveal>
-    <figure class="taxonomy-image"><img src="/assets/${page.image}" alt="" width="1280" height="819" loading="lazy"></figure>
-    <div><p class="eyebrow">${String(index + 1).padStart(2, "0")}</p><h3>${page.heading}</h3><p>${page.intro}<b>View page ${arrow}</b></p></div>
+    <figure class="taxonomy-image"><img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" loading="lazy"></figure>
+    <div><p class="eyebrow">${String(index + 1).padStart(2, "0")}</p><h2>${page.heading}</h2><p>${page.intro}<b>View page ${arrow}</b></p></div>
   </a>`).join("");
   const content = `
     <section class="page-intro"><div class="shell">${breadcrumbs([["Home", "/"], [eyebrow, null]])}<div class="page-intro-grid"><div><p class="eyebrow">${eyebrow}</p><h1>${heading}</h1></div><p>${intro}</p></div></div></section>
@@ -1678,7 +1823,7 @@ function reviewForm() {
     <div class="field"><label for="phone">Phone <span>Required</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" required></div>
     <div class="field"><label for="email">Email <span>Required</span></label><input id="email" name="email" type="email" autocomplete="email" required></div>
     <div class="field"><label for="material">Material <span>Required</span></label><select id="material" name="material" required>
-      <option value="">Select one</option><option value="scrap_silver">Scrap silver</option><option value="industrial_silver">Industrial silver</option><option value="silver_flake">Silver flake</option><option value="laboratory_silver">Laboratory silver</option><option value="silver_solder">Silver solder</option><option value="silver_plated">Silver-plated material</option><option value="dental_material">Dental material</option><option value="silver_oxide_batteries">Watch batteries</option><option value="xray_film">X-ray film</option><option value="silver_coins">Silver coins</option><option value="unknown">Not sure</option>
+      <option value="">Select one</option><option value="scrap_silver">Scrap silver</option><option value="industrial_silver">Industrial silver</option><option value="silver_flake">Silver flake</option><option value="laboratory_silver">Laboratory silver</option><option value="silver_solder">Silver solder</option><option value="silver_plated">Silver-plated material</option><option value="silver_bars">Silver bars</option><option value="silver_flatware">Silver flatware</option><option value="jewelry_scrap">Jewelry store scrap</option><option value="dental_material">Dental material</option><option value="silver_oxide_batteries">Watch batteries</option><option value="xray_film">X-ray film</option><option value="silver_coins">Silver coins</option><option value="unknown">Not sure</option>
     </select></div>
     <div class="field"><label for="quantity">Approximate amount</label><input id="quantity" name="quantity" maxlength="120" placeholder="Weight, boxes, drums, or pallets"></div>
     <div class="field"><label for="location">Pickup location <span>Required</span></label><input id="location" name="location" maxlength="180" placeholder="City or business address" required></div>
@@ -1713,10 +1858,10 @@ writeFileSync(join(out, "contact", "index.html"), document({
 const spanish = `
   <section class="page-intro"><div class="shell">${breadcrumbs([["Inicio", "/"], ["Español", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Servicio en español</p><h1>Venda su plata en Houston.</h1></div><p>AG Refining ofrece recogida gratis para cuentas comerciales que califican, pesaje en su local y precios claros.</p></div></div></section>
   <section class="section"><div class="shell spanish-materials">
-    <article><h3>Recogida</h3><p>Cuéntenos qué material tiene, cuánto pesa y dónde está. Confirmaremos si la recogida califica.</p></article>
-    <article><h3>Pesaje</h3><p>Pesamos el material en su presencia para que pueda ver el peso antes del pago.</p></article>
-    <article><h3>Pago</h3><p>El pago rápido está disponible para transacciones que califican. El tiempo depende del material y los términos acordados.</p></article>
-    <article><h3>Llame primero</h3><p>No envíe material ni visite sin confirmar el siguiente paso. Llame al ${phoneDisplay}.</p></article>
+    <article><h2>Recogida</h2><p>Cuéntenos qué material tiene, cuánto pesa y dónde está. Confirmaremos si la recogida califica.</p></article>
+    <article><h2>Pesaje</h2><p>Pesamos el material en su presencia para que pueda ver el peso antes del pago.</p></article>
+    <article><h2>Pago inmediato</h2><p>El pago inmediato está disponible para la mayoría de las transacciones que califican. El tiempo depende del material y los términos acordados.</p></article>
+    <article><h2>Llame primero</h2><p>No envíe material ni visite sin confirmar el siguiente paso. Llame al ${phoneDisplay}.</p></article>
   </div></section>
   <section class="cta-band"><div class="shell"><p class="eyebrow">Comience hoy</p><h2>Solicite una recogida.</h2><a class="button button-light" href="/contact">Enviar solicitud ${arrow}</a></div></section>`;
 mkdirSync(join(out, "espanol"), { recursive: true });
