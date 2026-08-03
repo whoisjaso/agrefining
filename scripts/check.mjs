@@ -22,6 +22,14 @@ const required = [
 ];
 const failures = required.filter((file) => !existsSync(join(root, file))).map((file) => `Missing ${file}`);
 const banned = [/\u2014/u, /[\u{1F300}-\u{1FAFF}]/u];
+const css = readFileSync(join(root, "src", "style.css"), "utf8");
+const clientScript = readFileSync(join(root, "src", "site.js"), "utf8");
+
+if (!css.includes("--canvas: #f1ede4")) failures.push("Silver Atelier canvas token is missing");
+if (!css.includes("--graphite: #171815")) failures.push("Silver Atelier graphite token is missing");
+if (/prefers-color-scheme\s*:\s*dark/.test(css)) failures.push("Automatic dark mode remains in the stylesheet");
+if (/mesh[^\n{]*drift|gradient-text/i.test(css)) failures.push("Legacy decorative effects remain in the stylesheet");
+if (clientScript.includes("page-leaving")) failures.push("Legacy page-exit animation remains in the client script");
 
 function files(dir) {
   return readdirSync(dir).flatMap((name) => {

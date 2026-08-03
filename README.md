@@ -2,6 +2,8 @@
 
 Production-oriented publishing system for AG Refining. It is designed for Vercel and expands through the data-driven material, industry, and service-area registries in `scripts/build.mjs`.
 
+The front end uses the Silver Atelier design system: warm mineral surfaces, restrained silver and champagne accents, editorial material photography, calibrated assay-line details, and one consistent pickup journey across every route. See `DESIGN.md` for the complete visual and structural contract.
+
 ## Local verification
 
 ```bash
@@ -10,7 +12,7 @@ npm run build
 npm run verify
 ```
 
-The generated site is written to `dist`.
+The generated site is written to `dist`. Verification covers 39 generated HTML files, 38 indexed routes, the shared Silver Atelier shell, representative page families, exact protected SEO fields, local route and asset targets, and the homepage conversion sequence.
 
 ## Lead delivery
 

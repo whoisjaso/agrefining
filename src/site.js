@@ -67,20 +67,6 @@ navMedia.addEventListener?.("change", (event) => {
 });
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-document.addEventListener("click", (event) => {
-  if (prefersReducedMotion || document.startViewTransition) return;
-  const link = event.target.closest("a[href]");
-  if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-  const target = new URL(link.href, window.location.href);
-  if (target.origin !== window.location.origin || target.hash || link.target || link.hasAttribute("download")) return;
-  if (target.pathname === window.location.pathname) return;
-  event.preventDefault();
-  document.body.classList.add("page-leaving");
-  window.setTimeout(() => {
-    window.location.href = target.href;
-  }, 150);
-});
-
 document.documentElement.classList.add("motion-ready");
 const observer = "IntersectionObserver" in window && !prefersReducedMotion
   ? new IntersectionObserver((entries) => {
