@@ -1,6 +1,6 @@
 /* ==========================================================================
    AG Refining: The Silver Atelier
-   Warm mineral surfaces, precise typography, and material-led composition.
+   Warm creme surfaces, tailored blue, and material-led composition.
    ========================================================================== */
 
 @font-face {
@@ -23,25 +23,26 @@
   --canvas: #f1ede4;
   --paper: #faf8f2;
   --paper-strong: #fffdf8;
-  --graphite: #171815;
-  --ink: #292a26;
-  --ink-soft: #494a44;
-  --muted: #67685f;
-  --steel: #8d918d;
-  --steel-soft: #d9d9d2;
-  --champagne: #9b7b56;
-  --champagne-soft: #e2d3be;
-  --focus: #256c8e;
-  --focus-soft: #dceaf0;
+  --navy: #102a43;
+  --ink: #20354c;
+  --ink-soft: #40566d;
+  --muted: #586b7e;
+  --steel: #8796a5;
+  --steel-soft: #d6dde3;
+  --mineral-blue: #416b94;
+  --mineral-blue-soft: #dce7f0;
+  --focus: #1d5e96;
+  --focus-soft: #d9e8f3;
   --danger: #984b3e;
   --success: #476653;
-  --line: rgba(23, 24, 21, 0.14);
-  --line-strong: rgba(23, 24, 21, 0.26);
+  --line: rgba(16, 42, 67, 0.14);
+  --line-strong: rgba(16, 42, 67, 0.27);
   --line-inverse: rgba(250, 248, 242, 0.22);
-  --shadow-soft: 0 1px 2px rgba(23, 24, 21, 0.05), 0 18px 48px rgba(23, 24, 21, 0.07);
-  --shadow-float: 0 2px 4px rgba(23, 24, 21, 0.08), 0 28px 70px rgba(23, 24, 21, 0.12);
+  --shadow-soft: 0 1px 2px rgba(16, 42, 67, 0.05), 0 18px 48px rgba(16, 42, 67, 0.08);
+  --shadow-float: 0 2px 4px rgba(16, 42, 67, 0.08), 0 28px 70px rgba(16, 42, 67, 0.13);
   --sans: "Manrope", "Helvetica Neue", Arial, sans-serif;
   --serif: "Newsreader", Iowan Old Style, Baskerville, Georgia, serif;
+  --display-weight: 360;
   --max: 1280px;
   --measure: 64ch;
   --gutter: clamp(1.15rem, 4vw, 3.5rem);
@@ -141,8 +142,8 @@ summary {
 }
 
 ::selection {
-  background: var(--champagne-soft);
-  color: var(--graphite);
+  background: var(--mineral-blue-soft);
+  color: var(--navy);
 }
 
 :focus-visible {
@@ -165,12 +166,16 @@ dd {
 h1,
 h2,
 h3 {
-  color: var(--graphite);
+  color: var(--navy);
   font-family: var(--sans);
-  font-weight: 470;
-  letter-spacing: -0.045em;
-  line-height: 1.02;
   text-wrap: balance;
+}
+
+h1,
+h2 {
+  font-weight: var(--display-weight);
+  letter-spacing: -0.042em;
+  line-height: 0.99;
 }
 
 h1 {
@@ -185,6 +190,8 @@ h2 {
 
 h3 {
   font-size: clamp(1.15rem, 1.8vw, 1.55rem);
+  font-weight: 540;
+  letter-spacing: -0.026em;
   line-height: 1.2;
 }
 
@@ -194,10 +201,10 @@ p {
 }
 
 blockquote {
-  color: var(--graphite);
-  font-family: var(--serif);
+  color: var(--navy);
+  font-family: var(--sans);
   font-size: clamp(2rem, 4.2vw, 4.25rem);
-  font-weight: 350;
+  font-weight: var(--display-weight);
   letter-spacing: -0.035em;
   line-height: 1.08;
   text-wrap: balance;
@@ -219,7 +226,7 @@ blockquote {
 }
 
 .skip {
-  background: var(--graphite);
+  background: var(--navy);
   color: var(--paper);
   font-size: 0.85rem;
   font-weight: 700;
@@ -238,7 +245,7 @@ blockquote {
 
 .eyebrow {
   align-items: center;
-  color: var(--champagne);
+  color: var(--mineral-blue);
   display: flex;
   font-size: 0.71rem;
   font-weight: 760;
@@ -315,7 +322,7 @@ blockquote {
 }
 
 .button-primary {
-  background: var(--graphite);
+  background: var(--navy);
   color: var(--paper);
 }
 
@@ -326,17 +333,17 @@ blockquote {
 .button-secondary {
   background: transparent;
   border-color: var(--line-strong);
-  color: var(--graphite);
+  color: var(--navy);
 }
 
 .button-secondary:hover {
   background: var(--paper);
-  border-color: var(--graphite);
+  border-color: var(--navy);
 }
 
 .button-inverse {
   background: var(--paper);
-  color: var(--graphite);
+  color: var(--navy);
 }
 
 .button-inverse:hover {
@@ -346,7 +353,7 @@ blockquote {
 .phone-link,
 .text-link {
   align-items: center;
-  color: var(--graphite);
+  color: var(--navy);
   display: inline-flex;
   font-size: 0.9rem;
   font-weight: 680;
@@ -419,7 +426,7 @@ blockquote {
 
 .assay-line {
   align-items: center;
-  color: var(--champagne);
+  color: var(--mineral-blue);
   display: grid;
   font-size: 0.68rem;
   font-weight: 740;
@@ -495,7 +502,7 @@ blockquote {
 
 .site-header[data-stuck="true"] {
   background: color-mix(in srgb, var(--paper) 97%, transparent);
-  box-shadow: 0 8px 30px rgba(23, 24, 21, 0.07);
+  box-shadow: 0 8px 30px rgba(16, 42, 67, 0.07);
 }
 
 .utility-bar {
@@ -520,7 +527,7 @@ blockquote {
 }
 
 .utility-inner p span {
-  color: var(--champagne);
+  color: var(--mineral-blue);
   margin-inline: 0.4rem;
 }
 
@@ -569,7 +576,7 @@ blockquote {
 }
 
 .brand-word {
-  color: var(--graphite);
+  color: var(--navy);
   font-size: 1rem;
   font-weight: 460;
   letter-spacing: -0.025em;
@@ -594,7 +601,7 @@ blockquote {
 }
 
 .nav-links > a:not(.button)::after {
-  background: var(--champagne);
+  background: var(--mineral-blue);
   bottom: 0.35rem;
   content: "";
   height: 1px;
@@ -685,7 +692,7 @@ blockquote {
 }
 
 .guide-mark {
-  border: 1px solid var(--champagne);
+  border: 1px solid var(--mineral-blue);
   border-radius: 50%;
   height: 0.72rem;
   position: relative;
@@ -693,7 +700,7 @@ blockquote {
 }
 
 .guide-mark::after {
-  background: var(--champagne);
+  background: var(--mineral-blue);
   content: "";
   height: 1px;
   left: 0.14rem;
@@ -736,7 +743,7 @@ blockquote {
 /* Footer */
 
 .footer {
-  background: var(--graphite);
+  background: var(--navy);
   color: rgba(250, 248, 242, 0.72);
   padding: clamp(4.5rem, 8vw, 8rem) 0 calc(2rem + var(--safe-bottom));
 }
@@ -811,7 +818,7 @@ blockquote {
 .hero-media::after {
   background:
     linear-gradient(90deg, rgba(241, 237, 228, 0.3), transparent 35%),
-    linear-gradient(0deg, rgba(23, 24, 21, 0.06), transparent 35%);
+    linear-gradient(0deg, rgba(16, 42, 67, 0.06), transparent 35%);
   content: "";
   inset: 0;
   pointer-events: none;
@@ -858,8 +865,8 @@ blockquote {
 
 .hero-kicker span {
   align-items: center;
-  border: 1px solid var(--champagne);
-  color: var(--champagne);
+  border: 1px solid var(--mineral-blue);
+  color: var(--mineral-blue);
   display: inline-flex;
   font-family: var(--serif);
   font-size: 1rem;
@@ -928,7 +935,7 @@ blockquote {
 }
 
 .hero-review-label {
-  color: var(--champagne);
+  color: var(--mineral-blue);
   font-size: 0.68rem;
   font-weight: 740;
   letter-spacing: 0.12em;
@@ -1095,7 +1102,7 @@ blockquote {
 
 .featured-material-copy strong {
   align-items: center;
-  color: var(--graphite);
+  color: var(--navy);
   display: inline-flex;
   font-size: 0.76rem;
   gap: 0.7rem;
@@ -1142,9 +1149,9 @@ blockquote {
 .process article > span {
   align-items: center;
   background: var(--canvas);
-  border: 1px solid var(--champagne);
+  border: 1px solid var(--mineral-blue);
   border-radius: 50%;
-  color: var(--champagne);
+  color: var(--mineral-blue);
   display: flex;
   font-size: 0.65rem;
   font-weight: 760;
@@ -1236,7 +1243,7 @@ blockquote {
 }
 
 .plain-checks li::before {
-  background: var(--champagne);
+  background: var(--mineral-blue);
   content: "";
   height: 0.35rem;
   left: 0;
@@ -1246,7 +1253,7 @@ blockquote {
 }
 
 .facility-feature .button-inverse {
-  background: var(--graphite);
+  background: var(--navy);
   color: var(--paper);
   justify-self: start;
 }
@@ -1277,7 +1284,7 @@ blockquote {
 }
 
 .related-card > span {
-  color: var(--champagne);
+  color: var(--mineral-blue);
   display: block;
   font-size: 0.66rem;
   font-weight: 740;
@@ -1353,7 +1360,7 @@ blockquote {
 }
 
 .legacy-number {
-  color: var(--champagne);
+  color: var(--mineral-blue);
   font-family: var(--serif);
   font-size: clamp(6rem, 15vw, 13rem);
   font-weight: 320;
@@ -1372,7 +1379,7 @@ blockquote {
 }
 
 .legacy-editorial cite {
-  color: var(--champagne);
+  color: var(--mineral-blue);
   display: block;
   font-size: 0.73rem;
   font-style: normal;
@@ -1470,7 +1477,7 @@ blockquote {
 
 .faq-list summary {
   align-items: center;
-  color: var(--graphite);
+  color: var(--navy);
   display: flex;
   font-size: 0.98rem;
   font-weight: 620;
@@ -1523,7 +1530,7 @@ blockquote {
 }
 
 .conversion-band {
-  background: var(--graphite);
+  background: var(--navy);
   color: rgba(250, 248, 242, 0.75);
   padding-block: clamp(5rem, 10vw, 10rem);
 }
@@ -1615,7 +1622,7 @@ blockquote {
 }
 
 .service-visual figcaption span {
-  color: var(--champagne);
+  color: var(--mineral-blue);
   font-family: var(--serif);
   font-size: 1.6rem;
 }
@@ -1678,7 +1685,7 @@ blockquote {
 }
 
 .answer-index {
-  color: var(--champagne);
+  color: var(--mineral-blue);
   font-size: 0.7rem;
   font-weight: 740;
   letter-spacing: 0.1em;
@@ -1790,7 +1797,7 @@ blockquote {
 }
 
 .taxonomy-card b {
-  color: var(--graphite);
+  color: var(--navy);
   display: flex;
   font-size: 0.7rem;
   gap: 0.6rem;
@@ -1846,7 +1853,7 @@ blockquote {
 
 .material-types-list li > span,
 .coin-types-list li > span {
-  background: var(--champagne);
+  background: var(--mineral-blue);
   display: inline-block;
   height: 0.35rem;
   margin-right: 0.65rem;
@@ -1945,7 +1952,7 @@ blockquote {
 .coin-value-mark strong,
 .xray-security-mark strong {
   align-self: center;
-  color: var(--champagne);
+  color: var(--mineral-blue);
   font-family: var(--serif);
   font-size: clamp(3rem, 7vw, 6rem);
   font-weight: 350;
@@ -1972,7 +1979,7 @@ blockquote {
 }
 
 .coin-caution {
-  border-left: 2px solid var(--champagne);
+  border-left: 2px solid var(--mineral-blue);
   font-size: 0.82rem;
   padding-left: 1rem;
 }
@@ -2002,7 +2009,7 @@ blockquote {
 .material-process li > span,
 .houston-process li > span,
 .process-rail li > span {
-  color: var(--champagne);
+  color: var(--mineral-blue);
   font-family: var(--serif);
   font-size: 1.75rem;
 }
@@ -2053,7 +2060,7 @@ blockquote {
 }
 
 .pathway-list a > span {
-  color: var(--champagne);
+  color: var(--mineral-blue);
   display: block;
   font-size: 0.68rem;
   font-weight: 720;
@@ -2468,7 +2475,7 @@ blockquote {
   }
 
   .nav-toggle span {
-    background: var(--graphite);
+    background: var(--navy);
     display: block;
     height: 1px;
     transition:
@@ -2537,7 +2544,7 @@ blockquote {
   }
 
   .nav-scrim {
-    background: rgba(23, 24, 21, 0.42);
+    background: rgba(16, 42, 67, 0.42);
     border: 0;
     display: block;
     inset: 0;
@@ -2714,7 +2721,7 @@ blockquote {
   }
 
   .hero-media::after {
-    background: linear-gradient(0deg, rgba(23, 24, 21, 0.08), transparent);
+    background: linear-gradient(0deg, rgba(16, 42, 67, 0.08), transparent);
   }
 
   .hero-commercial-grid {
@@ -3029,7 +3036,7 @@ blockquote {
 
   body {
     background: var(--paper);
-    color: var(--graphite);
+    color: var(--navy);
     padding: 0;
   }
 

@@ -1,6 +1,6 @@
 # AG Refining design system
 
-## The Silver Atelier
+## The Silver Atelier: Creme and Blue
 
 The site presents a Houston silver buyer with the composure of a premium industrial manufacturer. The system is warm, exact, tactile, and restrained. It uses real material photography, clear process language, mineral surfaces, and calibrated rules instead of generic luxury effects.
 
@@ -20,34 +20,34 @@ The site is intentionally light. There is no automatic dark mode because the war
 
 | Token | Value | Role |
 |---|---:|---|
-| `--canvas` | `#f1ede4` | Mineral page ground and browser chrome |
+| `--canvas` | `#f1ede4` | Creme page ground and browser chrome |
 | `--paper` | `#faf8f2` | Forms, image mats, and quiet inset surfaces |
 | `--paper-strong` | `#fffdf8` | Form controls and the brightest local surface |
-| `--graphite` | `#171815` | Headings, primary actions, footer, conversion band |
-| `--ink` | `#292a26` | Primary body copy |
-| `--ink-soft` | `#494a44` | Lead copy and secondary text |
-| `--muted` | `#67685f` | Captions, qualifications, and metadata |
-| `--steel` | `#8d918d` | Secondary rules and material metadata |
-| `--steel-soft` | `#d9d9d2` | Quiet media fallback surface |
-| `--champagne` | `#9b7b56` | Sparse value and provenance accent |
-| `--champagne-soft` | `#e2d3be` | Selection and warm inset support |
-| `--focus` | `#256c8e` | Links, focus, and functional interaction state |
+| `--navy` | `#102a43` | Headings, primary actions, footer, conversion band |
+| `--ink` | `#20354c` | Primary body copy |
+| `--ink-soft` | `#40566d` | Lead copy and secondary text |
+| `--muted` | `#586b7e` | Captions, qualifications, and metadata |
+| `--steel` | `#8796a5` | Secondary rules and material metadata |
+| `--steel-soft` | `#d6dde3` | Quiet media fallback surface |
+| `--mineral-blue` | `#416b94` | Assay, provenance, and editorial accent |
+| `--mineral-blue-soft` | `#dce7f0` | Selection and cool inset support |
+| `--focus` | `#1d5e96` | Links, focus, and functional interaction state |
 | `--danger` | `#984b3e` | Validation errors only |
 | `--success` | `#476653` | Confirmed operational state only |
 
 ### Color rules
 
-- Champagne stays below roughly 5 percent of a normal viewport.
-- Functional blue identifies interaction and focus. It is not a decorative brand wash.
-- Graphite appears as type, controls, the footer, and one final conversion composition.
+- Creme remains the dominant field and carries most page surfaces.
+- Ink blue appears as type, controls, the footer, and one final conversion composition.
+- Mineral blue stays below roughly 8 percent of a normal viewport and marks assay, provenance, and interaction details.
 - Pure black, pure white, neon accents, gold glows, and gradient-filled text are prohibited.
 - The top portion of every page remains light.
 
 ## Typography
 
-Manrope carries navigation, body text, labels, controls, data, and most headings. Newsreader is reserved for selected quotations and high-value editorial statements.
+Rollgates Luxury is the approved target display face. Because its commercial webfont files are not currently present in the repository, Manrope at a calibrated `360` weight carries display headings without an external font request or licensing risk. Manrope also carries navigation, body text, labels, controls, and data. Newsreader is limited to selected numeric and silver-signature moments.
 
-- Display headings use controlled weight, tight tracking, and compact line height.
+- Display headings use a light luxury-sans weight, controlled tracking, and compact line height.
 - `h1` scales from `3rem` to `6.8rem` and is limited to approximately 11 characters per line.
 - `h2` scales from `2.15rem` to `4.35rem` and is limited to approximately 14 characters per line.
 - Body text remains at least `1rem` with a maximum measure of `64ch`.
@@ -107,12 +107,12 @@ Photography is operational evidence.
 - Slim information rail for Houston, phone, email, and Spanish.
 - Cream navigation surface with one compact mark and wordmark.
 - Five stable destinations: Materials, Industries, Service areas, How it works, Our story.
-- One graphite `Schedule a Free Pickup` action.
+- One ink-blue `Schedule a Free Pickup` action.
 - Accessible mobile sheet with focus management and Escape handling.
 
 ### Footer
 
-- One graphite footer composition.
+- One ink-blue footer composition.
 - Contact details, high-intent material links, service qualification, privacy, and legal copy remain visible.
 - No separate collection of competing dark promotional bands.
 
@@ -130,7 +130,7 @@ Only three button variants are allowed:
 |---|---|
 | `.button-primary` | Main pickup action on light surfaces |
 | `.button-secondary` | Lower-priority navigation on light surfaces |
-| `.button-inverse` | Pickup action on graphite surfaces |
+| `.button-inverse` | Pickup action on ink-blue surfaces |
 
 Text and phone links use a restrained underline expansion. The primary action label is `Schedule a Free Pickup`; the phone number is the fallback. Route heroes do not introduce competing quote language.
 
@@ -150,7 +150,7 @@ The approved order is:
 8. Houston service area;
 9. family provenance;
 10. location and FAQ;
-11. one graphite conversion band.
+11. one ink-blue conversion band.
 
 The hero has one pickup action and one phone fallback. The intake controls are nested inside their labels so grid placement remains stable at every width.
 
@@ -190,10 +190,10 @@ The hero has one pickup action and one phone fallback. The intake controls are n
 
 ## Motion
 
-- Major compositions may enter with a short opacity and vertical-position transition.
+- Editorial content is never hidden behind a scroll observer or JavaScript reveal state.
 - Interaction feedback uses `160ms` to `260ms` transitions.
 - No floating mesh, parallax, bounce, continuous ambient movement, or page-exit animation.
-- `prefers-reduced-motion` removes nonessential transitions and reveals.
+- `prefers-reduced-motion` removes nonessential transitions.
 - Content remains visible and usable if JavaScript does not initialize.
 
 ## Responsive and accessibility requirements

@@ -2,7 +2,7 @@
 
 Production-oriented publishing system for AG Refining. It is designed for Vercel and expands through the data-driven material, industry, and service-area registries in `scripts/build.mjs`.
 
-The front end uses the Silver Atelier design system: warm mineral surfaces, restrained silver and champagne accents, editorial material photography, calibrated assay-line details, and one consistent pickup journey across every route. See `DESIGN.md` for the complete visual and structural contract.
+The front end uses the Silver Atelier design system: warm creme surfaces, tailored ink-blue structure, restrained mineral-blue accents, editorial material photography, calibrated assay-line details, and one consistent pickup journey across every route. See `DESIGN.md` for the complete visual and structural contract.
 
 ## Local verification
 
