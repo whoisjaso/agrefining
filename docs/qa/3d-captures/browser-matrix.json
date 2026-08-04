@@ -1,0 +1,767 @@
+{
+  "generatedAt": "2026-08-04T19:49:03.936Z",
+  "results": [
+    {
+      "name": "match-1440x960",
+      "status": "PASS",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "deviceScaleFactor": 1,
+      "opacity": {
+        "fallback": 0,
+        "canvas": 1
+      },
+      "state": "ready",
+      "fallbackReason": null,
+      "diagnostics": {
+        "state": "ready",
+        "active": true,
+        "disposed": false,
+        "frameCount": 2,
+        "triangles": 3438,
+        "drawCalls": 8,
+        "pixelRatio": 1,
+        "reviewView": "match",
+        "contextLost": false
+      },
+      "stageRect": {
+        "x": 748.8125,
+        "y": 114,
+        "width": 691.1875,
+        "height": 624,
+        "top": 114,
+        "right": 1440,
+        "bottom": 738,
+        "left": 748.8125
+      },
+      "canvasCount": 1,
+      "canvasRole": "presentation",
+      "canvasAriaHidden": "true",
+      "canvasTabIndex": -1,
+      "overflow": 0,
+      "ctaVisible": false,
+      "ctaTopmost": false,
+      "phoneVisible": false,
+      "resources": [
+        {
+          "name": "/style.css?v=20260804-assay",
+          "startTime": 9.2,
+          "duration": 33.4,
+          "transferSize": 60200
+        },
+        {
+          "name": "/assets/ag-assay-monolith-1280.webp",
+          "startTime": 9.4,
+          "duration": 34.6,
+          "transferSize": 35636
+        },
+        {
+          "name": "/site.js?v=20260804-assay",
+          "startTime": 9.4,
+          "duration": 38.5,
+          "transferSize": 21086
+        },
+        {
+          "name": "/assay-scene.js?v=20260804-assay",
+          "startTime": 73.3,
+          "duration": 5.7,
+          "transferSize": 36670
+        },
+        {
+          "name": "/assets/vendor/three.module.min.js",
+          "startTime": 93.7,
+          "duration": 3.4,
+          "transferSize": 365852
+        },
+        {
+          "name": "/assets/vendor/three.core.min.js",
+          "startTime": 101.9,
+          "duration": 3.5,
+          "transferSize": 385686
+        }
+      ],
+      "loadEventEnd": 63.7,
+      "errors": []
+    },
+    {
+      "name": "side-1440x960",
+      "status": "PASS",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "deviceScaleFactor": 1,
+      "opacity": {
+        "fallback": 0,
+        "canvas": 1
+      },
+      "state": "ready",
+      "fallbackReason": null,
+      "diagnostics": {
+        "state": "ready",
+        "active": true,
+        "disposed": false,
+        "frameCount": 2,
+        "triangles": 3438,
+        "drawCalls": 8,
+        "pixelRatio": 1,
+        "reviewView": "side",
+        "contextLost": false
+      },
+      "stageRect": {
+        "x": 748.8125,
+        "y": 114,
+        "width": 691.1875,
+        "height": 624,
+        "top": 114,
+        "right": 1440,
+        "bottom": 738,
+        "left": 748.8125
+      },
+      "canvasCount": 1,
+      "canvasRole": "presentation",
+      "canvasAriaHidden": "true",
+      "canvasTabIndex": -1,
+      "overflow": 0,
+      "ctaVisible": false,
+      "ctaTopmost": false,
+      "phoneVisible": false,
+      "resources": [
+        {
+          "name": "/style.css?v=20260804-assay",
+          "startTime": 5.2,
+          "duration": 33.8,
+          "transferSize": 60200
+        },
+        {
+          "name": "/assets/ag-assay-monolith-1280.webp",
+          "startTime": 5.3,
+          "duration": 35.1,
+          "transferSize": 35636
+        },
+        {
+          "name": "/site.js?v=20260804-assay",
+          "startTime": 5.4,
+          "duration": 38.3,
+          "transferSize": 21086
+        },
+        {
+          "name": "/assay-scene.js?v=20260804-assay",
+          "startTime": 69,
+          "duration": 12,
+          "transferSize": 36670
+        },
+        {
+          "name": "/assets/vendor/three.module.min.js",
+          "startTime": 101,
+          "duration": 3.9,
+          "transferSize": 365852
+        },
+        {
+          "name": "/assets/vendor/three.core.min.js",
+          "startTime": 110.5,
+          "duration": 3.3,
+          "transferSize": 385686
+        }
+      ],
+      "loadEventEnd": 61.4,
+      "errors": []
+    },
+    {
+      "name": "grazing-1440x960",
+      "status": "PASS",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "deviceScaleFactor": 1,
+      "opacity": {
+        "fallback": 0,
+        "canvas": 1
+      },
+      "state": "ready",
+      "fallbackReason": null,
+      "diagnostics": {
+        "state": "ready",
+        "active": true,
+        "disposed": false,
+        "frameCount": 2,
+        "triangles": 3438,
+        "drawCalls": 8,
+        "pixelRatio": 1,
+        "reviewView": "grazing",
+        "contextLost": false
+      },
+      "stageRect": {
+        "x": 748.8125,
+        "y": 114,
+        "width": 691.1875,
+        "height": 624,
+        "top": 114,
+        "right": 1440,
+        "bottom": 738,
+        "left": 748.8125
+      },
+      "canvasCount": 1,
+      "canvasRole": "presentation",
+      "canvasAriaHidden": "true",
+      "canvasTabIndex": -1,
+      "overflow": 0,
+      "ctaVisible": false,
+      "ctaTopmost": false,
+      "phoneVisible": false,
+      "resources": [
+        {
+          "name": "/style.css?v=20260804-assay",
+          "startTime": 4.7,
+          "duration": 27.7,
+          "transferSize": 60200
+        },
+        {
+          "name": "/assets/ag-assay-monolith-1280.webp",
+          "startTime": 4.8,
+          "duration": 28.6,
+          "transferSize": 35636
+        },
+        {
+          "name": "/site.js?v=20260804-assay",
+          "startTime": 4.9,
+          "duration": 33.7,
+          "transferSize": 21086
+        },
+        {
+          "name": "/assay-scene.js?v=20260804-assay",
+          "startTime": 75.8,
+          "duration": 3.2,
+          "transferSize": 36670
+        },
+        {
+          "name": "/assets/vendor/three.module.min.js",
+          "startTime": 89.7,
+          "duration": 2.9,
+          "transferSize": 365852
+        },
+        {
+          "name": "/assets/vendor/three.core.min.js",
+          "startTime": 98.5,
+          "duration": 3.7,
+          "transferSize": 385686
+        }
+      ],
+      "loadEventEnd": 66.1,
+      "errors": []
+    },
+    {
+      "name": "wide-1920x1080",
+      "status": "PASS",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "deviceScaleFactor": 2,
+      "opacity": {
+        "fallback": 0,
+        "canvas": 1
+      },
+      "state": "ready",
+      "fallbackReason": null,
+      "diagnostics": {
+        "state": "ready",
+        "active": true,
+        "disposed": false,
+        "frameCount": 2,
+        "triangles": 3438,
+        "drawCalls": 8,
+        "pixelRatio": 1.5,
+        "reviewView": "match",
+        "contextLost": false
+      },
+      "stageRect": {
+        "x": 1088,
+        "y": 114,
+        "width": 832,
+        "height": 624,
+        "top": 114,
+        "right": 1920,
+        "bottom": 738,
+        "left": 1088
+      },
+      "canvasCount": 1,
+      "canvasRole": "presentation",
+      "canvasAriaHidden": "true",
+      "canvasTabIndex": -1,
+      "overflow": 0,
+      "ctaVisible": true,
+      "ctaTopmost": true,
+      "phoneVisible": true,
+      "resources": [
+        {
+          "name": "/style.css?v=20260804-assay",
+          "startTime": 5.1,
+          "duration": 41.1,
+          "transferSize": 60200
+        },
+        {
+          "name": "/assets/ag-assay-monolith-1280.webp",
+          "startTime": 5.1,
+          "duration": 42.1,
+          "transferSize": 35636
+        },
+        {
+          "name": "/site.js?v=20260804-assay",
+          "startTime": 5.1,
+          "duration": 44.3,
+          "transferSize": 21086
+        },
+        {
+          "name": "/assay-scene.js?v=20260804-assay",
+          "startTime": 96.1,
+          "duration": 2.4,
+          "transferSize": 36670
+        },
+        {
+          "name": "/assets/vendor/three.module.min.js",
+          "startTime": 111.9,
+          "duration": 3.6,
+          "transferSize": 365852
+        },
+        {
+          "name": "/assets/vendor/three.core.min.js",
+          "startTime": 120.3,
+          "duration": 3.5,
+          "transferSize": 385686
+        }
+      ],
+      "loadEventEnd": 70.7,
+      "errors": []
+    },
+    {
+      "name": "tablet-768x1024",
+      "status": "PASS",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "deviceScaleFactor": 2,
+      "opacity": {
+        "fallback": 0,
+        "canvas": 1
+      },
+      "state": "ready",
+      "fallbackReason": null,
+      "diagnostics": {
+        "state": "ready",
+        "active": true,
+        "disposed": false,
+        "frameCount": 2,
+        "triangles": 2478,
+        "drawCalls": 8,
+        "pixelRatio": 1.25,
+        "reviewView": "match",
+        "contextLost": false
+      },
+      "stageRect": {
+        "x": 430.09375,
+        "y": 81,
+        "width": 337.90625,
+        "height": 384,
+        "top": 81,
+        "right": 768,
+        "bottom": 465,
+        "left": 430.09375
+      },
+      "canvasCount": 1,
+      "canvasRole": "presentation",
+      "canvasAriaHidden": "true",
+      "canvasTabIndex": -1,
+      "overflow": 0,
+      "ctaVisible": true,
+      "ctaTopmost": true,
+      "phoneVisible": true,
+      "resources": [
+        {
+          "name": "/style.css?v=20260804-assay",
+          "startTime": 6.4,
+          "duration": 3.1,
+          "transferSize": 60200
+        },
+        {
+          "name": "/assets/ag-assay-monolith-1280.webp",
+          "startTime": 6.8,
+          "duration": 5.2,
+          "transferSize": 35636
+        },
+        {
+          "name": "/site.js?v=20260804-assay",
+          "startTime": 7,
+          "duration": 9.9,
+          "transferSize": 21086
+        },
+        {
+          "name": "/assay-scene.js?v=20260804-assay",
+          "startTime": 38.4,
+          "duration": 38.7,
+          "transferSize": 36670
+        },
+        {
+          "name": "/assets/vendor/three.module.min.js",
+          "startTime": 97.9,
+          "duration": 4.4,
+          "transferSize": 365852
+        },
+        {
+          "name": "/assets/vendor/three.core.min.js",
+          "startTime": 107.4,
+          "duration": 3,
+          "transferSize": 385686
+        }
+      ],
+      "loadEventEnd": 33.8,
+      "errors": []
+    },
+    {
+      "name": "mobile-390x844",
+      "status": "PASS",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "state": "fallback",
+      "fallbackReason": "coarse-pointer",
+      "canvasCount": 0,
+      "pictureVisible": true,
+      "imageComplete": true,
+      "imageNaturalWidth": 720,
+      "overflow": 0,
+      "ctaVisible": true,
+      "phoneVisible": false,
+      "resources": [
+        {
+          "name": "/style.css?v=20260804-assay",
+          "startTime": 9.8,
+          "duration": 28.6,
+          "transferSize": 60200
+        },
+        {
+          "name": "/assets/ag-assay-monolith-mobile.webp",
+          "startTime": 9.9,
+          "duration": 29.2,
+          "transferSize": 11472
+        },
+        {
+          "name": "/site.js?v=20260804-assay",
+          "startTime": 9.9,
+          "duration": 29.5,
+          "transferSize": 21086
+        },
+        {
+          "name": "/assay-scene.js?v=20260804-assay",
+          "startTime": 75.3,
+          "duration": 1.9,
+          "transferSize": 36670
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "mobile-320x800",
+      "status": "PASS",
+      "viewport": {
+        "width": 320,
+        "height": 800
+      },
+      "state": "fallback",
+      "fallbackReason": "coarse-pointer",
+      "canvasCount": 0,
+      "pictureVisible": true,
+      "imageComplete": true,
+      "imageNaturalWidth": 720,
+      "overflow": 0,
+      "ctaVisible": false,
+      "phoneVisible": false,
+      "resources": [
+        {
+          "name": "/style.css?v=20260804-assay",
+          "startTime": 7.9,
+          "duration": 33.8,
+          "transferSize": 60200
+        },
+        {
+          "name": "/assets/ag-assay-monolith-mobile.webp",
+          "startTime": 7.9,
+          "duration": 34.6,
+          "transferSize": 11472
+        },
+        {
+          "name": "/site.js?v=20260804-assay",
+          "startTime": 8.1,
+          "duration": 36.6,
+          "transferSize": 21086
+        },
+        {
+          "name": "/assay-scene.js?v=20260804-assay",
+          "startTime": 66.3,
+          "duration": 7.8,
+          "transferSize": 36670
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "reduced-motion",
+      "status": "PASS",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "state": "fallback",
+      "fallbackReason": "reduced-motion",
+      "canvasCount": 0,
+      "pictureVisible": true,
+      "imageComplete": true,
+      "imageNaturalWidth": 1280,
+      "overflow": 0,
+      "ctaVisible": false,
+      "phoneVisible": false,
+      "resources": [
+        {
+          "name": "/assets/ag-assay-monolith-1280.webp",
+          "startTime": 5.3,
+          "duration": 35.1,
+          "transferSize": 35636
+        },
+        {
+          "name": "/style.css?v=20260804-assay",
+          "startTime": 5.3,
+          "duration": 33.8,
+          "transferSize": 60200
+        },
+        {
+          "name": "/site.js?v=20260804-assay",
+          "startTime": 5.7,
+          "duration": 38.4,
+          "transferSize": 21086
+        },
+        {
+          "name": "/assay-scene.js?v=20260804-assay",
+          "startTime": 68.9,
+          "duration": 2.9,
+          "transferSize": 36670
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "save-data",
+      "status": "PASS",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "state": "fallback",
+      "fallbackReason": "save-data",
+      "canvasCount": 0,
+      "pictureVisible": true,
+      "imageComplete": true,
+      "imageNaturalWidth": 1280,
+      "overflow": 0,
+      "ctaVisible": false,
+      "phoneVisible": false,
+      "resources": [
+        {
+          "name": "/style.css?v=20260804-assay",
+          "startTime": 4.5,
+          "duration": 39.5,
+          "transferSize": 60200
+        },
+        {
+          "name": "/assets/ag-assay-monolith-1280.webp",
+          "startTime": 4.6,
+          "duration": 40.7,
+          "transferSize": 35636
+        },
+        {
+          "name": "/site.js?v=20260804-assay",
+          "startTime": 4.6,
+          "duration": 44.3,
+          "transferSize": 21086
+        },
+        {
+          "name": "/assay-scene.js?v=20260804-assay",
+          "startTime": 88,
+          "duration": 2.7,
+          "transferSize": 36670
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "no-webgl",
+      "status": "PASS",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "state": "fallback",
+      "fallbackReason": "no-webgl",
+      "canvasCount": 0,
+      "pictureVisible": true,
+      "imageComplete": true,
+      "imageNaturalWidth": 1280,
+      "overflow": 0,
+      "ctaVisible": false,
+      "phoneVisible": false,
+      "resources": [
+        {
+          "name": "/style.css?v=20260804-assay",
+          "startTime": 4.9,
+          "duration": 17.3,
+          "transferSize": 60200
+        },
+        {
+          "name": "/assets/ag-assay-monolith-1280.webp",
+          "startTime": 5.1,
+          "duration": 18.2,
+          "transferSize": 35636
+        },
+        {
+          "name": "/site.js?v=20260804-assay",
+          "startTime": 5.1,
+          "duration": 21.1,
+          "transferSize": 21086
+        },
+        {
+          "name": "/assay-scene.js?v=20260804-assay",
+          "startTime": 66.5,
+          "duration": 2,
+          "transferSize": 36670
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "no-js",
+      "status": "PASS",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "pictureVisible": true,
+      "ctaVisible": true,
+      "phoneVisible": true,
+      "intakeVisible": true,
+      "canvasCount": 0,
+      "overflow": 0,
+      "resources": [
+        "/style.css?v=20260804-assay",
+        "/assets/ag-assay-monolith-mobile.webp",
+        "/site.js?v=20260804-assay"
+      ],
+      "errors": []
+    },
+    {
+      "name": "no-js-desktop",
+      "status": "PASS",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "pictureVisible": true,
+      "ctaVisible": true,
+      "phoneVisible": true,
+      "intakeVisible": true,
+      "canvasCount": 0,
+      "errors": []
+    },
+    {
+      "name": "context-loss",
+      "status": "PASS",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "extensionAvailable": true,
+      "threeRequestsBefore": 2,
+      "state": "fallback",
+      "reason": "context-lost",
+      "canvasCount": 0,
+      "hostHidden": true,
+      "fallbackOpacity": 1,
+      "controller": {
+        "state": "fallback",
+        "active": false,
+        "disposed": false,
+        "frameCount": 2,
+        "triangles": 3438,
+        "drawCalls": 8,
+        "pixelRatio": 1,
+        "reviewView": "match",
+        "contextLost": true
+      },
+      "ctaActionable": true,
+      "threeRequestsAfter": 2,
+      "errors": []
+    },
+    {
+      "name": "pause-and-pointer",
+      "status": "PASS",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "pointer": {
+        "initial": 2,
+        "moving": 15,
+        "settledA": 40,
+        "settledB": 40
+      },
+      "offscreen": {
+        "first": {
+          "state": "ready",
+          "active": false,
+          "disposed": false,
+          "frameCount": 44,
+          "triangles": 3438,
+          "drawCalls": 8,
+          "pixelRatio": 1,
+          "reviewView": "match",
+          "contextLost": false
+        },
+        "second": {
+          "state": "ready",
+          "active": false,
+          "disposed": false,
+          "frameCount": 44,
+          "triangles": 3438,
+          "drawCalls": 8,
+          "pixelRatio": 1,
+          "reviewView": "match",
+          "contextLost": false
+        },
+        "resumed": {
+          "state": "ready",
+          "active": true,
+          "disposed": false,
+          "frameCount": 58,
+          "triangles": 3438,
+          "drawCalls": 8,
+          "pixelRatio": 1,
+          "reviewView": "match",
+          "contextLost": false
+        }
+      },
+      "visibility": {
+        "emulated": true,
+        "method": "Page.setWebLifecycleState",
+        "beforeFrozen": 67,
+        "afterActive": 67,
+        "delta": 0,
+        "visibilityStateAfterActivation": "visible"
+      },
+      "errors": []
+    }
+  ],
+  "failures": []
+}

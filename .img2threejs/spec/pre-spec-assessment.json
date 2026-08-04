@@ -1,0 +1,115 @@
+{
+  "targetName": "AG assay monolith",
+  "sourceImage": "docs/qa/references/ag-assay-monolith-reference.png",
+  "preSpecAssessment": {
+    "sourceImage": "docs/qa/references/ag-assay-monolith-reference.png",
+    "objectClass": {
+      "primaryType": "cast assay monolith",
+      "primaryDomain": "object",
+      "formLanguage": ["hard-surface", "continuous-sculpt", "geometric", "shallow-relief"],
+      "structureKind": ["single body", "layered surface relief", "repeated concentric modules"],
+      "motionPotential": ["static prop", "whole-object inspection transform"],
+      "materialFamilies": ["satin silver metal", "blue inlay or paint", "dark recessed metal"],
+      "notes": "A reference-guided marketing approximation of one cast metallic object; not a manufacturing model."
+    },
+    "complexity": {
+      "tier": "moderate",
+      "scores": {
+        "silhouetteComplexity": 1,
+        "componentCount": 2,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 1,
+        "materialLayerCount": 2,
+        "localDetailDensity": 2,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 5,
+        "microFeatureGroups": 7,
+        "materialLayers": 4,
+        "repetitionSystems": 2
+      },
+      "reasoning": [
+        "The overall silhouette is simple, but the identity depends on physically readable concentric relief, recessed marks, a wrapped blue line, and multiscale metallic surface breakup.",
+        "A shallow hierarchy is sufficient because the object is one cast body and only the whole-object pivot moves."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "moderate",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Macro silhouette, meso identity assemblies, micro relief/material breakup, and one root inspection pivot are all required."
+    },
+    "unknownsToResolveBeforeImplementation": [
+      "Underside and rear-face geometry are hidden; keep them simple and explicitly inferred.",
+      "Exact real-world dimensions and chamfer radii are unavailable; use normalized proportions only.",
+      "Blue-line relief and medium are ambiguous; default to a flush shallow inlay without claiming exact construction.",
+      "Exact assay-well depth and ring profile are inferred from a single three-quarter view.",
+      "Exact glyph outlines are unavailable; use a close geometric approximation and grade legibility, not font identity."
+    ],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 10,
+      "note": "Each detail maps to a named component local feature or material local override in the final spec.",
+      "details": [
+        {"id": "d01", "region": [0.08, 0.27, 0.80, 0.55], "kind": "bevel", "affects": "geometry", "scale": "meso", "evidenceRef": "full-object", "confidence": 0.96, "mapsTo": {"type": "component.localFeatures", "componentId": "monolith-body", "featureId": "soft-cast-perimeter"}},
+        {"id": "d02", "region": [0.38, 0.42, 0.19, 0.24], "kind": "hole", "affects": "geometry", "scale": "meso", "evidenceRef": "assay-well", "confidence": 0.94, "mapsTo": {"type": "component.localFeatures", "componentId": "assay-bowl", "featureId": "recessed-assay-bowl"}},
+        {"id": "d03", "region": [0.37, 0.40, 0.21, 0.22], "kind": "ridge", "affects": "geometry", "scale": "meso", "evidenceRef": "assay-well", "confidence": 0.95, "mapsTo": {"type": "component.localFeatures", "componentId": "assay-rings", "featureId": "concentric-ridge-set"}},
+        {"id": "d04", "region": [0.12, 0.34, 0.77, 0.13], "kind": "linework", "affects": "material", "scale": "meso", "evidenceRef": "blue-line", "confidence": 0.90, "mapsTo": {"type": "material.localOverrides", "materialId": "blue-inlay", "overrideId": "wrapped-calibration-line"}},
+        {"id": "d05", "region": [0.62, 0.49, 0.21, 0.15], "kind": "linework", "affects": "geometry", "scale": "meso", "evidenceRef": "identity-marks", "confidence": 0.96, "mapsTo": {"type": "component.localFeatures", "componentId": "identity-glyphs", "featureId": "recessed-ag-47"}},
+        {"id": "d06", "region": [0.13, 0.54, 0.09, 0.13], "kind": "linework", "affects": "geometry", "scale": "micro", "evidenceRef": "front-ticks", "confidence": 0.97, "mapsTo": {"type": "component.localFeatures", "componentId": "front-ticks", "featureId": "three-recessed-ticks"}},
+        {"id": "d07", "region": [0.10, 0.25, 0.79, 0.43], "kind": "scratch", "affects": "roughness-normal", "scale": "micro", "evidenceRef": "metal-surface", "confidence": 0.92, "mapsTo": {"type": "material.localOverrides", "materialId": "satin-silver", "overrideId": "directional-scratch-field"}},
+        {"id": "d08", "region": [0.08, 0.28, 0.82, 0.36], "kind": "stain", "affects": "albedo-roughness", "scale": "micro", "evidenceRef": "metal-surface", "confidence": 0.84, "mapsTo": {"type": "material.localOverrides", "materialId": "satin-silver", "overrideId": "poured-mottle"}},
+        {"id": "d09", "region": [0.08, 0.28, 0.82, 0.40], "kind": "gloss", "affects": "roughness", "scale": "micro", "evidenceRef": "metal-surface", "confidence": 0.93, "mapsTo": {"type": "material.localOverrides", "materialId": "satin-silver", "overrideId": "bevel-crest-polish"}},
+        {"id": "d10", "region": [0.08, 0.27, 0.82, 0.44], "kind": "chip", "affects": "geometry-normal", "scale": "micro", "evidenceRef": "metal-surface", "confidence": 0.82, "mapsTo": {"type": "component.localFeatures", "componentId": "monolith-body", "featureId": "cast-edge-dents"}}
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {"headUnit": 0.0, "torso": 0.0, "legs": 0.0, "shoulderWidth": 0.0, "hipWidth": 0.0},
+      "pose": {"type": "not-applicable", "jointAngles": {}},
+      "faceLandmarks": {"eyeLine": 0.0, "eyeSpacing": 0.0, "noseBase": 0.0, "mouthLine": 0.0, "hairline": 0.0},
+      "features": [],
+      "confidence": 1.0,
+      "note": "Not a character or hybrid."
+    }
+  },
+  "qualityContract": {
+    "qualityBar": "moderate",
+    "definitionOfDone": [
+      "At the reference camera, the model reads immediately as the same low cast-silver assay monolith rather than a generic rounded box.",
+      "The assay bowl, concentric rings, blue line, `Ag / 47`, and three front ticks remain legible at desktop hero size.",
+      "Satin-metal highlight breakup survives neutral and grazing light without becoming mirror chrome or flat gray plastic.",
+      "Desktop and mobile use the same static fallback; WebGL remains optional and nonblocking."
+    ],
+    "minimumSpecDepth": {"macroComponents": 2, "mesoComponents": 5, "microFeatureGroups": 5, "materialLayers": 4, "repetitionSystems": 2, "reviewViewpoints": 4},
+    "featureGroups": [
+      {"id": "overall-silhouette", "name": "Shallow cast monolith silhouette", "required": true, "qualityCriteria": ["Approximate 4.8:1.7:0.72 proportions, softened plan corners, broad uneven perimeter bevel, and slight top crown are explicit."], "evidenceRefs": ["full-object"], "failureModes": ["reads as a sharp box", "height or depth overwhelms the long low profile"]},
+      {"id": "assay-relief", "name": "Concentric assay well", "required": true, "qualityCriteria": ["Multiple rings and the recessed bowl produce real parallax, occlusion, and grazing highlights."], "evidenceRefs": ["assay-well"], "failureModes": ["painted bullseye", "flat discs with no cavity"]},
+      {"id": "identity-marks", "name": "AG identity marks", "required": true, "qualityCriteria": ["Blue wrapped line, recessed `Ag / 47`, and three front ticks are placed and proportioned from visible evidence."], "evidenceRefs": ["blue-line", "identity-marks", "front-ticks"], "failureModes": ["generic logo", "marks missing or mirrored"]},
+      {"id": "silver-surface", "name": "Satin poured silver response", "required": true, "qualityCriteria": ["Independent albedo, roughness, normal, and AO responses include macro mottle, meso brushing/dents, and micro scratches."], "evidenceRefs": ["metal-surface"], "failureModes": ["uniform chrome", "flat gray plastic", "noise that changes silhouette excessively"]},
+      {"id": "runtime-restraint", "name": "Optional restrained inspection", "required": true, "qualityCriteria": ["One root pivot supports low-amplitude pointer inspection; reduced motion and static fallback remain first-class."], "evidenceRefs": ["full-object"], "failureModes": ["autonomous spin", "canvas blocks CTA", "mobile GPU budget exceeded"]}
+    ],
+    "visualDeltaChecks": ["long-low silhouette and corner radius", "ring count, diameter, depth, and negative-space bowl", "blue-line placement and end wrap", "glyph/tick placement and legibility", "satin metal roughness and multiscale relief", "reference camera, cream background, and soft rightward contact shadow"],
+    "antiShallowSpecRules": [
+      "Do not replace the assay well with a flat texture.",
+      "Do not model the monolith as an unmodified sharp BoxGeometry.",
+      "Do not reuse albedo as roughness, height, normal, or AO.",
+      "Do not claim hidden-face or manufacturing accuracy from this single image.",
+      "Do not proceed to visual acceptance without same-camera desktop and mobile renders plus a static-fallback check."
+    ]
+  },
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "cast metal monolith rounded cuboid concentric relief",
+    "index": {"status": "skipped", "reason": "The security-curated workflow uses direct reference observation; no object-specific local adapter was required.", "fingerprint": "none"},
+    "matches": []
+  },
+  "authoringInstruction": "Author a reference-specific ObjectSculptSpec; retain all single-image limitations and production runtime constraints."
+}

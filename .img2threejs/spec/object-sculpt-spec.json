@@ -1,0 +1,1111 @@
+{
+  "targetName": "AG assay monolith",
+  "targetId": "ag-assay-monolith",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "docs/qa/references/ag-assay-monolith-reference.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 34.0,
+    "aspect": 1.5,
+    "orientation": {
+      "yaw": -0.5,
+      "pitch": -0.42,
+      "roll": 0.0
+    },
+    "positionHint": [6.4, 4.5, 7.8],
+    "targetHint": [0.0, 0.35, 0.0],
+    "note": "Single-view approximation for same-frame review only. Reference projection is intentionally not used; confirm framing by render overlay before acceptance."
+  },
+  "suitability": "conditional",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "sourceImage": "docs/qa/references/ag-assay-monolith-reference.png",
+    "objectClass": {
+      "primaryType": "cast assay monolith",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "hard-surface",
+        "continuous-sculpt",
+        "geometric",
+        "shallow-relief"
+      ],
+      "structureKind": [
+        "single body",
+        "layered surface relief",
+        "repeated concentric modules"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object inspection transform"
+      ],
+      "materialFamilies": [
+        "satin silver metal",
+        "blue inlay or paint",
+        "dark recessed metal"
+      ],
+      "notes": "A reference-guided marketing approximation of one cast metallic object; not a manufacturing model."
+    },
+    "complexity": {
+      "tier": "moderate",
+      "scores": {
+        "silhouetteComplexity": 1,
+        "componentCount": 2,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 1,
+        "materialLayerCount": 2,
+        "localDetailDensity": 2,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 5,
+        "microFeatureGroups": 7,
+        "materialLayers": 4,
+        "repetitionSystems": 2
+      },
+      "reasoning": [
+        "The overall silhouette is simple, but the identity depends on physically readable concentric relief, recessed marks, a wrapped blue line, and multiscale metallic surface breakup.",
+        "A shallow hierarchy is sufficient because the object is one cast body and only the whole-object pivot moves."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "moderate",
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Macro silhouette, meso identity assemblies, micro relief/material breakup, and one root inspection pivot are all required."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 10,
+      "note": "Each detail maps to a named component local feature or material local override in the final spec.",
+      "details": [
+        {
+          "id": "d01",
+          "region": [
+            0.08,
+            0.27,
+            0.8,
+            0.55
+          ],
+          "kind": "bevel",
+          "affects": "geometry",
+          "scale": "meso",
+          "evidenceRef": "full-object",
+          "confidence": 0.96,
+          "mapsTo": {
+            "ref": "soft-cast-perimeter",
+            "type": "component.localFeatures",
+            "componentId": "monolith-body",
+            "featureId": "soft-cast-perimeter"
+          },
+          "realization": "geometry"
+        },
+        {
+          "id": "d02",
+          "region": [
+            0.38,
+            0.42,
+            0.19,
+            0.24
+          ],
+          "kind": "hole",
+          "affects": "geometry",
+          "scale": "meso",
+          "evidenceRef": "assay-well",
+          "confidence": 0.94,
+          "mapsTo": {
+            "ref": "recessed-assay-bowl",
+            "type": "component.localFeatures",
+            "componentId": "assay-bowl",
+            "featureId": "recessed-assay-bowl"
+          },
+          "realization": "geometry"
+        },
+        {
+          "id": "d03",
+          "region": [
+            0.37,
+            0.4,
+            0.21,
+            0.22
+          ],
+          "kind": "ridge",
+          "affects": "geometry",
+          "scale": "meso",
+          "evidenceRef": "assay-well",
+          "confidence": 0.95,
+          "mapsTo": {
+            "ref": "concentric-ridge-set",
+            "type": "component.localFeatures",
+            "componentId": "assay-rings",
+            "featureId": "concentric-ridge-set"
+          },
+          "realization": "geometry"
+        },
+        {
+          "id": "d04",
+          "region": [
+            0.12,
+            0.34,
+            0.77,
+            0.13
+          ],
+          "kind": "linework",
+          "affects": "material",
+          "scale": "meso",
+          "evidenceRef": "blue-line",
+          "confidence": 0.9,
+          "mapsTo": {
+            "ref": "wrapped-calibration-line",
+            "type": "material.localOverrides",
+            "materialId": "blue-inlay",
+            "overrideId": "wrapped-calibration-line"
+          },
+          "realization": "material-and-shallow-carrier"
+        },
+        {
+          "id": "d05",
+          "region": [
+            0.62,
+            0.49,
+            0.21,
+            0.15
+          ],
+          "kind": "linework",
+          "affects": "geometry",
+          "scale": "meso",
+          "evidenceRef": "identity-marks",
+          "confidence": 0.96,
+          "mapsTo": {
+            "ref": "recessed-ag-47",
+            "type": "component.localFeatures",
+            "componentId": "identity-glyphs",
+            "featureId": "recessed-ag-47"
+          },
+          "realization": "geometry"
+        },
+        {
+          "id": "d06",
+          "region": [
+            0.13,
+            0.54,
+            0.09,
+            0.13
+          ],
+          "kind": "linework",
+          "affects": "geometry",
+          "scale": "micro",
+          "evidenceRef": "front-ticks",
+          "confidence": 0.97,
+          "mapsTo": {
+            "ref": "three-recessed-ticks",
+            "type": "component.localFeatures",
+            "componentId": "front-ticks",
+            "featureId": "three-recessed-ticks"
+          },
+          "realization": "geometry"
+        },
+        {
+          "id": "d07",
+          "region": [
+            0.1,
+            0.25,
+            0.79,
+            0.43
+          ],
+          "kind": "scratch",
+          "affects": "roughness-normal",
+          "scale": "micro",
+          "evidenceRef": "metal-surface",
+          "confidence": 0.92,
+          "mapsTo": {
+            "ref": "directional-scratch-field",
+            "type": "material.localOverrides",
+            "materialId": "satin-silver",
+            "overrideId": "directional-scratch-field"
+          },
+          "realization": "independent-normal-and-roughness"
+        },
+        {
+          "id": "d08",
+          "region": [
+            0.08,
+            0.28,
+            0.82,
+            0.36
+          ],
+          "kind": "stain",
+          "affects": "albedo-roughness",
+          "scale": "micro",
+          "evidenceRef": "metal-surface",
+          "confidence": 0.84,
+          "mapsTo": {
+            "ref": "poured-mottle",
+            "type": "material.localOverrides",
+            "materialId": "satin-silver",
+            "overrideId": "poured-mottle"
+          },
+          "realization": "independent-albedo-and-roughness"
+        },
+        {
+          "id": "d09",
+          "region": [
+            0.08,
+            0.28,
+            0.82,
+            0.4
+          ],
+          "kind": "gloss",
+          "affects": "roughness",
+          "scale": "micro",
+          "evidenceRef": "metal-surface",
+          "confidence": 0.93,
+          "mapsTo": {
+            "ref": "bevel-crest-polish",
+            "type": "material.localOverrides",
+            "materialId": "satin-silver",
+            "overrideId": "bevel-crest-polish"
+          },
+          "realization": "localized-roughness"
+        },
+        {
+          "id": "d10",
+          "region": [
+            0.08,
+            0.27,
+            0.82,
+            0.44
+          ],
+          "kind": "chip",
+          "affects": "geometry-normal",
+          "scale": "micro",
+          "evidenceRef": "metal-surface",
+          "confidence": 0.82,
+          "mapsTo": {
+            "ref": "cast-edge-dents",
+            "type": "component.localFeatures",
+            "componentId": "monolith-body",
+            "featureId": "cast-edge-dents"
+          },
+          "realization": "geometry-and-normal"
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "not-applicable",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 1.0,
+      "note": "Not a character or hybrid."
+    }
+  },
+  "qualityContract": {
+    "qualityBar": "moderate",
+    "definitionOfDone": [
+      "At the reference camera, the model reads immediately as the same low cast-silver assay monolith rather than a generic rounded box.",
+      "The assay bowl, concentric rings, blue line, `Ag / 47`, and three front ticks remain legible at desktop hero size.",
+      "Satin-metal highlight breakup survives neutral and grazing light without becoming mirror chrome or flat gray plastic.",
+      "Desktop and mobile use the same static fallback; WebGL remains optional and nonblocking."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 2,
+      "mesoComponents": 5,
+      "microFeatureGroups": 5,
+      "materialLayers": 4,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Shallow cast monolith silhouette",
+        "required": true,
+        "qualityCriteria": [
+          "Approximate 4.8:1.7:0.72 proportions, softened plan corners, broad uneven perimeter bevel, and slight top crown are explicit."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "reads as a sharp box",
+          "height or depth overwhelms the long low profile"
+        ]
+      },
+      {
+        "id": "assay-relief",
+        "name": "Concentric assay well",
+        "required": true,
+        "qualityCriteria": [
+          "Multiple rings and the recessed bowl produce real parallax, occlusion, and grazing highlights."
+        ],
+        "evidenceRefs": [
+          "assay-well"
+        ],
+        "failureModes": [
+          "painted bullseye",
+          "flat discs with no cavity"
+        ]
+      },
+      {
+        "id": "identity-marks",
+        "name": "AG identity marks",
+        "required": true,
+        "qualityCriteria": [
+          "Blue wrapped line, recessed `Ag / 47`, and three front ticks are placed and proportioned from visible evidence."
+        ],
+        "evidenceRefs": [
+          "blue-line",
+          "identity-marks",
+          "front-ticks"
+        ],
+        "failureModes": [
+          "generic logo",
+          "marks missing or mirrored"
+        ]
+      },
+      {
+        "id": "silver-surface",
+        "name": "Satin poured silver response",
+        "required": true,
+        "qualityCriteria": [
+          "Independent albedo, roughness, normal, and AO responses include macro mottle, meso brushing/dents, and micro scratches."
+        ],
+        "evidenceRefs": [
+          "metal-surface"
+        ],
+        "failureModes": [
+          "uniform chrome",
+          "flat gray plastic",
+          "noise that changes silhouette excessively"
+        ]
+      },
+      {
+        "id": "runtime-restraint",
+        "name": "Optional restrained inspection",
+        "required": true,
+        "qualityCriteria": [
+          "One root pivot supports low-amplitude pointer inspection; reduced motion and static fallback remain first-class."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "autonomous spin",
+          "canvas blocks CTA",
+          "mobile GPU budget exceeded"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "long-low silhouette and corner radius",
+      "ring count, diameter, depth, and negative-space bowl",
+      "blue-line placement and end wrap",
+      "glyph/tick placement and legibility",
+      "satin metal roughness and multiscale relief",
+      "reference camera, cream background, and soft rightward contact shadow"
+    ],
+    "antiShallowSpecRules": [
+      "Do not replace the assay well with a flat texture.",
+      "Do not model the monolith as an unmodified sharp BoxGeometry.",
+      "Do not reuse albedo as roughness, height, normal, or AO.",
+      "Do not claim hidden-face or manufacturing accuracy from this single image.",
+      "Do not proceed to visual acceptance without same-camera desktop and mobile renders plus a static-fallback check.",
+      "Adjacent components must overlap by at least 0.02 world units at shared seams (source: grimoire/build/geometry_patterns.md).",
+      "Raised or recessed relief and fasteners must be geometry, instanced micro-parts, or displacement; a map alone is an approximation (source: grimoire/build/geometry_patterns.md)."
+    ],
+    "mustNotDo": [
+      "Do not replace the assay well with a flat texture.",
+      "Do not model the monolith as an unmodified sharp BoxGeometry.",
+      "Do not reuse albedo as roughness, height, normal, or AO.",
+      "Do not claim hidden-face or manufacturing accuracy from this single image.",
+      "Do not proceed to visual acceptance without same-camera desktop and mobile renders plus a static-fallback check.",
+      "Adjacent components must overlap by at least 0.02 world units at shared seams (source: grimoire/build/geometry_patterns.md).",
+      "Raised or recessed relief and fasteners must be geometry, instanced micro-parts, or displacement; a map alone is an approximation (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.82,
+    "mustMatch": [
+      "4.8:1.7:0.72 long-low silhouette with softened plan corners",
+      "real assay-bowl negative space and concentric relief",
+      "blue line, recessed Ag / 47, and three front ticks",
+      "reference-derived satin-metal response with PBR evidence confidence 0.86"
+    ],
+    "niceToHave": [
+      "nonidentical cast-edge dents and pits",
+      "warm-cream studio reflection and cool right-edge rim match"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "front",
+      "three-quarter",
+      "side",
+      "thickness-axis",
+      "long-axis"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "lighting-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "monolith-silhouette",
+      "name": "Long low cast body and softened perimeter",
+      "tier": "critical",
+      "passIds": [
+        "blockout"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "monolith-body"
+      ],
+      "evidenceRefs": [
+        "full-object"
+      ]
+    },
+    {
+      "id": "assay-well-relief",
+      "name": "Concentric assay well and recessed bowl",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass",
+        "form-refinement"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "assay-rings",
+        "assay-bowl"
+      ],
+      "evidenceRefs": [
+        "full-object"
+      ]
+    },
+    {
+      "id": "identity-mark-system",
+      "name": "Blue calibration line, Ag / 47, and front ticks",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass",
+        "form-refinement"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "blue-line",
+        "identity-glyphs",
+        "front-ticks"
+      ],
+      "evidenceRefs": [
+        "blue-line",
+        "identity-marks",
+        "front-ticks"
+      ]
+    },
+    {
+      "id": "satin-silver-response",
+      "name": "Satin poured-metal surface response",
+      "tier": "critical",
+      "passIds": [
+        "material-pass",
+        "surface-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "monolith-body"
+      ],
+      "evidenceRefs": [
+        "metal-surface"
+      ]
+    },
+    {
+      "id": "reference-lighting-read",
+      "name": "Cream studio key, cool rim, and soft contact shadow",
+      "tier": "important",
+      "passIds": [
+        "lighting-pass"
+      ],
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "componentRefs": [
+        "monolith-body"
+      ],
+      "evidenceRefs": [
+        "full-object"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "blockout requires a browser screenshot and self-correction review before structural-pass unlocks",
+    "nextRequiredEvidence": [
+      "blockout browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet",
+      "AI vision score >= 0.7 with layer scores and mismatch critique",
+      "critical semantic feature scores from the same image pair meeting their individual thresholds",
+      "reviewHistory entry for blockout with action=continue"
+    ]
+  },
+  "lookDevTargets": {
+    "qualityPriority": "reference-fidelity",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": true,
+      "normalOrBumpRequired": true,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 1024,
+      "preferredTextureResolution": 2048,
+      "independentMapChannels": [
+        "albedo",
+        "roughness",
+        "height",
+        "normal",
+        "ambient-occlusion"
+      ],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": true,
+        "targetThreshold": 0.7,
+        "stopOnLowConfidence": true,
+        "script": "forge/stage1_intake/extract_pbr_evidence.py",
+        "acceptedLimitation": "single-image extraction is reference-derived inference, not exact photogrammetry"
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "rim or environment light",
+        "exposure",
+        "tone mapping",
+        "background",
+        "contact shadow"
+      ],
+      "mustAvoid": [
+        "ambient-only lighting",
+        "flat value range",
+        "missing contact shadow",
+        "reference lighting copied without separating material readability"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "Hidden underside and rear faces use the same softened cast-metal language with no invented marks.",
+    "Normalized object dimensions are 4.8 by 0.72 by 1.7; they communicate proportion, not manufacturing scale.",
+    "The blue mark is implemented as a nearly flush inlay because the single view does not establish measurable depth.",
+    "The assay bowl and glyph recess depths are tuned by same-camera render comparison rather than claimed physical measurement."
+  ],
+  "coordinateFrame": {
+    "front": "+Z is the visible long face carrying the three ticks",
+    "up": "+Y is the top face normal",
+    "longAxis": "+X runs along the monolith length",
+    "scaleReference": "normalized 4.8 x 0.72 x 1.7 body proportions"
+  },
+  "silhouette": {
+    "boundingShape": "low rounded rectangular cuboid with a slight top crown and broad cast perimeter transition",
+    "aspectRatios": ["length:depth = 2.82:1", "length:height = 6.67:1", "depth:height = 2.36:1"],
+    "symmetry": "approximately bilateral about X and Z at macro scale; surface dents and marks are asymmetric",
+    "dominantCurves": ["rounded plan corners", "broad top-edge bevel", "soft lower-edge roll"],
+    "negativeSpaces": ["central recessed assay bowl"],
+    "landmarks": ["blue line near rear third", "assay well slightly left of center", "Ag / 47 on top-right", "three ticks on front-left"]
+  },
+  "viewEvidence": [
+    {"id": "full-object", "view": "primary three-quarter", "imageRegion": {"x": 0.06, "y": 0.24, "width": 0.87, "height": 0.66, "units": "normalized"}, "observations": ["long low body", "top/front/right faces visible", "soft rightward contact shadow"], "confidence": 0.97},
+    {"id": "assay-well", "view": "top center detail", "imageRegion": {"x": 0.37, "y": 0.40, "width": 0.21, "height": 0.24, "units": "normalized"}, "observations": ["multiple concentric ridges", "recessed bowl", "dark cavity rim"], "confidence": 0.95},
+    {"id": "blue-line", "view": "top rear-third detail", "imageRegion": {"x": 0.11, "y": 0.33, "width": 0.78, "height": 0.14, "units": "normalized"}, "observations": ["thin saturated-blue line", "visible lateral-end wrap", "near-flush relief"], "confidence": 0.91},
+    {"id": "identity-marks", "view": "top-right detail", "imageRegion": {"x": 0.61, "y": 0.47, "width": 0.23, "height": 0.17, "units": "normalized"}, "observations": ["recessed Ag / 47", "dark edges", "metallic interior highlights"], "confidence": 0.96},
+    {"id": "front-ticks", "view": "front-left detail", "imageRegion": {"x": 0.12, "y": 0.52, "width": 0.10, "height": 0.15, "units": "normalized"}, "observations": ["three narrow vertical grooves", "slight spacing and length variation"], "confidence": 0.97},
+    {"id": "metal-surface", "view": "top and front material", "imageRegion": {"x": 0.08, "y": 0.26, "width": 0.82, "height": 0.48, "units": "normalized"}, "observations": ["satin silver", "broad warm reflections", "pits and scratches", "finer front-face brushing"], "confidence": 0.93}
+  ],
+  "componentTree": [
+    {
+      "id": "root", "name": "Inspection pivot", "level": "macro", "role": "organizer", "importance": 1.0, "confidence": 1.0,
+      "primitive": "box", "topologyClass": "material-only", "topologyRationale": "Invisible unit-scale organizer; it carries no visible geometry and exists only for the whole-object inspection pivot.",
+      "geometryDescriptor": {"topologyIntent": "invisible unit-scale organizer", "edgeTreatment": {"type": "none", "bevelRadius": 0.0, "segments": 1}, "deformationStack": [], "uvStrategy": "none", "normalStrategy": "none"},
+      "parent": null, "attachment": null,
+      "dimensions": {"width": 1.0, "height": 1.0, "depth": 1.0, "units": "relative", "confidence": 1.0},
+      "transform": {"position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "root", "pivot": {"mode": "center-of-mass", "localPosition": [0, 0.36, 0], "axis": [0, 1, 0], "confidence": 0.9}, "transformChannels": {"translate": false, "rotate": true, "scale": false, "bend": false, "twist": false, "detach": false, "visibility": true, "materialState": false}, "sockets": [], "collider": {"type": "box", "offset": [0, 0.36, 0], "scale": [4.8, 0.72, 1.7], "isTrigger": false, "notes": "Optional pointer-hit proxy only; no physics."}, "constraints": ["pointer yaw <= 7 degrees", "pointer pitch <= 4 degrees", "spring return to rest"], "destruction": {"breakable": false, "fractureGroup": "monolith", "seamRefs": [], "detachableFragments": [], "breakImpulse": 0.0, "debrisMaterial": "satin-silver"}},
+      "material": "hidden", "materialLayers": ["hidden"], "deformations": [], "joints": [], "seams": [], "localFeatures": [], "surfaceDetail": {"macroRoughness": 0, "microRoughness": 0, "bumpAmplitude": 0, "normalPattern": "none", "displacementPattern": "none", "occlusionPattern": "none", "edgeWearPattern": "none", "notes": "not rendered"}, "evidenceRefs": ["full-object"], "details": [], "fidelityTier": "blockout"
+    },
+    {
+      "id": "monolith-body", "name": "Cast silver monolith body", "level": "macro", "role": "body", "importance": 1.0, "confidence": 0.93,
+      "primitive": "box", "topologyClass": "assembled-solid", "topologyRationale": "The reference shows countable top, front, and end faces joined by simple broad rounded transitions, so a custom rounded cuboid is structurally appropriate.",
+      "geometryDescriptor": {"topologyIntent": "custom rounded cuboid with slight crowned-top vertex deformation", "edgeTreatment": {"type": "rounded-chamfer", "bevelRadius": 0.16, "segments": 5}, "deformationStack": ["top crown +0.025 at center", "seeded edge-dent offsets <=0.018"], "uvStrategy": "triplanar-like object-space mapping", "normalStrategy": "weighted normals plus independent tangent-space micro normal"},
+      "colorMaterialRecipe": {"dominantAlbedo": "rgba(182, 166, 153, 1.0)", "secondaryAlbedo": "rgba(150, 139, 131, 1.0)", "materialClass": "metal", "materialClassConfidence": 0.94, "colorGradient": {"type": "linear", "stops": [{"offset": 0.0, "color": "rgba(192, 177, 162, 1.0)"}, {"offset": 1.0, "color": "rgba(118, 111, 107, 1.0)"}]}},
+      "parent": "root", "attachment": null,
+      "dimensions": {"width": 4.8, "height": 0.72, "depth": 1.7, "units": "relative", "confidence": 0.88},
+      "transform": {"position": [0, 0.36, 0], "rotation": [0, 0, 0], "scale": [4.8, 0.72, 1.7]},
+      "actionProfile": {"animationRole": "static-body", "pivot": {"mode": "inherited-root", "localPosition": [0, 0, 0], "axis": [0, 1, 0], "confidence": 1.0}, "transformChannels": {"translate": false, "rotate": false, "scale": false, "bend": false, "twist": false, "detach": false, "visibility": true, "materialState": true}, "sockets": [{"id": "top-relief", "localPosition": [0, 0.37, 0], "localRotation": [0, 0, 0]}], "collider": {"type": "box", "offset": [0, 0, 0], "scale": [1, 1, 1], "isTrigger": false, "notes": "Rounded-box approximation."}, "constraints": [], "destruction": {"breakable": false, "fractureGroup": "monolith", "seamRefs": [], "detachableFragments": [], "breakImpulse": 0.0, "debrisMaterial": "satin-silver"}},
+      "material": "satin-silver", "materialLayers": ["satin-silver", "recessed-dark"], "deformations": ["slight top crown", "seeded low-amplitude cast asymmetry"], "joints": [], "seams": [],
+      "localFeatures": [{"id": "soft-cast-perimeter", "type": "bevel", "placement": "all visible perimeter edges", "geometryEffect": "0.16 rounded chamfer with 5 segments", "confidence": 0.95}, {"id": "cast-edge-dents", "type": "chip", "placement": "sparse top and end perimeter", "geometryEffect": "seeded inward offsets <=0.018 without silhouette noise at mobile size", "confidence": 0.82}],
+      "surfaceDetail": {"macroRoughness": 0.12, "microRoughness": 0.18, "bumpAmplitude": 0.018, "normalPattern": "directional brushing plus sparse pits", "displacementPattern": "none on mobile; subtle crown in geometry", "occlusionPattern": "edge and relief crevices", "edgeWearPattern": "lower roughness on bevel crests", "notes": "Do not turn the surface into uniform chrome."},
+      "evidenceRefs": ["full-object", "metal-surface"], "details": ["long low cast mass", "soft rounded corners", "pitted satin surface"], "fidelityTier": "hero"
+    },
+    {
+      "id": "assay-rings", "name": "Concentric assay ring relief", "level": "meso", "role": "relief", "importance": 0.96, "confidence": 0.94,
+      "primitive": "torus", "topologyClass": "surface-relief", "topologyRationale": "Three concentric raised circular rims visibly catch grazing highlights and surround the central recess.",
+      "geometryDescriptor": {"topologyIntent": "three concentric torus ridges with shallow intervening grooves", "edgeTreatment": {"type": "rounded", "bevelRadius": 0.012, "segments": 3}, "torusTubeRatio": 0.055, "deformationStack": [], "uvStrategy": "cylindrical", "normalStrategy": "smooth vertex normals"},
+      "colorMaterialRecipe": {"dominantAlbedo": "rgba(182, 166, 153, 1.0)", "secondaryAlbedo": "rgba(118, 111, 107, 1.0)", "materialClass": "metal", "materialClassConfidence": 0.94},
+      "parent": "root", "attachment": null, "dimensions": {"width": 0.92, "height": 0.08, "depth": 0.92, "units": "relative", "confidence": 0.9},
+      "transform": {"position": [-0.12, 0.755, 0.08], "rotation": [1.5708, 0, 0], "scale": [0.92, 0.92, 0.12]},
+      "actionProfile": {"animationRole": "surface-detail", "pivot": {"mode": "center", "localPosition": [0, 0, 0], "axis": [0, 1, 0], "confidence": 1.0}, "transformChannels": {"translate": false, "rotate": false, "scale": false, "bend": false, "twist": false, "detach": false, "visibility": true, "materialState": true}, "sockets": [], "constraints": [], "destruction": {"breakable": false, "fractureGroup": "monolith", "seamRefs": [], "detachableFragments": [], "breakImpulse": 0, "debrisMaterial": "satin-silver"}},
+      "material": "satin-silver", "materialLayers": ["satin-silver", "recessed-dark"], "deformations": [], "joints": [], "seams": ["three shallow annular grooves"], "localFeatures": [{"id": "concentric-ridge-set", "type": "ridge", "placement": "top center-left", "geometryEffect": "three concentric rings with decreasing radii and slight height variation", "confidence": 0.95}], "surfaceDetail": {"macroRoughness": 0.06, "microRoughness": 0.12, "bumpAmplitude": 0.006, "normalPattern": "fine radial machining", "displacementPattern": "none", "occlusionPattern": "annular grooves", "edgeWearPattern": "polished ridge crests", "notes": "Must read by parallax and shadow."}, "evidenceRefs": ["assay-well"], "details": ["three metallic rings"], "fidelityTier": "hero"
+    },
+    {
+      "id": "assay-bowl", "name": "Recessed assay bowl", "level": "meso", "role": "cavity", "importance": 0.97, "confidence": 0.91,
+      "primitive": "lathe", "topologyClass": "continuous-sculpt", "topologyRationale": "The central feature is a rotationally symmetric concave bowl inferred from continuous highlight and shadow gradients.",
+      "geometryDescriptor": {"topologyIntent": "lathed shallow concave bowl proxy with dark inner wall", "edgeTreatment": {"type": "rounded-lip", "bevelRadius": 0.025, "segments": 4}, "latheProfile": {"points": [[0.08, -0.08], [0.23, -0.05], [0.31, 0.0], [0.34, 0.03]], "segments": 48}, "deformationStack": [], "uvStrategy": "cylindrical", "normalStrategy": "smooth vertex normals"},
+      "colorMaterialRecipe": {"dominantAlbedo": "rgba(150, 139, 131, 1.0)", "secondaryAlbedo": "rgba(59, 66, 77, 1.0)", "materialClass": "metal", "materialClassConfidence": 0.9, "colorGradient": {"type": "radial", "stops": [{"offset": 0.0, "color": "rgba(90, 84, 80, 1.0)"}, {"offset": 1.0, "color": "rgba(182, 166, 153, 1.0)"}]}},
+      "parent": "root", "attachment": null, "dimensions": {"radius": 0.34, "height": 0.11, "units": "relative", "confidence": 0.82},
+      "transform": {"position": [-0.12, 0.745, 0.08], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+      "actionProfile": {"animationRole": "surface-detail", "pivot": {"mode": "center", "localPosition": [0, 0, 0], "axis": [0, 1, 0], "confidence": 1.0}, "transformChannels": {"translate": false, "rotate": false, "scale": false, "bend": false, "twist": false, "detach": false, "visibility": true, "materialState": true}, "sockets": [], "constraints": [], "destruction": {"breakable": false, "fractureGroup": "monolith", "seamRefs": [], "detachableFragments": [], "breakImpulse": 0, "debrisMaterial": "satin-silver"}},
+      "material": "satin-silver", "materialLayers": ["satin-silver", "recessed-dark"], "deformations": [], "joints": [], "seams": [], "localFeatures": [{"id": "recessed-assay-bowl", "type": "hole", "placement": "inside concentric ring set", "geometryEffect": "visible concave negative space with a rounded lip and darkened inner wall", "confidence": 0.94}], "surfaceDetail": {"macroRoughness": 0.04, "microRoughness": 0.1, "bumpAmplitude": 0.004, "normalPattern": "fine circular tooling", "displacementPattern": "lathed profile", "occlusionPattern": "cavity darkening", "edgeWearPattern": "polished rim", "notes": "A convex plug is a blocking failure."}, "evidenceRefs": ["assay-well"], "details": ["shallow bowl", "tiny irregular center mark"], "fidelityTier": "hero"
+    },
+    {
+      "id": "blue-line", "name": "Blue calibration inlay", "level": "meso", "role": "inlay", "importance": 0.92, "confidence": 0.9,
+      "primitive": "box", "topologyClass": "material-only", "topologyRationale": "The blue line reads primarily as a flush color boundary; its physical depth is not established by the single image.",
+      "geometryDescriptor": {"topologyIntent": "near-flush thin carrier following the top and visible ends", "edgeTreatment": {"type": "none", "bevelRadius": 0, "segments": 1}, "deformationStack": ["wrap ends over lateral faces in production"], "uvStrategy": "planar", "normalStrategy": "inherit supporting surface"},
+      "parent": "root", "attachment": null, "dimensions": {"width": 4.65, "height": 0.012, "depth": 0.035, "units": "relative", "confidence": 0.86},
+      "transform": {"position": [0, 0.738, -0.36], "rotation": [0, 0, 0], "scale": [4.65, 0.012, 0.035]},
+      "actionProfile": {"animationRole": "surface-detail", "pivot": {"mode": "center", "localPosition": [0, 0, 0], "axis": [0, 1, 0], "confidence": 1.0}, "transformChannels": {"translate": false, "rotate": false, "scale": false, "bend": false, "twist": false, "detach": false, "visibility": true, "materialState": true}, "sockets": [], "constraints": [], "destruction": {"breakable": false, "fractureGroup": "monolith", "seamRefs": [], "detachableFragments": [], "breakImpulse": 0, "debrisMaterial": "blue-inlay"}},
+      "material": "blue-inlay", "materialLayers": ["blue-inlay"], "deformations": [], "joints": [], "seams": [], "localFeatures": [{"id": "wrapped-calibration-line", "type": "painted-line", "placement": "rear third of top, wrapping over visible end transitions", "geometryEffect": "near-flush carrier <=0.012 high", "confidence": 0.9}], "surfaceDetail": {"macroRoughness": 0, "microRoughness": 0.02, "bumpAmplitude": 0, "normalPattern": "none", "displacementPattern": "none", "occlusionPattern": "none", "edgeWearPattern": "slight intermittent edge softening", "notes": "Preserve a single clean saturated-blue accent."}, "evidenceRefs": ["blue-line"], "details": ["thin blue line", "end wrap"], "fidelityTier": "hero"
+    },
+    {
+      "id": "identity-glyphs", "name": "Recessed Ag / 47 identity glyphs", "level": "meso", "role": "marking", "importance": 0.94, "confidence": 0.96,
+      "primitive": "plane-card", "topologyClass": "material-only", "topologyRationale": "A thin carrier is used only as an upstream scaffold; production must replace it with local glyph paths and a shallow recessed/highlight treatment.",
+      "geometryDescriptor": {"topologyIntent": "vector glyph decal plus shallow recessed relief proxy", "edgeTreatment": {"type": "crisp", "bevelRadius": 0.006, "segments": 2}, "deformationStack": [], "uvStrategy": "planar", "normalStrategy": "glyph relief normal plus metallic interior"},
+      "parent": "root", "attachment": null, "dimensions": {"width": 1.15, "height": 0.32, "depth": 0.02, "units": "relative", "confidence": 0.86},
+      "transform": {"position": [1.35, 0.748, 0.18], "rotation": [-1.5708, 0, 0], "scale": [1.15, 0.32, 1]},
+      "actionProfile": {"animationRole": "surface-detail", "pivot": {"mode": "center", "localPosition": [0, 0, 0], "axis": [0, 1, 0], "confidence": 1.0}, "transformChannels": {"translate": false, "rotate": false, "scale": false, "bend": false, "twist": false, "detach": false, "visibility": true, "materialState": true}, "sockets": [], "constraints": [], "destruction": {"breakable": false, "fractureGroup": "monolith", "seamRefs": [], "detachableFragments": [], "breakImpulse": 0, "debrisMaterial": "recessed-dark"}},
+      "material": "recessed-dark", "materialLayers": ["recessed-dark", "satin-silver"], "deformations": [], "joints": [], "seams": [], "localFeatures": [{"id": "recessed-ag-47", "type": "linework", "placement": "top-right", "geometryEffect": "0.015 shallow recessed glyph strokes with metallic highlight on lower-right edges", "confidence": 0.96}], "surfaceDetail": {"macroRoughness": 0, "microRoughness": 0.03, "bumpAmplitude": 0.01, "normalPattern": "recessed glyph edges", "displacementPattern": "shallow relief only", "occlusionPattern": "dark glyph trough", "edgeWearPattern": "bright interior bevel", "notes": "Grade placement and legibility; exact font source is unavailable."}, "evidenceRefs": ["identity-marks"], "details": ["Ag / 47"], "fidelityTier": "hero"
+    },
+    {
+      "id": "front-ticks", "name": "Three recessed front ticks", "level": "meso", "role": "marking", "importance": 0.82, "confidence": 0.97,
+      "primitive": "plane-card", "topologyClass": "material-only", "topologyRationale": "The carrier exists only to organize three shallow front-face grooves; the tick geometry is emitted as a repeated micro system.",
+      "geometryDescriptor": {"topologyIntent": "three narrow vertical recessed strokes", "edgeTreatment": {"type": "crisp", "bevelRadius": 0.003, "segments": 1}, "deformationStack": [], "uvStrategy": "planar", "normalStrategy": "shallow groove normals"},
+      "parent": "root", "attachment": null, "dimensions": {"width": 0.36, "height": 0.24, "depth": 0.015, "units": "relative", "confidence": 0.91},
+      "transform": {"position": [-1.84, 0.38, 0.858], "rotation": [0, 0, 0], "scale": [0.36, 0.24, 1]},
+      "actionProfile": {"animationRole": "surface-detail", "pivot": {"mode": "center", "localPosition": [0, 0, 0], "axis": [0, 1, 0], "confidence": 1.0}, "transformChannels": {"translate": false, "rotate": false, "scale": false, "bend": false, "twist": false, "detach": false, "visibility": true, "materialState": true}, "sockets": [], "constraints": [], "destruction": {"breakable": false, "fractureGroup": "monolith", "seamRefs": [], "detachableFragments": [], "breakImpulse": 0, "debrisMaterial": "recessed-dark"}},
+      "material": "recessed-dark", "materialLayers": ["recessed-dark"], "deformations": [], "joints": [], "seams": [], "localFeatures": [{"id": "three-recessed-ticks", "type": "linework", "placement": "front-left long face", "geometryEffect": "three 0.012-deep vertical grooves with slightly varied height and spacing", "confidence": 0.97}], "surfaceDetail": {"macroRoughness": 0, "microRoughness": 0.04, "bumpAmplitude": 0.008, "normalPattern": "vertical groove edges", "displacementPattern": "shallow relief", "occlusionPattern": "dark tick troughs", "edgeWearPattern": "subtle metallic rim", "notes": "Do not render as floating black bars."}, "evidenceRefs": ["front-ticks"], "details": ["three vertical grooves"], "fidelityTier": "hero"
+    }
+  ],
+  "materials": [
+    {
+      "id": "satin-silver", "name": "Reference-derived satin silver", "type": "physical", "shaderModel": "MeshPhysicalMaterial / metallic-roughness PBR", "baseColor": "#B6A699", "color": "#B6A699",
+      "albedo": {"dominant": "#B6A699", "secondary": ["#A79B90", "#968B83", "#C0B1A2", "#766F6B", "#3B424D"], "samplingNotes": "Palette extracted from masked reference pixels; warm cream reflections remain lighting, not pure albedo."},
+      "colorVariation": {"palette": ["#B6A699", "#A79B90", "#968B83", "#C0B1A2", "#766F6B"], "pattern": "low-frequency poured mottle plus directional front-face brushing", "amplitude": 0.1, "heightCorrelation": 0.22},
+      "textureResolution": 1024, "textureProjection": {"mode": "triplanar-object-space", "repeat": [2.0, 2.0], "anisotropy": 4, "texelDensityIntent": "Keep micro scratches stable in object space; do not stretch with the 4.8:0.72:1.7 transform."},
+      "surfaceFrequencyBands": [{"id": "macro", "frequency": 1.4, "amplitude": 0.08, "role": "broad poured value drift"}, {"id": "meso", "frequency": 11.0, "amplitude": 0.055, "role": "brushing, pits, and shallow dents"}, {"id": "micro", "frequency": 64.0, "amplitude": 0.018, "role": "fine scratch and highlight breakup"}],
+      "roughness": {"base": 0.43, "variation": 0.13, "map": "independent reference-derived roughness plus seeded procedural breakup", "localResponse": "0.24-0.32 on bevel crests; 0.5-0.62 in pits and recesses"}, "metalness": {"base": 1.0, "variation": 0.02}, "clearcoat": {"base": 0.04}, "clearcoatRoughness": {"base": 0.42},
+      "normal": {"pattern": "independent reference-derived height plus directional scratch field", "strength": 0.24, "scale": 38.0, "space": "tangent"}, "bump": {"pattern": "sparse pits and cast ripple", "amplitude": 0.015, "scale": 18.0}, "displacement": {"pattern": "top crown only in geometry", "amplitude": 0.02, "scale": 1.0, "silhouetteAffects": true},
+      "ambientOcclusion": {"cavityStrength": 0.3, "contactShadowBias": 0.28, "notes": "Independent AO in assay grooves, bowl, glyphs, and tick recesses."}, "wear": {"edgeWear": 0.2, "scratches": ["short directional top scratches", "finer horizontal front-face brushing"], "chips": ["sparse soft dents on top/end perimeter"]}, "dirt": {"amount": 0.015, "cavityBias": 0.16, "color": "#514B47"},
+      "localOverrides": [{"id": "directional-scratch-field", "region": "top and front faces", "roughnessDelta": 0.08, "normalStrength": 0.18, "evidenceRef": "metal-surface"}, {"id": "poured-mottle", "region": "broad top-face patches", "albedoAmplitude": 0.07, "roughnessDelta": 0.05, "evidenceRef": "metal-surface"}, {"id": "bevel-crest-polish", "region": "visible perimeter bevel crests", "roughness": 0.26, "evidenceRef": "metal-surface"}],
+      "referencePbr": {"version": "1.0", "sourceImage": "docs/qa/references/ag-assay-monolith-reference.png", "extractor": "extract_pbr_evidence.py", "method": "single-image masked pixel evidence", "verdict": "pass", "hardLimit": "Reference-derived inference, not exact inverse rendering or photogrammetry.", "usable": true, "confidence": 0.86, "estimatedFidelity": 0.86, "targetThreshold": 0.7, "maps": {"albedo": {"path": ".img2threejs/intake/pbr-silver/satin-silver_albedo.png", "url": "satin-silver_albedo.png", "channel": "albedo", "source": "reference-pixel-extraction"}, "roughness": {"path": ".img2threejs/intake/pbr-silver/satin-silver_roughness.png", "url": "satin-silver_roughness.png", "channel": "roughness", "source": "reference-pixel-extraction"}, "height": {"path": ".img2threejs/intake/pbr-silver/satin-silver_height.png", "url": "satin-silver_height.png", "channel": "height", "source": "reference-pixel-extraction"}, "normal": {"path": ".img2threejs/intake/pbr-silver/satin-silver_normal.png", "url": "satin-silver_normal.png", "channel": "normal", "source": "reference-pixel-extraction"}, "ao": {"path": ".img2threejs/intake/pbr-silver/satin-silver_ao.png", "url": "satin-silver_ao.png", "channel": "ao", "source": "reference-pixel-extraction"}}},
+      "shaderNotes": ["Set albedo texture to SRGBColorSpace; keep roughness/normal/AO as NoColorSpace data.", "Cap runtime anisotropy at renderer capability and mobile budget.", "Environment reflections explain form but must not turn the surface into mirror chrome."], "notes": "Extraction passed at 0.86 confidence and still requires render review."
+    },
+    {"id": "blue-inlay", "name": "Saturated blue calibration inlay", "qualityTier": "utility", "type": "standard", "shaderModel": "MeshStandardMaterial", "baseColor": "#0D5E9C", "color": "#0D5E9C", "albedo": {"dominant": "#0D5E9C", "secondary": ["#114E7C"]}, "roughness": {"base": 0.34, "variation": 0.04, "map": "independent-procedural-field"}, "metalness": {"base": 0.05, "variation": 0}, "ambientOcclusion": {"cavityStrength": 0.05, "contactShadowBias": 0.02}, "localOverrides": [{"id": "wrapped-calibration-line", "region": "top rear third and visible end wraps", "baseColor": "#0D5E9C", "roughness": 0.34, "evidenceRef": "blue-line"}], "notes": "Use one precise accent; no glow or bloom."},
+    {"id": "recessed-dark", "name": "Darkened recessed metal", "qualityTier": "utility", "type": "standard", "shaderModel": "MeshStandardMaterial", "baseColor": "#3B424D", "color": "#3B424D", "albedo": {"dominant": "#3B424D", "secondary": ["#766F6B"]}, "roughness": {"base": 0.5, "variation": 0.08, "map": "independent-procedural-field"}, "metalness": {"base": 0.85, "variation": 0.05}, "ambientOcclusion": {"cavityStrength": 0.42, "contactShadowBias": 0.35}, "localOverrides": [], "notes": "For cavity depth and glyph/tick troughs; do not use as a flat black decal."},
+    {"id": "hidden", "name": "Invisible organizer", "qualityTier": "utility", "type": "standard", "shaderModel": "MeshBasicMaterial", "baseColor": "#000000", "color": "#000000", "roughness": {"base": 1.0, "variation": 0, "map": "none"}, "metalness": {"base": 0, "variation": 0}, "opacity": {"base": 0.0}, "transparent": true, "depthWrite": false, "ambientOcclusion": {"cavityStrength": 0, "contactShadowBias": 0}, "localOverrides": [], "notes": "Never rendered; root pivot only."}
+  ],
+  "repetitionSystems": [
+    {"id": "assay-concentric-relief", "level": "meso", "parent": "assay-rings", "count": 3, "primitive": "torus", "material": "satin-silver", "instanceScale": [1, 1, 1], "placement": {"mode": "concentric-scale", "axis": [0, 1, 0], "radius": 0, "startAngleDeg": 0, "scaleSequence": [1.0, 0.76, 0.53], "heightSequence": [0.0, -0.01, -0.018]}, "geometry": {"tubeRadius": 0.025}, "buildsGeometry": true, "distributionRule": "Three coaxial rings with decreasing radius; never three coincident copies."},
+    {"id": "front-tick-triad", "level": "micro", "parent": "front-ticks", "count": 3, "primitive": "box", "material": "recessed-dark", "instanceScale": [0.018, 0.16, 0.012], "placement": {"mode": "linear", "axis": [1, 0, 0], "radius": 0.12, "startAngleDeg": 0, "spacing": [0.0, 0.11, 0.23], "heightVariation": [0.92, 1.0, 0.86]}, "instances": 3, "buildsGeometry": true, "distributionRule": "Three vertical grooves with slight nonuniform spacing and height, aligned on the front face."}
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "lighting-pass",
+      "goal": "Make material and form readable under neutral turntable lighting plus optional reference lighting.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "lightingFromPhoto identifies key light direction/color/intensity, fill light, rim or environment light, and ambient color.",
+        "Exposure, tone mapping, background color/gradient, shadow softness, and contact shadow behavior are specified.",
+        "Lighting does not hide geometry/material gaps and screenshots can be compared fairly to the reference.",
+        "Neutral, grazing, and reference-matched lighting checks distinguish material errors from lighting errors.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Make the model ready for future animation, transformation, physics, or destruction.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro and movable meso components have stable pivot nodes.",
+        "Sockets, collider proxies, and destruction metadata are present for future runtime actions.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "balanced web-hero after visual acceptance",
+    "targetTriangles": 60000,
+    "mobileTargetTriangles": 32000,
+    "maxDrawCalls": 18,
+    "mobileMaxDrawCalls": 12,
+    "textureSize": 1024,
+    "mobileTextureSize": 768,
+    "fpsTarget": 60,
+    "mobileFpsFloor": 45,
+    "pixelRatioCap": 1.75,
+    "mobilePixelRatioCap": 1.25,
+    "activeRendererCount": 1,
+    "optimizationPolicy": "Lazy-load only after the static image is visible; pause offscreen/hidden, cap DPR and shadows, and reduce ring/surface detail on coarse-pointer devices without removing identity marks."
+  },
+  "lightingFromPhoto": [
+    "key light: large warm area source from upper-front-left, soft shadow, intensity target 2.0 relative",
+    "fill light: broad warm-neutral hemisphere/environment reflection, intensity target 0.55 relative",
+    "rim light: restrained cool blue-gray directional fill from rear-right, intensity target 0.35 relative",
+    "exposure and tone mapping: ACES Filmic, exposure 0.9-1.05, preserve satin highlights without clipping",
+    "background and contact shadow: cream #EEE3D4 ground/backdrop with a soft low-opacity shadow falling camera-right/back"
+  ],
+  "proceduralStrategy": [
+    "Build a custom rounded cuboid with a slight top crown before adding any marks.",
+    "Create the assay well as real concentric relief plus a concave lathed bowl; reject a flat target texture.",
+    "Add the blue wrapped line, recessed vector glyphs, and front tick grooves as separate named surface systems.",
+    "Use the 0.86-confidence PBR extraction as evidence, then author independent object-space albedo, roughness, normal, and AO fields that exclude the cream background.",
+    "Match the reference camera and warm-key/cool-rim lighting in a browser render before micro-detail tuning.",
+    "After visual acceptance, enforce the mobile triangle, draw-call, texture, DPR, and frame-rate budgets."
+  ],
+  "animationAnchors": [
+    "root pivot supports only restrained pointer-linked yaw/pitch and spring return",
+    "all visible identity parts remain locked to the monolith; there is no explode or autonomous spin"
+  ],
+  "destructionAnchors": [
+    "none: the marketing object is intentionally nonbreakable and nonphysical"
+  ],
+  "risks": [
+    "The upstream generator's plain BoxGeometry cannot produce the required cast rounded body without manual tailoring.",
+    "The upstream repetition emitter supports radial placement, not true concentric scale or linear tick spacing; generated systems require replacement.",
+    "The glyph carrier is not a faithful Ag / 47 relief until production vector paths are authored.",
+    "Single-image PBR evidence includes lighting inference and requires same-camera render review."
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "cast metal monolith rounded cuboid concentric relief",
+    "index": {
+      "status": "skipped",
+      "reason": "The security-curated workflow uses direct reference observation; no object-specific local adapter was required.",
+      "fingerprint": "none"
+    },
+    "matches": []
+  }
+}
