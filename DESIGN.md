@@ -12,11 +12,11 @@ The design has one commercial job: help a qualified visitor schedule a pickup wi
 2. **One visual contract.** Every route uses the same shell, color roles, typography, buttons, spacing, and conversion pattern.
 3. **Editorial structure before cards.** Divided lists, image-led rows, and measured whitespace carry most layouts. Cards are reserved for genuinely comparable information.
 4. **Luxury through control.** Small details, consistent alignment, and quiet transitions create the premium effect.
-5. **Silver-specific identity.** The assay line, `Ag / 47`, material taxonomy, furnace imagery, and Houston operating details make the system difficult to rebrand generically.
+5. **Silver-specific identity.** The material taxonomy, controlled refining imagery, restrained `Ag / 47` details, and Houston operating facts make the system difficult to rebrand generically.
 
 ## Color system
 
-The site is intentionally light. There is no automatic dark mode because the warm surface hierarchy must remain stable across devices.
+The shared site is intentionally light. The homepage alone opens with a controlled deep-navy photographic hero; this is a bounded composition, not an automatic dark theme. The warm surface hierarchy remains stable across devices and routes.
 
 | Token | Value | Role |
 |---|---:|---|
@@ -41,7 +41,7 @@ The site is intentionally light. There is no automatic dark mode because the war
 - Ink blue appears as type, controls, the footer, and one final conversion composition.
 - Mineral blue stays below roughly 8 percent of a normal viewport and marks assay, provenance, and interaction details.
 - Pure black, pure white, neon accents, gold glows, and gradient-filled text are prohibited.
-- The top portion of every page remains light.
+- Internal route introductions remain light. The homepage V2 hero is the sole dark opening exception.
 
 ## Typography
 
@@ -83,11 +83,11 @@ The assay line is a calibrated rule with fine ticks and a compact material label
 
 Use it for:
 
-- page and homepage hero framing;
+- selected internal page framing;
 - the actual contact-to-payment sequence;
 - selected transitions where measurement or progression is meaningful.
 
-Do not use it as a random divider, decorative graph, or fake performance metric.
+The homepage V2 hero does not use the assay line. Do not use it as a random divider, decorative graph, or fake performance metric.
 
 ## Photography
 
@@ -116,11 +116,11 @@ Photography is operational evidence.
 - Contact details, high-intent material links, service qualification, privacy, and legal copy remain visible.
 - No separate collection of competing dark promotional bands.
 
-### Persistent mobile action
+### Mobile action model
 
-- Call and pickup remain available in a safe-area-aware dock.
-- The document reserves space so the dock never covers legal copy, errors, or footer content.
-- Coarse-pointer targets are at least `44px`.
+- Fixed action docks and the material guide are hidden at `900px` and below.
+- Pickup, phone, and material paths remain available as in-flow controls in the page and navigation.
+- Coarse-pointer targets are at least `44px`, and no fixed control may cover reading or form content.
 
 ## Buttons and links
 
@@ -128,11 +128,11 @@ Only three button variants are allowed:
 
 | Class | Use |
 |---|---|
-| `.button-primary` | Main pickup action on light surfaces |
-| `.button-secondary` | Lower-priority navigation on light surfaces |
+| `.button-primary` | Main pickup action; paper-on-navy in the homepage hero |
+| `.button-secondary` | Lower-priority navigation, with contrast adapted to its surface |
 | `.button-inverse` | Pickup action on ink-blue surfaces |
 
-Text and phone links use a restrained underline expansion. The primary action label is `Schedule a Free Pickup`; the phone number is the fallback. Route heroes do not introduce competing quote language.
+Text and phone links use a restrained underline expansion. The primary action label is `Schedule a Free Pickup`; the phone number is the fallback. The homepage may also use `See what we buy` as a clearly subordinate material path. Route heroes do not introduce competing quote language.
 
 ## Page structures
 
@@ -140,7 +140,7 @@ Text and phone links use a restrained underline expansion. The primary action la
 
 The approved order is:
 
-1. light editorial hero;
+1. cinematic deep-navy refining hero with responsive imagery and an in-hero proof rail;
 2. porcelain material intake panel;
 3. four operational trust facts;
 4. six image-led material rows;
@@ -152,7 +152,7 @@ The approved order is:
 10. location and FAQ;
 11. one ink-blue conversion band.
 
-The hero has one pickup action and one phone fallback. The intake controls are nested inside their labels so grid placement remains stable at every width.
+The hero has one dominant pickup action, one subordinate `See what we buy` path, and one phone fallback. The hero uses a dedicated portrait source on mobile, contains no WebGL or canvas dependency, and ends before the intake section begins. The intake controls are nested inside their labels so grid placement remains stable at every width.
 
 ### Material, industry, and location pages
 

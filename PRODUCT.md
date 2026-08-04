@@ -16,8 +16,10 @@ scheduled pickup.
 
 Every page answers one question: what do you have, and how does it become cash.
 
-The single conversion action is **Schedule a Free Pickup**. The secondary action
-is a phone call. Nothing else on the site competes with those two.
+The single conversion action is **Schedule a Free Pickup**. A phone call remains
+the universal fallback. On the homepage, **See what we buy** may appear as a
+clearly subordinate material-identification path. Nothing else competes with the
+pickup action.
 
 ## Users
 
@@ -37,8 +39,8 @@ lots, more need for reassurance and no pressure.
 
 **Device.** Mobile first, iOS specifically. The client named iPhone users as the
 main audience. Assume a phone in a warehouse or an office, one-handed, possibly
-in poor light. The bottom action dock and the safe-area handling are not
-decoration.
+in poor light. High-intent actions remain in flow, controls respect safe areas,
+and fixed docks do not cover the reading or form workspace.
 
 ## Voice and tone
 
@@ -80,10 +82,12 @@ promise the business can keep and one it cannot.
 
 ## Anti-references
 
-**A dark upper half.** The client reviewed the first mockup and gave exactly one
-piece of visual feedback: "the first half of the site was too dark." Heroes,
-page intros, and answer bands stay light. Deep bands live below roughly the 40%
-mark. This outranks any instinct toward a dramatic dark hero.
+**Uncontrolled dark compositions.** Earlier feedback rejected a dark first
+mockup. The later, explicit homepage V2 direction supersedes that rule for the
+homepage only: it opens with one deep-navy, full-bleed, operational refining
+photograph with protected copy contrast. Internal route heroes, page intros,
+and answer bands remain light. Dark-mode styling, gold glow, and decorative
+drama remain prohibited.
 
 **Cash-for-gold pawn aesthetic.** No garish yellow-gold, no starburst badges, no
 "WE PAY MORE!!" energy, no countdown urgency. The competitors look like this and
