@@ -1,0 +1,132 @@
+{
+  "generatedAt": "2026-08-04T19:49:16.065Z",
+  "environment": "local headless Chromium; not a release-preview field measurement",
+  "trace": {
+    "navigation": {
+      "domContentLoaded": 37,
+      "loadEventEnd": 77.30000000074506
+    },
+    "sceneStart": 116.10000000149012,
+    "threeStart": 129.70000000298023,
+    "lcp": {
+      "startTime": 104,
+      "size": 304980,
+      "url": "http://127.0.0.1:4180/assets/ag-assay-monolith-1280.webp",
+      "tag": "IMG"
+    },
+    "cls": 0,
+    "longTasks": [
+      {
+        "startTime": 152.70000000298023,
+        "duration": 56
+      },
+      {
+        "startTime": 210,
+        "duration": 278
+      },
+      {
+        "startTime": 488.5,
+        "duration": 355
+      }
+    ],
+    "mountLongTasks": [
+      {
+        "startTime": 152.70000000298023,
+        "duration": 56
+      },
+      {
+        "startTime": 210,
+        "duration": 278
+      },
+      {
+        "startTime": 488.5,
+        "duration": 355
+      }
+    ],
+    "diagnostics": {
+      "state": "ready",
+      "active": true,
+      "disposed": false,
+      "frameCount": 2,
+      "triangles": 3438,
+      "drawCalls": 8,
+      "pixelRatio": 1,
+      "reviewView": "match",
+      "contextLost": false
+    },
+    "webgl": {
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "vendor": "Google Inc. (Google)",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+    }
+  },
+  "performanceGate": {
+    "representativeGpu": false,
+    "mountLongTaskGate": "not-evaluable-on-software-renderer",
+    "observedMountLongTasks": [
+      {
+        "startTime": 152.70000000298023,
+        "duration": 56
+      },
+      {
+        "startTime": 210,
+        "duration": 278
+      },
+      {
+        "startTime": 488.5,
+        "duration": 355
+      }
+    ]
+  },
+  "geometryStability": {
+    "fallbackRect": {
+      "x": 748.8125,
+      "y": 114,
+      "width": 691.1875,
+      "height": 624,
+      "top": 114,
+      "right": 1440,
+      "bottom": 738,
+      "left": 748.8125
+    },
+    "readyRect": {
+      "x": 748.8125,
+      "y": 114,
+      "width": 691.1875,
+      "height": 624,
+      "top": 114,
+      "right": 1440,
+      "bottom": 738,
+      "left": 748.8125
+    },
+    "identical": true
+  },
+  "limitations": [
+    "INP is not claimed from this synthetic local trace.",
+    "The available Chromium uses ANGLE SwiftShader, so its shader-compile long tasks are recorded but not claimed as representative hardware-GPU mount timing.",
+    "The 56ms earliest mount task is combined module-evaluation/mount work; the direct owned field benchmark is recorded separately.",
+    "Release-preview LCP, CLS, and INP still require deployment telemetry."
+  ],
+  "ownedMaterialGeneration": {
+    "environment": "same local headless Chromium process; exported pure generator called directly at 256px",
+    "moduleImportMilliseconds": 4.899999998509884,
+    "firstCallMilliseconds": 28,
+    "warmRunsMilliseconds": [
+      14.399999998509884,
+      15.100000001490116,
+      11.300000000745058,
+      11,
+      14,
+      12.099999997764826
+    ],
+    "warmMedianMilliseconds": 13.049999998882413,
+    "checksum": 3443,
+    "gateMilliseconds": 50,
+    "pass": true
+  },
+  "longTaskInterpretation": {
+    "earliestMountTaskMilliseconds": 56,
+    "earliestMountTaskScope": "combined module evaluation and mount work; not attributed solely to the software GPU",
+    "laterTasks": "observed in an ANGLE SwiftShader render path and left open for release-preview hardware verification"
+  }
+}
