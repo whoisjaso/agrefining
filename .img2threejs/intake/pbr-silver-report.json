@@ -1,0 +1,87 @@
+{
+  "ok": true,
+  "verdict": "pass",
+  "confidence": 0.86,
+  "estimatedFidelity": 0.86,
+  "targetThreshold": 0.7,
+  "materialId": "satin-silver",
+  "sourceImage": "/workspace/scratch/bfc565b217a9/agrefining/docs/qa/references/ag-assay-monolith-reference.png",
+  "outDir": "/workspace/scratch/bfc565b217a9/agrefining/.img2threejs/intake/pbr-silver",
+  "palette": [
+    "#B6A699",
+    "#A79B90",
+    "#968B83",
+    "#C0B1A2",
+    "#766F6B",
+    "#3B424D"
+  ],
+  "maps": {
+    "albedo": {
+      "path": "/workspace/scratch/bfc565b217a9/agrefining/.img2threejs/intake/pbr-silver/satin-silver_albedo.png",
+      "url": "satin-silver_albedo.png",
+      "channel": "albedo",
+      "source": "reference-pixel-extraction"
+    },
+    "roughness": {
+      "path": "/workspace/scratch/bfc565b217a9/agrefining/.img2threejs/intake/pbr-silver/satin-silver_roughness.png",
+      "url": "satin-silver_roughness.png",
+      "channel": "roughness",
+      "source": "reference-pixel-extraction"
+    },
+    "height": {
+      "path": "/workspace/scratch/bfc565b217a9/agrefining/.img2threejs/intake/pbr-silver/satin-silver_height.png",
+      "url": "satin-silver_height.png",
+      "channel": "height",
+      "source": "reference-pixel-extraction"
+    },
+    "normal": {
+      "path": "/workspace/scratch/bfc565b217a9/agrefining/.img2threejs/intake/pbr-silver/satin-silver_normal.png",
+      "url": "satin-silver_normal.png",
+      "channel": "normal",
+      "source": "reference-pixel-extraction"
+    },
+    "ao": {
+      "path": "/workspace/scratch/bfc565b217a9/agrefining/.img2threejs/intake/pbr-silver/satin-silver_ao.png",
+      "url": "satin-silver_ao.png",
+      "channel": "ao",
+      "source": "reference-pixel-extraction"
+    }
+  },
+  "diagnostics": {
+    "sourceWidth": 1536,
+    "sourceHeight": 1024,
+    "mapSize": 512,
+    "cropBBoxPixels": {
+      "x": 106,
+      "y": 258,
+      "width": 1427,
+      "height": 654
+    },
+    "mask": {
+      "backgroundColor": "#ECDFD0",
+      "backgroundNoise": 31.953,
+      "transparentPixelFraction": 0.0,
+      "foregroundCoverage": 0.3167
+    },
+    "mapStats": {
+      "valueRange": 0.426,
+      "heightP90Gradient": 0.07753,
+      "roughnessBase": 0.709,
+      "roughnessVariation": 0.132,
+      "normalStrength": 0.247,
+      "blurRadius": 10
+    },
+    "palette": [
+      "#B6A699",
+      "#A79B90",
+      "#968B83",
+      "#C0B1A2",
+      "#766F6B",
+      "#3B424D"
+    ]
+  },
+  "warnings": [
+    "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+  ],
+  "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+}

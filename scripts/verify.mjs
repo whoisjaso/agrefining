@@ -53,7 +53,7 @@ for (const path of htmlFiles) {
 const home = readFileSync(join(out, "index.html"), "utf8");
 const exactHomeChecks = [
   "<title>Houston Silver Buyer | Sell Scrap Silver in Houston | AG Refining</title>",
-  '<meta name="description" content="Sell silver in Houston with AG Refining. Free pickup, on-site weighing, immediate payment, and honest pricing for commercial accounts.">',
+  '<meta name="description" content="Sell silver in Houston with AG Refining. Free pickup, on-site weighing, honest pricing, and payment terms confirmed with the offer.">',
   "<h1>Turn silver-bearing material into cash.</h1>"
 ];
 for (const expected of exactHomeChecks) {
@@ -67,6 +67,20 @@ else {
   if ((hero.match(/href="\/contact\?intent=pickup"/g) || []).length !== 1) failures.push("Homepage hero must have one pickup action");
   if (!hero.includes('href="tel:+12818982719"')) failures.push("Homepage hero must keep the phone fallback");
   if (hero.includes("Request a quote")) failures.push("Homepage hero contains a competing quote action");
+  if ((hero.match(/data-assay-stage/g) || []).length !== 1) failures.push("Homepage hero must contain one assay stage");
+  if (!hero.includes('data-assay-state="fallback"')) failures.push("Homepage assay stage must begin in fallback state");
+  if (!hero.includes('data-assay-canvas-host hidden aria-hidden="true"')) failures.push("Homepage assay canvas host must begin hidden and decorative");
+  if (!hero.includes("ag-assay-monolith-1280.webp") || !hero.includes("ag-assay-monolith-mobile.webp")) failures.push("Homepage assay fallback variants are missing");
+  if (!hero.includes('fetchpriority="high"') || hero.includes('loading="lazy"')) failures.push("Homepage assay fallback must remain the eager first-paint image");
+}
+if (!home.includes("ag-silver-hero-1600.webp")) failures.push("Homepage must retain the lower industrial proof image");
+for (const artifact of [
+  "assay-scene.js",
+  "assets/vendor/three.module.min.js",
+  "assets/vendor/three.core.min.js",
+  "assets/vendor/three.LICENSE.txt"
+]) {
+  if (!existsSync(join(out, artifact))) failures.push(`Build output is missing ${artifact}`);
 }
 if (!home.includes('class="intake-panel"')) failures.push("Homepage is missing the separate material intake panel");
 if (!/<label for="hero-material">(?:(?!<\/label>)[\s\S])*<select id="hero-material"(?:(?!<\/label>)[\s\S])*<\/select>\s*<\/label>/.test(home)) {
@@ -106,26 +120,26 @@ if (/featured-material-copy"><span>\d{2}<\/span>/.test(home)) failures.push("Hom
 const seoPages = [
   {
     path: "sell-silver-coins-houston",
-    title: "Sell Silver Coins in Houston | Top Prices | AG Refining",
-    description: "Sell silver coins in Houston for top prices. AG Refining offers expert evaluations, fast payment, and trusted local service.",
+    title: "Sell Silver Coins in Houston | Clear Evaluations | AG Refining",
+    description: "Sell silver coins in Houston with clear evaluations based on coin type, silver content, weight, condition, and current market values.",
     h1: "Sell your silver coins in Houston."
   },
   {
     path: "silver-flake-buyer-houston",
     title: "Silver Flake Buyer in Houston, TX | AG Refining",
-    description: "Sell silver flake in Houston for competitive prices. AG Refining offers expert evaluations, fast payment, and trusted refining services.",
+    description: "Sell silver flake in Houston with an evaluation based on confirmed silver content, purity, weight, condition, and current market values.",
     h1: "Sell silver flake in Houston."
   },
   {
     path: "laboratory-silver-buyer-houston",
     title: "Laboratory Silver Buyer in Houston, TX | AG Refining",
-    description: "Sell laboratory silver in Houston for top value. AG Refining offers expert evaluations, fair pricing, and fast payment for silver materials.",
+    description: "Sell laboratory silver in Houston with evaluations based on confirmed recoverable silver, material condition, and current market values.",
     h1: "Sell laboratory silver in Houston."
   },
   {
     path: "silver-solder-buyer-houston",
     title: "Silver Solder Buyer in Houston, TX | AG Refining",
-    description: "Sell silver solder in Houston for competitive prices. AG Refining offers expert evaluations, fast payment, and trusted refining services.",
+    description: "Sell silver solder in Houston with evaluations based on alloy, silver content, weight, condition, and current market values.",
     h1: "Sell silver solder in Houston."
   },
   {
@@ -137,31 +151,31 @@ const seoPages = [
   {
     path: "dental-scrap-buyer-houston",
     title: "Dental Scrap Buyer Houston | Sell Dental Scrap | AG Refining",
-    description: "Sell dental scrap in Houston with AG Refining. Competitive pricing, free pickup, on-site service, and fast payment for dental practices.",
+    description: "Sell dental scrap in Houston with material review, free qualifying pickup, on-site service, and pricing based on confirmed precious-metal content.",
     h1: "Sell your dental scrap with confidence."
   },
   {
     path: "silver-oxide-watch-battery-recycling-houston",
     title: "Silver Oxide Watch Battery Recycling Houston | AG Refining",
-    description: "Recycle silver oxide watch batteries in Houston with AG Refining. Competitive pricing, fast service, and professional precious metal recovery.",
+    description: "Recycle silver oxide watch batteries in Houston with material review, qualifying pickup, and recovery based on confirmed content and condition.",
     h1: "Recycle silver oxide watch batteries in Houston."
   },
   {
     path: "houston-silver-buyer",
     title: "Houston Silver Buyer | Sell Scrap Silver in Houston | AG Refining",
-    description: "Sell silver in Houston with AG Refining. Free pickup, on-site weighing, immediate payment, and honest pricing for commercial accounts.",
+    description: "Sell silver in Houston with AG Refining. Free pickup, on-site weighing, honest pricing, and payment terms confirmed with the offer.",
     h1: "Sell your silver with confidence."
   },
   {
     path: "x-ray-recycling-services-houston",
     title: "X-Ray Recycling Services Houston | X-Ray Film Recycling | AG Refining",
-    description: "Houston X-ray recycling services for medical and industrial film. Secure silver recovery, competitive pricing, and professional service.",
+    description: "Houston X-ray recycling services for qualifying medical and industrial film, with handling planning, silver recovery review, and professional service.",
     h1: "Secure X-ray film recycling in Houston."
   },
   {
     path: "scrap-silver-buyer-houston",
     title: "Scrap Silver Buyer Houston | Sell Scrap Silver | AG Refining",
-    description: "Sell scrap silver in Houston with AG Refining. Top prices, free pickup, on-site weighing, and immediate payment",
+    description: "Sell scrap silver in Houston with AG Refining. Free qualifying pickup, on-site weighing, and offers based on confirmed material and current market values.",
     h1: "Turn your scrap silver into cash."
   }
 ];
@@ -203,6 +217,59 @@ const generatedMarkup = htmlFiles.map((path) => readFileSync(path, "utf8")).join
 if (/<input(?![^>]*\btype=)[^>]*>/.test(generatedMarkup)) {
   failures.push("Generated form markup contains an input without an explicit type");
 }
+const exactPaymentTimingClaims = [
+  /\bimmediate payment\b/i,
+  /\bsame-day(?: payment| service)?\b/i,
+  /\bpay on the spot\b/i,
+  /\bpago inmediato\b/i
+];
+if (exactPaymentTimingClaims.some((pattern) => pattern.test(generatedMarkup))) {
+  failures.push("Generated pages contain an unqualified exact payment-timing claim");
+}
+const unsupportedValueClaims = [
+  /\btop (?:prices?|value)\b/i,
+  /\bcompetitive pric(?:e|es|ing)\b/i,
+  /\brecover(?:ing)? (?:the )?full value\b/i,
+  /\bno hidden fees\b/i
+];
+if (unsupportedValueClaims.some((pattern) => pattern.test(generatedMarkup))) {
+  failures.push("Generated pages contain an unsupported price, fee, or full-value superlative");
+}
+
+const jewelryStore = readFileSync(join(out, "jewelry-store-silver-recycling-houston", "index.html"), "utf8");
+if (/your inventory and volumes stay between us/i.test(jewelryStore)) {
+  failures.push("Jewelry-store page contains an absolute confidentiality promise");
+}
+if (!/inventory and volume details[\s\S]{0,240}privacy notice/i.test(jewelryStore)) {
+  failures.push("Jewelry-store page must qualify inventory handling against the privacy notice");
+}
+
+const contactPage = readFileSync(join(out, "contact", "index.html"), "utf8");
+const privacyPage = readFileSync(join(out, "privacy", "index.html"), "utf8");
+const attributionDisclosureTerms = ["form page", "first landing page", "referring page", "campaign or ad identifiers"];
+for (const term of attributionDisclosureTerms) {
+  if (!contactPage.toLowerCase().includes(term) || !privacyPage.toLowerCase().includes(term)) {
+    failures.push(`Contact and privacy notices must disclose the ${term}`);
+  }
+}
+if (!/sent with your request/i.test(contactPage)) {
+  failures.push("Contact notice must state that website attribution accompanies the request");
+}
+
+const hospital = readFileSync(join(out, "hospital-silver-recycling", "index.html"), "utf8");
+const hospitalHeroStart = hospital.indexOf('<div class="service-hero-copy"');
+const hospitalHeroEnd = hospital.indexOf('<figure class="service-visual"', hospitalHeroStart);
+const hospitalHero = hospitalHeroStart >= 0 && hospitalHeroEnd > hospitalHeroStart
+  ? hospital.slice(hospitalHeroStart, hospitalHeroEnd)
+  : "";
+const hospitalGuardrailPosition = hospitalHero.indexOf("Do not upload patient information");
+const hospitalActionPosition = hospitalHero.indexOf('href="/contact?intent=pickup');
+if (hospitalGuardrailPosition < 0 || hospitalActionPosition < 0 || hospitalGuardrailPosition > hospitalActionPosition) {
+  failures.push("Hospital hero must show the protected-record guardrail before its pickup action");
+}
+if (!hospitalHero.includes('href="/medical-x-ray-recycling"')) {
+  failures.push("Hospital hero must route medical film visitors to the protected-record guidance");
+}
 const decorativeNumberPatterns = [
   /<article data-reveal><span>\d{2}<\/span><h3>/,
   /<li><span>\d{2}<\/span>[^<]+<\/li>/,
@@ -222,8 +289,7 @@ if (!notFound.includes('<meta name="robots" content="noindex,follow">')) {
   failures.push("404 page must be noindex");
 }
 
-const privacy = readFileSync(join(out, "privacy", "index.html"), "utf8");
-if (!privacy.includes('<nav aria-label="Privacy sections">')) {
+if (!privacyPage.includes('<nav aria-label="Privacy sections">')) {
   failures.push("Privacy section navigation needs a unique accessible name");
 }
 
