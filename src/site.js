@@ -1,3 +1,4 @@
+const siteHeader = document.querySelector("[data-site-header]");
 const toggle = document.querySelector("[data-nav-toggle]");
 const nav = document.querySelector("[data-nav]");
 const navScrim = document.querySelector("[data-nav-scrim]");
@@ -5,68 +6,116 @@ const navBackground = Array.from(document.querySelectorAll("main, .material-guid
 const navMedia = window.matchMedia("(min-width: 901px)");
 const spanish = document.documentElement.lang.startsWith("es");
 let navReturnFocus = null;
+let navEnhanced = false;
+const navTabIndexes = new Map();
+
+function navControls() {
+  return Array.from(nav?.querySelectorAll("a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]") || []);
+}
 
 function navFocusables() {
-  return [toggle, ...(nav?.querySelectorAll("a[href], button:not([disabled])") || [])].filter(Boolean);
+  return [toggle, ...navControls()].filter((control) => control && !control.hidden);
 }
 
 function setNavBackgroundInert(inert) {
   navBackground.forEach((element) => {
     element.inert = inert;
+    if (inert) element.setAttribute("inert", "");
+    else element.removeAttribute("inert");
   });
 }
 
-function closeNav(restoreFocus = false) {
+function setNavControlsEnabled(enabled) {
+  navControls().forEach((control) => {
+    if (!enabled) {
+      if (!navTabIndexes.has(control)) {
+        navTabIndexes.set(control, {
+          present: control.hasAttribute("tabindex"),
+          value: control.getAttribute("tabindex")
+        });
+      }
+      control.setAttribute("tabindex", "-1");
+      return;
+    }
+    const original = navTabIndexes.get(control);
+    if (!original) return;
+    if (original.present) control.setAttribute("tabindex", original.value ?? "");
+    else control.removeAttribute("tabindex");
+    navTabIndexes.delete(control);
+  });
+}
+
+function syncNavState({ open = false, restoreFocus = false } = {}) {
+  if (!navEnhanced || !toggle || !nav) return;
+  const mobile = !navMedia.matches;
+  const menuOpen = mobile && open;
   const wasOpen = document.body.classList.contains("nav-open");
-  document.body.classList.remove("nav-open");
-  toggle?.setAttribute("aria-expanded", "false");
-  toggle?.setAttribute("aria-label", spanish ? "Abrir navegación" : "Open navigation");
-  setNavBackgroundInert(false);
-  if (wasOpen && restoreFocus) (navReturnFocus || toggle)?.focus?.();
-  navReturnFocus = null;
+  const interactive = !mobile || menuOpen;
+  document.body.classList.toggle("nav-open", menuOpen);
+  toggle.setAttribute("aria-expanded", String(menuOpen));
+  toggle.setAttribute("aria-label", menuOpen
+    ? (spanish ? "Cerrar navegación" : "Close navigation")
+    : (spanish ? "Abrir navegación" : "Open navigation"));
+  nav.inert = !interactive;
+  if (interactive) {
+    nav.removeAttribute("inert");
+    nav.removeAttribute("aria-hidden");
+  } else {
+    nav.setAttribute("inert", "");
+    nav.setAttribute("aria-hidden", "true");
+  }
+  setNavControlsEnabled(interactive);
+  setNavBackgroundInert(menuOpen);
+  if (wasOpen && !menuOpen && restoreFocus) (navReturnFocus || toggle).focus?.();
+  if (!menuOpen) navReturnFocus = null;
 }
 
 function openNav() {
-  if (!toggle || !nav) return;
+  if (!navEnhanced || !toggle || !nav || navMedia.matches) return;
   navReturnFocus = document.activeElement;
-  document.body.classList.add("nav-open");
-  toggle.setAttribute("aria-expanded", "true");
-  toggle.setAttribute("aria-label", spanish ? "Cerrar navegación" : "Close navigation");
-  setNavBackgroundInert(true);
+  syncNavState({ open: true });
   window.requestAnimationFrame(() => nav.querySelector("a[href]")?.focus());
 }
 
-toggle?.addEventListener("click", () => {
-  if (document.body.classList.contains("nav-open")) closeNav(true);
-  else openNav();
-});
+function initializeNav() {
+  if (!siteHeader || !toggle || !nav || !navScrim) return;
 
-nav?.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => closeNav(false)));
-navScrim?.addEventListener("click", () => closeNav(true));
-document.addEventListener("keydown", (event) => {
-  if (!document.body.classList.contains("nav-open")) return;
-  if (event.key === "Escape") {
-    event.preventDefault();
-    closeNav(true);
-    return;
-  }
-  if (event.key !== "Tab") return;
-  const focusables = navFocusables();
-  const first = focusables[0];
-  const last = focusables.at(-1);
-  if (event.shiftKey && document.activeElement === first) {
-    event.preventDefault();
-    last?.focus();
-  } else if (!event.shiftKey && document.activeElement === last) {
-    event.preventDefault();
-    first?.focus();
-  }
-});
-navMedia.addEventListener?.("change", (event) => {
-  if (event.matches) closeNav(false);
-});
+  toggle.addEventListener("click", () => {
+    if (document.body.classList.contains("nav-open")) syncNavState({ open: false, restoreFocus: true });
+    else openNav();
+  });
+  nav.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => syncNavState({ open: false })));
+  navScrim.addEventListener("click", () => syncNavState({ open: false, restoreFocus: true }));
+  document.addEventListener("keydown", (event) => {
+    if (!document.body.classList.contains("nav-open")) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      syncNavState({ open: false, restoreFocus: true });
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusables = navFocusables();
+    const first = focusables[0];
+    const last = focusables.at(-1);
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last?.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first?.focus();
+    }
+  });
+  navMedia.addEventListener?.("change", () => syncNavState({ open: false }));
 
-const siteHeader = document.querySelector("[data-site-header]");
+  navEnhanced = true;
+  syncNavState({ open: false });
+  siteHeader.dataset.navEnhanced = "true";
+  toggle.hidden = false;
+  navScrim.hidden = false;
+}
+
+initializeNav();
+
 const actionDock = document.querySelector(".mobile-actions");
 let chromeTicking = false;
 
@@ -99,6 +148,41 @@ document.addEventListener("keydown", (event) => {
 });
 
 const reviewForm = document.querySelector("[data-review-form]");
+const formLocale = reviewForm?.dataset.locale === "es" || spanish ? "es" : "en";
+const formUi = {
+  en: {
+    errorHeading: "Please review the following:",
+    required: (label) => `${label} is required.`,
+    invalidEmail: "Enter a valid email.",
+    invalidField: (label) => `Enter a valid ${label.toLowerCase()}.`,
+    shortDetails: "Add a little more detail so the material can be reviewed.",
+    sendingButton: "Sending request...",
+    sendingStatus: "Sending your material review request.",
+    success: "Your request was received. AG Refining will review the details and follow up using your preferred contact method.",
+    emailDetails: "Email these details",
+    networkError: "The request could not be sent. Please call (281) 898-2719 or try again.",
+    submit: "Send request",
+    subject: (intent) => `AG Refining ${intent === "quote" ? "quote" : "pickup"} request`,
+    labels: ["Name", "Business", "Phone", "Email", "Material", "Amount", "Location", "Frequency"],
+    notProvided: "Not provided"
+  },
+  es: {
+    errorHeading: "Revise lo siguiente:",
+    required: (label) => `${label} es obligatorio.`,
+    invalidEmail: "Escriba un correo electrónico válido.",
+    invalidField: (label) => `Escriba un ${label.toLowerCase()} válido.`,
+    shortDetails: "Añada un poco más de información para revisar el material.",
+    sendingButton: "Enviando solicitud...",
+    sendingStatus: "Enviando su solicitud de revisión del material.",
+    success: "Recibimos su solicitud. AG Refining revisará los detalles y se comunicará por el medio que prefirió.",
+    emailDetails: "Enviar estos datos por correo",
+    networkError: "No se pudo enviar la solicitud. Llame al (281) 898-2719 o inténtelo de nuevo.",
+    submit: "Enviar solicitud",
+    subject: () => "Solicitud de recogida de AG Refining",
+    labels: ["Nombre", "Empresa", "Teléfono", "Correo electrónico", "Material", "Cantidad", "Ubicación", "Frecuencia"],
+    notProvided: "No indicado"
+  }
+}[formLocale];
 
 function prefillReviewForm(form) {
   if (!form) return;
@@ -159,7 +243,7 @@ function readAttribution() {
 readAttribution();
 
 function fieldLabel(field) {
-  return field.labels?.[0]?.textContent?.replace(/Required/gi, "").trim() || field.name;
+  return field.labels?.[0]?.textContent?.replace(/Required|Obligatorio/gi, "").trim() || field.name;
 }
 
 function validateReviewForm(form) {
@@ -171,10 +255,12 @@ function validateReviewForm(form) {
     if (field.name === "company_url") return;
     if (!field.checkValidity()) {
       const message = field.validity.valueMissing
-        ? `${fieldLabel(field)} is required.`
+        ? formUi.required(fieldLabel(field))
         : field.validity.typeMismatch
-          ? `Enter a valid ${fieldLabel(field).toLowerCase()}.`
-          : field.validationMessage;
+          ? (field.name === "email" ? formUi.invalidEmail : formUi.invalidField(fieldLabel(field)))
+          : field.validity.tooShort && field.name === "details"
+            ? formUi.shortDetails
+            : formUi.invalidField(fieldLabel(field));
       issues.push({ field, message });
       field.setAttribute("aria-invalid", "true");
     }
@@ -183,7 +269,7 @@ function validateReviewForm(form) {
   const details = form.elements.namedItem("details");
   if (details && details.value.trim().length > 0 && details.value.trim().length < 20 && !issues.some((issue) => issue.field === details)) {
     details.setAttribute("aria-invalid", "true");
-    issues.push({ field: details, message: "Add a little more detail so the material can be reviewed." });
+    issues.push({ field: details, message: formUi.shortDetails });
   }
 
   return issues;
@@ -199,7 +285,7 @@ function showFormIssues(form, issues) {
   }
 
   const heading = document.createElement("p");
-  heading.textContent = "Please review the following:";
+  heading.textContent = formUi.errorHeading;
   const list = document.createElement("ul");
   issues.forEach(({ field, message }) => {
     const item = document.createElement("li");
@@ -240,22 +326,26 @@ function formPayload(form) {
     company_url: String(data.get("company_url") || "").trim(),
     form_started: String(data.get("form_started") || ""),
     submission_key: String(data.get("submission_key") || ""),
+    locale: String(data.get("locale") || formLocale),
     turnstile_token: String(data.get("cf-turnstile-response") || ""),
     attribution: readAttribution()
   };
 }
 
 function fallbackMailto(payload, recipient) {
-  const subject = `AG Refining ${payload.intent === "quote" ? "quote" : "pickup"} request`;
+  const subject = formUi.subject(payload.intent);
+  const values = [
+    payload.name,
+    payload.business || formUi.notProvided,
+    payload.phone,
+    payload.email,
+    payload.material.replaceAll("_", " "),
+    payload.quantity || formUi.notProvided,
+    payload.location,
+    payload.frequency.replaceAll("_", " ")
+  ];
   const body = [
-    `Name: ${payload.name}`,
-    `Business: ${payload.business || "Not provided"}`,
-    `Phone: ${payload.phone}`,
-    `Email: ${payload.email}`,
-    `Material: ${payload.material.replaceAll("_", " ")}`,
-    `Amount: ${payload.quantity || "Not provided"}`,
-    `Location: ${payload.location}`,
-    `Frequency: ${payload.frequency.replaceAll("_", " ")}`,
+    ...formUi.labels.map((label, index) => `${label}: ${values[index]}`),
     "",
     payload.details
   ].join("\n");
@@ -269,7 +359,7 @@ function showDeliveryFallback(form, message, recipient, payload) {
   text.textContent = `${message} `;
   const link = document.createElement("a");
   link.href = fallbackMailto(payload, recipient);
-  link.textContent = "Email these details";
+  link.textContent = formUi.emailDetails;
   status.replaceChildren(text, link);
   status.dataset.state = "error";
 }
@@ -296,12 +386,13 @@ if (reviewForm) {
     const originalButtonMarkup = button?.innerHTML;
     if (button) {
       button.disabled = true;
-      button.textContent = "Sending request...";
+      button.textContent = formUi.sendingButton;
     }
     form.setAttribute("aria-busy", "true");
-    setFormStatus(form, "Sending your material review request.");
+    setFormStatus(form, formUi.sendingStatus);
 
     const payload = formPayload(form);
+    let responseErrorMessage = "";
     try {
       const response = await fetch(form.action, {
         method: "POST",
@@ -327,13 +418,16 @@ if (reviewForm) {
         if (result.fallback_email) {
           showDeliveryFallback(
             form,
-            result.message || "The request could not be sent.",
+            result.message || formUi.networkError,
             result.fallback_email,
             payload
           );
           return;
         }
-        throw new Error(result.message || "The request could not be sent.");
+        responseErrorMessage = typeof result.message === "string" && result.message
+          ? result.message
+          : formUi.networkError;
+        throw new Error("Lead request failed");
       }
 
       form.reset();
@@ -341,18 +435,143 @@ if (reviewForm) {
       if (submissionKey) submissionKey.value = createSubmissionKey();
       window.turnstile?.reset?.();
       showFormIssues(form, []);
-      setFormStatus(form, "Your request was received. AG Refining will review the details and follow up using your preferred contact method.", "success");
-    } catch (error) {
-      const message = error instanceof Error && error.message
-        ? error.message
-        : "The request could not be sent. Please call (281) 898-2719 or try again.";
-      setFormStatus(form, message, "error");
+      setFormStatus(form, formUi.success, "success");
+    } catch {
+      setFormStatus(form, responseErrorMessage || formUi.networkError, "error");
     } finally {
       form.removeAttribute("aria-busy");
       if (button) {
         button.disabled = false;
-        button.innerHTML = originalButtonMarkup || "Request a material review";
+        button.innerHTML = originalButtonMarkup || formUi.submit;
       }
     }
   });
+
+  reviewForm.noValidate = true;
+  reviewForm.dataset.enhanced = "true";
 }
+
+function initializeAssayHero() {
+  const stage = document.querySelector("[data-assay-stage]");
+  if (!stage) return;
+
+  const host = stage.querySelector("[data-assay-canvas-host]");
+  let bootstrapObserver = null;
+  let idleHandle = null;
+  let idleFallback = null;
+  let controller = null;
+  let disposed = false;
+  let loadHandler = null;
+
+  const clearIdle = () => {
+    if (idleHandle !== null && "cancelIdleCallback" in window) window.cancelIdleCallback(idleHandle);
+    if (idleFallback !== null) window.clearTimeout(idleFallback);
+    idleHandle = null;
+    idleFallback = null;
+  };
+
+  const setFallback = (reason) => {
+    stage.dataset.assayState = "fallback";
+    if (reason) stage.dataset.assayFallbackReason = reason;
+    if (host) {
+      host.hidden = true;
+      host.replaceChildren();
+    }
+  };
+
+  const copyDiagnostics = (diagnostics) => {
+    const fields = {
+      assayFrameCount: diagnostics.frameCount,
+      assayTriangles: diagnostics.triangles,
+      assayDrawCalls: diagnostics.drawCalls,
+      assayPixelRatio: diagnostics.pixelRatio
+    };
+    Object.entries(fields).forEach(([key, value]) => {
+      if (Number.isFinite(value)) stage.dataset[key] = String(value);
+    });
+    stage.dataset.assayReviewView = diagnostics.reviewView;
+  };
+
+  const mount = async () => {
+    if (disposed) return;
+    stage.dataset.assayState = "loading";
+    try {
+      const module = await import("/assay-scene.js?v=20260804-assay");
+      if (disposed) return;
+      const requestedView = new URLSearchParams(window.location.search).get("assay_view");
+      const reviewView = requestedView === "side" || requestedView === "grazing" ? requestedView : "match";
+      const mounted = await module.mountAssayScene(stage, {
+        reviewView,
+        onReady(diagnostics) {
+          if (disposed) return;
+          stage.dataset.assayState = "ready";
+          delete stage.dataset.assayFallbackReason;
+          copyDiagnostics(diagnostics);
+        },
+        onFallback(reason) {
+          if (!disposed) setFallback(reason);
+        }
+      });
+      if (disposed) mounted?.dispose();
+      else if (mounted) {
+        controller = mounted;
+        Object.defineProperty(stage, "__assayController", { configurable: true, value: controller });
+      }
+    } catch {
+      if (!disposed) setFallback("module-error");
+    }
+  };
+
+  const scheduleIdleMount = () => {
+    if (disposed || idleHandle !== null || idleFallback !== null) return;
+    if ("requestIdleCallback" in window) {
+      idleHandle = window.requestIdleCallback(() => {
+        idleHandle = null;
+        mount();
+      }, { timeout: 1500 });
+    } else {
+      idleFallback = window.setTimeout(() => {
+        idleFallback = null;
+        mount();
+      }, 250);
+    }
+  };
+
+  const awaitNearViewport = () => {
+    if (disposed) return;
+    if (!("IntersectionObserver" in window)) {
+      scheduleIdleMount();
+      return;
+    }
+    bootstrapObserver = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      bootstrapObserver?.disconnect();
+      bootstrapObserver = null;
+      scheduleIdleMount();
+    }, { rootMargin: "200px 0px", threshold: 0 });
+    bootstrapObserver.observe(stage);
+  };
+
+  if (document.readyState === "complete") awaitNearViewport();
+  else {
+    loadHandler = () => {
+      loadHandler = null;
+      awaitNearViewport();
+    };
+    window.addEventListener("load", loadHandler, { once: true });
+  }
+
+  window.addEventListener("pagehide", () => {
+    if (disposed) return;
+    disposed = true;
+    if (loadHandler) window.removeEventListener("load", loadHandler);
+    bootstrapObserver?.disconnect();
+    bootstrapObserver = null;
+    clearIdle();
+    controller?.dispose();
+    controller = null;
+    delete stage.__assayController;
+  }, { once: true });
+}
+
+initializeAssayHero();

@@ -7,9 +7,12 @@
     "assets": "node scripts/fetch-assets.mjs",
     "build": "npm run assets && node scripts/build.mjs",
     "check": "node scripts/check.mjs",
-    "verify": "npm run build && npm run check && node scripts/verify.mjs"
+    "test": "node --test tests/generated-interaction-contract.test.mjs tests/leads-response.test.mjs",
+    "test:assay": "node --test tests/assay-scene-runtime.test.mjs tests/assay-production-contract.test.mjs",
+    "verify": "npm run build && npm test && npm run test:assay && npm run check && node scripts/verify.mjs"
   },
   "devDependencies": {
-    "sharp": "^0.35.3"
+    "sharp": "^0.35.3",
+    "three": "0.185.1"
   }
 }

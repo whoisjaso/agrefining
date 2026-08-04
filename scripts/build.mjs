@@ -1,6 +1,7 @@
 import { cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { renderReviewForm } from "../src/review-form.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const out = join(root, "dist");
@@ -10,6 +11,11 @@ mkdirSync(join(out, "assets"), { recursive: true });
 cpSync(join(root, "assets"), join(out, "assets"), { recursive: true });
 cpSync(join(root, "src", "style.css"), join(out, "style.css"));
 cpSync(join(root, "src", "site.js"), join(out, "site.js"));
+mkdirSync(join(out, "assets", "vendor"), { recursive: true });
+cpSync(join(root, "node_modules", "three", "build", "three.module.min.js"), join(out, "assets", "vendor", "three.module.min.js"));
+cpSync(join(root, "node_modules", "three", "build", "three.core.min.js"), join(out, "assets", "vendor", "three.core.min.js"));
+cpSync(join(root, "node_modules", "three", "LICENSE"), join(out, "assets", "vendor", "three.LICENSE.txt"));
+cpSync(join(root, "src", "assay-scene.js"), join(out, "assay-scene.js"));
 
 const siteUrl = "https://agrefining.com";
 const phoneDisplay = "(281) 898-2719";
@@ -67,8 +73,8 @@ const materialPages = [
   },
   {
     path: "sell-silver-coins-houston",
-    title: "Sell Silver Coins in Houston | Top Prices | AG Refining",
-    description: "Sell silver coins in Houston for top prices. AG Refining offers expert evaluations, fast payment, and trusted local service.",
+    title: "Sell Silver Coins in Houston | Clear Evaluations | AG Refining",
+    description: "Sell silver coins in Houston with clear evaluations based on coin type, silver content, weight, condition, and current market values.",
     eyebrow: "Silver coins buyer in Houston, Texas",
     heading: "Sell your silver coins in Houston.",
     intro: "AG Refining buys silver coins from collectors, investors, estates, businesses, and individuals. Whether you have one coin or a full collection, we will explain the value and make a clear offer.",
@@ -78,7 +84,7 @@ const materialPages = [
     answerText: "We inspect the coin type, silver content, weight, condition, and current silver market. Some rare or graded coins may be worth more to a collector than for their silver, so we explain the difference before you decide.",
     details: [
       ["Honest evaluation", "We inspect your coins and explain the factors that affect the offer."],
-      ["Competitive pricing", "We follow the silver market and base each offer on the coins we confirm."],
+      ["Market-based pricing", "We follow the silver market and base each offer on the coins we confirm."],
       ["Fast payment", "If you accept the offer, we complete the sale and issue prompt payment."]
     ],
     faqs: [
@@ -93,7 +99,7 @@ const materialPages = [
     layout: "long-material",
     path: "silver-flake-buyer-houston",
     title: "Silver Flake Buyer in Houston, TX | AG Refining",
-    description: "Sell silver flake in Houston for competitive prices. AG Refining offers expert evaluations, fast payment, and trusted refining services.",
+    description: "Sell silver flake in Houston with an evaluation based on confirmed silver content, purity, weight, condition, and current market values.",
     eyebrow: "Silver flake buyer Houston",
     heading: "Sell silver flake in Houston.",
     intro: "AG Refining buys qualifying silver flake from manufacturers, electronics companies, laboratories, metal finishers, and industrial facilities. We review the material, explain the offer, and make the process easy to follow.",
@@ -138,7 +144,7 @@ const materialPages = [
     layout: "long-material",
     path: "laboratory-silver-buyer-houston",
     title: "Laboratory Silver Buyer in Houston, TX | AG Refining",
-    description: "Sell laboratory silver in Houston for top value. AG Refining offers expert evaluations, fair pricing, and fast payment for silver materials.",
+    description: "Sell laboratory silver in Houston with evaluations based on confirmed recoverable silver, material condition, and current market values.",
     eyebrow: "Laboratory silver buyer Houston",
     heading: "Sell laboratory silver in Houston.",
     intro: "AG Refining reviews silver-bearing material from laboratories, research facilities, universities, medical facilities, and industrial companies. We help approved customers recover value from unused, outdated, or excess material.",
@@ -183,7 +189,7 @@ const materialPages = [
     layout: "long-material",
     path: "silver-solder-buyer-houston",
     title: "Silver Solder Buyer in Houston, TX | AG Refining",
-    description: "Sell silver solder in Houston for competitive prices. AG Refining offers expert evaluations, fast payment, and trusted refining services.",
+    description: "Sell silver solder in Houston with evaluations based on alloy, silver content, weight, condition, and current market values.",
     eyebrow: "Silver solder buyer Houston",
     heading: "Sell silver solder in Houston.",
     intro: "AG Refining buys qualifying silver solder from manufacturers, machine shops, HVAC and plumbing companies, electrical contractors, jewelers, fabricators, and industrial businesses.",
@@ -273,7 +279,7 @@ const materialPages = [
     layout: "long-material",
     path: "silver-oxide-watch-battery-recycling-houston",
     title: "Silver Oxide Watch Battery Recycling Houston | AG Refining",
-    description: "Recycle silver oxide watch batteries in Houston with AG Refining. Competitive pricing, fast service, and professional precious metal recovery.",
+    description: "Recycle silver oxide watch batteries in Houston with material review, qualifying pickup, and recovery based on confirmed content and condition.",
     eyebrow: "Silver oxide watch battery recycling Houston",
     heading: "Recycle silver oxide watch batteries in Houston.",
     intro: "AG Refining reviews commercial quantities of qualifying silver oxide button cells from watch shops, jewelers, distributors, hospitals, manufacturers, and recyclers.",
@@ -299,7 +305,7 @@ const materialPages = [
     reasons: [
       ["Precious-metal focus", "We review identified silver oxide cells for recoverable silver."],
       ["Clear lot guidance", "We explain the sorting and records needed before transfer."],
-      ["Competitive pricing", "Approved lots are valued from confirmed material, weight, condition, and current silver values."],
+      ["Market-based pricing", "Approved lots are valued from confirmed material, weight, condition, and current silver values."],
       ["Commercial support", "Qualifying Houston lots may be eligible for scheduled pickup and prompt payment."]
     ],
     faqs: [
@@ -338,7 +344,7 @@ const materialPages = [
     layout: "long-material",
     path: "scrap-silver-buyer-houston",
     title: "Scrap Silver Buyer Houston | Sell Scrap Silver | AG Refining",
-    description: "Sell scrap silver in Houston with AG Refining. Top prices, free pickup, on-site weighing, and immediate payment",
+    description: "Sell scrap silver in Houston with AG Refining. Free qualifying pickup, on-site weighing, and offers based on confirmed material and current market values.",
     eyebrow: "Scrap silver buyer Houston",
     heading: "Turn your scrap silver into cash.",
     intro: "AG Refining buys qualifying scrap silver from commercial, industrial, medical, and manufacturing businesses across Houston. We make the process simple, clear, and easy to follow.",
@@ -375,7 +381,7 @@ const materialPages = [
       ["Do you offer free pickup?", "Yes, for qualifying commercial and industrial lots in the Houston Metro Area."],
       ["Do you weigh materials at my location?", "On-site weighing is available for qualifying pickups."],
       ["How is the price determined?", "Pricing depends on confirmed material, silver content, purity, weight, condition, and current market values."],
-      ["When do I receive payment?", "Prompt or same-day payment may be available after the material is confirmed and the offer is accepted."],
+      ["When do I receive payment?", "Payment timing is confirmed with the offer and depends on the approved material and transaction."],
       ["Why choose AG Refining?", "AG Refining is a Houston-based, family-owned company focused on honest pricing, clear service, convenient pickup, and long-term relationships."]
     ],
     materialQuery: "scrap_silver",
@@ -386,7 +392,7 @@ const materialPages = [
     layout: "long-material",
     path: "dental-scrap-buyer-houston",
     title: "Dental Scrap Buyer Houston | Sell Dental Scrap | AG Refining",
-    description: "Sell dental scrap in Houston with AG Refining. Competitive pricing, free pickup, on-site service, and fast payment for dental practices.",
+    description: "Sell dental scrap in Houston with material review, free qualifying pickup, on-site service, and pricing based on confirmed precious-metal content.",
     eyebrow: "Dental scrap buyer Houston",
     heading: "Sell your dental scrap with confidence.",
     intro: "AG Refining reviews qualifying precious-metal dental scrap from dental offices, dental laboratories, orthodontic practices, oral surgeons, universities, and approved healthcare facilities in Houston.",
@@ -413,7 +419,7 @@ const materialPages = [
     guardrailText: "Do not include patient records, names, extracted teeth or biological material, sharps, liquids, amalgam, or unknown clinical waste in ordinary pickup. Your practice must confirm its own privacy, retention, safety, and disposal duties before transfer.",
     reasons: [
       ["Clear evaluation", "We explain what material qualifies and what factors affect the offer."],
-      ["Competitive pricing", "Approved material is priced from confirmed precious-metal content and current market values."],
+      ["Market-based pricing", "Approved material is priced from confirmed precious-metal content and current market values."],
       ["Practice-friendly service", "We plan around your schedule after the material and quantity are reviewed."],
       ["Long-term support", "We can discuss one-time cleanouts and approved recurring dental-lab material."]
     ],
@@ -432,7 +438,7 @@ const materialPages = [
     layout: "xray-hub",
     path: "x-ray-recycling-services-houston",
     title: "X-Ray Recycling Services Houston | X-Ray Film Recycling | AG Refining",
-    description: "Houston X-ray recycling services for medical and industrial film. Secure silver recovery, competitive pricing, and professional service.",
+    description: "Houston X-ray recycling services for qualifying medical and industrial film, with handling planning, silver recovery review, and professional service.",
     eyebrow: "X-ray recycling services Houston",
     heading: "Secure X-ray film recycling in Houston.",
     intro: "AG Refining reviews qualifying medical, dental, and industrial X-ray film for silver recovery. We help Houston organizations plan a clear, secure, and responsible recycling process.",
@@ -474,7 +480,7 @@ const materialPages = [
     layout: "long-material",
     path: "sell-silver-bars-houston",
     title: "Sell Silver Bars in Houston | AG Refining",
-    description: "Sell silver bars in Houston for top prices. AG Refining offers honest evaluations, fast payment, and outstanding customer service.",
+    description: "Sell silver bars in Houston with evaluations based on confirmed weight, fineness, and current silver market values.",
     eyebrow: "Sell silver bars Houston",
     heading: "Turn your silver bars into cash.",
     intro: "AG Refining buys silver bars from investors, businesses, estates, jewelers, and industrial companies across the Houston Metro Area. Whether you have one bar or an entire collection, we evaluate it against the current silver market and pay you quickly.",
@@ -500,7 +506,7 @@ const materialPages = [
     guardrailHeading: "Call before you travel with a collection.",
     guardrailText: "Tell us the bar sizes, approximate total weight, and where the lot is stored. We will confirm the right next step, and for larger holdings we can discuss an on-site evaluation instead of you moving the silver.",
     reasons: [
-      ["Competitive prices", "Offers are based on the current silver market, which moves throughout the day."],
+      ["Market-based offers", "Offers are based on the current silver market, which moves throughout the day."],
       ["Honest evaluations", "Every bar is inspected, weighed, and tested when needed. We explain how the value was reached."],
       ["Fast payment", "Once your bars are evaluated, we complete the transaction quickly and accurately."],
       ["No pressure to sell", "We answer your questions and make the offer. The decision stays yours."]
@@ -519,7 +525,7 @@ const materialPages = [
     layout: "long-material",
     path: "silver-flatware-buyer-houston",
     title: "Silver Flatware Buyer in Houston, TX | AG Refining",
-    description: "Sell silver flatware in Houston for top prices. AG Refining offers honest evaluations, fast payment, and trusted service.",
+    description: "Sell silver flatware in Houston with evaluations based on confirmed silver content, weight, condition, and current market values.",
     eyebrow: "Silver flatware buyer Houston",
     heading: "Turn unused silver flatware into cash.",
     intro: "AG Refining buys sterling flatware, antique silverware, serving pieces, and complete sets from homeowners, estates, collectors, and dealers. From a single serving spoon to a full family collection, we price it against the current silver market.",
@@ -545,11 +551,11 @@ const materialPages = [
     audienceText: "We work with individuals, estate executors, antique dealers, jewelers, and businesses across Houston and the surrounding metro area.",
     audiences: ["Homeowners", "Estate executors", "Antique dealers", "Jewelers"],
     guardrailHeading: "Ask about mobile service for large collections.",
-    guardrailText: "If you have a full estate collection, do not move it before calling. We can come to your location, evaluate the silver, weigh the material, and pay on the spot once you accept the offer.",
+    guardrailText: "If you have a full estate collection, do not move it before calling. We can come to your location, evaluate the silver, weigh the material, and explain the offer before you decide whether to sell.",
     reasons: [
-      ["Competitive prices", "Offers follow the current silver market, which changes daily."],
+      ["Market-based offers", "Offers follow the current silver market, which changes daily."],
       ["Accurate evaluations", "Each piece is examined and weighed, and we explain what is sterling and what is not."],
-      ["Fast, secure payment", "No hidden fees and no unnecessary delays once you accept the offer."],
+      ["Clear offer terms", "We explain the offer before you choose whether to sell."],
       ["Respectful service", "Inherited silver carries history. We treat every collection and every customer with respect."]
     ],
     faqs: [
@@ -569,7 +575,7 @@ const materialPages = [
     description: "AG Refining helps Houston jewelry stores recycle silver scrap with expert service, fair pricing, accurate evaluations, and fast payment.",
     eyebrow: "Jewelry store silver recycling Houston",
     heading: "Turn bench scrap into working capital.",
-    intro: "Jewelry stores handle silver every day. Damaged pieces, customer trade-ins, bench scrap, and outdated inventory build up fast. AG Refining helps Houston jewelers recover the full value of that material with accurate evaluations and fast payment.",
+    intro: "Jewelry stores handle silver every day. Damaged pieces, customer trade-ins, bench scrap, and outdated inventory build up fast. AG Refining helps Houston jewelers evaluate that material using confirmed silver content, weight, purity, and current market conditions.",
     image: "material-silver-jewelry-1280.webp",
     imageAlt: "Sterling silver jewelry scrap, findings, and bench material collected for refining",
     answerHeading: "The silver you already own is working capital.",
@@ -594,9 +600,9 @@ const materialPages = [
     guardrailHeading: "Set up a routine instead of a one-time cleanout.",
     guardrailText: "If your bench produces scrap every month, tell us your volume and schedule. We can agree on a recurring pickup so the material never piles up and the value never sits idle.",
     reasons: [
-      ["Competitive pricing", "Offers follow current silver market values, not a flat shop rate."],
+      ["Market-based pricing", "Offers follow current silver market values, not a flat shop rate."],
       ["Accurate content evaluations", "Experienced precious metal specialists assess silver content and explain the result."],
-      ["Professional and confidential", "Your inventory and volumes stay between us."],
+      ["Commercial request handling", "We use inventory and volume details to review your request and plan service. See our <a href=\"/privacy\">privacy notice</a> for how website requests are handled."],
       ["Convenient pickup", "For larger quantities we come to your store, evaluate, weigh, and make the offer on site."]
     ],
     faqs: [
@@ -641,6 +647,11 @@ const industryPages = [
   ]
 }));
 
+Object.assign(industryPages.find((page) => page.path === "hospital-silver-recycling"), {
+  materialQuery: "xray_film",
+  heroGuardrail: "Do not upload patient information or readable X-ray images. Confirm your organization's record-retention and privacy duties before transfer. See the <a href=\"/medical-x-ray-recycling\">medical X-ray film guidance</a>."
+});
+
 const locationPages = [
   // The fourth column keeps the service-area index from repeating one photograph
   // seven times. Each city carries a different material from the set.
@@ -679,7 +690,7 @@ const locationPages = [
 Object.assign(locationPages.find((page) => page.path === "houston-silver-buyer"), {
   layout: "houston-hub",
   title: "Houston Silver Buyer | Sell Scrap Silver in Houston | AG Refining",
-  description: "Sell silver in Houston with AG Refining. Free pickup, on-site weighing, immediate payment, and honest pricing for commercial accounts.",
+  description: "Sell silver in Houston with AG Refining. Free pickup, on-site weighing, honest pricing, and payment terms confirmed with the offer.",
   eyebrow: "Houston silver buyer",
   heading: "Sell your silver with confidence.",
   intro: "AG Refining helps Houston businesses sell qualifying silver-bearing material. We offer clear evaluations, convenient pickup, on-site weighing, and prompt payment when the transaction qualifies.",
@@ -689,44 +700,86 @@ Object.assign(locationPages.find((page) => page.path === "houston-silver-buyer")
     ["What types of customers does AG Refining serve?", "We work with commercial, industrial, medical, educational, manufacturing, recycling, and other approved customers across the Houston Metro Area."],
     ["Do you offer free pickup?", "Yes, for qualifying commercial and industrial accounts after the material, quantity, location, and schedule are confirmed."],
     ["Do you weigh materials on-site?", "On-site weighing is available for qualifying pickups so you can see the weight before accepting an offer."],
-    ["When do I get paid?", "Prompt or same-day payment may be available after the material is confirmed and the offer is accepted."],
+    ["When do I get paid?", "Payment timing is confirmed with the offer and depends on the approved material and transaction."],
     ["What areas do you serve?", "We serve Houston, Pearland, Pasadena, Sugar Land, Katy, Cypress, Spring, The Woodlands, Conroe, Humble, Baytown, League City, Friendswood, Missouri City, Richmond, Rosenberg, Tomball, Bellaire, Deer Park, La Porte, Texas City, Galveston, and nearby communities."]
   ]
 });
 
 const allServicePages = [...materialPages, ...industryPages, ...locationPages];
 
-const nav = `
-  <header class="site-header" data-site-header>
-    <div class="utility-bar">
-      <div class="shell utility-inner">
-        <p>Houston, Texas <span aria-hidden="true">/</span> Silver buying and pickup</p>
-        <div>
-          <a href="tel:${phoneHref}">${phoneDisplay}</a><span></span>
-          <a href="mailto:${email}">${email}</a><span></span>
-          <a href="/espanol">Español</a>
-        </div>
-      </div>
-    </div>
-    <nav class="nav shell" aria-label="Primary navigation">
-      <a class="brand" href="/" aria-label="AG Refining home">
-        <img src="/assets/ag-mark-path.svg" alt="" width="48" height="48">
-        <span class="brand-word"><strong>AG</strong> Refining</span>
-      </a>
-      <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-links" aria-label="Open navigation"><span></span><span></span></button>
-      <div class="nav-links" id="primary-links" data-nav>
+const languageNote = '<small class="language-note">en ingles</small>';
+
+function renderNav(locale = "en") {
+  const spanish = locale === "es";
+  const links = spanish
+    ? `
+        <a href="/accepted-materials" hreflang="en">Materiales ${languageNote}</a>
+        <a href="/industries" hreflang="en">Industrias ${languageNote}</a>
+        <a href="/service-areas" hreflang="en">Áreas de servicio ${languageNote}</a>
+        <a href="/how-it-works" hreflang="en">Cómo funciona ${languageNote}</a>
+        <a href="/about" hreflang="en">Nuestra historia ${languageNote}</a>
+        <a class="button button-primary nav-review" href="#solicitud">Enviar solicitud ${arrow}</a>`
+    : `
         <a href="/accepted-materials">Materials</a>
         <a href="/industries">Industries</a>
         <a href="/service-areas">Service areas</a>
         <a href="/how-it-works">How it works</a>
         <a href="/about">Our story</a>
-        <a class="button button-primary nav-review" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
+        <a class="button button-primary nav-review" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>`;
+  return `
+  <header class="site-header" data-site-header>
+    <div class="utility-bar">
+      <div class="shell utility-inner">
+        <p>${spanish ? "Houston, Texas <span aria-hidden=\"true\">/</span> Compra y recogida de plata" : "Houston, Texas <span aria-hidden=\"true\">/</span> Silver buying and pickup"}</p>
+        <div>
+          <a href="tel:${phoneHref}">${phoneDisplay}</a><span></span>
+          <a href="mailto:${email}">${email}</a><span></span>
+          ${spanish ? '<a href="/" hreflang="en"><span lang="en">English</span></a>' : '<a href="/espanol" hreflang="es">Español</a>'}
+        </div>
+      </div>
+    </div>
+    <nav class="nav shell" aria-label="${spanish ? "Navegación principal" : "Primary navigation"}">
+      <a class="brand" href="${spanish ? "/espanol" : "/"}" aria-label="${spanish ? "Inicio de AG Refining" : "AG Refining home"}">
+        <img src="/assets/ag-mark-path.svg" alt="" width="48" height="48">
+        <span class="brand-word"><strong>AG</strong> Refining</span>
+      </a>
+      <button class="nav-toggle" type="button" data-nav-toggle hidden aria-expanded="false" aria-controls="primary-links" aria-label="${spanish ? "Abrir navegación" : "Open navigation"}"><span></span><span></span></button>
+      <div class="nav-links" id="primary-links" data-nav>${links}
       </div>
     </nav>
-    <button class="nav-scrim" type="button" data-nav-scrim aria-label="Close navigation" tabindex="-1"></button>
+    <button class="nav-scrim" type="button" data-nav-scrim hidden aria-label="${spanish ? "Cerrar navegación" : "Close navigation"}" tabindex="-1"></button>
   </header>`;
+}
 
-const footer = `
+function renderFooter(locale = "en") {
+  const spanish = locale === "es";
+  if (spanish) {
+    return `
+  <footer class="footer">
+    <div class="shell footer-grid">
+      <div>
+        <a class="brand" href="/espanol"><img src="/assets/ag-mark-path.svg" alt="" width="48" height="48"><span class="brand-word">AG Refining</span></a>
+        <p>Compra y recogida de plata en Houston para cuentas comerciales, industriales, médicas y empresariales que califican.</p>
+      </div>
+      <nav aria-label="Materiales">
+        <a href="/scrap-silver-buyer-houston" hreflang="en">Plata para reciclaje ${languageNote}</a>
+        <a href="/industrial-x-ray-silver-recycling" hreflang="en">Película industrial de rayos X ${languageNote}</a>
+        <a href="/silver-oxide-watch-battery-recycling-houston" hreflang="en">Baterías de reloj ${languageNote}</a>
+        <a href="/accepted-materials" hreflang="en">Todos los materiales ${languageNote}</a>
+      </nav>
+      <nav aria-label="Contacto">
+        <a href="tel:${phoneHref}">${phoneDisplay}</a>
+        <a href="mailto:${email}">${email}</a>
+        <a href="#solicitud">Enviar solicitud</a>
+      </nav>
+    </div>
+    <div class="shell footer-bottom">
+      <p>Copyright 2026 AG Refining. La recogida gratuita y el pago rápido dependen del material, la ubicación, el tipo de cuenta y el horario.</p>
+      <nav aria-label="Avisos legales"><a href="/privacy" hreflang="en">Privacidad ${languageNote}</a></nav>
+    </div>
+  </footer>`;
+  }
+  return `
   <footer class="footer">
     <div class="shell footer-grid">
       <div>
@@ -750,8 +803,23 @@ const footer = `
       <nav aria-label="Legal"><a href="/privacy">Privacy</a></nav>
     </div>
   </footer>`;
+}
 
-const materialGuide = `
+function renderMaterialGuide(locale = "en") {
+  if (locale === "es") {
+    return `
+  <details class="material-guide">
+    <summary><span class="guide-mark" aria-hidden="true"></span><span>Identifique su material</span></summary>
+    <div class="material-guide-panel">
+      <h2>Comience con el material.</h2>
+      <a href="/accepted-materials" hreflang="en">Vea lo que compramos ${languageNote} ${arrow}</a>
+      <a href="/how-it-works" hreflang="en">Vea cómo funciona la recogida ${languageNote} ${arrow}</a>
+      <a href="#solicitud">Solicite una revisión ${arrow}</a>
+      <a href="tel:${phoneHref}">Llame al ${phoneDisplay}</a>
+    </div>
+  </details>`;
+  }
+  return `
   <details class="material-guide">
     <summary><span class="guide-mark" aria-hidden="true"></span><span>Identify your material</span></summary>
     <div class="material-guide-panel">
@@ -762,8 +830,13 @@ const materialGuide = `
       <a href="tel:${phoneHref}">Call ${phoneDisplay}</a>
     </div>
   </details>`;
+}
 
-const mobileActions = `<nav class="mobile-actions" aria-label="Quick actions"><a href="tel:${phoneHref}">Call</a><a class="button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></nav>`;
+function renderMobileActions(locale = "en") {
+  return locale === "es"
+    ? `<nav class="mobile-actions" aria-label="Acciones rápidas"><a href="tel:${phoneHref}">Llamar</a><a class="button-primary" href="#solicitud">Enviar solicitud ${arrow}</a></nav>`
+    : `<nav class="mobile-actions" aria-label="Quick actions"><a href="tel:${phoneHref}">Call</a><a class="button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></nav>`;
+}
 
 function schemaTag(data) {
   return `<script type="application/ld+json">${JSON.stringify(data).replaceAll("<", "\\u003c")}</script>`;
@@ -812,6 +885,7 @@ function document({
   image = "ag-silver-social.webp",
   robots = "index,follow,max-image-preview:large"
 }) {
+  const locale = lang === "es" ? "es" : "en";
   const canonical = path ? `${siteUrl}/${path}` : `${siteUrl}/`;
   const schema = [organizationSchema, ...pageSchema];
   return `<!DOCTYPE html>
@@ -839,17 +913,17 @@ function document({
     <link rel="icon" href="/assets/ag-mark-path.svg" type="image/svg+xml">
     <link rel="preload" href="/assets/fonts/newsreader-latin-opsz.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/assets/fonts/manrope-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/style.css?v=20260803-silver-atelier">
+    <link rel="stylesheet" href="/style.css?v=20260804-assay">
     ${schemaTag({ "@context": "https://schema.org", "@graph": schema })}
   </head>
   <body data-design="silver-atelier"${bodyClass ? ` class="${bodyClass}"` : ""}>
-    <a class="skip" href="#main">Skip to content</a>
-    ${nav}
+    <a class="skip" href="#main">${locale === "es" ? "Saltar al contenido" : "Skip to content"}</a>
+    ${renderNav(locale)}
     <main id="main">${content}</main>
-    ${mobileActions}
-    ${footer}
-    ${materialGuide}
-    <script src="/site.js?v=20260803-silver-atelier" defer></script>
+    ${renderMobileActions(locale)}
+    ${renderFooter(locale)}
+    ${renderMaterialGuide(locale)}
+    <script src="/site.js?v=20260804-assay" defer></script>
   </body>
 </html>`;
 }
@@ -890,25 +964,26 @@ const homeFaqs = [
   ["What types of customers does AG Refining serve?", "We work with commercial, industrial, medical, educational, manufacturing, and recycling businesses throughout the Houston Metro Area."],
   ["Do you offer free pickup?", "Yes. We provide free pickup throughout the Houston Metro Area for qualifying commercial and industrial accounts."],
   ["Do you weigh materials on-site?", "Yes. We perform on-site weighing for qualifying pickups so you can see the weight before payment."],
-  ["When do I get paid?", "Immediate payment is available for most qualifying transactions. Same-day service depends on the material, schedule, and agreed terms."],
+  ["When do I get paid?", "Payment timing is confirmed with the offer and depends on the approved material and transaction."],
   ["What areas do you serve?", "We serve Houston, Pearland, Pasadena, Sugar Land, Katy, Cypress, Spring, The Woodlands, Conroe, Humble, Baytown, League City, Friendswood, Missouri City, Richmond, Rosenberg, Tomball, Bellaire, Deer Park, La Porte, Texas City, Galveston, and nearby communities."],
   ["Why choose AG Refining?", "Customers choose AG Refining for honest pricing, professional service, free qualifying pickup, on-site weighing, and direct Houston-based support."]
 ];
 
 const home = `
   <section class="atelier-hero">
-    <div class="hero-media">
-      <picture>
-        <source media="(max-width: 700px)" srcset="/assets/ag-silver-pour-mobile.webp">
-        <img src="/assets/ag-silver-pour-1600.webp" alt="Molten silver poured from an induction furnace into a mold at AG Refining" width="1600" height="900" fetchpriority="high">
+    <div class="hero-media assay-stage" data-assay-stage data-assay-state="fallback">
+      <picture class="assay-fallback" data-assay-fallback>
+        <source media="(max-width: 700px)" srcset="/assets/ag-assay-monolith-mobile.webp">
+        <img src="/assets/ag-assay-monolith-1280.webp" alt="Cast-silver AG assay monolith with a blue line, concentric well, and Ag 47 mark" width="1280" height="819" fetchpriority="high">
       </picture>
+      <div class="assay-canvas-host" data-assay-canvas-host hidden aria-hidden="true"></div>
     </div>
     <div class="shell hero-commercial-grid">
       <div class="hero-copy" data-reveal>
         <div class="assay-line" aria-hidden="true"><span>Ag / 47</span><i></i></div>
         <p class="hero-kicker"><span>Ag</span> Houston silver buyer</p>
         <h1>Turn silver-bearing material into cash.</h1>
-        <p class="hero-lede">AG Refining turns silver-bearing material into cash for Houston businesses. Free pickup for qualifying accounts, on-site weighing you can watch, honest pricing, and immediate payment on most qualifying transactions.</p>
+        <p class="hero-lede">AG Refining turns silver-bearing material into cash for Houston businesses. Free pickup for qualifying accounts, on-site weighing you can watch, honest pricing, and payment terms confirmed with the offer.</p>
         <div class="hero-actions">
           <a class="button button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
           <a class="phone-link" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
@@ -945,7 +1020,7 @@ const home = `
       <p>Houston-based</p>
       <p>Free qualifying pickup</p>
       <p>On-site weighing</p>
-      <p>Immediate payment</p>
+      <p>Confirmed payment terms</p>
     </div>
   </div>
 
@@ -1077,7 +1152,7 @@ const home = `
           <a class="button button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
           <a class="phone-link" href="tel:${phoneHref}">Call AG Refining</a>
         </div>
-        <p class="location-note">Please call before visiting. Pickup and same-day service depend on the material and schedule.</p>
+        <p class="location-note">Please call before visiting. Pickup and service timing depend on the material and schedule.</p>
       </div>
     </div>
   </section>
@@ -1103,7 +1178,7 @@ const home = `
 
 writeFileSync(join(out, "index.html"), document({
   title: "Houston Silver Buyer | Sell Scrap Silver in Houston | AG Refining",
-  description: "Sell silver in Houston with AG Refining. Free pickup, on-site weighing, immediate payment, and honest pricing for commercial accounts.",
+  description: "Sell silver in Houston with AG Refining. Free pickup, on-site weighing, honest pricing, and payment terms confirmed with the offer.",
   content: home,
   bodyClass: "home-page",
   pageSchema: [faqSchema(homeFaqs)]
@@ -1121,7 +1196,8 @@ function servicePage(page) {
     "dental-scrap-buyer-houston": "dental_material",
     "industrial-silver-scrap": "industrial_silver"
   };
-  const materialQuery = materialByPath[page.path] ? `&material=${materialByPath[page.path]}` : "";
+  const materialQueryValue = page.materialQuery || materialByPath[page.path];
+  const materialQuery = materialQueryValue ? `&material=${materialQueryValue}` : "";
   const content = `
     <section class="page-hero service-hero">
       <div class="shell">
@@ -1132,6 +1208,7 @@ function servicePage(page) {
             <p class="eyebrow">${page.eyebrow}</p>
             <h1>${page.heading}</h1>
             <p>${page.intro}</p>
+            ${page.heroGuardrail ? `<p class="material-hero-note">${page.heroGuardrail}</p>` : ""}
             <a class="button button-primary" href="/contact?intent=pickup${materialQuery}">${primaryCta} ${arrow}</a>
           </div>
           <figure class="service-visual"><img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" fetchpriority="high"></figure>
@@ -1193,7 +1270,7 @@ function coinServicePage(page) {
   const reasons = [
     ["Outstanding customer service", "We answer your questions, explain each step, and never pressure you to sell."],
     ["Industry experience", "Our team understands silver content, weight, condition, and current market values."],
-    ["Competitive pricing", "We monitor the silver market and make an offer based on the coins we confirm."],
+    ["Market-based pricing", "We monitor the silver market and make an offer based on the coins we confirm."],
     ["Honest evaluations", "We show you the factors that affect the offer before you make a decision."],
     ["Fast payment", "Once you accept the offer, we complete the transaction without unnecessary delays."]
   ];
@@ -1827,30 +1904,6 @@ writeFileSync(join(out, "about", "index.html"), document({
   content: about
 }));
 
-function reviewForm() {
-  return `<form id="review-form" class="review-form" data-review-form action="/api/leads" method="post" novalidate>
-    <div class="form-errors field-wide" data-form-errors tabindex="-1" hidden></div>
-    <input type="hidden" name="intent" value="pickup">
-    <input type="hidden" name="form_started" value="">
-    <input type="hidden" name="submission_key" value="">
-    <div class="field"><label for="name">Name <span>Required</span></label><input id="name" name="name" type="text" autocomplete="name" required></div>
-    <div class="field"><label for="business">Business</label><input id="business" name="business" type="text" autocomplete="organization"></div>
-    <div class="field"><label for="phone">Phone <span>Required</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" required></div>
-    <div class="field"><label for="email">Email <span>Required</span></label><input id="email" name="email" type="email" autocomplete="email" required></div>
-    <div class="field"><label for="material">Material <span>Required</span></label><select id="material" name="material" required>
-      <option value="">Select one</option><option value="scrap_silver">Scrap silver</option><option value="industrial_silver">Industrial silver</option><option value="silver_flake">Silver flake</option><option value="laboratory_silver">Laboratory silver</option><option value="silver_solder">Silver solder</option><option value="silver_plated">Silver-plated material</option><option value="silver_bars">Silver bars</option><option value="silver_flatware">Silver flatware</option><option value="jewelry_scrap">Jewelry store scrap</option><option value="dental_material">Dental material</option><option value="silver_oxide_batteries">Watch batteries</option><option value="xray_film">X-ray film</option><option value="silver_coins">Silver coins</option><option value="unknown">Not sure</option>
-    </select></div>
-    <div class="field"><label for="quantity">Approximate amount</label><input id="quantity" name="quantity" type="text" maxlength="120" placeholder="Weight, boxes, drums, or pallets"></div>
-    <div class="field"><label for="location">Pickup location <span>Required</span></label><input id="location" name="location" type="text" maxlength="180" placeholder="City or business address" required></div>
-    <div class="field"><label for="frequency">How often?</label><select id="frequency" name="frequency"><option value="one_time">One-time lot</option><option value="recurring">Recurring material</option><option value="unknown">Not sure</option></select></div>
-    <div class="field field-wide"><label for="details">What should we know? <span>Required</span></label><textarea id="details" name="details" required minlength="20" placeholder="Describe the material, condition, source, and anything that may affect pickup."></textarea></div>
-    <fieldset class="field field-wide preferred-contact"><legend>Preferred contact</legend><label><input type="radio" name="preferred_contact" value="phone" checked> Phone</label><label><input type="radio" name="preferred_contact" value="email"> Email</label></fieldset>
-    <div class="honeypot" aria-hidden="true"><label for="company_url">Company website</label><input id="company_url" name="company_url" type="text" tabindex="-1" autocomplete="off"></div>
-    <p class="form-note field-wide">This request is not a final quote or pickup promise. Free pickup and fast payment depend on the material, location, account type, and schedule. Do not send patient records, passwords, financial data, or identity documents. See our <a href="/privacy">privacy notice</a>.</p>
-    <div class="form-actions field-wide"><button class="button button-primary" type="submit" data-submit-button>Send request ${arrow}</button><p class="form-status" data-form-status aria-live="polite"></p></div>
-  </form>`;
-}
-
 const contact = `
   <section class="page-hero page-intro page-intro-contact"><div class="shell">${breadcrumbs([["Home", "/"], ["Contact", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Schedule pickup</p><h1>Tell us what silver you have.</h1></div><p>Share the material, amount, and location. We will confirm whether it qualifies and explain the next step.</p></div></div></section>
   <section class="section contact-section"><div class="shell contact-grid">
@@ -1860,7 +1913,7 @@ const contact = `
       <div class="contact-line"><span>Address</span><strong>${street}<br>${cityLine}</strong></div>
       <div class="contact-boundary"><h3>Before you ship or visit</h3><p>Call first. We will confirm the material, pickup option, and next step.</p></div>
     </aside>
-    <div><p class="eyebrow">Pickup and quote request</p><h2>Start with a few details.</h2>${reviewForm()}</div>
+    <div><p class="eyebrow">Pickup and quote request</p><h2>Start with a few details.</h2>${renderReviewForm({ locale: "en" })}</div>
   </div></section>`;
 mkdirSync(join(out, "contact"), { recursive: true });
 writeFileSync(join(out, "contact", "index.html"), document({
@@ -1871,14 +1924,23 @@ writeFileSync(join(out, "contact", "index.html"), document({
 }));
 
 const spanish = `
-  <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Inicio", "/"], ["Español", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Servicio en español</p><h1>Venda su plata en Houston.</h1></div><p>AG Refining ofrece recogida gratis para cuentas comerciales que califican, pesaje en su local y precios claros.</p></div></div></section>
+  <section class="page-hero page-intro"><div class="shell"><nav class="breadcrumbs" aria-label="Migas de pan"><ol><li><a href="/" hreflang="en">Inicio ${languageNote}</a></li><li>Español</li></ol></nav><div class="page-intro-grid"><div><p class="eyebrow">Servicio en español</p><h1>Venda su plata en Houston.</h1></div><p>AG Refining ofrece recogida gratis para cuentas comerciales que califican, pesaje en su local y precios claros.</p></div></div></section>
   <section class="section"><div class="shell spanish-materials">
     <article><h2>Recogida</h2><p>Cuéntenos qué material tiene, cuánto pesa y dónde está. Confirmaremos si la recogida califica.</p></article>
     <article><h2>Pesaje</h2><p>Pesamos el material en su presencia para que pueda ver el peso antes del pago.</p></article>
-    <article><h2>Pago inmediato</h2><p>El pago inmediato está disponible para la mayoría de las transacciones que califican. El tiempo depende del material y los términos acordados.</p></article>
+    <article><h2>Condiciones de pago</h2><p>El plazo de pago se confirma con la oferta y depende del material aprobado y de la transacción.</p></article>
     <article><h2>Llame primero</h2><p>No envíe material ni visite sin confirmar el siguiente paso. Llame al ${phoneDisplay}.</p></article>
   </div></section>
-  <section class="conversion-band"><div class="shell"><p class="eyebrow">Comience hoy</p><h2>Solicite una recogida.</h2><a class="button button-inverse" href="/contact?intent=pickup">Enviar solicitud ${arrow}</a></div></section>`;
+  <section class="conversion-band"><div class="shell"><p class="eyebrow">Comience hoy</p><h2>Solicite una recogida.</h2><a class="button button-inverse" href="#solicitud">Enviar solicitud ${arrow}</a></div></section>
+  <section class="section contact-section" id="solicitud"><div class="shell contact-grid">
+    <aside class="expectation-rail contact-aside"><p class="eyebrow">Contacte a AG Refining</p><h2>¿Prefiere hablar primero?</h2>
+      <a class="contact-line" href="tel:${phoneHref}"><span>Teléfono</span><strong>${phoneDisplay}</strong></a>
+      <a class="contact-line" href="mailto:${email}"><span>Correo electrónico</span><strong>${email}</strong></a>
+      <div class="contact-line"><span>Dirección</span><strong>${street}<br>${cityLine}</strong></div>
+      <div class="contact-boundary"><h3>Antes de enviar material o visitarnos</h3><p>Llame primero. Confirmaremos el material, la opción de recogida y el siguiente paso.</p></div>
+    </aside>
+    <div><p class="eyebrow">Solicitud de recogida y cotización</p><h2>Comience con algunos datos.</h2>${renderReviewForm({ locale: "es" })}</div>
+  </div></section>`;
 mkdirSync(join(out, "espanol"), { recursive: true });
 writeFileSync(join(out, "espanol", "index.html"), document({
   title: "Comprador de Plata en Houston | AG Refining",
@@ -1891,7 +1953,7 @@ writeFileSync(join(out, "espanol", "index.html"), document({
 const privacy = `
   <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["Privacy", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Privacy</p><h1>How we handle website requests.</h1></div><p>This page explains the information collected through the AG Refining website.</p></div></div></section>
   <section class="section"><div class="shell legal-grid"><nav aria-label="Privacy sections"><a href="#collect">What we collect</a><a href="#use">How we use it</a><a href="#avoid">What not to send</a><a href="#contact-privacy">Contact</a></nav><div>
-    <section id="collect"><h2>What we collect</h2><p>The pickup form asks for your name, business, phone, email, material, amount, location, preferred contact method, and details you choose to provide. Basic website attribution may also be stored to understand how you found the site.</p></section>
+    <section id="collect"><h2>What we collect</h2><p>The pickup form asks for your name, business, phone, email, material, amount, location, preferred contact method, and details you choose to provide. The site also attaches the form page, first landing page, referring page, and supported campaign or ad identifiers to your form details. These website attribution fields are sent with your request to help AG Refining understand how you found the site.</p></section>
     <section id="use"><h2>How we use it</h2><p>AG Refining uses the information to review your request, contact you, plan a possible pickup, and improve the website. We do not promise a quote or pickup from a form submission alone.</p></section>
     <section id="avoid"><h2>What not to send</h2><p>Do not send patient records, passwords, financial account data, identity documents, controlled records, or other sensitive information through the public form.</p></section>
     <section id="contact-privacy"><h2>Contact</h2><p>Questions can be sent to <a href="mailto:${email}">${email}</a> or discussed by phone at <a href="tel:${phoneHref}">${phoneDisplay}</a>.</p></section>
