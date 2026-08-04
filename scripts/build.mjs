@@ -883,7 +883,8 @@ function document({
   bodyClass = "",
   pageSchema = [],
   image = "ag-silver-social.webp",
-  robots = "index,follow,max-image-preview:large"
+  robots = "index,follow,max-image-preview:large",
+  materialGuide = true
 }) {
   const locale = lang === "es" ? "es" : "en";
   const canonical = path ? `${siteUrl}/${path}` : `${siteUrl}/`;
@@ -913,7 +914,7 @@ function document({
     <link rel="icon" href="/assets/ag-mark-path.svg" type="image/svg+xml">
     <link rel="preload" href="/assets/fonts/newsreader-latin-opsz.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/assets/fonts/manrope-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/style.css?v=20260804-assay">
+    <link rel="stylesheet" href="/style.css?v=20260804-hero-v2">
     ${schemaTag({ "@context": "https://schema.org", "@graph": schema })}
   </head>
   <body data-design="silver-atelier"${bodyClass ? ` class="${bodyClass}"` : ""}>
@@ -922,8 +923,8 @@ function document({
     <main id="main">${content}</main>
     ${renderMobileActions(locale)}
     ${renderFooter(locale)}
-    ${renderMaterialGuide(locale)}
-    <script src="/site.js?v=20260804-assay" defer></script>
+    ${materialGuide ? renderMaterialGuide(locale) : ""}
+    <script src="/site.js?v=20260804-hero-v2" defer></script>
   </body>
 </html>`;
 }
@@ -971,29 +972,36 @@ const homeFaqs = [
 
 const home = `
   <section class="atelier-hero">
-    <div class="hero-media assay-stage" data-assay-stage data-assay-state="fallback">
-      <picture class="assay-fallback" data-assay-fallback>
-        <source media="(max-width: 700px)" srcset="/assets/ag-assay-monolith-mobile.webp">
-        <img src="/assets/ag-assay-monolith-1280.webp" alt="Cast-silver AG assay monolith with a blue line, concentric well, and Ag 47 mark" width="1280" height="819" fetchpriority="high">
-      </picture>
-      <div class="assay-canvas-host" data-assay-canvas-host hidden aria-hidden="true"></div>
-    </div>
+    <picture class="hero-media">
+      <source media="(max-width: 700px)" srcset="/assets/ag-refining-hero-v2-mobile.webp">
+      <img src="/assets/ag-refining-hero-v2-2048.webp" alt="Bright molten silver pouring into a refining mold" width="2048" height="1152" fetchpriority="high">
+    </picture>
     <div class="shell hero-commercial-grid">
-      <div class="hero-copy" data-reveal>
-        <div class="assay-line" aria-hidden="true"><span>Ag / 47</span><i></i></div>
-        <p class="hero-kicker"><span>Ag</span> Houston silver buyer</p>
-        <h1>Turn silver-bearing material into cash.</h1>
-        <p class="hero-lede">AG Refining turns silver-bearing material into cash for Houston businesses. Free pickup for qualifying accounts, on-site weighing you can watch, honest pricing, and payment terms confirmed with the offer.</p>
+      <div class="hero-copy">
+        <p class="hero-kicker">Houston, Texas · Commercial silver buyer</p>
+        <h1>Your silver, valued precisely.</h1>
+        <p class="hero-lede">Free pickup for qualifying Houston accounts. See the weight, review the offer, and choose what happens next.</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
-          <a class="phone-link" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
+          <a class="button button-primary" href="/contact?intent=pickup">Schedule a free pickup</a>
+          <a class="button button-secondary" href="/accepted-materials">See what we buy</a>
         </div>
-        <p class="shipping-note"><span></span>Contact AG before shipping or visiting.</p>
+        <a class="phone-link phone-link-inverse hero-call" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
       </div>
+      <ul class="hero-proof-rail" aria-label="Service proof">
+        <li>Houston-based</li>
+        <li>Free qualifying pickup</li>
+        <li>On-site weighing</li>
+        <li>Confirmed payment terms</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="hero-intake-section" aria-labelledby="hero-intake-title">
+    <div class="shell">
       <form class="intake-panel" action="/contact" method="get" data-reveal>
         <input type="hidden" name="intent" value="pickup">
         <p class="hero-review-label">Start here</p>
-        <h2>What silver do you have?</h2>
+        <h2 id="hero-intake-title">What silver do you have?</h2>
         <p>Choose the closest type. We will review the details and confirm the next step.</p>
         <label for="hero-material">Material type
           <select id="hero-material" name="material" required>
@@ -1181,7 +1189,8 @@ writeFileSync(join(out, "index.html"), document({
   description: "Sell silver in Houston with AG Refining. Free pickup, on-site weighing, honest pricing, and payment terms confirmed with the offer.",
   content: home,
   bodyClass: "home-page",
-  pageSchema: [faqSchema(homeFaqs)]
+  pageSchema: [faqSchema(homeFaqs)],
+  materialGuide: false
 }));
 
 function servicePage(page) {
