@@ -22,6 +22,39 @@ function localTarget(url) {
   return join(target, "index.html");
 }
 
+function outerSection(source, className) {
+  const opening = new RegExp(`<section\\b[^>]*\\bclass=(?:"[^"]*\\b${className}\\b[^"]*"|'[^']*\\b${className}\\b[^']*')[^>]*>`, "i").exec(source);
+  if (!opening || opening.index === undefined) return null;
+
+  const sections = /<\/?section\b[^>]*>/gi;
+  sections.lastIndex = opening.index;
+  let depth = 0;
+  let tag;
+  while ((tag = sections.exec(source))) {
+    if (tag[0].startsWith("</")) {
+      depth -= 1;
+      if (depth === 0) {
+        return {
+          html: source.slice(opening.index, sections.lastIndex),
+          start: opening.index,
+          end: sections.lastIndex
+        };
+      }
+    } else {
+      depth += 1;
+    }
+  }
+  return null;
+}
+
+function anchorsIn(source) {
+  return [...source.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)].map(([, attributes, content]) => ({
+    classes: (attributes.match(/\bclass=(["'])(.*?)\1/)?.[2] || "").split(/\s+/),
+    href: attributes.match(/\bhref=(["'])(.*?)\1/)?.[2],
+    text: content.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim()
+  }));
+}
+
 const htmlFiles = walk(out).filter((path) => path.endsWith(".html"));
 for (const path of htmlFiles) {
   const source = readFileSync(path, "utf8");
@@ -54,35 +87,57 @@ const home = readFileSync(join(out, "index.html"), "utf8");
 const exactHomeChecks = [
   "<title>Houston Silver Buyer | Sell Scrap Silver in Houston | AG Refining</title>",
   '<meta name="description" content="Sell silver in Houston with AG Refining. Free pickup, on-site weighing, honest pricing, and payment terms confirmed with the offer.">',
-  "<h1>Turn silver-bearing material into cash.</h1>"
+  "<h1>Your silver, valued precisely.</h1>"
 ];
 for (const expected of exactHomeChecks) {
   if (!home.includes(expected)) failures.push(`Homepage is missing: ${expected}`);
 }
 
-const heroMatch = home.match(/<section class="atelier-hero"[\s\S]*?<\/section>/);
-if (!heroMatch) failures.push("Homepage is missing the atelier hero");
+const heroSection = outerSection(home, "atelier-hero");
+if (!heroSection) failures.push("Homepage is missing the complete outer atelier hero");
 else {
-  const hero = heroMatch[0];
-  if ((hero.match(/href="\/contact\?intent=pickup"/g) || []).length !== 1) failures.push("Homepage hero must have one pickup action");
+  const hero = heroSection.html;
+  const pictures = hero.match(/<picture\b[\s\S]*?<\/picture>/g) || [];
+  if (pictures.length !== 1) failures.push("Homepage hero must contain exactly one responsive picture");
+  else {
+    const [picture] = pictures;
+    if (!picture.includes('srcset="/assets/ag-refining-hero-v2-mobile.webp"') || !picture.includes('src="/assets/ag-refining-hero-v2-2048.webp"')) {
+      failures.push("Homepage hero must use both responsive V2 refining assets");
+    }
+    if (!picture.includes('fetchpriority="high"') || picture.includes('loading="lazy"')) {
+      failures.push("Homepage hero picture must remain eager first-paint media");
+    }
+  }
+  const heroAnchors = anchorsIn(hero);
+  const primaryAction = heroAnchors.find((anchor) => anchor.href === "/contact?intent=pickup");
+  const fallbackAction = heroAnchors.find((anchor) => anchor.href === "/accepted-materials");
+  if (!primaryAction) failures.push("Homepage hero must provide a primary pickup anchor to /contact?intent=pickup");
+  else {
+    if (!primaryAction.classes.includes("button") || !primaryAction.classes.includes("button-primary")) {
+      failures.push("Homepage hero pickup anchor must use button button-primary classes");
+    }
+    if (primaryAction.text !== "Schedule a free pickup") failures.push("Homepage hero pickup anchor must use the exact V2 label");
+  }
+  if (!fallbackAction) failures.push("Homepage hero must provide a fallback material anchor to /accepted-materials");
+  else {
+    if (!fallbackAction.classes.includes("button") || !fallbackAction.classes.includes("button-secondary")) {
+      failures.push("Homepage hero material anchor must use button button-secondary classes");
+    }
+    if (fallbackAction.text !== "See what we buy") failures.push("Homepage hero material anchor must use the exact V2 label");
+  }
   if (!hero.includes('href="tel:+12818982719"')) failures.push("Homepage hero must keep the phone fallback");
-  if (hero.includes("Request a quote")) failures.push("Homepage hero contains a competing quote action");
-  if ((hero.match(/data-assay-stage/g) || []).length !== 1) failures.push("Homepage hero must contain one assay stage");
-  if (!hero.includes('data-assay-state="fallback"')) failures.push("Homepage assay stage must begin in fallback state");
-  if (!hero.includes('data-assay-canvas-host hidden aria-hidden="true"')) failures.push("Homepage assay canvas host must begin hidden and decorative");
-  if (!hero.includes("ag-assay-monolith-1280.webp") || !hero.includes("ag-assay-monolith-mobile.webp")) failures.push("Homepage assay fallback variants are missing");
-  if (!hero.includes('fetchpriority="high"') || hero.includes('loading="lazy"')) failures.push("Homepage assay fallback must remain the eager first-paint image");
+  const requiredProof = ["Houston-based", "Free qualifying pickup", "On-site weighing", "Confirmed payment terms"];
+  const proofRail = (hero.match(/<ul\b[\s\S]*?<\/ul>/g) || []).find((list) => requiredProof.every((proof) => list.includes(proof))) || "";
+  if (!proofRail) failures.push("Homepage hero must keep the proof rail inside the hero");
+  for (const proof of requiredProof) {
+    if (!proofRail.includes(proof)) failures.push(`Homepage hero proof rail is missing ${proof}`);
+  }
 }
 if (!home.includes("ag-silver-hero-1600.webp")) failures.push("Homepage must retain the lower industrial proof image");
-for (const artifact of [
-  "assay-scene.js",
-  "assets/vendor/three.module.min.js",
-  "assets/vendor/three.core.min.js",
-  "assets/vendor/three.LICENSE.txt"
-]) {
-  if (!existsSync(join(out, artifact))) failures.push(`Build output is missing ${artifact}`);
-}
 if (!home.includes('class="intake-panel"')) failures.push("Homepage is missing the separate material intake panel");
+const closingHero = heroSection?.end ?? -1;
+const intakeStart = home.indexOf('<form class="intake-panel"');
+if (closingHero >= 0 && intakeStart <= closingHero) failures.push("Homepage intake form must begin after the closing hero section");
 if (!/<label for="hero-material">(?:(?!<\/label>)[\s\S])*<select id="hero-material"(?:(?!<\/label>)[\s\S])*<\/select>\s*<\/label>/.test(home)) {
   failures.push("Homepage material intake control must be nested inside its label");
 }
@@ -90,6 +145,13 @@ if (!/<label for="hero-quantity">(?:(?!<\/label>)[\s\S])*<input id="hero-quantit
   failures.push("Homepage quantity intake control must be nested inside its label");
 }
 if (home.includes('class="hero-review-card"')) failures.push("Homepage still contains the floating glass intake card");
+if (/data-assay-stage|assay-canvas-host|assay-fallback/.test(home)) {
+  failures.push("Homepage still contains retired assay-stage markup");
+}
+const siteSource = readFileSync(join(root, "src", "site.js"), "utf8");
+if (/import\(\s*["']\/assay-scene\.js(?:[?"'])/.test(siteSource) || /querySelector\(\s*["']\[data-assay-stage\]["']\s*\)/.test(siteSource)) {
+  failures.push("Shared site script still boots the retired assay scene");
+}
 const homepageJourney = [
   "atelier-hero",
   "intake-panel",
