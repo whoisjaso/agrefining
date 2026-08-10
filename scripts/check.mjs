@@ -49,10 +49,10 @@ function files(dir) {
   });
 }
 
-const ignored = [`${sep}.git${sep}`, `${sep}node_modules${sep}`, `${sep}dist${sep}`];
+const ignored = [`${sep}.git${sep}`, `${sep}node_modules${sep}`, `${sep}dist${sep}`, `${join(root, ".superpowers", "sdd")}${sep}`];
 // Binary files are not text: decoding them as utf8 can produce byte sequences
 // that land in the banned emoji ranges and fail the build for no reason.
-const binary = [".png", ".webp", ".jpg", ".jpeg", ".gif", ".ico", ".woff", ".woff2", ".ttf", ".otf", ".pdf", ".zip", ".docx"];
+const binary = [".png", ".webp", ".jpg", ".jpeg", ".gif", ".ico", ".woff", ".woff2", ".ttf", ".otf", ".pdf", ".zip", ".docx", ".mp4", ".webm"];
 for (const path of files(root).filter(
   (path) => !ignored.some((part) => path.includes(part)) && !binary.some((ext) => path.toLowerCase().endsWith(ext))
 )) {

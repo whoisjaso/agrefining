@@ -4,6 +4,7 @@ const nav = document.querySelector("[data-nav]");
 const navScrim = document.querySelector("[data-nav-scrim]");
 const navBackground = Array.from(document.querySelectorAll("main, .material-guide, .mobile-actions, .footer"));
 const navMedia = window.matchMedia("(min-width: 901px)");
+const materialsResetEvent = "materials-disclosure-reset";
 const spanish = document.documentElement.lang.startsWith("es");
 let navReturnFocus = null;
 let navEnhanced = false;
@@ -45,7 +46,11 @@ function setNavControlsEnabled(enabled) {
   });
 }
 
-function syncNavState({ open = false, restoreFocus = false } = {}) {
+function resetMaterialsDisclosure() {
+  window.dispatchEvent(new Event(materialsResetEvent));
+}
+
+function syncNavState({ open = false, restoreFocus = false, resetMaterials = true } = {}) {
   if (!navEnhanced || !toggle || !nav) return;
   const mobile = !navMedia.matches;
   const menuOpen = mobile && open;
@@ -66,6 +71,7 @@ function syncNavState({ open = false, restoreFocus = false } = {}) {
   }
   setNavControlsEnabled(interactive);
   setNavBackgroundInert(menuOpen);
+  if (wasOpen && !menuOpen && resetMaterials) resetMaterialsDisclosure();
   if (wasOpen && !menuOpen && restoreFocus) (navReturnFocus || toggle).focus?.();
   if (!menuOpen) navReturnFocus = null;
 }
@@ -105,7 +111,10 @@ function initializeNav() {
       first?.focus();
     }
   });
-  navMedia.addEventListener?.("change", () => syncNavState({ open: false }));
+  navMedia.addEventListener?.("change", () => {
+    syncNavState({ open: false, resetMaterials: false });
+    resetMaterialsDisclosure();
+  });
 
   navEnhanced = true;
   syncNavState({ open: false });
