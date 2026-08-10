@@ -5,6 +5,15 @@ import { fileURLToPath } from "node:url";
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const out = join(root, "dist");
 const failures = [];
+const serviceAreaEmblemPath = join(root, "assets", "service-area-emblems.svg");
+const serviceAreaEmblems = existsSync(serviceAreaEmblemPath) ? readFileSync(serviceAreaEmblemPath, "utf8") : "";
+
+if (!serviceAreaEmblems) failures.push("Missing assets/service-area-emblems.svg");
+if ((serviceAreaEmblems.match(/<symbol\b/g) || []).length !== 7) failures.push("Service-area emblem sheet must contain seven symbols");
+if ((serviceAreaEmblems.match(/viewBox="0 0 160 160"/g) || []).length !== 7) failures.push("Service-area symbols must share the normalized viewBox");
+if (/<text\b|<image\b|data:image\/|\bfilter\s*=|<filter\b|<feTurbulence\b/i.test(serviceAreaEmblems)) {
+  failures.push("Service-area emblem sheet must remain text-free geometric SVG");
+}
 
 function walk(dir) {
   return readdirSync(dir).flatMap((name) => {
@@ -97,17 +106,36 @@ const heroSection = outerSection(home, "atelier-hero");
 if (!heroSection) failures.push("Homepage is missing the complete outer atelier hero");
 else {
   const hero = heroSection.html;
-  const pictures = hero.match(/<picture\b[\s\S]*?<\/picture>/g) || [];
-  if (pictures.length !== 1) failures.push("Homepage hero must contain exactly one responsive picture");
+  const posters = hero.match(/<picture class="cinematic-hero-poster"[\s\S]*?<\/picture>/g) || [];
+  if (posters.length !== 1) failures.push("Homepage hero must contain exactly one permanent cinematic poster");
   else {
-    const [picture] = pictures;
-    if (!picture.includes('srcset="/assets/ag-refining-hero-v2-mobile.webp"') || !picture.includes('src="/assets/ag-refining-hero-v2-2048.webp"')) {
-      failures.push("Homepage hero must use both responsive V2 refining assets");
+    const [poster] = posters;
+    if (!poster.includes('src="/images/ag-refining-molten-pour-poster.webp"') || !poster.includes('width="1280" height="720"')) {
+      failures.push("Homepage hero must use the eager, dimensioned molten-pour poster");
     }
-    if (!picture.includes('fetchpriority="high"') || picture.includes('loading="lazy"')) {
+    if (!poster.includes('fetchpriority="high"') || poster.includes('loading="lazy"')) {
       failures.push("Homepage hero picture must remain eager first-paint media");
     }
   }
+  const stacks = hero.match(/<div class="cinematic-hero-video-stack"[\s\S]*?<\/div>/g) || [];
+  if (stacks.length !== 1) failures.push("Homepage hero must contain one cinematic video stack");
+  else {
+    const videos = stacks[0].match(/<video class="cinematic-hero-video"[\s\S]*?<\/video>/g) || [];
+    if (videos.length !== 2) failures.push("Homepage hero must contain exactly two inert cinematic video layers");
+    for (const video of videos) {
+      if (!/\bautoplay\b/.test(video) || !/\bmuted\b/.test(video) || !/\bplaysinline\b/.test(video) || !video.includes('aria-hidden="true"') || !video.includes('tabindex="-1"') || /\b(?:controls|loop)\b/.test(video)) {
+        failures.push("Homepage hero videos must remain inert decorative layers");
+        break;
+      }
+      const sources = video.match(/<source\b[^>]*>/g) || [];
+      if (sources.length !== 2 || !sources[0].includes('data-video-format="webm"') || !sources[1].includes('data-video-format="mp4"') || sources.some((source) => /\bsrc=/.test(source))) {
+        failures.push("Homepage hero videos must defer WebM then MP4 sources from server HTML");
+        break;
+      }
+    }
+  }
+  if ((hero.match(/class="cinematic-hero-overlay"/g) || []).length !== 1) failures.push("Homepage hero must contain one stable cinematic overlay");
+  if (/\/assets\/ag-refining-hero-v2-[^"']+\.webp/.test(hero)) failures.push("Homepage hero still references retired V2 artwork");
   const heroAnchors = anchorsIn(hero);
   const primaryAction = heroAnchors.find((anchor) => anchor.href === "/contact?intent=pickup");
   const fallbackAction = heroAnchors.find((anchor) => anchor.href === "/accepted-materials");
@@ -180,6 +208,12 @@ if (home.includes("material-shortcuts")) failures.push("Homepage still contains 
 if (/featured-material-copy"><span>\d{2}<\/span>/.test(home)) failures.push("Homepage material rows still use decorative numbering");
 
 const seoPages = [
+  {
+    path: "industrial-x-ray-silver-recycling",
+    title: "Industrial NDT Film Silver Recycling in Houston | AG Refining",
+    description: "Recycle qualifying industrial NDT film in Houston with AG Refining. Get clear guidance, free qualifying pickup, and on-site weighing.",
+    h1: "Recover silver from industrial NDT film."
+  },
   {
     path: "sell-silver-coins-houston",
     title: "Sell Silver Coins in Houston | Clear Evaluations | AG Refining",
@@ -276,6 +310,45 @@ for (const [route, classes] of atelierFamilies) {
 }
 
 const generatedMarkup = htmlFiles.map((path) => readFileSync(path, "utf8")).join("\n");
+if (/industrial x-ray/i.test(generatedMarkup)) {
+  failures.push("Generated customer-facing output still uses industrial X-ray wording");
+}
+if ((generatedMarkup.match(/Industrial Non-Destructive Testing film/g) || []).length !== 1) {
+  failures.push("Industrial NDT guidance must expand Non-Destructive Testing exactly once");
+}
+
+const acceptedMaterials = readFileSync(join(out, "accepted-materials", "index.html"), "utf8");
+const acceptedCards = [...acceptedMaterials.matchAll(/<a class="([^"]*\btaxonomy-card\b[^"]*)" href="([^"]+)"/g)];
+if (acceptedCards.length !== 17) failures.push(`Accepted materials must contain 17 taxonomy cards, found ${acceptedCards.length}`);
+if (acceptedCards[0]?.[2] !== "/silver-oxide-watch-battery-recycling-houston" || !acceptedCards[0]?.[1].split(/\s+/).includes("taxonomy-card-featured")) {
+  failures.push("Accepted materials must lead with a full-width Silver oxide card");
+}
+if (new Set(acceptedCards.map((match) => match[2])).size !== acceptedCards.length) {
+  failures.push("Accepted materials contains a duplicate taxonomy destination");
+}
+if (!acceptedMaterials.includes("<h1>We purchase.</h1>")) failures.push("Accepted materials must use the exact We purchase. heading");
+
+const serviceAreas = readFileSync(join(out, "service-areas", "index.html"), "utf8");
+const serviceAreaRoutes = [
+  "/houston-silver-buyer",
+  "/silver-buyer-pearland",
+  "/silver-buyer-pasadena",
+  "/silver-buyer-sugar-land",
+  "/silver-buyer-katy",
+  "/silver-buyer-the-woodlands",
+  "/silver-buyer-conroe"
+];
+const cityArtifactRoutes = [...serviceAreas.matchAll(/<a class="[^"]*\bcity-artifact\b[^"]*" href="([^"]+)"/g)].map((match) => match[1]);
+if (JSON.stringify(cityArtifactRoutes) !== JSON.stringify(serviceAreaRoutes)) failures.push("Service areas must keep the seven routed city artifacts in order");
+const serviceCoverageLedger = serviceAreas.match(/<ul\b[^>]*data-service-coverage(?:="")?[^>]*>[\s\S]*?<\/ul>/)?.[0] || "";
+if ((serviceCoverageLedger.match(/<li\b/g) || []).length !== 23 || !serviceCoverageLedger.includes("<li>Stafford</li>")) {
+  failures.push("Service areas must keep the marked 23-city coverage ledger");
+}
+const emittedServiceEmblems = [...serviceAreas.matchAll(/<svg\b([^>]*)>[\s\S]*?<use\b[^>]*href="\/assets\/service-area-emblems\.svg#[^"]+"[^>]*>[\s\S]*?<\/svg>/g)];
+if (emittedServiceEmblems.length !== 7 || emittedServiceEmblems.some(([, attributes]) => !attributes.includes('aria-hidden="true"') || !attributes.includes('focusable="false"'))) {
+  failures.push("Service-area emblems must remain decorative and unfocusable");
+}
+
 if (/<input(?![^>]*\btype=)[^>]*>/.test(generatedMarkup)) {
   failures.push("Generated form markup contains an input without an explicit type");
 }
@@ -358,6 +431,8 @@ if (!privacyPage.includes('<nav aria-label="Privacy sections">')) {
 const sitemap = readFileSync(join(out, "sitemap.xml"), "utf8");
 const sitemapEntries = (sitemap.match(/<url>/g) || []).length;
 if (sitemapEntries !== 38) failures.push(`Expected 38 sitemap pages, found ${sitemapEntries}`);
+const sitemapLocations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+if (new Set(sitemapLocations).size !== sitemapLocations.length) failures.push("Sitemap contains a duplicate URL");
 
 for (const page of seoPages) {
   if (!sitemap.includes(`<loc>https://agrefining.com/${page.path}</loc>`)) {

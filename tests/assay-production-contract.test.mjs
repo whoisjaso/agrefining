@@ -89,16 +89,22 @@ test("the deployable homepage hero presents both approved V2 actions", () => {
   assert.equal(fallback.text, "See what we buy");
 });
 
-test("the deployable homepage hero uses one responsive V2 refining picture", () => {
+test("the deployable homepage hero uses a permanent cinematic poster and two deferred video layers", () => {
   const { hero } = homepageHero();
-  const pictures = hero.match(/<picture\b[\s\S]*?<\/picture>/g) || [];
+  const posters = hero.match(/<picture class="cinematic-hero-poster"[\s\S]*?<\/picture>/g) || [];
+  const stacks = hero.match(/<div class="cinematic-hero-video-stack"[\s\S]*?<\/div>/g) || [];
 
-  assert.equal(pictures.length, 1, "the hero must contain exactly one responsive picture");
-  const [picture] = pictures;
-  assert.match(picture, /<source media="\(max-width: 700px\)" srcset="\/assets\/ag-refining-hero-v2-mobile\.webp">/);
-  assert.match(picture, /<img src="\/assets\/ag-refining-hero-v2-2048\.webp"/);
-  assert.match(picture, /fetchpriority="high"/);
-  assert.doesNotMatch(picture, /loading="lazy"/);
+  assert.equal(posters.length, 1, "the hero must contain exactly one cinematic poster");
+  assert.match(posters[0], /<img src="\/images\/ag-refining-molten-pour-poster\.webp" alt="" width="1280" height="720" fetchpriority="high">/);
+  assert.equal(stacks.length, 1, "the hero must contain one cinematic video stack");
+  const videos = stacks[0].match(/<video class="cinematic-hero-video"[\s\S]*?<\/video>/g) || [];
+  assert.equal(videos.length, 2, "the hero must contain exactly two video layers");
+  for (const video of videos) {
+    assert.match(video, /<source data-video-format="webm" type="video\/webm">/);
+    assert.match(video, /<source data-video-format="mp4" type="video\/mp4">/);
+    assert.doesNotMatch(video, /<source[^>]*\bsrc=/);
+  }
+  assert.doesNotMatch(hero, /\/assets\/ag-refining-hero-v2-[^"']+\.webp/);
 });
 
 test("the deployable homepage keeps its supported proof rail inside the hero", () => {
@@ -142,20 +148,15 @@ test("the shared site script does not boot the retired assay scene", () => {
   assert.doesNotMatch(site, /querySelector\(\s*["']\[data-assay-stage\]["']\s*\)/);
 });
 
-test("owned V2 hero assets decode at exact intrinsic sizes within first-paint budgets", async () => {
-  const cases = [
-    ["ag-refining-hero-v2-2048.webp", 2048, 1152, 280 * 1024],
-    ["ag-refining-hero-v2-mobile.webp", 960, 1280, 180 * 1024]
-  ];
+test("the permanent hero poster decodes at its first-paint dimensions within budget", async () => {
+  const name = "ag-refining-molten-pour-poster.webp";
+  const path = join(root, "images", name);
 
-  for (const [name, width, height, byteLimit] of cases) {
-    const path = join(root, "assets", name);
-    assert.ok(existsSync(path), `${name} is missing`);
-    const metadata = await sharp(path).metadata();
-    assert.equal(metadata.width, width, `${name} width`);
-    assert.equal(metadata.height, height, `${name} height`);
-    assert.ok(statSync(path).size <= byteLimit, `${name} exceeds ${byteLimit} bytes`);
-  }
+  assert.ok(existsSync(path), `${name} is missing`);
+  const metadata = await sharp(path).metadata();
+  assert.equal(metadata.width, 1280, `${name} width`);
+  assert.equal(metadata.height, 720, `${name} height`);
+  assert.ok(statSync(path).size <= 96 * 1024, `${name} exceeds the first-paint budget`);
 });
 
 test("build output keeps authoring state private and retains the 39-document route contract", () => {

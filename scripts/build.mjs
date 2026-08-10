@@ -9,8 +9,14 @@ const out = join(root, "dist");
 rmSync(out, { recursive: true, force: true });
 mkdirSync(join(out, "assets"), { recursive: true });
 cpSync(join(root, "assets"), join(out, "assets"), { recursive: true });
+mkdirSync(join(out, "videos"), { recursive: true });
+cpSync(join(root, "videos"), join(out, "videos"), { recursive: true });
+mkdirSync(join(out, "images"), { recursive: true });
+cpSync(join(root, "images"), join(out, "images"), { recursive: true });
 cpSync(join(root, "src", "style.css"), join(out, "style.css"));
 cpSync(join(root, "src", "site.js"), join(out, "site.js"));
+cpSync(join(root, "src", "materials-disclosure.js"), join(out, "materials-disclosure.js"));
+cpSync(join(root, "src", "cinematic-hero-video.js"), join(out, "cinematic-hero-video.js"));
 mkdirSync(join(out, "assets", "vendor"), { recursive: true });
 cpSync(join(root, "node_modules", "three", "build", "three.module.min.js"), join(out, "assets", "vendor", "three.module.min.js"));
 cpSync(join(root, "node_modules", "three", "build", "three.core.min.js"), join(out, "assets", "vendor", "three.core.min.js"));
@@ -51,15 +57,15 @@ const materialPages = [
   },
   {
     path: "industrial-x-ray-silver-recycling",
-    title: "Industrial X-Ray Silver Recycling in Houston | AG Refining",
-    description: "Recycle qualifying industrial X-ray film in Houston with AG Refining. Get clear guidance, free qualifying pickup, and on-site weighing.",
-    eyebrow: "Industrial X-ray film",
-    heading: "Recover silver from industrial X-ray film.",
-    intro: "AG Refining works with Houston companies that have qualifying industrial X-ray film, NDT film, and related silver-bearing imaging material.",
+    title: "Industrial NDT Film Silver Recycling in Houston | AG Refining",
+    description: "Recycle qualifying industrial NDT film in Houston with AG Refining. Get clear guidance, free qualifying pickup, and on-site weighing.",
+    eyebrow: "Industrial NDT film",
+    heading: "Recover silver from industrial NDT film.",
+    intro: "AG Refining works with Houston companies that have qualifying industrial NDT film and related silver-bearing imaging material.",
     image: "material-industrial-xray-1280.webp",
     imageAlt: "Industrial radiographic film and archive boxes prepared for review",
     answerHeading: "Old film can hold recoverable silver.",
-    answerText: "The type, age, condition, quantity, and storage method can affect the review. Start with a clear count or weight and a short description.",
+    answerText: "Industrial Non-Destructive Testing film can contain recoverable silver. The type, age, condition, quantity, and storage method can affect the review.",
     details: [
       ["Common sources", "Oil and gas testing, weld inspection, aerospace work, manufacturing, laboratories, and non-destructive testing programs."],
       ["Records and privacy", "Remove protected, private, or controlled records before transfer. Do not upload private images or records through the public form."],
@@ -441,9 +447,9 @@ const materialPages = [
     description: "Houston X-ray recycling services for qualifying medical and industrial film, with handling planning, silver recovery review, and professional service.",
     eyebrow: "X-ray recycling services Houston",
     heading: "Secure X-ray film recycling in Houston.",
-    intro: "AG Refining reviews qualifying medical, dental, and industrial X-ray film for silver recovery. We help Houston organizations plan a clear, secure, and responsible recycling process.",
+    intro: "AG Refining reviews qualifying medical and dental X-ray film, plus industrial NDT film, for silver recovery. We help Houston organizations plan a clear, secure, and responsible recycling process.",
     image: "material-industrial-xray-1280.webp",
-    imageAlt: "Medical and industrial X-ray film organized in archive boxes for recycling",
+    imageAlt: "Medical X-ray film and industrial NDT film organized in archive boxes for recycling",
     answerHeading: "Traditional X-ray film may contain recoverable silver.",
     answerText: "Digital images do not contain recoverable silver film. Tell us the film type, quantity, date range, storage method, and whether the records are cleared for destruction.",
     faqs: [
@@ -620,7 +626,7 @@ const materialPages = [
 const industryPages = [
   ["hospital-silver-recycling", "Hospital Silver Recycling in Houston", "Hospitals", "medical X-ray film, dental material, lab material, and other qualifying silver-bearing items", "material-medical-xray-1280.webp"],
   ["dental-lab-silver-recycling", "Dental Lab Silver Recycling in Houston", "Dental laboratories", "qualifying crowns, bridges, inlays, filings, and silver-bearing dental material", "material-dental-scrap-1280.webp"],
-  ["oil-gas-silver-recovery", "Oil and Gas Silver Recovery in Houston", "Oil and gas companies", "industrial X-ray film, NDT film, contacts, and qualifying silver-bearing maintenance or production material", "material-industrial-xray-1280.webp"],
+  ["oil-gas-silver-recovery", "Oil and Gas Silver Recovery in Houston", "Oil and gas companies", "industrial NDT film, contacts, and qualifying silver-bearing maintenance or production material", "material-industrial-xray-1280.webp"],
   ["manufacturing-silver-recovery", "Manufacturing Silver Recovery in Houston", "Manufacturers", "wire, contacts, sheet, solder, clean offcuts, parts, and recurring production scrap", "material-industrial-silver-1280.webp"],
   ["university-silver-recycling", "University Silver Recycling in Houston", "Universities", "qualifying lab material, old X-ray film, electronics, batteries, and approved silver-bearing inventory", "material-laboratory-silver-1280.webp"],
   ["electronics-silver-recovery", "Electronics Silver Recovery in Houston", "Electronics companies", "qualifying contacts, switches, components, solder, and silver-bearing production scrap", "material-silver-solder-1280.webp"]
@@ -655,23 +661,27 @@ Object.assign(industryPages.find((page) => page.path === "hospital-silver-recycl
 const locationPages = [
   // The fourth column keeps the service-area index from repeating one photograph
   // seven times. Each city carries a different material from the set.
-  // The 1280 variant, not the 1600 hero crop: service pages and taxonomy cards
-  // declare width="1280" height="819", so the file has to actually be that.
-  ["houston-silver-buyer", "Houston", "the City of Houston", "ag-silver-pour-1280.webp"],
-  ["silver-buyer-pearland", "Pearland", "Pearland and nearby south Houston businesses", "material-sterling-hollowware-1280.webp"],
-  ["silver-buyer-pasadena", "Pasadena", "Pasadena, Deer Park, and nearby industrial areas", "material-industrial-silver-1280.webp"],
-  ["silver-buyer-sugar-land", "Sugar Land", "Sugar Land, Stafford, and nearby southwest Houston businesses", "material-silver-jewelry-1280.webp"],
-  ["silver-buyer-katy", "Katy", "Katy and west Houston businesses", "material-silver-coins-1280.webp"],
-  ["silver-buyer-the-woodlands", "The Woodlands", "The Woodlands, Spring, and north Houston businesses", "material-silver-bars-1280.webp"],
-  ["silver-buyer-conroe", "Conroe", "Conroe and nearby Montgomery County businesses", "material-industrial-xray-1280.webp"]
-].map(([path, city, area, image]) => ({
+  // The 1280 variant, not the 1600 hero crop: location service pages declare
+  // width="1280" height="819", so the file has to actually be that.
+  ["houston-silver-buyer", "Houston", "the City of Houston", "ag-silver-pour-1280.webp", "city-houston", "A bayou line crosses the industrial skyline of Houston's qualifying silver pickup route.", "major"],
+  ["silver-buyer-pearland", "Pearland", "Pearland and nearby south Houston businesses", "material-sterling-hollowware-1280.webp", "city-pearland", "A pear and assay line mark Pearland's route for qualifying silver material.", "minor"],
+  ["silver-buyer-pasadena", "Pasadena", "Pasadena, Deer Park, and nearby industrial areas", "material-industrial-silver-1280.webp", "city-pasadena", "A strawberry form meets measured cuts for Pasadena's qualifying silver pickup route.", "minor"],
+  ["silver-buyer-sugar-land", "Sugar Land", "Sugar Land, Stafford, and nearby southwest Houston businesses", "material-silver-jewelry-1280.webp", "city-sugar-land", "Cane leaves, a crystal facet, and a chimney mark Sugar Land's silver service.", "major"],
+  ["silver-buyer-katy", "Katy", "Katy and west Houston businesses", "material-silver-coins-1280.webp", "city-katy", "Rice and rail lines frame Katy's qualifying silver pickup route.", "major"],
+  ["silver-buyer-the-woodlands", "The Woodlands", "The Woodlands, Spring, and north Houston businesses", "material-silver-bars-1280.webp", "city-the-woodlands", "Three pines identify The Woodlands route for qualifying silver material.", "minor"],
+  ["silver-buyer-conroe", "Conroe", "Conroe and nearby Montgomery County businesses", "material-industrial-xray-1280.webp", "city-conroe", "Growth rings and one rail line mark Conroe's qualifying silver service.", "full"]
+].map(([path, city, area, image, emblem, artifactDescription, artifactScale]) => ({
   path,
+  city,
   title: `Silver Buyer in ${city}, TX | Free Qualifying Pickup | AG Refining`,
   description: `Sell qualifying silver in ${city}. AG Refining offers free commercial pickup, on-site weighing, honest pricing, and fast payment.`,
   eyebrow: "Houston Metro service",
   heading: `${city} silver buyer for commercial accounts.`,
   intro: `AG Refining serves ${area}. Qualifying commercial accounts can ask for free pickup, on-site weighing, and fast payment.`,
   image,
+  emblem,
+  artifactDescription,
+  artifactScale,
   imageAlt: `Silver-bearing commercial material for pickup near ${city}, Texas`,
   answerHeading: `We come to qualifying businesses in ${city}.`,
   answerText: "You do not have to move a large lot before you know the process. Tell us what you have, and we will confirm whether the pickup qualifies.",
@@ -686,6 +696,12 @@ const locationPages = [
     ["Do you buy from individuals?", "AG Refining reviews individual and business inquiries, but free pickup is focused on qualifying commercial accounts."]
   ]
 }));
+
+const serviceCoverage = [
+  "Houston", "Pearland", "Pasadena", "Sugar Land", "Katy", "Cypress", "Spring", "The Woodlands",
+  "Conroe", "Humble", "Baytown", "League City", "Friendswood", "Missouri City", "Richmond", "Rosenberg",
+  "Tomball", "Bellaire", "Deer Park", "La Porte", "Texas City", "Galveston", "Stafford"
+];
 
 Object.assign(locationPages.find((page) => page.path === "houston-silver-buyer"), {
   layout: "houston-hub",
@@ -707,7 +723,48 @@ Object.assign(locationPages.find((page) => page.path === "houston-silver-buyer")
 
 const allServicePages = [...materialPages, ...industryPages, ...locationPages];
 
+const materialTaxonomyItems = [
+  { group: "Featured", label: "Silver oxide watch batteries", path: "silver-oxide-watch-battery-recycling-houston", featured: true },
+  { group: "Silver forms", label: "Scrap silver", path: "scrap-silver-buyer-houston" },
+  { group: "Silver forms", label: "Scrap silver jewelry", path: "scrap-silver-jewelry" },
+  { group: "Silver forms", label: "Silver coins", path: "sell-silver-coins-houston" },
+  { group: "Silver forms", label: "Silver bars", path: "sell-silver-bars-houston" },
+  { group: "Silver forms", label: "Sterling and flatware", path: "silver-flatware-buyer-houston" },
+  { group: "Silver forms", label: "Silver-plated materials", path: "silver-plated-materials-buyer-houston" },
+  { group: "Industrial and laboratory", label: "Industrial silver", path: "industrial-silver-scrap" },
+  { group: "Industrial and laboratory", label: "Electronics silver recovery", path: "electronics-silver-recovery" },
+  { group: "Industrial and laboratory", label: "Silver flake", path: "silver-flake-buyer-houston" },
+  { group: "Industrial and laboratory", label: "Silver solder", path: "silver-solder-buyer-houston" },
+  { group: "Industrial and laboratory", label: "Laboratory silver", path: "laboratory-silver-buyer-houston" },
+  { group: "Imaging and healthcare", label: "Industrial NDT film", path: "industrial-x-ray-silver-recycling" },
+  { group: "Imaging and healthcare", label: "Medical X-ray film", path: "medical-x-ray-recycling" },
+  { group: "Imaging and healthcare", label: "Dental scrap", path: "dental-scrap-buyer-houston" },
+  { group: "Guides and trade", label: "X-ray recycling services", path: "x-ray-recycling-services-houston" },
+  { group: "Guides and trade", label: "Jewelry-store silver recycling", path: "jewelry-store-silver-recycling-houston" }
+];
+
+const materialTaxonomyPages = materialTaxonomyItems.map((item) => {
+  const page = allServicePages.find((candidate) => candidate.path === item.path);
+  if (!page) throw new Error(`Missing material taxonomy page: ${item.path}`);
+  return { ...item, page };
+});
+
 const languageNote = '<small class="language-note">en ingles</small>';
+
+function renderMaterialsDisclosure() {
+  const groups = [...new Set(materialTaxonomyPages.map(({ group }) => group))];
+  return `<div class="materials-disclosure" data-materials-disclosure>
+          <a class="materials-link" href="/accepted-materials">Materials</a>
+          <button class="materials-disclosure-toggle" type="button" aria-expanded="false" aria-controls="materials-panel" aria-label="Show material pages" data-materials-disclosure-toggle></button>
+          <div class="materials-panel" id="materials-panel" data-materials-panel>
+            <a class="materials-panel-all" href="/accepted-materials">All materials</a>
+            ${groups.map((group) => `<section><h2>${group}</h2><ul>${materialTaxonomyPages
+              .filter((item) => item.group === group)
+              .map(({ label, path }) => `<li><a href="/${path}">${label}</a></li>`)
+              .join("")}</ul></section>`).join("")}
+          </div>
+        </div>`;
+}
 
 function renderNav(locale = "en") {
   const spanish = locale === "es";
@@ -720,11 +777,11 @@ function renderNav(locale = "en") {
         <a href="/about" hreflang="en">Nuestra historia ${languageNote}</a>
         <a class="button button-primary nav-review" href="#solicitud">Enviar solicitud ${arrow}</a>`
     : `
-        <a href="/accepted-materials">Materials</a>
+        ${renderMaterialsDisclosure()}
         <a href="/industries">Industries</a>
-        <a href="/service-areas">Service areas</a>
-        <a href="/how-it-works">How it works</a>
-        <a href="/about">Our story</a>
+        <a href="/service-areas">Service Areas</a>
+        <a href="/how-it-works">How It Works</a>
+        <a href="/about">Our Story</a>
         <a class="button button-primary nav-review" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>`;
   return `
   <header class="site-header" data-site-header>
@@ -763,7 +820,7 @@ function renderFooter(locale = "en") {
       </div>
       <nav aria-label="Materiales">
         <a href="/scrap-silver-buyer-houston" hreflang="en">Plata para reciclaje ${languageNote}</a>
-        <a href="/industrial-x-ray-silver-recycling" hreflang="en">Película industrial de rayos X ${languageNote}</a>
+        <a href="/industrial-x-ray-silver-recycling" hreflang="en">Película industrial NDT ${languageNote}</a>
         <a href="/silver-oxide-watch-battery-recycling-houston" hreflang="en">Baterías de reloj ${languageNote}</a>
         <a href="/accepted-materials" hreflang="en">Todos los materiales ${languageNote}</a>
       </nav>
@@ -788,7 +845,7 @@ function renderFooter(locale = "en") {
       </div>
       <nav aria-label="Materials">
         <a href="/scrap-silver-buyer-houston">Silver scrap</a>
-        <a href="/industrial-x-ray-silver-recycling">Industrial X-ray film</a>
+        <a href="/industrial-x-ray-silver-recycling">Industrial NDT film</a>
         <a href="/silver-oxide-watch-battery-recycling-houston">Watch batteries</a>
         <a href="/accepted-materials">All materials</a>
       </nav>
@@ -884,7 +941,8 @@ function document({
   pageSchema = [],
   image = "ag-silver-social.webp",
   robots = "index,follow,max-image-preview:large",
-  materialGuide = true
+  materialGuide = true,
+  moduleScripts = []
 }) {
   const locale = lang === "es" ? "es" : "en";
   const canonical = path ? `${siteUrl}/${path}` : `${siteUrl}/`;
@@ -925,6 +983,8 @@ function document({
     ${renderFooter(locale)}
     ${materialGuide ? renderMaterialGuide(locale) : ""}
     <script src="/site.js?v=20260804-hero-v2" defer></script>
+    <script type="module" src="/materials-disclosure.js?v=20260810-materials"></script>
+    ${moduleScripts.map((src) => `<script type="module" src="${src}"></script>`).join("\n    ")}
   </body>
 </html>`;
 }
@@ -952,13 +1012,17 @@ function assayLine(label = "Ag / 47") {
   return `<div class="assay-line" aria-hidden="true"><span>${label}</span><i></i></div>`;
 }
 
+function serviceAreaEmblem(page, className = "") {
+  return `<svg class="service-area-emblem${className ? ` ${className}` : ""}" aria-hidden="true" focusable="false" viewBox="0 0 160 160" width="160" height="160"><use href="/assets/service-area-emblems.svg#${page.emblem}"></use></svg>`;
+}
+
 const featuredMaterials = [
   ["Scrap silver jewelry", "scrap-silver-jewelry", "material-silver-jewelry-1280.webp", "material-silver-jewelry-mobile.webp", "Jewelry, flatware, coins, and mixed silver items."],
-  ["Industrial X-ray film", "industrial-x-ray-silver-recycling", "material-industrial-xray-1280.webp", "material-industrial-xray-mobile.webp", "Industrial radiography and NDT film from qualifying accounts."],
+  ["Industrial NDT film", "industrial-x-ray-silver-recycling", "material-industrial-xray-1280.webp", "material-industrial-xray-mobile.webp", "Industrial radiography film from qualifying NDT programs."],
   ["Silver coins", "sell-silver-coins-houston", "material-silver-coins-1280.webp", "material-silver-coins-mobile.webp", "Single coins, mixed lots, and estate collections evaluated with care."],
   ["Silver oxide batteries", "silver-oxide-watch-battery-recycling-houston", "material-watch-batteries-real-1280.webp", "material-watch-batteries-real-mobile.webp", "Sorted commercial lots from watch and jewelry businesses."],
   ["Medical X-ray film", "medical-x-ray-recycling", "material-medical-xray-1280.webp", "material-medical-xray-mobile.webp", "Qualifying film from medical, dental, and imaging facilities."],
-  ["Sterling and hollowware", "silver-flatware-buyer-houston", "material-sterling-hollowware-1280.webp", "material-sterling-hollowware-mobile.webp", "Sterling flatware, serving pieces, trays, and estate collections."]
+  ["Sterling and flatware", "silver-flatware-buyer-houston", "material-sterling-hollowware-1280.webp", "material-sterling-hollowware-mobile.webp", "Sterling flatware, serving pieces, trays, and estate collections."]
 ];
 
 const homeFaqs = [
@@ -972,10 +1036,22 @@ const homeFaqs = [
 
 const home = `
   <section class="atelier-hero">
-    <picture class="hero-media">
-      <source media="(max-width: 700px)" srcset="/assets/ag-refining-hero-v2-mobile.webp">
-      <img src="/assets/ag-refining-hero-v2-2048.webp" alt="Bright molten silver pouring into a refining mold" width="2048" height="1152" fetchpriority="high">
-    </picture>
+    <div class="cinematic-hero-media" aria-hidden="true" data-cinematic-hero-media>
+      <picture class="cinematic-hero-poster" data-cinematic-poster>
+        <img src="/images/ag-refining-molten-pour-poster.webp" alt="" width="1280" height="720" fetchpriority="high">
+      </picture>
+      <div class="cinematic-hero-video-stack" data-cinematic-video-stack>
+        <video class="cinematic-hero-video" autoplay muted playsinline aria-hidden="true" tabindex="-1" preload="none" poster="/images/ag-refining-molten-pour-poster.webp" data-video-layer="0">
+          <source data-video-format="webm" type="video/webm">
+          <source data-video-format="mp4" type="video/mp4">
+        </video>
+        <video class="cinematic-hero-video" autoplay muted playsinline aria-hidden="true" tabindex="-1" preload="none" poster="/images/ag-refining-molten-pour-poster.webp" data-video-layer="1">
+          <source data-video-format="webm" type="video/webm">
+          <source data-video-format="mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+    <div class="cinematic-hero-overlay" aria-hidden="true"></div>
     <div class="shell hero-commercial-grid">
       <div class="hero-copy">
         <p class="hero-kicker">Houston, Texas · Commercial silver buyer</p>
@@ -1188,6 +1264,7 @@ writeFileSync(join(out, "index.html"), document({
   title: "Houston Silver Buyer | Sell Scrap Silver in Houston | AG Refining",
   description: "Sell silver in Houston with AG Refining. Free pickup, on-site weighing, honest pricing, and payment terms confirmed with the offer.",
   content: home,
+  moduleScripts: ["/cinematic-hero-video.js"],
   bodyClass: "home-page",
   pageSchema: [faqSchema(homeFaqs)],
   materialGuide: false
@@ -1220,7 +1297,7 @@ function servicePage(page) {
             ${page.heroGuardrail ? `<p class="material-hero-note">${page.heroGuardrail}</p>` : ""}
             <a class="button button-primary" href="/contact?intent=pickup${materialQuery}">${primaryCta} ${arrow}</a>
           </div>
-          <figure class="service-visual"><img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" fetchpriority="high"></figure>
+          <figure class="service-visual${page.emblem ? " service-visual-location" : ""}"><img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" fetchpriority="high">${page.emblem ? `<span class="location-emblem">${serviceAreaEmblem(page, "location-emblem-svg")}</span>` : ""}</figure>
         </div>
       </div>
     </section>
@@ -1557,7 +1634,7 @@ function xrayHubPage(page) {
     },
     {
       label: "Industrial and NDT film",
-      title: "Industrial X-ray Silver Recycling",
+      title: "Industrial NDT Film Silver Recycling",
       text: "For oil and gas, aerospace, weld inspection, manufacturing, and NDT programs.",
       href: "/industrial-x-ray-silver-recycling"
     }
@@ -1698,7 +1775,7 @@ function houstonHubPage(page) {
   ];
   const services = [
     ["Scrap Silver", "Wire, contacts, solder, sterling, bars, production scrap, and more.", "/scrap-silver-buyer-houston"],
-    ["X-Ray Film", "Medical, dental, industrial, and NDT film review and silver recovery.", "/x-ray-recycling-services-houston"],
+    ["Medical and NDT Film", "Medical and dental X-ray film, plus industrial NDT film review and silver recovery.", "/x-ray-recycling-services-houston"],
     ["Silver Oxide Batteries", "Sorted commercial watch-battery lots with confirmed chemistry.", "/silver-oxide-watch-battery-recycling-houston"],
     ["Laboratory Silver", "Identified lab silver, compounds, solutions, powders, and approved material.", "/laboratory-silver-buyer-houston"]
   ];
@@ -1730,8 +1807,9 @@ function houstonHubPage(page) {
             </div>
             <p class="material-hero-note">Pickup, on-site weighing, and prompt payment depend on the material, account, location, and schedule.</p>
           </div>
-          <figure class="service-visual material-visual">
+          <figure class="service-visual material-visual service-visual-location">
             <img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" fetchpriority="high">
+            <span class="location-emblem">${serviceAreaEmblem(page, "location-emblem-svg")}</span>
             <figcaption><span>47</span><p>Houston<br>Silver buyer</p></figcaption>
           </figure>
         </div>
@@ -1839,10 +1917,17 @@ allServicePages.forEach((page) => {
 });
 
 function taxonomyPage({ path, title, description, eyebrow, heading, intro, items }) {
-  const cards = items.map((page) => `<a class="taxonomy-card" href="/${page.path}" data-reveal>
+  const firstRegularIndex = items.findIndex((item) => !item.featured);
+  const cards = items.map((item, index) => {
+    const page = item.page || item;
+    const featured = Boolean(item.featured);
+    const rowStart = !featured && (index - firstRegularIndex) % 2 === 0;
+    const classes = ["taxonomy-card", featured && "taxonomy-card-featured", rowStart && "taxonomy-card-row-start"].filter(Boolean).join(" ");
+    return `<a class="${classes}" href="/${page.path}" data-reveal>
     <figure class="taxonomy-image"><img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" loading="lazy"></figure>
-    <div><p class="eyebrow">${page.eyebrow}</p><h2>${page.heading}</h2><p>${page.intro}<b>View page ${arrow}</b></p></div>
-  </a>`).join("");
+    <div><p class="eyebrow">${item.label || page.eyebrow}</p><h2>${page.heading}</h2><p>${page.intro}<b>View page ${arrow}</b></p></div>
+  </a>`;
+  }).join("");
   const content = `
     <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], [eyebrow, null]])}<div class="page-intro-grid"><div><p class="eyebrow">${eyebrow}</p><h1>${heading}</h1></div><p>${intro}</p></div></div></section>
     <section class="section decision-section"><div class="shell"><div class="editorial-index taxonomy-grid">${cards}</div></div></section>
@@ -1852,14 +1937,40 @@ function taxonomyPage({ path, title, description, eyebrow, heading, intro, items
   writeFileSync(join(dir, "index.html"), document({ title, description, path, content }));
 }
 
+function serviceAreasPage() {
+  const cityArtifacts = locationPages.map((page) => `<a class="city-artifact city-artifact-${page.artifactScale}" href="/${page.path}">
+    <span class="city-artifact-medallion">${serviceAreaEmblem(page)}</span>
+    <div class="city-artifact-copy"><h2>${page.city}</h2><p class="city-artifact-description">${page.artifactDescription}</p><span class="city-artifact-action">View city service ${arrow}</span></div>
+  </a>`).join("");
+  const content = `
+    <section class="page-hero page-intro service-area-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["Service areas", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Service areas</p><h1>Silver pickup across the Houston Metro Area.</h1></div><p>Free pickup may be available for qualifying commercial and industrial accounts. Choose your closest service area.</p></div></div></section>
+    <section class="section service-artifacts-section" aria-labelledby="featured-service-areas"><div class="shell">
+      <div class="service-artifacts-heading"><h2 id="featured-service-areas">Choose your service area.</h2><p>Each local route keeps the same clear weighing, offer, and qualification process.</p></div>
+      <div class="city-artifact-field" data-featured-service-areas>${cityArtifacts}</div>
+    </div></section>
+    <section class="section service-coverage" aria-labelledby="service-coverage-title"><div class="shell service-coverage-grid">
+      <div><h2 id="service-coverage-title">Houston Metro coverage</h2><p>Free pickup may be available for qualifying commercial accounts. We confirm the material, location, and schedule first.</p></div>
+      <ul data-service-coverage>${serviceCoverage.map((city) => `<li>${city}</li>`).join("")}</ul>
+    </div></section>
+    <section class="conversion-band"><div class="shell"><h2>Tell us where the material is.</h2><p>We will confirm whether the lot and location qualify for pickup.</p><a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></div></section>`;
+  const path = "service-areas";
+  mkdirSync(join(out, path), { recursive: true });
+  writeFileSync(join(out, path, "index.html"), document({
+    title: "Houston Metro Silver Pickup Service Areas | AG Refining",
+    description: "See AG Refining silver pickup service areas across Houston, Pearland, Pasadena, Sugar Land, Katy, The Woodlands, Conroe, and nearby cities.",
+    path,
+    content
+  }));
+}
+
 taxonomyPage({
   path: "accepted-materials",
   title: "Silver Materials We Buy | AG Refining Houston",
   description: "See the scrap silver, X-ray film, silver oxide batteries, coins, jewelry, dental material, and industrial silver AG Refining reviews.",
   eyebrow: "Materials",
-  heading: "Silver materials we buy.",
+  heading: "We purchase.",
   intro: "Choose the closest material. Each page explains what to share, what may qualify, and how pickup works.",
-  items: materialPages
+  items: materialTaxonomyPages
 });
 
 taxonomyPage({
@@ -1872,18 +1983,10 @@ taxonomyPage({
   items: industryPages
 });
 
-taxonomyPage({
-  path: "service-areas",
-  title: "Houston Metro Silver Pickup Service Areas | AG Refining",
-  description: "See AG Refining silver pickup service areas across Houston, Pearland, Pasadena, Sugar Land, Katy, The Woodlands, Conroe, and nearby cities.",
-  eyebrow: "Service areas",
-  heading: "Silver pickup across the Houston Metro Area.",
-  intro: "Free pickup may be available for qualifying commercial and industrial accounts. Choose your closest service area.",
-  items: locationPages
-});
+serviceAreasPage();
 
 const howItWorks = `
-  <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["How it works", null]])}<div class="page-intro-grid"><div><p class="eyebrow">How it works</p><h1>Six clear steps from silver to cash.</h1></div><p>You know what happens before the material moves.</p></div></div></section>
+  <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["How it works", null]])}<div class="page-intro-grid"><div><p class="eyebrow">How it works</p><h1>Six simple steps from silver to cash.</h1></div><p>You know what happens before the material moves.</p></div></div></section>
   <section class="section process-page"><div class="shell"><ol class="assay-process process-rail">
     <li><span>01</span><div><h2>Tell us what you have.</h2><p>Call or use the form. Share the material type, amount, condition, location, and whether it is a one-time or repeat lot.</p></div></li>
     <li><span>02</span><div><h2>We review the details.</h2><p>We may ask for markings, weights, photos, box counts, or other simple facts needed to understand the lot.</p></div></li>

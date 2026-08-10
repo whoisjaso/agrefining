@@ -221,10 +221,21 @@ test("all static headers expose navigation when site.js is unavailable", () => {
   for (const [name, html] of htmlDocuments) {
     const header = html.match(/<header class="site-header"[\s\S]*?<\/header>/)?.[0] || "";
     const menu = header.match(/<div class="nav-links"[^>]*>/)?.[0] || "";
+    const materialsPanel = header.match(/<div class="materials-panel"[^>]*>/)?.[0] || "";
     assert.match(header, /data-nav-toggle[^>]*\bhidden\b/, `${name}: enhancement toggle must start hidden`);
     assert.match(header, /data-nav-scrim[^>]*\bhidden\b/, `${name}: enhancement scrim must start hidden`);
     assert.doesNotMatch(menu, /\b(?:hidden|inert|aria-hidden)\b/, `${name}: fallback links must start exposed`);
+    if (/<html lang="en">/.test(html)) {
+      assert.match(header, /<a\b[^>]*href="\/accepted-materials"[^>]*>Materials<\/a>/, `${name}: Materials must remain directly navigable`);
+      assert.match(header, /<button\b[^>]*aria-controls="materials-panel"[^>]*>/, `${name}: missing adjacent disclosure control`);
+      assert.doesNotMatch(materialsPanel, /\b(?:hidden|inert|aria-hidden)\b/, `${name}: static material links must remain reachable`);
+    }
   }
+});
+
+test("static CSS exposes the one materials panel to keyboard and fine-pointer users", () => {
+  assert.match(css, /\.materials-disclosure:focus-within\s+\.materials-panel\s*\{[^}]*display:\s*(?:grid|block)/s);
+  assert.match(css, /@media\s*\(hover:\s*hover\)\s*and\s*\(pointer:\s*fine\)[\s\S]*?\.materials-disclosure:hover\s+\.materials-panel\s*\{[^}]*display:\s*(?:grid|block)/s);
 });
 
 test("Spanish stays Spanish through the lead form", () => {
