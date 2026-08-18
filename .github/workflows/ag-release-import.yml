@@ -27,12 +27,11 @@ jobs:
       - name: Download Verified Release Archives
         env:
           RELEASE_BASE_URL: https://temporary-instant-slate-stezred.vercel.app
-          RELEASE_SHARE_URL: https://temporary-instant-slate-stezred.vercel.app/?_vercel_share=7xF5lpdIJkNDmLItZnlFQXCBWXOB2J7n
+          RELEASE_SHARE_TOKEN: 7xF5lpdIJkNDmLItZnlFQXCBWXOB2J7n
         run: |
           set -euo pipefail
-          curl --fail --location --cookie-jar "$RUNNER_TEMP/vercel.cookies" "$RELEASE_SHARE_URL" --output /dev/null
           for archive in masters qa site; do
-            curl --fail --location --retry 5 --retry-all-errors --retry-delay 2               --cookie "$RUNNER_TEMP/vercel.cookies"               "$RELEASE_BASE_URL/ag-release-$archive.zip"               --output "$RUNNER_TEMP/ag-release-$archive.zip"
+            curl --fail --location --retry 5 --retry-all-errors --retry-delay 2               "$RELEASE_BASE_URL/ag-release-$archive.zip?_vercel_share=$RELEASE_SHARE_TOKEN"               --output "$RUNNER_TEMP/ag-release-$archive.zip"
           done
           echo "36064711c558c981d3dae209c26dada088f2648fe16656a9772639f76442a420  $RUNNER_TEMP/ag-release-masters.zip" | sha256sum --check
           echo "11274d55ed5a94c0fc3f31374830e90f16ec06e67aac7eb0d1e57f6a08a87c98  $RUNNER_TEMP/ag-release-qa.zip" | sha256sum --check
