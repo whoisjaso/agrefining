@@ -116,11 +116,39 @@ async function verifyMobileChrome(browser, baseUrl) {
     header: "rgb(250, 248, 242)"
   });
 
+  const sectionColors = await page.evaluate(() => Object.fromEntries([
+    ["intake", ".hero-intake-section"],
+    ["answer", ".answer-home"],
+    ["materials", ".material-editorial"],
+    ["process", ".assay-process"],
+    ["industries", ".industry-index"],
+    ["service", ".service-area-section"],
+    ["story", ".provenance-story"],
+    ["location", ".location-section"],
+    ["faq", ".faq-section"]
+  ].map(([name, selector]) => [name, getComputedStyle(document.querySelector(selector)).backgroundColor])));
+  assert.deepEqual(sectionColors, {
+    intake: "rgb(241, 237, 228)",
+    answer: "rgb(241, 237, 228)",
+    materials: "rgb(250, 248, 242)",
+    process: "rgb(16, 42, 67)",
+    industries: "rgb(250, 248, 242)",
+    service: "rgb(16, 42, 67)",
+    story: "rgb(250, 248, 242)",
+    location: "rgb(241, 237, 228)",
+    faq: "rgb(250, 248, 242)"
+  });
+
   const heroHeight = await page.locator(".atelier-hero").evaluate((hero) => hero.getBoundingClientRect().height);
   assert.ok(heroHeight >= 844, `mobile hero must fill the 844px viewport, received ${heroHeight}px`);
 
   await page.evaluate(() => window.scrollTo(0, 120));
   await page.locator("[data-nav-toggle]").waitFor({ state: "visible" });
+  assert.equal(await page.locator("[data-site-header] .brand").getAttribute("href"), "#top");
+  await page.locator("[data-site-header] .brand").click();
+  assert.ok(await page.evaluate(() => window.scrollY > 0), "homepage brand must animate rather than jump immediately");
+  await page.waitForFunction(() => window.scrollY === 0);
+  await page.evaluate(() => window.scrollTo(0, 120));
   await page.locator("[data-nav-toggle]").focus();
   await page.keyboard.press("Enter");
   await page.waitForFunction(() => document.body.classList.contains("nav-open"));

@@ -100,26 +100,31 @@ test("the homepage loader is semantic, homepage-only, and fails open after 1.2 s
   assert.match(css, /@media \(prefers-reduced-motion:\s*reduce\)[^]*?\.home-loader\s*\{[^}]*display:\s*none/s);
 });
 
-test("homepage chrome and every major storytelling band carry the blue system", () => {
+test("homepage keeps a cream-dominant editorial rhythm with blue carried through key bands", () => {
   assert.match(home, /<meta name="theme-color" content="#102a43">/);
   assert.match(home, /<html lang="en" class="home-document">/);
   assert.doesNotMatch(contact, /class="home-document"/);
   assert.match(css, /\.home-document,\s*\.home-page\s*\{[^}]*background:\s*#102a43/s);
   assert.match(css, /\.home-page\s+\.site-header,\s*\.home-page\s+\.site-header\[data-stuck="true"\]\s*\{[^}]*background:\s*#faf8f2/s);
   for (const selector of [
+    ".home-page .assay-process",
+    ".home-page .service-area-section"
+  ]) {
+    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    assert.match(css, new RegExp(`${escaped}\\s*\\{[^}]*background:\\s*#102a43`, "s"), `${selector} must carry the homepage blue`);
+  }
+  for (const selector of [
     ".home-page main",
     ".home-page .hero-intake-section",
     ".home-page .answer-home",
     ".home-page .material-editorial",
-    ".home-page .assay-process",
     ".home-page .industry-index",
-    ".home-page .service-area-section",
     ".home-page .provenance-story",
     ".home-page .location-section",
     ".home-page .faq-section"
   ]) {
     const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    assert.match(css, new RegExp(`${escaped}\\s*\\{[^}]*background:\\s*#102a43`, "s"), `${selector} must carry the homepage blue`);
+    assert.match(css, new RegExp(`${escaped}\\s*\\{[^}]*background:\\s*var\\(--(?:canvas|paper)\\)`, "s"), `${selector} must restore the cream editorial field`);
   }
 });
 

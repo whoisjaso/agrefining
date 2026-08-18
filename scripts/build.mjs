@@ -931,7 +931,7 @@ function renderMaterialsDisclosure() {
         </div>`;
 }
 
-function renderNav(locale = "en") {
+function renderNav(locale = "en", homepage = false) {
   const spanish = locale === "es";
   const links = spanish
     ? `
@@ -961,7 +961,7 @@ function renderNav(locale = "en") {
       </div>
     </div>
     <nav class="nav shell" aria-label="${spanish ? "Navegación principal" : "Primary navigation"}">
-      <a class="brand" href="${spanish ? "/espanol" : "/"}" aria-label="${spanish ? "Inicio de AG Refining" : "AG Refining home"}">
+      <a class="brand" href="${homepage ? "#top" : spanish ? "/espanol" : "/"}" aria-label="${homepage ? "AG Refining, Back to Top" : spanish ? "Inicio de AG Refining" : "AG Refining home"}">
         <img src="/assets/ag-mark-path.svg" alt="" width="48" height="48">
         <span class="brand-word"><strong>AG</strong> Refining</span>
       </a>
@@ -1259,10 +1259,10 @@ function document({
     ${homepage ? '<script>document.documentElement.classList.add("home-header-pending");window.__agHeaderFailOpen=setTimeout(function(){document.documentElement.classList.remove("home-header-pending","home-header-ready","home-header-revealed")},1500);if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.dataset.loaderState="ready"}else{document.documentElement.dataset.loaderState="loading";window.__agLoaderFailOpen=setTimeout(function(){document.documentElement.dataset.loaderState="ready";var loader=document.querySelector("[data-home-loader]");if(loader){loader.dataset.loaderState="ready";loader.setAttribute("aria-hidden","true");loader.setAttribute("inert","");loader.inert=true}},1200)}</script>' : ""}
     ${schemaTag({ "@context": "https://schema.org", "@graph": schema })}
   </head>
-  <body data-design="silver-atelier"${bodyClass ? ` class="${bodyClass}"` : ""}>
+  <body data-design="silver-atelier"${homepage ? ' id="top"' : ""}${bodyClass ? ` class="${bodyClass}"` : ""}>
     <a class="skip" href="#main">${locale === "es" ? "Saltar al contenido" : "Skip to content"}</a>
     ${homepage ? renderHomeLoader() : ""}
-    ${renderNav(locale)}
+    ${renderNav(locale, homepage)}
     <main id="main">${content}</main>
     ${renderMobileActions(locale)}
     ${renderFooter(locale)}

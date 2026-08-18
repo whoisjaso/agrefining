@@ -113,6 +113,10 @@ function click(target) {
   target.dispatchEvent(browserEvent("click", { target }));
 }
 
+function wait(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
 test("start progressively enhances the fallback into a closed, inert disclosure", () => {
   const { root, button, panel, panelLink } = setup();
   assert.equal(root.dataset.materialsEnhanced, "true");
@@ -173,6 +177,18 @@ test("fine-pointer hover opens and closes unless focus remains within", () => {
   assert.equal(panel.hidden, false, "hover leave must not hide focused panel content");
   root.dispatchEvent(browserEvent("focusout", { target: panelLink, relatedTarget: outside }));
   assert.equal(panel.hidden, true);
+});
+
+test("crossing the header gap into the panel does not collapse the hover disclosure", async () => {
+  const { root, panel } = setup({ finePointer: true });
+  root.dispatchEvent(browserEvent("pointerenter", { target: root }));
+  assert.equal(panel.hidden, false);
+
+  root.dispatchEvent(browserEvent("pointerleave", { target: root }));
+  assert.equal(panel.hidden, false, "leaving the trigger must allow time to reach the detached panel");
+  panel.dispatchEvent(browserEvent("pointerenter", { target: panel }));
+  await wait(220);
+  assert.equal(panel.hidden, false, "entering the panel must cancel the pending hover close");
 });
 
 // Mutation killed: a hover-opened panel is immediately toggled shut by the same pointer click.

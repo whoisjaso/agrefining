@@ -118,6 +118,12 @@ test("English headers keep exact primary labels and an adjacent Materials disclo
   }
 });
 
+test("the homepage brand returns to the page top while internal brands still navigate home", () => {
+  assert.match(home, /<body\b[^>]*\bid="top"[^>]*>/);
+  assert.match(headerOf(home), /<a class="brand" href="#top" aria-label="AG Refining, Back to Top">/);
+  assert.match(headerOf(accepted), /<a class="brand" href="\/" aria-label="AG Refining home">/);
+});
+
 test("the disclosure groups exactly 17 unique destinations with ordinary list semantics", () => {
   for (const html of englishDocuments) {
     const disclosure = disclosureOf(html);

@@ -808,13 +808,21 @@ html[data-loader-state="ready"] .home-loader {
   box-shadow: var(--shadow-float);
   display: none;
   gap: 0;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: minmax(12rem, 1.35fr) repeat(4, minmax(0, 1fr));
   left: 50%;
   padding: clamp(1.5rem, 2.4vw, 2.5rem);
   position: fixed;
   top: calc(var(--header-height) + 2px);
   transform: translateX(-50%);
-  width: min(72rem, calc(100vw - (2 * var(--gutter))));
+  width: min(76rem, calc(100vw - (2 * var(--gutter))));
+}
+
+.materials-panel::before {
+  content: "";
+  height: 0.75rem;
+  inset-inline: 0;
+  position: absolute;
+  top: -0.75rem;
 }
 
 .materials-panel > .materials-panel-all {
@@ -1174,19 +1182,19 @@ html[data-loader-state="ready"] .home-loader {
 }
 
 .home-page main {
-  background: #102a43;
+  background: var(--canvas);
 }
 
 .home-page .hero-intake-section {
-  background: #102a43;
+  background: var(--canvas);
 }
 
 .home-page .answer-home {
-  background: #102a43;
+  background: var(--canvas);
 }
 
 .home-page .material-editorial {
-  background: #102a43;
+  background: var(--paper);
 }
 
 .home-page .assay-process {
@@ -1194,7 +1202,7 @@ html[data-loader-state="ready"] .home-loader {
 }
 
 .home-page .industry-index {
-  background: #102a43;
+  background: var(--paper);
 }
 
 .home-page .service-area-section {
@@ -1202,40 +1210,70 @@ html[data-loader-state="ready"] .home-loader {
 }
 
 .home-page .provenance-story {
-  background: #102a43;
+  background: var(--paper);
 }
 
 .home-page .location-section {
-  background: #102a43;
+  background: var(--canvas);
 }
 
 .home-page .faq-section {
-  background: #102a43;
+  background: var(--paper);
 }
 
-.home-page .answer-home,
-.home-page .material-editorial,
 .home-page .assay-process,
-.home-page .industry-index,
-.home-page .service-area-section,
-.home-page .provenance-story,
-.home-page .location-section,
-.home-page .faq-section {
+.home-page .service-area-section {
   color: rgba(250, 248, 242, 0.86);
 }
 
-.home-page .answer-home h2,
-.home-page .material-editorial h2,
 .home-page .assay-process h2,
-.home-page .industry-index h2,
 .home-page .service-area-section h2,
-.home-page .provenance-story blockquote,
-.home-page .location-section h2,
-.home-page .faq-section h2 {
+.home-page .assay-process h3 {
   color: var(--paper);
 }
 
-.home-page .section + .section {
+.home-page .assay-process .eyebrow,
+.home-page .service-area-section .eyebrow {
+  color: var(--mineral-blue-soft);
+}
+
+.home-page .assay-process .section-intro-small,
+.home-page .assay-process .process article p,
+.home-page .service-area-section .service-area-layout > div:first-child > p:not(.eyebrow) {
+  color: rgba(250, 248, 242, 0.78);
+}
+
+.home-page .assay-process .process article,
+.home-page .assay-process .process article:last-child,
+.home-page .service-area-section .service-area-links,
+.home-page .service-area-section .service-area-links a {
+  border-color: rgba(250, 248, 242, 0.22);
+}
+
+.home-page .assay-process .process::before {
+  background: rgba(250, 248, 242, 0.22);
+}
+
+.home-page .assay-process .process article > span {
+  background: var(--navy);
+  border-color: var(--mineral-blue-soft);
+  color: var(--paper);
+}
+
+.home-page .assay-process .button-secondary,
+.home-page .service-area-section .button-secondary {
+  border-color: rgba(250, 248, 242, 0.52);
+  color: var(--paper);
+}
+
+.home-page .assay-process .button-secondary:hover,
+.home-page .service-area-section .button-secondary:hover {
+  background: rgba(250, 248, 242, 0.1);
+  border-color: var(--paper);
+}
+
+.home-page .assay-process + .section,
+.home-page .service-area-section + .section {
   border-top-color: rgba(250, 248, 242, 0.16);
 }
 
@@ -3342,6 +3380,10 @@ html[data-loader-state="ready"] .home-loader {
     position: static;
     transform: none;
     width: 100%;
+  }
+
+  .materials-panel::before {
+    display: none;
   }
 
   .materials-panel > .materials-panel-all {
