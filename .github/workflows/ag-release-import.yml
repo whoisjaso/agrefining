@@ -1,0 +1,53 @@
+name: Publish Verified AG Refining Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/ag-release-import.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ag-release-import
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check Out Main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Download Verified Release Parts
+        env:
+          RELEASE_BASE_URL: https://temporary-zippy-coral-ge3hua0.vercel.app
+        run: |
+          set -euo pipefail
+          for part in 00 01 02; do
+            curl --fail --location --retry 5 --retry-delay 2               "$RELEASE_BASE_URL/ag-refining-release.part-$part"               --output "$RUNNER_TEMP/ag-refining-release.part-$part"
+          done
+          cat "$RUNNER_TEMP"/ag-refining-release.part-* > "$RUNNER_TEMP/ag-refining-release.tar.gz"
+          echo "7b14646b4b9644a5ef87bf938de5ce797a1871697b68d890eca12127796c3414  $RUNNER_TEMP/ag-refining-release.tar.gz" | sha256sum --check
+
+      - name: Replace Repository With Tested Tree
+        run: |
+          set -euo pipefail
+          git rm --recursive .
+          tar --extract --gzip --file "$RUNNER_TEMP/ag-refining-release.tar.gz" --directory .
+          git add --all
+          git diff --cached --check
+          git status --short
+
+      - name: Publish Release
+        run: |
+          set -euo pipefail
+          git config user.name "whoisjaso"
+          git config user.email "168715273+whoisjaso@users.noreply.github.com"
+          git commit --message "Publish verified AG Refining release"
+          git push origin HEAD:main
