@@ -24,25 +24,30 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Download Verified Release Parts
+      - name: Download Verified Release Archives
         env:
-          RELEASE_BASE_URL: https://temporary-zippy-coral-ge3hua0.vercel.app
+          RELEASE_BASE_URL: https://temporary-instant-slate-stezred.vercel.app
+          RELEASE_SHARE_URL: https://temporary-instant-slate-stezred.vercel.app/?_vercel_share=7xF5lpdIJkNDmLItZnlFQXCBWXOB2J7n
         run: |
           set -euo pipefail
-          for part in 00 01 02; do
-            curl --fail --location --retry 5 --retry-all-errors --retry-delay 2               --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/127.0 Safari/537.36"               --header "Accept: application/octet-stream"               "$RELEASE_BASE_URL/ag-refining-release.part-$part"               --output "$RUNNER_TEMP/ag-refining-release.part-$part"
+          curl --fail --location --cookie-jar "$RUNNER_TEMP/vercel.cookies" "$RELEASE_SHARE_URL" --output /dev/null
+          for archive in masters qa site; do
+            curl --fail --location --retry 5 --retry-all-errors --retry-delay 2               --cookie "$RUNNER_TEMP/vercel.cookies"               "$RELEASE_BASE_URL/ag-release-$archive.zip"               --output "$RUNNER_TEMP/ag-release-$archive.zip"
           done
-          cat "$RUNNER_TEMP"/ag-refining-release.part-* > "$RUNNER_TEMP/ag-refining-release.tar.gz"
-          echo "7b14646b4b9644a5ef87bf938de5ce797a1871697b68d890eca12127796c3414  $RUNNER_TEMP/ag-refining-release.tar.gz" | sha256sum --check
+          echo "36064711c558c981d3dae209c26dada088f2648fe16656a9772639f76442a420  $RUNNER_TEMP/ag-release-masters.zip" | sha256sum --check
+          echo "11274d55ed5a94c0fc3f31374830e90f16ec06e67aac7eb0d1e57f6a08a87c98  $RUNNER_TEMP/ag-release-qa.zip" | sha256sum --check
+          echo "a9352f25e03e7c1183973a804c73c3c339969a1d907b7f9b1e05bf57fec893fa  $RUNNER_TEMP/ag-release-site.zip" | sha256sum --check
 
       - name: Replace Repository With Tested Tree
         run: |
           set -euo pipefail
           git rm --recursive .
-          tar --extract --gzip --file "$RUNNER_TEMP/ag-refining-release.tar.gz" --directory .
+          unzip -q "$RUNNER_TEMP/ag-release-masters.zip" -d .
+          unzip -q "$RUNNER_TEMP/ag-release-qa.zip" -d .
+          unzip -q "$RUNNER_TEMP/ag-release-site.zip" -d .
           git add --all
           git diff --cached --check
-          git status --short
+          test "$(git write-tree)" = "64bb3455f5c653dd475be211747e030fac960a26"
 
       - name: Publish Release
         run: |
