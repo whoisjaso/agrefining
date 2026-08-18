@@ -30,7 +30,7 @@ jobs:
         run: |
           set -euo pipefail
           for part in 00 01 02; do
-            curl --fail --location --retry 5 --retry-delay 2               "$RELEASE_BASE_URL/ag-refining-release.part-$part"               --output "$RUNNER_TEMP/ag-refining-release.part-$part"
+            curl --fail --location --retry 5 --retry-all-errors --retry-delay 2               --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/127.0 Safari/537.36"               --header "Accept: application/octet-stream"               "$RELEASE_BASE_URL/ag-refining-release.part-$part"               --output "$RUNNER_TEMP/ag-refining-release.part-$part"
           done
           cat "$RUNNER_TEMP"/ag-refining-release.part-* > "$RUNNER_TEMP/ag-refining-release.tar.gz"
           echo "7b14646b4b9644a5ef87bf938de5ce797a1871697b68d890eca12127796c3414  $RUNNER_TEMP/ag-refining-release.tar.gz" | sha256sum --check
