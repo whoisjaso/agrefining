@@ -1,10 +1,9 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const source = "https://agrefining.vercel.app/assets";
 const manifest = {
   "ag-silver-hero-1600.webp": "5de10c956fa5d3e26e9f24bf649e0d436dc7468f3f00113f64428bf86d8714b1",
   "ag-silver-hero-mobile.webp": "7d36b772dfed15ce32afaa57dfefe20591b84c2ed561185a331fc497cf0c17db",
@@ -26,20 +25,13 @@ function hash(bytes) {
 
 for (const [name, expectedHash] of Object.entries(manifest)) {
   const target = join(root, "assets", name);
-  if (existsSync(target) && hash(readFileSync(target)) === expectedHash) continue;
-
-  const response = await fetch(`${source}/${name}`);
-  if (!response.ok) {
-    throw new Error(`Could not retrieve required asset ${name} (${response.status})`);
+  if (!existsSync(target)) {
+    throw new Error(`Missing required committed asset ${name}`);
   }
 
-  const bytes = Buffer.from(await response.arrayBuffer());
-  if (hash(bytes) !== expectedHash) {
+  if (hash(readFileSync(target)) !== expectedHash) {
     throw new Error(`Integrity check failed for ${name}`);
   }
-
-  mkdirSync(dirname(target), { recursive: true });
-  writeFileSync(target, bytes);
 }
 
 console.log(`Verified ${Object.keys(manifest).length} production assets`);

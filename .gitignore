@@ -3,14 +3,3 @@ dist/
 node_modules/
 .worktrees/
 .DS_Store
-assets/ag-silver-hero-1600.webp
-assets/ag-silver-hero-mobile.webp
-assets/material-dental-1280.webp
-assets/material-dental-mobile.webp
-assets/material-scrap-silver-1280.webp
-assets/material-scrap-silver-mobile.webp
-assets/material-watch-batteries-1280.webp
-assets/material-watch-batteries-mobile.webp
-assets/material-xray-film-1280.webp
-assets/material-xray-film-mobile.webp
-assets/fonts/*.woff2
