@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import test from "node:test";
@@ -6,6 +7,21 @@ import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const dist = join(root, "dist");
+
+test("browser provenance resolves the current branch base dynamically", () => {
+  const browserHarness = readFileSync(join(root, "tests", "cinematic-hero-browser.mjs"), "utf8");
+  const expectedBase = execFileSync("git", ["merge-base", "HEAD", "main"], { cwd: root, encoding: "utf8" }).trim();
+  assert.doesNotMatch(browserHarness, /const baseCommit = "[0-9a-f]{40}"/);
+  assert.match(browserHarness, /merge-base/);
+  assert.equal(expectedBase.length, 40);
+});
+
+test("the standard verification gate runs the site chrome browser scenarios once", () => {
+  const packageJson = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+  assert.match(packageJson.scripts.verify, /npm run test:site-chrome/);
+  assert.equal(packageJson.scripts["test:site-chrome"], "node tests/site-chrome-browser.mjs");
+  assert.doesNotMatch(packageJson.scripts["test:browser"], /site-chrome-browser/);
+});
 
 function outerElement(source, className) {
   const opening = new RegExp(`<([\\w-]+)\\b(?=[^>]*\\bclass=(?:"(?:[^"]*\\s)?${className}(?:\\s[^"]*)?"|'(?:[^']*\\s)?${className}(?:\\s[^']*)?'))[^>]*>`, "i").exec(source);
@@ -81,7 +97,7 @@ test("the generated hero directly nests the permanent poster and exactly two ine
   assert.equal(media[0].inner.slice(0, poster.start).trim(), "", "the poster must be a direct first child of the media shell");
   assert.equal(media[0].inner.slice(poster.end, stack.start).trim(), "", "the video stack must directly follow the poster");
   assert.equal(media[0].inner.slice(stack.end).trim(), "", "the video stack must be the final direct child of the media shell");
-  assert.match(poster.html, /<img src="\/images\/ag-refining-molten-pour-poster\.webp" alt="" width="1280" height="720" fetchpriority="high">/);
+  assert.match(poster.html, /<img src="\/images\/ag-refining-molten-pour-poster\.webp" alt="" width="2560" height="1440" fetchpriority="high">/);
   assert.doesNotMatch(poster.html, /loading="lazy"/);
 
   const videos = outerElements(stack.inner, "cinematic-hero-video");
@@ -104,7 +120,7 @@ test("the generated hero directly nests the permanent poster and exactly two ine
   assert.doesNotMatch(hero, /\/assets\/ag-refining-hero-v2-[^"']+\.webp/);
 });
 
-test("the generated hero keeps the stable overlay behind unchanged commercial content", () => {
+test("the generated hero keeps the stable overlay behind the streamlined commercial content", () => {
   const { home, hero, heroEnd } = homepageHero();
   const overlay = outerElements(hero, "cinematic-hero-overlay");
   assert.equal(overlay.length, 1, "the poster and video layers need one stable overlay");
@@ -112,11 +128,9 @@ test("the generated hero keeps the stable overlay behind unchanged commercial co
   assert.ok(hero.indexOf('class="cinematic-hero-overlay"') < hero.indexOf('class="shell hero-commercial-grid"'));
   assert.equal((hero.match(/<h1(?:\s[^>]*)?>/g) || []).length, 1);
   assert.match(hero, /<h1>Your silver, valued precisely\.<\/h1>/);
-  const kicker = outerElement(hero, "hero-kicker");
-  assert.ok(kicker, "the hero kicker must remain present");
-  assert.equal(kicker.inner.trim(), "Houston, Texas · Commercial silver buyer");
+  assert.doesNotMatch(hero, /class="hero-kicker"/, "the hero kicker should be removed to keep the first screen quieter");
   assert.match(hero, /Free pickup for qualifying Houston accounts\. See the weight, review the offer, and choose what happens next\./);
-  assert.match(hero, /href="\/contact\?intent=pickup">Schedule a free pickup<\/a>/);
+  assert.match(hero, /href="\/contact\?intent=pickup">Schedule a Free Pickup<\/a>/);
   assert.match(hero, /href="\/accepted-materials">See what we buy<\/a>/);
   assert.match(hero, /href="tel:\+12818982719">Call \(281\) 898-2719<\/a>/);
   const proofRail = outerElement(hero, "hero-proof-rail");
@@ -142,15 +156,18 @@ test("the built stylesheet isolates layered hero media with stationary overlay a
   assert.match(videoRule, /inset:\s*0/);
   assert.match(videoRule, /position:\s*absolute/);
   assert.match(videoRule, /transition:\s*opacity 800ms cubic-bezier\(0\.4, 0, 0\.2, 1\)/, "a 300ms cinematic fade would be too abrupt");
-  assert.match(overlayRule, /linear-gradient\(90deg, rgba\(3, 22, 36, 0\.98\) 0%, rgba\(3, 22, 36, 0\.93\) 28%, rgba\(3, 22, 36, 0\.72\) 46%, rgba\(3, 22, 36, 0\.26\) 68%, rgba\(3, 22, 36, 0\.08\) 100%\)/, "the approved stationary gradient belongs on the overlay");
-  assert.match(overlayRule, /linear-gradient\(180deg, rgba\(3, 22, 36, 0\.15\) 0%, transparent 28%, rgba\(3, 22, 36, 0\.18\) 100%\)/);
+  assert.match(overlayRule, /linear-gradient\(90deg, rgba\(3, 22, 36, 0\.58\) 0%, rgba\(3, 22, 36, 0\.48\) 26%, rgba\(3, 22, 36, 0\.32\) 44%, rgba\(3, 22, 36, 0\.14\) 66%, rgba\(3, 22, 36, 0\.04\) 100%\)/, "the lighter stationary gradient belongs on the overlay");
+  assert.match(overlayRule, /linear-gradient\(180deg, rgba\(3, 22, 36, 0\.12\) 0%, transparent 30%, rgba\(3, 22, 36, 0\.16\) 100%\)/);
   assert.doesNotMatch(overlayRule, /transition:/, "the stationary overlay must not animate");
+  assert.doesNotMatch(coverRule, /filter:|backdrop-filter:/, "hero media must not use CSS filters");
+  assert.doesNotMatch(videoRule, /filter:|backdrop-filter:/, "hero videos must not use CSS filters");
+  assert.doesNotMatch(overlayRule, /filter:|backdrop-filter:/, "the hero overlay must not use CSS filters");
   assert.doesNotMatch(videoRule, /linear-gradient/, "moving the stable overlay gradient onto a video layer would cause visual flashes");
   assert.ok(cinematicDeclarations.length > 0, "cinematic layer rules must be present");
   for (const declarations of cinematicDeclarations) assert.doesNotMatch(declarations, /z-index:\s*-/);
-  assert.match(stylesheet, /\.cinematic-hero-poster img,\s*\.cinematic-hero-video[\s\S]*?object-position:\s*65% center/);
-  assert.match(stylesheet, /@media \(max-width: 1100px\)[\s\S]*?\.cinematic-hero-poster img,\s*\.cinematic-hero-video[\s\S]*?object-position:\s*68% center/);
-  assert.match(stylesheet, /@media \(max-width: 700px\)[\s\S]*?\.cinematic-hero-poster img,\s*\.cinematic-hero-video[\s\S]*?object-position:\s*72% center/);
+  assert.match(stylesheet, /\.cinematic-hero-poster img,\s*\.cinematic-hero-video[\s\S]*?object-position:\s*70% center/);
+  assert.match(stylesheet, /@media \(max-width: 1100px\)[\s\S]*?\.cinematic-hero-poster img,\s*\.cinematic-hero-video[\s\S]*?object-position:\s*74% center/);
+  assert.match(stylesheet, /@media \(max-width: 700px\)[\s\S]*?\.cinematic-hero-poster img,\s*\.cinematic-hero-video[\s\S]*?object-position:\s*78% center/);
   assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.cinematic-hero-video\s*\{[^}]*opacity:\s*0;[^}]*transition:\s*none;[^}]*\}[\s\S]*?\.cinematic-hero-poster\s*\{[^}]*opacity:\s*1/);
 });
 

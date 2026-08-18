@@ -8,13 +8,19 @@ const out = join(root, "dist");
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(join(out, "assets"), { recursive: true });
-cpSync(join(root, "assets"), join(out, "assets"), { recursive: true });
+const sourceMasters = join(root, "assets", "material-masters");
+cpSync(join(root, "assets"), join(out, "assets"), {
+  recursive: true,
+  filter: (source) => source !== sourceMasters && !source.startsWith(`${sourceMasters}/`)
+});
 mkdirSync(join(out, "videos"), { recursive: true });
 cpSync(join(root, "videos"), join(out, "videos"), { recursive: true });
 mkdirSync(join(out, "images"), { recursive: true });
 cpSync(join(root, "images"), join(out, "images"), { recursive: true });
 cpSync(join(root, "src", "style.css"), join(out, "style.css"));
 cpSync(join(root, "src", "site.js"), join(out, "site.js"));
+cpSync(join(root, "src", "home-header-reveal.js"), join(out, "home-header-reveal.js"));
+cpSync(join(root, "src", "home-loader.js"), join(out, "home-loader.js"));
 cpSync(join(root, "src", "materials-disclosure.js"), join(out, "materials-disclosure.js"));
 cpSync(join(root, "src", "cinematic-hero-video.js"), join(out, "cinematic-hero-video.js"));
 mkdirSync(join(out, "assets", "vendor"), { recursive: true });
@@ -30,7 +36,146 @@ const email = "dennis@agrefining.com";
 const street = "9125 Airport Blvd., Suite B-1";
 const cityLine = "Houston, TX 77061";
 const primaryCta = "Schedule a Free Pickup";
+const spanishPrimaryCta = "Programar Una Recogida Gratis";
 const arrow = '<span class="icon-arrow" aria-hidden="true"></span>';
+const titleCaseMinorWords = {
+  en: new Set(["a", "an", "and", "as", "at", "but", "by", "for", "from", "in", "nor", "of", "on", "or", "per", "so", "the", "to", "vs", "via", "with", "yet"]),
+  es: new Set(["a", "al", "ante", "bajo", "cabe", "con", "contra", "de", "del", "desde", "durante", "e", "el", "en", "entre", "hacia", "hasta", "la", "las", "lo", "los", "o", "para", "por", "según", "sin", "so", "sobre", "tras", "u", "un", "una", "unas", "unos", "y"])
+};
+
+function capitalizeTitleToken(token, locale) {
+  const lower = token.toLocaleLowerCase(locale);
+  const letterIndex = lower.search(/\p{L}/u);
+  if (letterIndex === -1) return token;
+  return `${lower.slice(0, letterIndex)}${lower[letterIndex].toLocaleUpperCase(locale)}${lower.slice(letterIndex + 1)}`;
+}
+
+function titleCaseHeading(text, locale = "en") {
+  const minorWords = titleCaseMinorWords[locale] || titleCaseMinorWords.en;
+  const words = text.split(/\s+/).filter(Boolean);
+
+  return words.map((word, wordIndex) => titleCaseWord(word, wordIndex, words.length, minorWords, locale)).join(" ");
+}
+
+function titleCaseWord(word, wordIndex, wordCount, minorWords, locale) {
+    const parts = word.split("-");
+    return parts.map((part, partIndex) => {
+      if (!part) return part;
+      if (/^[A-Z0-9]{2,}$/u.test(part)) return part;
+
+      const stripped = part.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}.?!]+$/gu, "");
+      const lowered = stripped.toLocaleLowerCase(locale);
+      const firstPart = wordIndex === 0 && partIndex === 0;
+      const lastPart = wordIndex === wordCount - 1 && partIndex === parts.length - 1;
+
+      if (parts.length === 1 && !firstPart && !lastPart && minorWords.has(lowered)) {
+        return part.toLocaleLowerCase(locale);
+      }
+
+      return capitalizeTitleToken(part, locale);
+    }).join("-");
+}
+
+function titleCaseMarkupContent(content, locale) {
+  const minorWords = titleCaseMinorWords[locale] || titleCaseMinorWords.en;
+  const parts = content.split(/(<[^>]+>)/g);
+  const wordCount = parts
+    .filter((part) => !part.startsWith("<"))
+    .flatMap((part) => part.match(/\S+/g) || [])
+    .filter((word) => /[\p{L}\p{N}]/u.test(word))
+    .length;
+  let wordIndex = 0;
+
+  return parts.map((part) => {
+    if (part.startsWith("<")) return part;
+    return part.replace(/\S+/g, (word) => {
+      if (!/[\p{L}\p{N}]/u.test(word)) return word;
+      const normalized = titleCaseWord(word, wordIndex, wordCount, minorWords, locale);
+      wordIndex += 1;
+      return normalized;
+    });
+  }).join("");
+}
+
+function normalizeTitleCaseMarkup(markup, locale = "en") {
+  const apply = (pattern, source = markup) => source.replace(pattern, (_, open, content, close) => `${open}${titleCaseMarkupContent(content, locale)}${close}`);
+
+  let normalized = markup;
+  normalized = apply(/(<p class="(?:eyebrow|answer-index|hero-kicker|hero-review-label|legacy-caption)">)([\s\S]*?)(<\/p>)/g, normalized);
+  normalized = apply(/(<h2\b[^>]*>)([\s\S]*?)(<\/h2>)/g, normalized);
+  normalized = apply(/(<h3\b[^>]*>)([\s\S]*?)(<\/h3>)/g, normalized);
+  normalized = apply(/(<details class="material-guide">[\s\S]*?<summary>[\s\S]*?<span>)([\s\S]*?)(<\/span><\/summary>)/g, normalized);
+  normalized = apply(/(<a\b[^>]*>\s*<span(?:\s[^>]*)?>)([^<]+)(<\/span>\s*<h[23]\b)/g, normalized);
+  return normalized;
+}
+
+const materialImageManifest = {
+  "silver-oxide-watch-battery-recycling-houston": { basename: "material-watch-batteries", focus: "52% 48%" },
+  "scrap-silver-buyer-houston": { basename: "material-scrap-silver", focus: "49% 58%" },
+  "scrap-silver-jewelry": { basename: "material-scrap-jewelry", focus: "54% 48%" },
+  "sell-silver-coins-houston": { basename: "material-coins", focus: "48% 58%" },
+  "sell-silver-bars-houston": { basename: "material-silver-bars", focus: "50% 55%" },
+  "silver-flatware-buyer-houston": { basename: "material-sterling-flatware", focus: "45% 50%" },
+  "silver-plated-materials-buyer-houston": { basename: "material-silver-plated", focus: "50% 54%" },
+  "industrial-silver-scrap": { basename: "material-industrial-silver", focus: "57% 52%" },
+  "electronics-silver-recovery": { basename: "material-electronics", focus: "51% 53%" },
+  "silver-flake-buyer-houston": { basename: "material-silver-flake", focus: "53% 54%" },
+  "silver-solder-buyer-houston": { basename: "material-silver-solder", focus: "54% 54%" },
+  "laboratory-silver-buyer-houston": { basename: "material-lab-silver", focus: "48% 56%" },
+  "industrial-x-ray-silver-recycling": { basename: "material-industrial-ndt", focus: "48% 52%" },
+  "medical-x-ray-recycling": { basename: "material-medical-xray", focus: "50% 51%" },
+  "dental-scrap-buyer-houston": { basename: "material-dental", focus: "50% 50%" },
+  "x-ray-recycling-services-houston": { basename: "material-xray-film", focus: "47% 50%" },
+  "jewelry-store-silver-recycling-houston": { basename: "material-scrap-jewelry", focus: "54% 48%" }
+};
+
+const responsiveFourByThreeFiles = new Set([
+  ...[...new Set(Object.values(materialImageManifest).map(({ basename }) => basename))]
+    .map((basename) => `${basename}-1280.webp`),
+  "service-area-houston-1280.webp",
+  "service-area-pearland-1280.webp",
+  "service-area-pasadena-1280.webp",
+  "service-area-sugar-land-1280.webp",
+  "service-area-katy-1280.webp",
+  "service-area-the-woodlands-1280.webp",
+  "service-area-conroe-1280.webp"
+]);
+
+function withMaterialImage(page) {
+  const materialImage = materialImageManifest[page.path];
+  if (!materialImage) return page;
+  page.imageBase = materialImage.basename;
+  page.imageFocus = materialImage.focus;
+  page.image = `${materialImage.basename}-1280.webp`;
+  return page;
+}
+
+function renderMaterialPicture({
+  basename,
+  alt,
+  focus,
+  className,
+  sizes,
+  eager = false,
+  loading = "lazy"
+}) {
+  const priority = eager ? ' fetchpriority="high"' : ` loading="${loading}"`;
+  return `<picture class="${className}" style="--material-focus:${focus};"><img src="/assets/${basename}-1280.webp" srcset="/assets/${basename}-800.webp 800w, /assets/${basename}-1280.webp 1280w" sizes="${sizes}" alt="${alt}" width="1280" height="960"${priority}></picture>`;
+}
+
+function renderServiceVisual(page, caption, figureClass = "service-visual") {
+  const media = page.imageBase
+    ? renderMaterialPicture({
+      basename: page.imageBase,
+      alt: page.imageAlt,
+      focus: page.imageFocus || "50% 50%",
+      className: "service-visual-picture",
+      sizes: "(max-width: 700px) calc(100vw - 2rem), (max-width: 1100px) min(42rem, 48vw), 42rem",
+      eager: true
+    })
+    : `<img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" fetchpriority="high">`;
+  return `<figure class="${figureClass}">${media}${caption}</figure>`;
+}
 
 const materialPages = [
   {
@@ -63,7 +208,7 @@ const materialPages = [
     heading: "Recover silver from industrial NDT film.",
     intro: "AG Refining works with Houston companies that have qualifying industrial NDT film and related silver-bearing imaging material.",
     image: "material-industrial-xray-1280.webp",
-    imageAlt: "Industrial radiographic film and archive boxes prepared for review",
+    imageAlt: "Industrial radiographic film prepared for silver recovery review",
     answerHeading: "Old film can hold recoverable silver.",
     answerText: "Industrial Non-Destructive Testing film can contain recoverable silver. The type, age, condition, quantity, and storage method can affect the review.",
     details: [
@@ -155,7 +300,7 @@ const materialPages = [
     heading: "Sell laboratory silver in Houston.",
     intro: "AG Refining reviews silver-bearing material from laboratories, research facilities, universities, medical facilities, and industrial companies. We help approved customers recover value from unused, outdated, or excess material.",
     image: "material-laboratory-silver-1280.webp",
-    imageAlt: "Labeled laboratory silver materials arranged for a professional review",
+    imageAlt: "Laboratory silver materials arranged for a professional review",
     answerHeading: "Start with clear labels and records.",
     answerText: "Laboratory silver may come as clean metal, powder, compound, solution, coated parts, or research material. The form and condition decide how the material must be reviewed.",
     typesHeading: "Laboratory silver materials we review.",
@@ -449,7 +594,7 @@ const materialPages = [
     heading: "Secure X-ray film recycling in Houston.",
     intro: "AG Refining reviews qualifying medical and dental X-ray film, plus industrial NDT film, for silver recovery. We help Houston organizations plan a clear, secure, and responsible recycling process.",
     image: "material-industrial-xray-1280.webp",
-    imageAlt: "Medical X-ray film and industrial NDT film organized in archive boxes for recycling",
+    imageAlt: "Medical X-ray film and industrial NDT film prepared for recycling",
     answerHeading: "Traditional X-ray film may contain recoverable silver.",
     answerText: "Digital images do not contain recoverable silver film. Tell us the film type, quantity, date range, storage method, and whether the records are cleared for destruction.",
     faqs: [
@@ -659,18 +804,14 @@ Object.assign(industryPages.find((page) => page.path === "hospital-silver-recycl
 });
 
 const locationPages = [
-  // The fourth column keeps the service-area index from repeating one photograph
-  // seven times. Each city carries a different material from the set.
-  // The 1280 variant, not the 1600 hero crop: location service pages declare
-  // width="1280" height="819", so the file has to actually be that.
-  ["houston-silver-buyer", "Houston", "the City of Houston", "ag-silver-pour-1280.webp", "city-houston", "A bayou line crosses the industrial skyline of Houston's qualifying silver pickup route.", "major"],
-  ["silver-buyer-pearland", "Pearland", "Pearland and nearby south Houston businesses", "material-sterling-hollowware-1280.webp", "city-pearland", "A pear and assay line mark Pearland's route for qualifying silver material.", "minor"],
-  ["silver-buyer-pasadena", "Pasadena", "Pasadena, Deer Park, and nearby industrial areas", "material-industrial-silver-1280.webp", "city-pasadena", "A strawberry form meets measured cuts for Pasadena's qualifying silver pickup route.", "minor"],
-  ["silver-buyer-sugar-land", "Sugar Land", "Sugar Land, Stafford, and nearby southwest Houston businesses", "material-silver-jewelry-1280.webp", "city-sugar-land", "Cane leaves, a crystal facet, and a chimney mark Sugar Land's silver service.", "major"],
-  ["silver-buyer-katy", "Katy", "Katy and west Houston businesses", "material-silver-coins-1280.webp", "city-katy", "Rice and rail lines frame Katy's qualifying silver pickup route.", "major"],
-  ["silver-buyer-the-woodlands", "The Woodlands", "The Woodlands, Spring, and north Houston businesses", "material-silver-bars-1280.webp", "city-the-woodlands", "Three pines identify The Woodlands route for qualifying silver material.", "minor"],
-  ["silver-buyer-conroe", "Conroe", "Conroe and nearby Montgomery County businesses", "material-industrial-xray-1280.webp", "city-conroe", "Growth rings and one rail line mark Conroe's qualifying silver service.", "full"]
-].map(([path, city, area, image, emblem, artifactDescription, artifactScale]) => ({
+  ["houston-silver-buyer", "Houston", "the City of Houston", "service-area-houston", "city-houston", "A refinery corridor and downtown skyline mark Houston's commercial silver route.", "major", "50% 50%", "Houston refinery corridor and skyline prepared for commercial silver pickup service"],
+  ["silver-buyer-pearland", "Pearland", "Pearland and nearby south Houston businesses", "service-area-pearland", "city-pearland", "Pearland service supports qualifying south-metro silver pickups with clear scheduling.", "minor", "50% 50%", "Pearland commercial corridor prepared for qualifying silver pickup service"],
+  ["silver-buyer-pasadena", "Pasadena", "Pasadena, Deer Park, and nearby industrial areas", "service-area-pasadena", "city-pasadena", "Pasadena route coverage includes refinery-adjacent industrial silver pickups.", "minor", "50% 50%", "Pasadena industrial skyline prepared for commercial silver pickup service"],
+  ["silver-buyer-sugar-land", "Sugar Land", "Sugar Land, Stafford, and nearby southwest Houston businesses", "service-area-sugar-land", "city-sugar-land", "Sugar Land route planning supports commercial silver review before pickup.", "major", "50% 50%", "Sugar Land commercial district prepared for qualifying silver pickup service"],
+  ["silver-buyer-katy", "Katy", "Katy and west Houston businesses", "service-area-katy", "city-katy", "Katy businesses can confirm silver pickup service before anything moves.", "major", "50% 50%", "Katy commercial district prepared for qualifying silver pickup service"],
+  ["silver-buyer-the-woodlands", "The Woodlands", "The Woodlands, Spring, and north Houston businesses", "service-area-the-woodlands", "city-the-woodlands", "The Woodlands route serves north-metro silver accounts with scheduled pickup.", "minor", "50% 50%", "The Woodlands business district prepared for commercial silver pickup service"],
+  ["silver-buyer-conroe", "Conroe", "Conroe and nearby Montgomery County businesses", "service-area-conroe", "city-conroe", "Conroe coverage extends silver pickup service across Montgomery County accounts.", "full", "50% 50%", "Conroe commercial corridor prepared for qualifying silver pickup service"]
+].map(([path, city, area, imageBase, emblem, artifactDescription, artifactScale, imageFocus, imageAlt]) => ({
   path,
   city,
   title: `Silver Buyer in ${city}, TX | Free Qualifying Pickup | AG Refining`,
@@ -678,11 +819,13 @@ const locationPages = [
   eyebrow: "Houston Metro service",
   heading: `${city} silver buyer for commercial accounts.`,
   intro: `AG Refining serves ${area}. Qualifying commercial accounts can ask for free pickup, on-site weighing, and fast payment.`,
-  image,
+  image: `${imageBase}-1280.webp`,
+  imageBase,
+  imageFocus,
   emblem,
   artifactDescription,
   artifactScale,
-  imageAlt: `Silver-bearing commercial material for pickup near ${city}, Texas`,
+  imageAlt,
   answerHeading: `We come to qualifying businesses in ${city}.`,
   answerText: "You do not have to move a large lot before you know the process. Tell us what you have, and we will confirm whether the pickup qualifies.",
   details: [
@@ -697,10 +840,30 @@ const locationPages = [
   ]
 }));
 
-const serviceCoverage = [
-  "Houston", "Pearland", "Pasadena", "Sugar Land", "Katy", "Cypress", "Spring", "The Woodlands",
-  "Conroe", "Humble", "Baytown", "League City", "Friendswood", "Missouri City", "Richmond", "Rosenberg",
-  "Tomball", "Bellaire", "Deer Park", "La Porte", "Texas City", "Galveston", "Stafford"
+const serviceCoverageLinks = [
+  ["Houston", "/houston-silver-buyer"],
+  ["Pearland", "/silver-buyer-pearland"],
+  ["Pasadena", "/silver-buyer-pasadena"],
+  ["Sugar Land", "/silver-buyer-sugar-land"],
+  ["Katy", "/silver-buyer-katy"],
+  ["Cypress", "/silver-buyer-katy"],
+  ["Spring", "/silver-buyer-the-woodlands"],
+  ["The Woodlands", "/silver-buyer-the-woodlands"],
+  ["Conroe", "/silver-buyer-conroe"],
+  ["Humble", "/houston-silver-buyer"],
+  ["Baytown", "/silver-buyer-pasadena"],
+  ["League City", "/silver-buyer-pearland"],
+  ["Friendswood", "/silver-buyer-pearland"],
+  ["Missouri City", "/silver-buyer-sugar-land"],
+  ["Richmond", "/silver-buyer-sugar-land"],
+  ["Rosenberg", "/silver-buyer-sugar-land"],
+  ["Tomball", "/silver-buyer-the-woodlands"],
+  ["Bellaire", "/houston-silver-buyer"],
+  ["Deer Park", "/silver-buyer-pasadena"],
+  ["La Porte", "/silver-buyer-pasadena"],
+  ["Texas City", "/silver-buyer-pearland"],
+  ["Galveston", "/silver-buyer-pearland"],
+  ["Stafford", "/silver-buyer-sugar-land"]
 ];
 
 Object.assign(locationPages.find((page) => page.path === "houston-silver-buyer"), {
@@ -722,6 +885,8 @@ Object.assign(locationPages.find((page) => page.path === "houston-silver-buyer")
 });
 
 const allServicePages = [...materialPages, ...industryPages, ...locationPages];
+allServicePages.forEach(withMaterialImage);
+const allServicePagesByPath = new Map(allServicePages.map((page) => [page.path, page]));
 
 const materialTaxonomyItems = [
   { group: "Featured", label: "Silver oxide watch batteries", path: "silver-oxide-watch-battery-recycling-houston", featured: true },
@@ -744,7 +909,7 @@ const materialTaxonomyItems = [
 ];
 
 const materialTaxonomyPages = materialTaxonomyItems.map((item) => {
-  const page = allServicePages.find((candidate) => candidate.path === item.path);
+  const page = allServicePagesByPath.get(item.path);
   if (!page) throw new Error(`Missing material taxonomy page: ${item.path}`);
   return { ...item, page };
 });
@@ -775,7 +940,7 @@ function renderNav(locale = "en") {
         <a href="/service-areas" hreflang="en">Áreas de servicio ${languageNote}</a>
         <a href="/how-it-works" hreflang="en">Cómo funciona ${languageNote}</a>
         <a href="/about" hreflang="en">Nuestra historia ${languageNote}</a>
-        <a class="button button-primary nav-review" href="#solicitud">Enviar solicitud ${arrow}</a>`
+        <a class="button button-primary nav-review" href="#solicitud">${spanishPrimaryCta} ${arrow}</a>`
     : `
         ${renderMaterialsDisclosure()}
         <a href="/industries">Industries</a>
@@ -800,12 +965,133 @@ function renderNav(locale = "en") {
         <img src="/assets/ag-mark-path.svg" alt="" width="48" height="48">
         <span class="brand-word"><strong>AG</strong> Refining</span>
       </a>
-      <button class="nav-toggle" type="button" data-nav-toggle hidden aria-expanded="false" aria-controls="primary-links" aria-label="${spanish ? "Abrir navegación" : "Open navigation"}"><span></span><span></span></button>
+      <button class="nav-toggle" type="button" data-nav-toggle hidden aria-expanded="false" aria-controls="primary-links" aria-label="${spanish ? "Abrir navegación" : "Open navigation"}"><span class="nav-toggle-label" data-nav-toggle-label>${spanish ? "Menú" : "Menu"}</span><span class="nav-toggle-glyph" aria-hidden="true"><i></i><i></i></span></button>
       <div class="nav-links" id="primary-links" data-nav>${links}
       </div>
     </nav>
     <button class="nav-scrim" type="button" data-nav-scrim hidden aria-label="${spanish ? "Cerrar navegación" : "Close navigation"}" tabindex="-1"></button>
   </header>`;
+}
+
+const footerNavigationGroups = [
+  {
+    label: "Materials",
+    links: [
+      ["All Materials", "/accepted-materials"],
+      ["Silver Oxide Watch Batteries", "/silver-oxide-watch-battery-recycling-houston"],
+      ["Scrap Silver", "/scrap-silver-buyer-houston"],
+      ["Scrap Silver Jewelry", "/scrap-silver-jewelry"],
+      ["Silver Coins", "/sell-silver-coins-houston"],
+      ["Silver Bars", "/sell-silver-bars-houston"],
+      ["Sterling and Flatware", "/silver-flatware-buyer-houston"],
+      ["Silver-Plated Materials", "/silver-plated-materials-buyer-houston"],
+      ["Industrial Silver", "/industrial-silver-scrap"],
+      ["Electronics Silver Recovery", "/electronics-silver-recovery"],
+      ["Silver Flake", "/silver-flake-buyer-houston"],
+      ["Silver Solder", "/silver-solder-buyer-houston"],
+      ["Laboratory Silver", "/laboratory-silver-buyer-houston"],
+      ["Industrial NDT Film", "/industrial-x-ray-silver-recycling"],
+      ["Medical X-Ray Film", "/medical-x-ray-recycling"],
+      ["Dental Scrap", "/dental-scrap-buyer-houston"],
+      ["X-Ray Recycling Services", "/x-ray-recycling-services-houston"],
+      ["Jewelry-Store Silver Recycling", "/jewelry-store-silver-recycling-houston"]
+    ]
+  },
+  {
+    label: "Industries",
+    links: [
+      ["All Industries", "/industries"],
+      ["Hospital Silver Recycling", "/hospital-silver-recycling"],
+      ["Dental Lab Silver Recycling", "/dental-lab-silver-recycling"],
+      ["Oil and Gas Silver Recovery", "/oil-gas-silver-recovery"],
+      ["Manufacturing Silver Recovery", "/manufacturing-silver-recovery"],
+      ["University Silver Recycling", "/university-silver-recycling"]
+    ]
+  },
+  {
+    label: "Service Areas",
+    links: [
+      ["All Service Areas", "/service-areas"],
+      ...serviceCoverageLinks
+    ]
+  },
+  {
+    label: "Company and Contact",
+    links: [
+      ["Our Story", "/about"],
+      ["How It Works", "/how-it-works"],
+      ["Contact AG Refining", "/contact"],
+      [primaryCta, "/contact?intent=pickup"],
+      [phoneDisplay, `tel:${phoneHref}`],
+      [email, `mailto:${email}`],
+      ["Privacy", "/privacy"]
+    ]
+  }
+];
+
+const spanishFooterNavigationGroups = [
+  {
+    label: "Materiales",
+    links: [
+      [`Todos los Materiales ${languageNote}`, "/accepted-materials"],
+      [`Baterías de Reloj de Óxido de Plata ${languageNote}`, "/silver-oxide-watch-battery-recycling-houston"],
+      [`Plata para Reciclaje ${languageNote}`, "/scrap-silver-buyer-houston"],
+      [`Recortes de Joyería de Plata ${languageNote}`, "/scrap-silver-jewelry"],
+      [`Monedas de Plata ${languageNote}`, "/sell-silver-coins-houston"],
+      [`Barras de Plata ${languageNote}`, "/sell-silver-bars-houston"],
+      [`Plata de Ley y Cubiertos ${languageNote}`, "/silver-flatware-buyer-houston"],
+      [`Materiales Plateados ${languageNote}`, "/silver-plated-materials-buyer-houston"],
+      [`Plata Industrial ${languageNote}`, "/industrial-silver-scrap"],
+      [`Recuperación de Plata de Electrónica ${languageNote}`, "/electronics-silver-recovery"],
+      [`Escamas de Plata ${languageNote}`, "/silver-flake-buyer-houston"],
+      [`Soldadura de Plata ${languageNote}`, "/silver-solder-buyer-houston"],
+      [`Plata de Laboratorio ${languageNote}`, "/laboratory-silver-buyer-houston"],
+      [`Película Industrial NDT ${languageNote}`, "/industrial-x-ray-silver-recycling"],
+      [`Película Médica de Rayos X ${languageNote}`, "/medical-x-ray-recycling"],
+      [`Material Dental ${languageNote}`, "/dental-scrap-buyer-houston"],
+      [`Servicios de Reciclaje de Rayos X ${languageNote}`, "/x-ray-recycling-services-houston"],
+      [`Reciclaje de Plata para Joyerías ${languageNote}`, "/jewelry-store-silver-recycling-houston"]
+    ]
+  },
+  {
+    label: "Industrias",
+    links: [
+      [`Todas las Industrias ${languageNote}`, "/industries"],
+      [`Reciclaje de Plata para Hospitales ${languageNote}`, "/hospital-silver-recycling"],
+      [`Reciclaje de Plata para Laboratorios Dentales ${languageNote}`, "/dental-lab-silver-recycling"],
+      [`Recuperación de Plata de Petróleo y Gas ${languageNote}`, "/oil-gas-silver-recovery"],
+      [`Recuperación de Plata para Manufactura ${languageNote}`, "/manufacturing-silver-recovery"],
+      [`Reciclaje de Plata para Universidades ${languageNote}`, "/university-silver-recycling"]
+    ]
+  },
+  {
+    label: "Áreas de Servicio",
+    links: [
+      [`Todas las Áreas de Servicio ${languageNote}`, "/service-areas"],
+      ...serviceCoverageLinks.map(([city, href]) => [`${city} ${languageNote}`, href])
+    ]
+  },
+  {
+    label: "Empresa y Contacto",
+    links: [
+      [`Nuestra historia ${languageNote}`, "/about"],
+      [`Cómo funciona ${languageNote}`, "/how-it-works"],
+      [`Contacto AG Refining ${languageNote}`, "/contact"],
+      [spanishPrimaryCta, "#solicitud"],
+      [phoneDisplay, `tel:${phoneHref}`],
+      [email, `mailto:${email}`],
+      [`Privacidad ${languageNote}`, "/privacy"]
+    ]
+  }
+];
+
+function renderFooterGroups(groups, spanish = false) {
+  return groups.map(({ label, links }) => `<details class="footer-group">
+        <summary>${label}</summary>
+        <nav class="footer-links" aria-label="${spanish ? "Navegación del pie de página:" : "Footer"} ${label}">
+          ${links.map(([linkLabel, href]) => `<a href="${href}"${spanish && href.startsWith("/") ? ' hreflang="en"' : ""}>${linkLabel}</a>`).join("\n          ")}
+        </nav>
+      </details>`).join("\n      ");
 }
 
 function renderFooter(locale = "en") {
@@ -814,50 +1100,32 @@ function renderFooter(locale = "en") {
     return `
   <footer class="footer">
     <div class="shell footer-grid">
-      <div>
+      <div class="footer-brand">
         <a class="brand" href="/espanol"><img src="/assets/ag-mark-path.svg" alt="" width="48" height="48"><span class="brand-word">AG Refining</span></a>
         <p>Compra y recogida de plata en Houston para cuentas comerciales, industriales, médicas y empresariales que califican.</p>
       </div>
-      <nav aria-label="Materiales">
-        <a href="/scrap-silver-buyer-houston" hreflang="en">Plata para reciclaje ${languageNote}</a>
-        <a href="/industrial-x-ray-silver-recycling" hreflang="en">Película industrial NDT ${languageNote}</a>
-        <a href="/silver-oxide-watch-battery-recycling-houston" hreflang="en">Baterías de reloj ${languageNote}</a>
-        <a href="/accepted-materials" hreflang="en">Todos los materiales ${languageNote}</a>
-      </nav>
-      <nav aria-label="Contacto">
-        <a href="tel:${phoneHref}">${phoneDisplay}</a>
-        <a href="mailto:${email}">${email}</a>
-        <a href="#solicitud">Enviar solicitud</a>
-      </nav>
+      <div class="footer-navigation">
+        ${renderFooterGroups(spanishFooterNavigationGroups, true)}
+      </div>
     </div>
     <div class="shell footer-bottom">
       <p>Copyright 2026 AG Refining. La recogida gratuita y el pago rápido dependen del material, la ubicación, el tipo de cuenta y el horario.</p>
-      <nav aria-label="Avisos legales"><a href="/privacy" hreflang="en">Privacidad ${languageNote}</a></nav>
     </div>
   </footer>`;
   }
   return `
   <footer class="footer">
     <div class="shell footer-grid">
-      <div>
+      <div class="footer-brand">
         <a class="brand" href="/"><img src="/assets/ag-mark-path.svg" alt="" width="48" height="48"><span class="brand-word">AG Refining</span></a>
         <p>Houston silver buying and pickup for qualifying commercial, industrial, medical, and business accounts.</p>
       </div>
-      <nav aria-label="Materials">
-        <a href="/scrap-silver-buyer-houston">Silver scrap</a>
-        <a href="/industrial-x-ray-silver-recycling">Industrial NDT film</a>
-        <a href="/silver-oxide-watch-battery-recycling-houston">Watch batteries</a>
-        <a href="/accepted-materials">All materials</a>
-      </nav>
-      <nav aria-label="Contact">
-        <a href="tel:${phoneHref}">${phoneDisplay}</a>
-        <a href="mailto:${email}">${email}</a>
-        <a href="/contact?intent=pickup">${primaryCta}</a>
-      </nav>
+      <div class="footer-navigation">
+        ${renderFooterGroups(footerNavigationGroups)}
+      </div>
     </div>
     <div class="shell footer-bottom">
       <p>Copyright 2026 AG Refining. Free pickup and fast payment depend on material, location, account type, and schedule.</p>
-      <nav aria-label="Legal"><a href="/privacy">Privacy</a></nav>
     </div>
   </footer>`;
 }
@@ -891,8 +1159,20 @@ function renderMaterialGuide(locale = "en") {
 
 function renderMobileActions(locale = "en") {
   return locale === "es"
-    ? `<nav class="mobile-actions" aria-label="Acciones rápidas"><a href="tel:${phoneHref}">Llamar</a><a class="button-primary" href="#solicitud">Enviar solicitud ${arrow}</a></nav>`
-    : `<nav class="mobile-actions" aria-label="Quick actions"><a href="tel:${phoneHref}">Call</a><a class="button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></nav>`;
+    ? `<nav class="mobile-actions" aria-label="Acciones rápidas" data-visible="false" aria-hidden="true" inert><a class="button-primary" href="#solicitud">${spanishPrimaryCta} ${arrow}</a></nav>`
+    : `<nav class="mobile-actions" aria-label="Quick actions" data-visible="false" aria-hidden="true" inert><a class="button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></nav>`;
+}
+
+function renderHomeLoader() {
+  return `<div class="home-loader" data-home-loader data-loader-state="loading" role="status" aria-live="polite" aria-atomic="true">
+      <span class="home-loader-assay" data-loader-assay aria-hidden="true">
+        <span class="home-loader-symbol" data-loader-symbol>Ag</span>
+        <span class="home-loader-atomic-number" data-loader-atomic-number>47</span>
+        <span class="home-loader-purity" data-loader-purity>99.9</span>
+      </span>
+      <span class="home-loader-line" aria-hidden="true"></span>
+      <span class="visually-hidden">Loading AG Refining</span>
+    </div>`;
 }
 
 function schemaTag(data) {
@@ -927,6 +1207,7 @@ const organizationSchema = {
 // scripts/optimize-asset.mjs.
 function ogSize(image) {
   if (image.endsWith("-1600.webp")) return { w: 1600, h: 900 };
+  if (responsiveFourByThreeFiles.has(image)) return { w: 1280, h: 960 };
   if (image.endsWith("-1280.webp")) return { w: 1280, h: 819 };
   return { w: 1200, h: 675 };
 }
@@ -947,8 +1228,10 @@ function document({
   const locale = lang === "es" ? "es" : "en";
   const canonical = path ? `${siteUrl}/${path}` : `${siteUrl}/`;
   const schema = [organizationSchema, ...pageSchema];
-  return `<!DOCTYPE html>
-<html lang="${lang}">
+  const homepage = bodyClass.split(/\s+/).includes("home-page");
+  const themeColor = homepage ? "#102a43" : "#f1ede4";
+  return normalizeTitleCaseMarkup(`<!DOCTYPE html>
+<html lang="${lang}"${homepage ? ' class="home-document"' : ""}>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -956,7 +1239,7 @@ function document({
     <meta name="description" content="${description}">
     <link rel="canonical" href="${canonical}">
     <meta name="robots" content="${robots}">
-    <meta name="theme-color" content="#f1ede4">
+    <meta name="theme-color" content="${themeColor}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AG Refining">
@@ -973,20 +1256,24 @@ function document({
     <link rel="preload" href="/assets/fonts/newsreader-latin-opsz.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/assets/fonts/manrope-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/style.css?v=20260804-hero-v2">
+    ${homepage ? '<script>document.documentElement.classList.add("home-header-pending");window.__agHeaderFailOpen=setTimeout(function(){document.documentElement.classList.remove("home-header-pending","home-header-ready","home-header-revealed")},1500);if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.dataset.loaderState="ready"}else{document.documentElement.dataset.loaderState="loading";window.__agLoaderFailOpen=setTimeout(function(){document.documentElement.dataset.loaderState="ready";var loader=document.querySelector("[data-home-loader]");if(loader){loader.dataset.loaderState="ready";loader.setAttribute("aria-hidden","true");loader.setAttribute("inert","");loader.inert=true}},1200)}</script>' : ""}
     ${schemaTag({ "@context": "https://schema.org", "@graph": schema })}
   </head>
   <body data-design="silver-atelier"${bodyClass ? ` class="${bodyClass}"` : ""}>
     <a class="skip" href="#main">${locale === "es" ? "Saltar al contenido" : "Skip to content"}</a>
+    ${homepage ? renderHomeLoader() : ""}
     ${renderNav(locale)}
     <main id="main">${content}</main>
     ${renderMobileActions(locale)}
     ${renderFooter(locale)}
     ${materialGuide ? renderMaterialGuide(locale) : ""}
     <script src="/site.js?v=20260804-hero-v2" defer></script>
+    ${homepage ? '<script src="/home-header-reveal.js?v=20260813-header" defer></script>' : ""}
+    ${homepage ? '<script type="module" src="/home-loader.js?v=20260813-loader"></script>' : ""}
     <script type="module" src="/materials-disclosure.js?v=20260810-materials"></script>
     ${moduleScripts.map((src) => `<script type="module" src="${src}"></script>`).join("\n    ")}
   </body>
-</html>`;
+</html>`, locale);
 }
 
 function breadcrumbs(items) {
@@ -1017,12 +1304,12 @@ function serviceAreaEmblem(page, className = "") {
 }
 
 const featuredMaterials = [
-  ["Scrap silver jewelry", "scrap-silver-jewelry", "material-silver-jewelry-1280.webp", "material-silver-jewelry-mobile.webp", "Jewelry, flatware, coins, and mixed silver items."],
-  ["Industrial NDT film", "industrial-x-ray-silver-recycling", "material-industrial-xray-1280.webp", "material-industrial-xray-mobile.webp", "Industrial radiography film from qualifying NDT programs."],
-  ["Silver coins", "sell-silver-coins-houston", "material-silver-coins-1280.webp", "material-silver-coins-mobile.webp", "Single coins, mixed lots, and estate collections evaluated with care."],
-  ["Silver oxide batteries", "silver-oxide-watch-battery-recycling-houston", "material-watch-batteries-real-1280.webp", "material-watch-batteries-real-mobile.webp", "Sorted commercial lots from watch and jewelry businesses."],
-  ["Medical X-ray film", "medical-x-ray-recycling", "material-medical-xray-1280.webp", "material-medical-xray-mobile.webp", "Qualifying film from medical, dental, and imaging facilities."],
-  ["Sterling and flatware", "silver-flatware-buyer-houston", "material-sterling-hollowware-1280.webp", "material-sterling-hollowware-mobile.webp", "Sterling flatware, serving pieces, trays, and estate collections."]
+  ["Scrap Silver Jewelry", "scrap-silver-jewelry", "Jewelry, flatware, coins, and mixed silver items."],
+  ["Industrial NDT Film", "industrial-x-ray-silver-recycling", "Industrial radiography film from qualifying NDT programs."],
+  ["Silver Coins", "sell-silver-coins-houston", "Single coins, mixed lots, and estate collections evaluated with care."],
+  ["Silver Oxide Batteries", "silver-oxide-watch-battery-recycling-houston", "Sorted commercial lots from watch and jewelry businesses."],
+  ["Medical X-Ray Film", "medical-x-ray-recycling", "Qualifying film from medical, dental, and imaging facilities."],
+  ["Sterling and Flatware", "silver-flatware-buyer-houston", "Sterling flatware, serving pieces, trays, and estate collections."]
 ];
 
 const homeFaqs = [
@@ -1038,7 +1325,7 @@ const home = `
   <section class="atelier-hero">
     <div class="cinematic-hero-media" aria-hidden="true" data-cinematic-hero-media>
       <picture class="cinematic-hero-poster" data-cinematic-poster>
-        <img src="/images/ag-refining-molten-pour-poster.webp" alt="" width="1280" height="720" fetchpriority="high">
+        <img src="/images/ag-refining-molten-pour-poster.webp" alt="" width="2560" height="1440" fetchpriority="high">
       </picture>
       <div class="cinematic-hero-video-stack" data-cinematic-video-stack>
         <video class="cinematic-hero-video" autoplay muted playsinline aria-hidden="true" tabindex="-1" preload="none" poster="/images/ag-refining-molten-pour-poster.webp" data-video-layer="0">
@@ -1054,11 +1341,10 @@ const home = `
     <div class="cinematic-hero-overlay" aria-hidden="true"></div>
     <div class="shell hero-commercial-grid">
       <div class="hero-copy">
-        <p class="hero-kicker">Houston, Texas · Commercial silver buyer</p>
         <h1>Your silver, valued precisely.</h1>
         <p class="hero-lede">Free pickup for qualifying Houston accounts. See the weight, review the offer, and choose what happens next.</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="/contact?intent=pickup">Schedule a free pickup</a>
+          <a class="button button-primary" href="/contact?intent=pickup">${primaryCta}</a>
           <a class="button button-secondary" href="/accepted-materials">See what we buy</a>
         </div>
         <a class="phone-link phone-link-inverse hero-call" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
@@ -1076,8 +1362,8 @@ const home = `
     <div class="shell">
       <form class="intake-panel" action="/contact" method="get" data-reveal>
         <input type="hidden" name="intent" value="pickup">
-        <p class="hero-review-label">Start here</p>
-        <h2 id="hero-intake-title">What silver do you have?</h2>
+        <p class="hero-review-label">Start Here</p>
+        <h2 id="hero-intake-title">What Silver Do You Have?</h2>
         <p>Choose the closest type. We will review the details and confirm the next step.</p>
         <label for="hero-material">Material type
           <select id="hero-material" name="material" required>
@@ -1110,7 +1396,7 @@ const home = `
 
   <section class="section answer-home">
     <div class="shell answer-home-grid">
-      <div><p class="eyebrow">Houston's trusted silver buyer</p><h2>Sell your silver with confidence.</h2></div>
+      <div><p class="eyebrow">Houston's Trusted Silver Buyer</p><h2>Sell Your Silver with Confidence.</h2></div>
       <div>
         <p class="answer-lede">Experience, honesty, and service matter when you sell silver.</p>
         <p>AG Refining makes the process simple. We help with small commercial lots and large industrial loads. You see the weight, hear the offer, and choose what happens next.</p>
@@ -1125,14 +1411,24 @@ const home = `
   <section class="section material-editorial">
     <div class="shell">
       <div class="section-title-row">
-        <div><p class="eyebrow">Materials we buy</p><h2>Start with what you have.</h2></div>
+        <div><p class="eyebrow">Materials We Buy</p><h2>Start with What You Have.</h2></div>
         <p class="section-intro-small">Each page explains what to share, what may qualify, and how pickup works.</p>
       </div>
       <div class="featured-materials-grid">
-        ${featuredMaterials.map(([name, path, desktop, mobile, copy]) => `<a class="material-row" href="/${path}" data-reveal>
-          <picture class="featured-material-image"><source media="(max-width: 700px)" srcset="/assets/${mobile}"><img src="/assets/${desktop}" alt="${name} prepared for review" width="1280" height="819" loading="lazy"></picture>
+        ${featuredMaterials.map(([name, path, copy]) => {
+          const page = allServicePagesByPath.get(path);
+          if (!page?.imageBase) throw new Error(`Missing featured material image for ${path}`);
+          return `<a class="material-row" href="/${path}" data-reveal>
+          ${renderMaterialPicture({
+            basename: page.imageBase,
+            alt: `${name} prepared for review`,
+            focus: page.imageFocus || "50% 50%",
+            className: "featured-material-image",
+            sizes: "(max-width: 700px) calc(100vw - 2rem), (max-width: 900px) calc(100vw - 6rem), (max-width: 1200px) 48vw, 38rem"
+          })}
           <div class="featured-material-copy"><h3>${name}</h3><p>${copy}</p><strong>View material ${arrow}</strong></div>
-        </a>`).join("")}
+        </a>`;
+        }).join("")}
       </div>
     </div>
   </section>
@@ -1140,16 +1436,16 @@ const home = `
   <section class="section assay-process">
     <div class="shell">
       <div class="section-title-row">
-        <div><p class="eyebrow">A simple process</p><h2>Six steps from silver to cash.</h2></div>
+        <div><p class="eyebrow">A Simple Process</p><h2>Six Steps from Silver to Cash.</h2></div>
         <p class="section-intro-small">You stay informed from the first call to final payment.</p>
       </div>
       <div class="process process-six" data-reveal>
-        <article><span>01</span><h3>Contact us</h3><p>Tell us what silver you have.</p></article>
+        <article><span>01</span><h3>Contact Us</h3><p>Tell us what silver you have.</p></article>
         <article><span>02</span><h3>Schedule</h3><p>Choose a pickup time that works.</p></article>
-        <article><span>03</span><h3>We arrive</h3><p>Our team comes to your location.</p></article>
-        <article><span>04</span><h3>We weigh</h3><p>See the material weight on-site.</p></article>
-        <article><span>05</span><h3>Get an offer</h3><p>Review clear, market-based pricing.</p></article>
-        <article><span>06</span><h3>Get paid</h3><p>Receive fast payment when available.</p></article>
+        <article><span>03</span><h3>We Arrive</h3><p>Our team comes to your location.</p></article>
+        <article><span>04</span><h3>We Weigh</h3><p>See the material weight on-site.</p></article>
+        <article><span>05</span><h3>Get an Offer</h3><p>Review clear, market-based pricing.</p></article>
+        <article><span>06</span><h3>Get Paid</h3><p>Receive fast payment when available.</p></article>
       </div>
       <a class="button button-secondary process-link" href="/how-it-works">See the full process ${arrow}</a>
     </div>
@@ -1161,8 +1457,8 @@ const home = `
         <picture class="industrial-feature-picture"><source media="(max-width: 700px)" srcset="/assets/ag-silver-hero-mobile.webp"><img src="/assets/ag-silver-hero-1600.webp" alt="Industrial silver material prepared for pickup and weighing" width="1600" height="900" loading="lazy"></picture>
       </div>
       <div class="industrial-feature-copy" data-reveal>
-        <p class="eyebrow">Why businesses choose AG Refining</p>
-        <h2>We come to your facility.</h2>
+        <p class="eyebrow">Why Businesses Choose AG Refining</p>
+        <h2>We Come to Your Facility.</h2>
         <p>Qualifying Houston accounts save time and avoid the trouble of moving valuable material before the process is clear.</p>
         <ul class="plain-checks">
           <li>Family-owned, Houston-based company</li>
@@ -1180,11 +1476,11 @@ const home = `
   <section class="section industry-index">
     <div class="shell">
       <div class="section-title-row">
-        <div><p class="eyebrow">Industries we serve</p><h2>Built for business accounts.</h2></div>
+        <div><p class="eyebrow">Industries We Serve</p><h2>Built for Business Accounts.</h2></div>
         <p class="section-intro-small">AG Refining works with organizations that create or store silver-bearing material.</p>
       </div>
       <div class="related-grid">
-        ${industryPages.slice(0, 6).map((page) => `<a class="related-card" href="/${page.path}"><span>Industry page</span><h3>${page.heading.replace(" in Houston", "")}</h3><p>${page.intro}</p><b>${arrow}</b></a>`).join("")}
+        ${industryPages.slice(0, 6).map((page) => `<a class="related-card" href="/${page.path}"><span>Industry Page</span><h3>${page.heading.replace(" in Houston", "")}</h3><p>${page.intro}</p><b>${arrow}</b></a>`).join("")}
       </div>
     </div>
   </section>
@@ -1193,7 +1489,7 @@ const home = `
     <div class="shell service-area-layout">
       <div>
         <p class="eyebrow">Serving the Houston Metro Area</p>
-        <h2>Local pickup across Southeast Texas.</h2>
+        <h2>Local Pickup Across Southeast Texas.</h2>
         <p>We serve Houston, Pearland, Pasadena, Sugar Land, Katy, Cypress, Spring, The Woodlands, Conroe, Humble, Baytown, League City, Friendswood, Missouri City, Richmond, Rosenberg, Tomball, Bellaire, Deer Park, La Porte, Texas City, Galveston, and nearby communities.</p>
         <a class="button button-secondary" href="/service-areas">View service areas ${arrow}</a>
       </div>
@@ -1205,9 +1501,9 @@ const home = `
 
   <section class="section provenance-story">
     <div class="shell legacy-editorial">
-      <div><p class="legacy-number">Ag</p><p class="legacy-caption">The Stevens family</p></div>
+      <div><p class="legacy-number">Ag</p><p class="legacy-caption">The Stevens Family</p></div>
       <div>
-        <p class="eyebrow">A family legacy</p>
+        <p class="eyebrow">A Family Legacy</p>
         <blockquote>“My father taught us the importance of honesty, hard work, and respect.”</blockquote>
         <cite>Dennis Stevens</cite>
         <p>John Stevens built his name by treating customers fairly. Dennis carries that lesson into every silver transaction today.</p>
@@ -1224,8 +1520,8 @@ const home = `
         <span class="location-map-detail"><span>${street}<br>${cityLine}</span><strong>Open in Google Maps ${arrow}</strong></span>
       </a>
       <div class="location-copy">
-        <p class="eyebrow">Contact and location</p>
-        <h2>Call before shipping or visiting.</h2>
+        <p class="eyebrow">Contact and Location</p>
+        <h2>Call Before Shipping or Visiting.</h2>
         <p>We will confirm the material, pickup option, and next step before anything moves.</p>
         <dl>
           <div><dt>Address</dt><dd>${street}<br>${cityLine}</dd></div>
@@ -1243,15 +1539,15 @@ const home = `
 
   <section class="section faq-section">
     <div class="shell faq-grid">
-      <div><p class="eyebrow">Common questions</p><h2>Clear answers before pickup.</h2></div>
+      <div><p class="eyebrow">Common Questions</p><h2>Clear Answers Before Pickup.</h2></div>
       ${faqMarkup(homeFaqs)}
     </div>
   </section>
 
   <section class="conversion-band">
     <div class="shell" data-reveal>
-      <p class="eyebrow">Ready to sell your silver?</p>
-      <h2>Let us come to you.</h2>
+      <p class="eyebrow">Ready to Sell Your Silver?</p>
+      <h2>Let Us Come to You.</h2>
       <p>Tell us what you have, how much there is, and where it is located. We will confirm whether the lot qualifies for free pickup.</p>
       <div class="hero-actions hero-actions-center">
         <a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
@@ -1297,7 +1593,9 @@ function servicePage(page) {
             ${page.heroGuardrail ? `<p class="material-hero-note">${page.heroGuardrail}</p>` : ""}
             <a class="button button-primary" href="/contact?intent=pickup${materialQuery}">${primaryCta} ${arrow}</a>
           </div>
-          <figure class="service-visual${page.emblem ? " service-visual-location" : ""}"><img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" fetchpriority="high">${page.emblem ? `<span class="location-emblem">${serviceAreaEmblem(page, "location-emblem-svg")}</span>` : ""}</figure>
+          ${page.emblem
+            ? renderServiceVisual(page, `<span class="location-emblem">${serviceAreaEmblem(page, "location-emblem-svg")}</span>`, "service-visual service-visual-location")
+            : renderServiceVisual(page, "")}
         </div>
       </div>
     </section>
@@ -1383,10 +1681,7 @@ function coinServicePage(page) {
             </div>
             <p class="coin-hero-note">No pressure to sell. We explain the offer before any transaction.</p>
           </div>
-          <figure class="service-visual coin-visual">
-            <img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" fetchpriority="high">
-            <figcaption><span>Ag</span><p>Silver<br>Atomic no. 47</p></figcaption>
-          </figure>
+          ${renderServiceVisual(page, "<figcaption><span>Ag</span><p>Silver<br>Atomic no. 47</p></figcaption>", "service-visual coin-visual")}
         </div>
       </div>
     </section>
@@ -1515,10 +1810,7 @@ function longMaterialPage(page) {
             </div>
             <p class="material-hero-note">Nothing moves until the material and next step are confirmed.</p>
           </div>
-          <figure class="service-visual material-visual">
-            <img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" fetchpriority="high">
-            <figcaption><span>Ag</span><p>Houston<br>Material review</p></figcaption>
-          </figure>
+          ${renderServiceVisual(page, "<figcaption><span>Ag</span><p>Houston<br>Material review</p></figcaption>")}
         </div>
       </div>
     </section>
@@ -1670,10 +1962,7 @@ function xrayHubPage(page) {
             </div>
             <p class="material-hero-note">Do not upload patient information, private records, or readable X-ray images.</p>
           </div>
-          <figure class="service-visual material-visual">
-            <img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" fetchpriority="high">
-            <figcaption><span>Ag</span><p>Film review<br>Silver recovery</p></figcaption>
-          </figure>
+          ${renderServiceVisual(page, "<figcaption><span>Ag</span><p>Film review<br>Silver recovery</p></figcaption>")}
         </div>
       </div>
     </section>
@@ -1807,11 +2096,7 @@ function houstonHubPage(page) {
             </div>
             <p class="material-hero-note">Pickup, on-site weighing, and prompt payment depend on the material, account, location, and schedule.</p>
           </div>
-          <figure class="service-visual material-visual service-visual-location">
-            <img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" fetchpriority="high">
-            <span class="location-emblem">${serviceAreaEmblem(page, "location-emblem-svg")}</span>
-            <figcaption><span>47</span><p>Houston<br>Silver buyer</p></figcaption>
-          </figure>
+          ${renderServiceVisual(page, `<span class="location-emblem">${serviceAreaEmblem(page, "location-emblem-svg")}</span><figcaption><span>47</span><p>Houston<br>Silver buyer</p></figcaption>`, "service-visual material-visual service-visual-location")}
         </div>
       </div>
     </section>
@@ -1924,7 +2209,17 @@ function taxonomyPage({ path, title, description, eyebrow, heading, intro, items
     const rowStart = !featured && (index - firstRegularIndex) % 2 === 0;
     const classes = ["taxonomy-card", featured && "taxonomy-card-featured", rowStart && "taxonomy-card-row-start"].filter(Boolean).join(" ");
     return `<a class="${classes}" href="/${page.path}" data-reveal>
-    <figure class="taxonomy-image"><img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" loading="lazy"></figure>
+    ${page.imageBase
+      ? renderMaterialPicture({
+        basename: page.imageBase,
+        alt: page.imageAlt,
+        focus: page.imageFocus || "50% 50%",
+        className: "taxonomy-image",
+        sizes: featured
+          ? "(max-width: 700px) calc(100vw - 2rem), (max-width: 1100px) min(44rem, 52vw), 42rem"
+          : "(max-width: 700px) calc(100vw - 2rem), (max-width: 1100px) 44vw, 28rem"
+      })
+      : `<figure class="taxonomy-image"><img src="/assets/${page.image}" alt="${page.imageAlt}" width="1280" height="819" loading="lazy"></figure>`}
     <div><p class="eyebrow">${item.label || page.eyebrow}</p><h2>${page.heading}</h2><p>${page.intro}<b>View page ${arrow}</b></p></div>
   </a>`;
   }).join("");
@@ -1938,19 +2233,29 @@ function taxonomyPage({ path, title, description, eyebrow, heading, intro, items
 }
 
 function serviceAreasPage() {
-  const cityArtifacts = locationPages.map((page) => `<a class="city-artifact city-artifact-${page.artifactScale}" href="/${page.path}">
-    <span class="city-artifact-medallion">${serviceAreaEmblem(page)}</span>
+  const cityArtifacts = locationPages.map((page) => `<a class="city-artifact city-artifact-card city-artifact-${page.artifactScale}" href="/${page.path}" data-reveal>
+    <span class="city-artifact-media">
+      ${renderMaterialPicture({
+        basename: page.imageBase,
+        alt: page.imageAlt,
+        focus: page.imageFocus || "50% 50%",
+        className: "city-artifact-picture",
+        sizes: "(max-width: 700px) calc(100vw - 2rem), (max-width: 1100px) calc(50vw - 2.5rem), 30rem",
+        loading: "lazy"
+      })}
+      <span class="city-artifact-medallion">${serviceAreaEmblem(page)}</span>
+    </span>
     <div class="city-artifact-copy"><h2>${page.city}</h2><p class="city-artifact-description">${page.artifactDescription}</p><span class="city-artifact-action">View city service ${arrow}</span></div>
   </a>`).join("");
   const content = `
     <section class="page-hero page-intro service-area-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["Service areas", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Service areas</p><h1>Silver pickup across the Houston Metro Area.</h1></div><p>Free pickup may be available for qualifying commercial and industrial accounts. Choose your closest service area.</p></div></div></section>
     <section class="section service-artifacts-section" aria-labelledby="featured-service-areas"><div class="shell">
-      <div class="service-artifacts-heading"><h2 id="featured-service-areas">Choose your service area.</h2><p>Each local route keeps the same clear weighing, offer, and qualification process.</p></div>
+      <div class="service-artifacts-heading"><h2 id="featured-service-areas">Choose your <span class="service-area-heading-emphasis">service area</span>.</h2><p>Each local route keeps the same clear weighing, offer, and qualification process.</p></div>
       <div class="city-artifact-field" data-featured-service-areas>${cityArtifacts}</div>
     </div></section>
     <section class="section service-coverage" aria-labelledby="service-coverage-title"><div class="shell service-coverage-grid">
       <div><h2 id="service-coverage-title">Houston Metro coverage</h2><p>Free pickup may be available for qualifying commercial accounts. We confirm the material, location, and schedule first.</p></div>
-      <ul data-service-coverage>${serviceCoverage.map((city) => `<li>${city}</li>`).join("")}</ul>
+      <ul data-service-coverage>${serviceCoverageLinks.map(([city, href]) => `<li><a href="${href}">${city}</a></li>`).join("")}</ul>
     </div></section>
     <section class="conversion-band"><div class="shell"><h2>Tell us where the material is.</h2><p>We will confirm whether the lot and location qualify for pickup.</p><a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></div></section>`;
   const path = "service-areas";

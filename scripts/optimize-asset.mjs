@@ -9,12 +9,13 @@
 // Presets match the dimensions already used in scripts/build.mjs, so imported
 // assets drop into existing markup without touching width/height:
 //
-//   material  1280x819 + 720x461 mobile   material and service page images
+//   material  1280x960 + 800x600          material and service page images
 //   hero      1600x900 + 900x506 mobile   full-bleed hero art
 //   social    1200x675, no mobile         the og:image
 //
-// Cropping is attention-based, so the subject survives the reframe instead of
-// being centre-cropped blindly.
+// By default, material images are cropped with Sharp's attention strategy. Use
+// --fit contain to preserve an already-accurate legacy image inside the 4:3
+// canvas with a controlled background instead of forcing a crop.
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -26,8 +27,8 @@ const assets = join(root, "assets");
 
 const PRESETS = {
   material: [
-    { suffix: "-1280", width: 1280, height: 819 },
-    { suffix: "-mobile", width: 720, height: 461 }
+    { suffix: "-1280", width: 1280, height: 960 },
+    { suffix: "-800", width: 800, height: 600 }
   ],
   hero: [
     { suffix: "-1600", width: 1600, height: 900 },
@@ -42,6 +43,9 @@ const positional = [];
 let presetName = "material";
 let force = false;
 let quality = 78;
+let fit = "cover";
+let background = "#f1ede4";
+let position = "attention";
 
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
@@ -52,6 +56,18 @@ for (let i = 0; i < argv.length; i++) {
   }
   if (a.startsWith("--quality")) {
     quality = Number(a.includes("=") ? a.split("=")[1] : argv[++i]);
+    continue;
+  }
+  if (a.startsWith("--fit")) {
+    fit = a.includes("=") ? a.split("=")[1] : argv[++i];
+    continue;
+  }
+  if (a.startsWith("--background")) {
+    background = a.includes("=") ? a.split("=")[1] : argv[++i];
+    continue;
+  }
+  if (a.startsWith("--position")) {
+    position = a.includes("=") ? a.split("=")[1] : argv[++i];
     continue;
   }
   if (a.startsWith("--")) { console.error(`unknown flag ${a}`); process.exit(1); }
@@ -66,7 +82,7 @@ if (!Number.isFinite(quality) || quality < 1 || quality > 100) {
 }
 
 if (!source || !basename) {
-  console.error("usage: node scripts/optimize-asset.mjs <source> <basename> [--preset material|hero|social] [--force]");
+  console.error("usage: node scripts/optimize-asset.mjs <source> <basename> [--preset material|hero|social] [--quality N] [--fit cover|contain] [--background #rrggbb] [--position attention|centre|north|south|east|west|northeast|northwest|southeast|southwest] [--force]");
   process.exit(1);
 }
 if (!/^[a-z0-9-]+$/.test(basename)) {
@@ -76,6 +92,29 @@ if (!/^[a-z0-9-]+$/.test(basename)) {
 const preset = PRESETS[presetName];
 if (!preset) {
   console.error(`unknown preset "${presetName}". Use one of: ${Object.keys(PRESETS).join(", ")}`);
+  process.exit(1);
+}
+if (!["cover", "contain"].includes(fit)) {
+  console.error(`--fit must be "cover" or "contain", got "${fit}"`);
+  process.exit(1);
+}
+
+const positionMap = {
+  attention: sharp.strategy.attention,
+  centre: "centre",
+  center: "centre",
+  north: "north",
+  south: "south",
+  east: "east",
+  west: "west",
+  northeast: "northeast",
+  northwest: "northwest",
+  southeast: "southeast",
+  southwest: "southwest"
+};
+const resizePosition = positionMap[position];
+if (!resizePosition) {
+  console.error(`unsupported --position "${position}"`);
   process.exit(1);
 }
 
@@ -106,7 +145,7 @@ for (const { suffix, width, height } of preset) {
     console.log(`note   ${name}: source is only ${meta.width}px wide, upscaling to ${width}px will look soft`);
   }
   const out = await sharp(input)
-    .resize(width, height, { fit: "cover", position: sharp.strategy.attention })
+    .resize(width, height, { fit, position: resizePosition, background })
     .webp({ quality, effort: 6 })
     .toBuffer();
   writeFileSync(target, out);

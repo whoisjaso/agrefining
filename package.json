@@ -7,15 +7,16 @@
     "assets": "node scripts/fetch-assets.mjs",
     "build": "npm run assets && node scripts/build.mjs",
     "check": "node scripts/check.mjs",
-    "test": "node --test tests/generated-interaction-contract.test.mjs tests/materials-navigation-contract.test.mjs tests/leads-response.test.mjs tests/cinematic-hero-markup.test.mjs tests/service-area-artifacts-contract.test.mjs && npm run test:hero-runtime && npm run test:materials-runtime",
+    "test": "node --test tests/generated-interaction-contract.test.mjs tests/footer-navigation-contract.test.mjs tests/mobile-homepage-contract.test.mjs tests/materials-navigation-contract.test.mjs tests/material-image-contract.test.mjs tests/leads-response.test.mjs tests/cinematic-hero-markup.test.mjs tests/service-area-artifacts-contract.test.mjs tests/service-area-image-contract.test.mjs && npm run test:hero-runtime && npm run test:materials-runtime",
     "test:assay": "node --test tests/assay-scene-runtime.test.mjs tests/assay-production-contract.test.mjs",
     "test:media": "node --test tests/cinematic-media-contract.test.mjs",
     "test:hero-markup": "node --test tests/cinematic-hero-markup.test.mjs",
     "test:hero-runtime": "node --test tests/cinematic-hero-runtime.test.mjs",
     "test:browser": "node tests/cinematic-hero-browser.mjs",
-    "test:service-areas": "node --test tests/service-area-artifacts-contract.test.mjs",
+    "test:site-chrome": "node tests/site-chrome-browser.mjs",
+    "test:service-areas": "node --test tests/service-area-artifacts-contract.test.mjs tests/service-area-image-contract.test.mjs",
     "test:materials-runtime": "node --test tests/materials-disclosure-runtime.test.mjs",
-    "verify": "npm run build && npm test && npm run test:assay && npm run check && node scripts/verify.mjs"
+    "verify": "npm run build && npm test && npm run test:assay && npm run check && node scripts/verify.mjs && npm run test:site-chrome"
   },
   "devDependencies": {
     "@sparticuz/chromium": "^149.0.0",

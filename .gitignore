@@ -1,6 +1,7 @@
 dist/
 .vercel/
 node_modules/
+.worktrees/
 .DS_Store
 assets/ag-silver-hero-1600.webp
 assets/ag-silver-hero-mobile.webp

@@ -82,7 +82,7 @@ test("the deployable homepage hero presents both approved V2 actions", () => {
   assert.ok(primary, "the primary pickup CTA must be an anchor to /contact?intent=pickup");
   assert.ok(primary.classes.includes("button"), "the primary pickup CTA must use the shared button class");
   assert.ok(primary.classes.includes("button-primary"), "the primary pickup CTA must use the primary button class");
-  assert.equal(primary.text, "Schedule a free pickup");
+  assert.equal(primary.text, "Schedule a Free Pickup");
   assert.ok(fallback, "the fallback material CTA must be an anchor to /accepted-materials");
   assert.ok(fallback.classes.includes("button"), "the fallback material CTA must use the shared button class");
   assert.ok(fallback.classes.includes("button-secondary"), "the fallback material CTA must use the secondary button class");
@@ -95,7 +95,7 @@ test("the deployable homepage hero uses a permanent cinematic poster and two def
   const stacks = hero.match(/<div class="cinematic-hero-video-stack"[\s\S]*?<\/div>/g) || [];
 
   assert.equal(posters.length, 1, "the hero must contain exactly one cinematic poster");
-  assert.match(posters[0], /<img src="\/images\/ag-refining-molten-pour-poster\.webp" alt="" width="1280" height="720" fetchpriority="high">/);
+  assert.match(posters[0], /<img src="\/images\/ag-refining-molten-pour-poster\.webp" alt="" width="2560" height="1440" fetchpriority="high">/);
   assert.equal(stacks.length, 1, "the hero must contain one cinematic video stack");
   const videos = stacks[0].match(/<video class="cinematic-hero-video"[\s\S]*?<\/video>/g) || [];
   assert.equal(videos.length, 2, "the hero must contain exactly two video layers");
@@ -154,15 +154,17 @@ test("the permanent hero poster decodes at its first-paint dimensions within bud
 
   assert.ok(existsSync(path), `${name} is missing`);
   const metadata = await sharp(path).metadata();
-  assert.equal(metadata.width, 1280, `${name} width`);
-  assert.equal(metadata.height, 720, `${name} height`);
-  assert.ok(statSync(path).size <= 96 * 1024, `${name} exceeds the first-paint budget`);
+  assert.equal(metadata.width, 2560, `${name} width`);
+  assert.equal(metadata.height, 1440, `${name} height`);
+  assert.ok(statSync(path).size <= 300 * 1024, `${name} exceeds the 300 KiB first-paint budget`);
 });
 
 test("build output keeps authoring state private and retains the 39-document route contract", () => {
   const files = walk(dist);
   const html = files.filter((path) => path.endsWith(".html"));
   assert.equal(html.length, 39);
+  assert.ok(existsSync(join(root, "assets", "material-masters")), "committed source masters must remain available to authors");
+  assert.equal(existsSync(join(dist, "assets", "material-masters")), false, "source masters must not be published");
 
   const deployableText = files
     .filter((path) => /\.(?:html|css|js)$/.test(path))

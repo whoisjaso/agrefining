@@ -6,18 +6,18 @@ import { fileURLToPath } from "node:url";
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const source = "https://agrefining.vercel.app/assets";
 const manifest = {
-  "ag-silver-hero-1600.webp": "f0dd368191d0aa662e5edd61948d5b59a1a1da59ad08cc7b325c65ce924f0b37",
-  "ag-silver-hero-mobile.webp": "07e416764613a6f5cd7bf9e06eee0d695955e7cb81c7411128ebf286ffbdec87",
-  "material-dental-1280.webp": "14a7893a0ecb9d6069f30f269d62da734c29a184768a7e4113dac4139a8ae585",
-  "material-dental-mobile.webp": "43e7e53576128b11cba48401163eeb79575befb9766c91e22c4584b2bf1721af",
-  "material-scrap-silver-1280.webp": "f87b60c18bd88aeafa0da8b047955796bb4a57c62d10205f39d04740e4224829",
-  "material-scrap-silver-mobile.webp": "b0aa0c022dab674f56fb5ac5ed7aeb2b9a9d7d44f245f448cc221c8dd373e267",
-  "material-watch-batteries-1280.webp": "b8c741dedce0714901b7956e3f01a111cae74d1ccf63cbce1feca6de78cf683f",
-  "material-watch-batteries-mobile.webp": "fdcb2032da4c3cee774443d16770ebac5071d4fba7504d7067cbfbeeede01f2c",
-  "material-xray-film-1280.webp": "5135a911178ed0788cedb8290deb4e53bf11fc6fd971d5c76e6ac726b72cfc53",
-  "material-xray-film-mobile.webp": "daf62e7ea35aff27b83a87173e278de4475e5228bd3901ab825433478dbbb4d3",
+  "ag-silver-hero-1600.webp": "5de10c956fa5d3e26e9f24bf649e0d436dc7468f3f00113f64428bf86d8714b1",
+  "ag-silver-hero-mobile.webp": "7d36b772dfed15ce32afaa57dfefe20591b84c2ed561185a331fc497cf0c17db",
+  "material-dental-1280.webp": "81407c57c181c2e305af01daca6e386c2436e9cbbd8ee376a0efdaf869b2eef2",
+  "material-dental-800.webp": "9db27e34c7e9eabcd65a31f9816ff6b92bd831ad629644c3e9a19e94ada859f8",
+  "material-scrap-silver-1280.webp": "a6a544efee973c87602dac4ce21a40d1f8f7a7d11f27bab9a7fd44701a940530",
+  "material-scrap-silver-800.webp": "c670dd54dc58494c42e72a1eea0b3fdc4095261611cfa09c5eb311695f798c44",
+  "material-watch-batteries-1280.webp": "12e2f40749861d7324e960b9af9ed3feabf0f190f0d6a39b949d4b6ad3592724",
+  "material-watch-batteries-800.webp": "cc78aefdd6b1f6c6fa3139f4ecf5b3b79ab8fd82648b7c2e01f0f47950dad97d",
+  "material-xray-film-1280.webp": "cdefb82a03790190dc886bdfe3c725c314dc074a6235073771fbcd0aab813ae9",
+  "material-xray-film-800.webp": "3208ec921a46f4515eb44487a1e564a40ad31e942ef1a3bba31ef88b68c18c17",
   "fonts/newsreader-latin-opsz.woff2": "6e4f2958c3a7c4a80acde4e5a679abe7e01bc1e30b92be3c7a8b696ef401d101",
-  "fonts/manrope-latin-wght.woff2": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972"
+  "fonts/manrope-latin-wght.woff2": "6e4f2958c3a7c4a80acde4e5a679abe7e01bc1e30b92be3c7a8b696ef401d101"
 };
 
 function hash(bytes) {

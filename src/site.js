@@ -2,6 +2,7 @@ const siteHeader = document.querySelector("[data-site-header]");
 const toggle = document.querySelector("[data-nav-toggle]");
 const nav = document.querySelector("[data-nav]");
 const navScrim = document.querySelector("[data-nav-scrim]");
+const toggleLabel = toggle?.querySelector("[data-nav-toggle-label]");
 const navBackground = Array.from(document.querySelectorAll("main, .material-guide, .mobile-actions, .footer"));
 const navMedia = window.matchMedia("(min-width: 901px)");
 const materialsResetEvent = "materials-disclosure-reset";
@@ -61,6 +62,9 @@ function syncNavState({ open = false, restoreFocus = false, resetMaterials = tru
   toggle.setAttribute("aria-label", menuOpen
     ? (spanish ? "Cerrar navegación" : "Close navigation")
     : (spanish ? "Abrir navegación" : "Open navigation"));
+  if (toggleLabel) toggleLabel.textContent = menuOpen
+    ? (spanish ? "Cerrar" : "Close")
+    : (spanish ? "Menú" : "Menu");
   nav.inert = !interactive;
   if (interactive) {
     nav.removeAttribute("inert");
@@ -87,16 +91,29 @@ function initializeNav() {
   if (!siteHeader || !toggle || !nav || !navScrim) return;
 
   toggle.addEventListener("click", () => {
-    if (document.body.classList.contains("nav-open")) syncNavState({ open: false, restoreFocus: true });
-    else openNav();
+    if (document.body.classList.contains("nav-open")) {
+      syncNavState({ open: false, restoreFocus: true });
+      updateChrome();
+    }
+    else {
+      openNav();
+      updateChrome();
+    }
   });
-  nav.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => syncNavState({ open: false })));
-  navScrim.addEventListener("click", () => syncNavState({ open: false, restoreFocus: true }));
+  nav.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => {
+    syncNavState({ open: false });
+    updateChrome();
+  }));
+  navScrim.addEventListener("click", () => {
+    syncNavState({ open: false, restoreFocus: true });
+    updateChrome();
+  });
   document.addEventListener("keydown", (event) => {
     if (!document.body.classList.contains("nav-open")) return;
     if (event.key === "Escape") {
       event.preventDefault();
       syncNavState({ open: false, restoreFocus: true });
+      updateChrome();
       return;
     }
     if (event.key !== "Tab") return;
@@ -114,6 +131,7 @@ function initializeNav() {
   navMedia.addEventListener?.("change", () => {
     syncNavState({ open: false, resetMaterials: false });
     resetMaterialsDisclosure();
+    updateChrome();
   });
 
   navEnhanced = true;
@@ -126,6 +144,7 @@ function initializeNav() {
 initializeNav();
 
 const actionDock = document.querySelector(".mobile-actions");
+const footer = document.querySelector(".footer");
 let chromeTicking = false;
 
 function updateChrome() {
@@ -133,8 +152,15 @@ function updateChrome() {
   const offset = window.scrollY;
   siteHeader?.setAttribute("data-stuck", offset > 12 ? "true" : "false");
   if (!actionDock) return;
-  const atFoot = window.innerHeight + offset >= document.body.scrollHeight - 140;
-  actionDock.setAttribute("data-visible", offset > 320 && !atFoot ? "true" : "false");
+  const footerTop = footer ? footer.getBoundingClientRect().top : Number.POSITIVE_INFINITY;
+  const viewportHeight = window.visualViewport?.height || window.innerHeight;
+  const navOpen = document.body.classList.contains("nav-open");
+  const visible = !navMedia.matches && offset > 320 && !navOpen && footerTop > viewportHeight + 24;
+  actionDock.setAttribute("data-visible", visible ? "true" : "false");
+  actionDock.setAttribute("aria-hidden", visible ? "false" : "true");
+  actionDock.inert = !visible;
+  if (visible) actionDock.removeAttribute("inert");
+  else actionDock.setAttribute("inert", "");
 }
 
 window.addEventListener("scroll", () => {
@@ -143,6 +169,8 @@ window.addEventListener("scroll", () => {
   window.requestAnimationFrame(updateChrome);
 }, { passive: true });
 window.addEventListener("resize", updateChrome, { passive: true });
+window.visualViewport?.addEventListener("resize", updateChrome, { passive: true });
+window.visualViewport?.addEventListener("scroll", updateChrome, { passive: true });
 updateChrome();
 
 const materialGuide = document.querySelector(".material-guide");

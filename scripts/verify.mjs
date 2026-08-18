@@ -76,7 +76,8 @@ for (const path of htmlFiles) {
   if (h1s.length !== 1) failures.push(`${displayPath}: expected one h1`);
   if (/\b(?:undefined|NaN)\b/.test(source)) failures.push(`${displayPath}: contains unresolved output`);
   if (!source.includes('data-design="silver-atelier"')) failures.push(`${displayPath}: missing Silver Atelier document marker`);
-  if (!source.includes('<meta name="theme-color" content="#f1ede4">')) failures.push(`${displayPath}: missing light browser chrome`);
+  const expectedThemeColor = displayPath === "index.html" ? "#102a43" : "#f1ede4";
+  if (!source.includes(`<meta name="theme-color" content="${expectedThemeColor}">`)) failures.push(`${displayPath}: missing expected browser chrome ${expectedThemeColor}`);
   if ((source.match(/class="site-header"/g) || []).length !== 1) failures.push(`${displayPath}: expected one shared header`);
   if ((source.match(/class="footer"/g) || []).length !== 1) failures.push(`${displayPath}: expected one shared footer`);
 
@@ -110,7 +111,7 @@ else {
   if (posters.length !== 1) failures.push("Homepage hero must contain exactly one permanent cinematic poster");
   else {
     const [poster] = posters;
-    if (!poster.includes('src="/images/ag-refining-molten-pour-poster.webp"') || !poster.includes('width="1280" height="720"')) {
+    if (!poster.includes('src="/images/ag-refining-molten-pour-poster.webp"') || !poster.includes('width="2560" height="1440"')) {
       failures.push("Homepage hero must use the eager, dimensioned molten-pour poster");
     }
     if (!poster.includes('fetchpriority="high"') || poster.includes('loading="lazy"')) {
@@ -136,6 +137,7 @@ else {
   }
   if ((hero.match(/class="cinematic-hero-overlay"/g) || []).length !== 1) failures.push("Homepage hero must contain one stable cinematic overlay");
   if (/\/assets\/ag-refining-hero-v2-[^"']+\.webp/.test(hero)) failures.push("Homepage hero still references retired V2 artwork");
+  if (/class="hero-kicker"/.test(hero)) failures.push("Homepage hero must not restore the retired kicker line");
   const heroAnchors = anchorsIn(hero);
   const primaryAction = heroAnchors.find((anchor) => anchor.href === "/contact?intent=pickup");
   const fallbackAction = heroAnchors.find((anchor) => anchor.href === "/accepted-materials");
@@ -144,7 +146,7 @@ else {
     if (!primaryAction.classes.includes("button") || !primaryAction.classes.includes("button-primary")) {
       failures.push("Homepage hero pickup anchor must use button button-primary classes");
     }
-    if (primaryAction.text !== "Schedule a free pickup") failures.push("Homepage hero pickup anchor must use the exact V2 label");
+    if (primaryAction.text !== "Schedule a Free Pickup") failures.push("Homepage hero pickup anchor must use the exact V2 label");
   }
   if (!fallbackAction) failures.push("Homepage hero must provide a fallback material anchor to /accepted-materials");
   else {
@@ -341,7 +343,12 @@ const serviceAreaRoutes = [
 const cityArtifactRoutes = [...serviceAreas.matchAll(/<a class="[^"]*\bcity-artifact\b[^"]*" href="([^"]+)"/g)].map((match) => match[1]);
 if (JSON.stringify(cityArtifactRoutes) !== JSON.stringify(serviceAreaRoutes)) failures.push("Service areas must keep the seven routed city artifacts in order");
 const serviceCoverageLedger = serviceAreas.match(/<ul\b[^>]*data-service-coverage(?:="")?[^>]*>[\s\S]*?<\/ul>/)?.[0] || "";
-if ((serviceCoverageLedger.match(/<li\b/g) || []).length !== 23 || !serviceCoverageLedger.includes("<li>Stafford</li>")) {
+const serviceCoverageAnchors = [...serviceCoverageLedger.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/g)].map(([, href, text]) => ({ href, text: text.trim() }));
+if (
+  (serviceCoverageLedger.match(/<li\b/g) || []).length !== 23
+  || serviceCoverageAnchors.length !== 23
+  || !serviceCoverageAnchors.some(({ href, text }) => href === "/silver-buyer-sugar-land" && text === "Stafford")
+) {
   failures.push("Service areas must keep the marked 23-city coverage ledger");
 }
 const emittedServiceEmblems = [...serviceAreas.matchAll(/<svg\b([^>]*)>[\s\S]*?<use\b[^>]*href="\/assets\/service-area-emblems\.svg#[^"]+"[^>]*>[\s\S]*?<\/svg>/g)];

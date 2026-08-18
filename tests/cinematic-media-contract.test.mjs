@@ -13,9 +13,9 @@ const clips = [
   ["ag-refining-precision-assay", 6, 10]
 ];
 const posters = [
-  "ag-refining-molten-pour-poster.webp",
-  "ag-refining-silver-ingots-poster.webp",
-  "ag-refining-precision-assay-poster.webp"
+  { name: "ag-refining-molten-pour-poster.webp", width: 2560, height: 1440, minBytes: 80 * 1024, maxBytes: 600 * 1024 },
+  { name: "ag-refining-silver-ingots-poster.webp", width: 1280, height: 720, minBytes: 10 * 1024, maxBytes: 96 * 1024 },
+  { name: "ag-refining-precision-assay-poster.webp", width: 1280, height: 720, minBytes: 10 * 1024, maxBytes: 96 * 1024 }
 ];
 
 function mediaProbe(path) {
@@ -69,15 +69,15 @@ test("cinematic source videos meet the production media contract", () => {
 
 test("cinematic posters meet the production media contract", async () => {
   for (const poster of posters) {
-    const path = join(root, "images", poster);
+    const path = join(root, "images", poster.name);
     assert.ok(existsSync(path), `Missing source media: ${path}`);
-    assert.ok(statSync(path).size > 10 * 1024, `${path} must be greater than 10 KiB`);
-    assert.ok(statSync(path).size < 96 * 1024, `${path} must be smaller than 96 KiB`);
+    assert.ok(statSync(path).size > poster.minBytes, `${path} must be greater than ${Math.round(poster.minBytes / 1024)} KiB`);
+    assert.ok(statSync(path).size < poster.maxBytes, `${path} must be smaller than ${Math.round(poster.maxBytes / 1024)} KiB`);
 
     const metadata = await sharp(path).metadata();
     assert.equal(metadata.format, "webp", `${path} must be WebP`);
-    assert.equal(metadata.width, 1280, `${path} must be 1280 pixels wide`);
-    assert.equal(metadata.height, 720, `${path} must be 720 pixels high`);
+    assert.equal(metadata.width, poster.width, `${path} must be ${poster.width} pixels wide`);
+    assert.equal(metadata.height, poster.height, `${path} must be ${poster.height} pixels high`);
   }
 });
 
@@ -89,7 +89,7 @@ test("a static build publishes every cinematic media file at its public path", (
     }
   }
   for (const poster of posters) {
-    const path = join(root, "dist", "images", poster);
+    const path = join(root, "dist", "images", poster.name);
     assert.ok(existsSync(path), `Missing built media: ${path}`);
   }
 });

@@ -9,7 +9,7 @@ const dist = join(root, "dist");
 
 const taxonomy = [
   ["Featured", [["Silver oxide watch batteries", "/silver-oxide-watch-battery-recycling-houston"]]],
-  ["Silver forms", [
+  ["Silver Forms", [
     ["Scrap silver", "/scrap-silver-buyer-houston"],
     ["Scrap silver jewelry", "/scrap-silver-jewelry"],
     ["Silver coins", "/sell-silver-coins-houston"],
@@ -17,19 +17,19 @@ const taxonomy = [
     ["Sterling and flatware", "/silver-flatware-buyer-houston"],
     ["Silver-plated materials", "/silver-plated-materials-buyer-houston"]
   ]],
-  ["Industrial and laboratory", [
+  ["Industrial and Laboratory", [
     ["Industrial silver", "/industrial-silver-scrap"],
     ["Electronics silver recovery", "/electronics-silver-recovery"],
     ["Silver flake", "/silver-flake-buyer-houston"],
     ["Silver solder", "/silver-solder-buyer-houston"],
     ["Laboratory silver", "/laboratory-silver-buyer-houston"]
   ]],
-  ["Imaging and healthcare", [
+  ["Imaging and Healthcare", [
     ["Industrial NDT film", "/industrial-x-ray-silver-recycling"],
     ["Medical X-ray film", "/medical-x-ray-recycling"],
     ["Dental scrap", "/dental-scrap-buyer-houston"]
   ]],
-  ["Guides and trade", [
+  ["Guides and Trade", [
     ["X-ray recycling services", "/x-ray-recycling-services-houston"],
     ["Jewelry-store silver recycling", "/jewelry-store-silver-recycling-houston"]
   ]]
@@ -168,15 +168,15 @@ test("the sitemap contains every public route once", () => {
 });
 
 test("homepage material labels use the approved purchase taxonomy", () => {
-  assert.match(home, />Sterling and flatware<\/h3>/);
-  assert.match(home, />Industrial NDT film<\/h3>/);
+  assert.match(home, />Sterling and Flatware<\/h3>/);
+  assert.match(home, />Industrial NDT Film<\/h3>/);
   assert.doesNotMatch(home, />Sterling and hollowware<\/h3>/);
 });
 
 test("the industrial film page explains NDT consistently and expands the term once", () => {
   assert.match(industrial, /<title>Industrial NDT Film Silver Recycling in Houston \| AG Refining<\/title>/);
   assert.match(industrial, /<meta name="description" content="[^"]*industrial NDT film[^"]*">/);
-  assert.match(industrial, /<p class="eyebrow">Industrial NDT film<\/p>/);
+  assert.match(industrial, /<p class="eyebrow">Industrial NDT Film<\/p>/);
   assert.match(industrial, /<h1>Recover silver from industrial NDT film\.<\/h1>/);
   assert.match(industrial, /AG Refining works with Houston companies that have qualifying industrial NDT film/);
   assert.ok((customerFacingText(industrial).match(/Industrial NDT film/gi) || []).length >= 5);
@@ -188,8 +188,8 @@ test("all customer-facing output removes industrial X-ray wording while preservi
   assert.doesNotMatch(output, /industrial x[ -]?ray/i);
   assert.ok(htmlDocuments.some((html) => html.includes('href="/industrial-x-ray-silver-recycling"')));
 
-  assert.match(customerFacingText(home), /Industrial NDT film/);
-  assert.match(customerFacingText(readFileSync(join(dist, "espanol", "index.html"), "utf8")), /Película industrial NDT/);
+  assert.match(customerFacingText(home), /Industrial NDT Film/);
+  assert.match(customerFacingText(readFileSync(join(dist, "espanol", "index.html"), "utf8")), /Película Industrial NDT/);
   assert.match(customerFacingText(readFileSync(join(dist, "oil-gas-silver-recovery", "index.html"), "utf8")), /industrial NDT film/i);
   assert.match(customerFacingText(readFileSync(join(dist, "houston-silver-buyer", "index.html"), "utf8")), /Medical and NDT film/i);
   assert.match(customerFacingText(xrayHub), /Industrial NDT Film Silver Recycling/);
@@ -197,7 +197,7 @@ test("all customer-facing output removes industrial X-ray wording while preservi
 
 test("medical and general X-ray terminology remains accurate", () => {
   assert.match(medical, /<title>Medical X-Ray Film Recycling in Houston \| AG Refining<\/title>/);
-  assert.match(medical, /<p class="eyebrow">Medical X-ray film<\/p>/);
+  assert.match(medical, /<p class="eyebrow">Medical X-Ray Film<\/p>/);
   assert.match(customerFacingText(medical), /silver-bearing X-ray film/);
   assert.match(xrayHub, /<title>X-Ray Recycling Services Houston \| X-Ray Film Recycling \| AG Refining<\/title>/);
   assert.match(xrayHub, /<h1>Secure X-ray film recycling in Houston\.<\/h1>/);

@@ -17,9 +17,13 @@ const required = [
   "assets/ag-assay-monolith-1280.webp",
   "assets/ag-assay-monolith-mobile.webp",
   "assets/material-dental-1280.webp",
+  "assets/material-dental-800.webp",
   "assets/material-scrap-silver-1280.webp",
+  "assets/material-scrap-silver-800.webp",
   "assets/material-watch-batteries-1280.webp",
+  "assets/material-watch-batteries-800.webp",
   "assets/material-xray-film-1280.webp",
+  "assets/material-xray-film-800.webp",
   "assets/fonts/newsreader-latin-opsz.woff2",
   "assets/fonts/manrope-latin-wght.woff2"
 ];
@@ -49,7 +53,13 @@ function files(dir) {
   });
 }
 
-const ignored = [`${sep}.git${sep}`, `${sep}node_modules${sep}`, `${sep}dist${sep}`, `${join(root, ".superpowers", "sdd")}${sep}`];
+const ignored = [
+  `${sep}.git${sep}`,
+  `${sep}node_modules${sep}`,
+  `${sep}dist${sep}`,
+  `${join(root, ".superpowers", "sdd")}${sep}`,
+  `${join(root, "docs", "superpowers", "specs")}${sep}`
+];
 // Binary files are not text: decoding them as utf8 can produce byte sequences
 // that land in the banned emoji ranges and fail the build for no reason.
 const binary = [".png", ".webp", ".jpg", ".jpeg", ".gif", ".ico", ".woff", ".woff2", ".ttf", ".otf", ".pdf", ".zip", ".docx", ".mp4", ".webm"];

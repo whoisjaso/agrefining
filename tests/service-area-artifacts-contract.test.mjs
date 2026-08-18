@@ -18,20 +18,40 @@ const featuredCities = [
   ["Conroe", "/silver-buyer-conroe", "city-conroe"]
 ];
 
-const coverageCities = [
-  "Houston", "Pearland", "Pasadena", "Sugar Land", "Katy", "Cypress", "Spring", "The Woodlands",
-  "Conroe", "Humble", "Baytown", "League City", "Friendswood", "Missouri City", "Richmond", "Rosenberg",
-  "Tomball", "Bellaire", "Deer Park", "La Porte", "Texas City", "Galveston", "Stafford"
+const coverageLinks = [
+  ["Houston", "/houston-silver-buyer"],
+  ["Pearland", "/silver-buyer-pearland"],
+  ["Pasadena", "/silver-buyer-pasadena"],
+  ["Sugar Land", "/silver-buyer-sugar-land"],
+  ["Katy", "/silver-buyer-katy"],
+  ["Cypress", "/silver-buyer-katy"],
+  ["Spring", "/silver-buyer-the-woodlands"],
+  ["The Woodlands", "/silver-buyer-the-woodlands"],
+  ["Conroe", "/silver-buyer-conroe"],
+  ["Humble", "/houston-silver-buyer"],
+  ["Baytown", "/silver-buyer-pasadena"],
+  ["League City", "/silver-buyer-pearland"],
+  ["Friendswood", "/silver-buyer-pearland"],
+  ["Missouri City", "/silver-buyer-sugar-land"],
+  ["Richmond", "/silver-buyer-sugar-land"],
+  ["Rosenberg", "/silver-buyer-sugar-land"],
+  ["Tomball", "/silver-buyer-the-woodlands"],
+  ["Bellaire", "/houston-silver-buyer"],
+  ["Deer Park", "/silver-buyer-pasadena"],
+  ["La Porte", "/silver-buyer-pasadena"],
+  ["Texas City", "/silver-buyer-pearland"],
+  ["Galveston", "/silver-buyer-pearland"],
+  ["Stafford", "/silver-buyer-sugar-land"]
 ];
 
 const operationalImages = {
-  "houston-silver-buyer": "ag-silver-pour-1280.webp",
-  "silver-buyer-pearland": "material-sterling-hollowware-1280.webp",
-  "silver-buyer-pasadena": "material-industrial-silver-1280.webp",
-  "silver-buyer-sugar-land": "material-silver-jewelry-1280.webp",
-  "silver-buyer-katy": "material-silver-coins-1280.webp",
-  "silver-buyer-the-woodlands": "material-silver-bars-1280.webp",
-  "silver-buyer-conroe": "material-industrial-xray-1280.webp"
+  "houston-silver-buyer": "service-area-houston-1280.webp",
+  "silver-buyer-pearland": "service-area-pearland-1280.webp",
+  "silver-buyer-pasadena": "service-area-pasadena-1280.webp",
+  "silver-buyer-sugar-land": "service-area-sugar-land-1280.webp",
+  "silver-buyer-katy": "service-area-katy-1280.webp",
+  "silver-buyer-the-woodlands": "service-area-the-woodlands-1280.webp",
+  "silver-buyer-conroe": "service-area-conroe-1280.webp"
 };
 
 function htmlFor(route) {
@@ -105,10 +125,14 @@ test("the marked coverage ledger contains the exact 23-city service list and qua
   const html = htmlFor("service-areas");
   const section = html.match(/<section\b[^>]*class="[^"]*service-coverage[^"]*"[^>]*>[\s\S]*?<\/section>/)?.[0] || "";
   assert.ok(section, "service areas must render the coverage section");
-  assert.match(section, /<h2[^>]*>Houston Metro coverage<\/h2>/);
+  assert.match(section, /<h2[^>]*>Houston Metro Coverage<\/h2>/);
   const ledger = section.match(/<ul\b[^>]*data-service-coverage(?:="")?[^>]*>[\s\S]*?<\/ul>/)?.[0] || "";
-  const values = [...ledger.matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/g)].map((match) => textContent(match[1]));
-  assert.deepEqual(values, coverageCities);
+  const values = [...ledger.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)].map(([, attributes, contents]) => ({
+    href: attribute(attributes, "href"),
+    text: textContent(contents)
+  }));
+  assert.deepEqual(values, coverageLinks.map(([text, href]) => ({ text, href })));
+  assert.equal(new Set(values.map(({ text }) => text)).size, 23, "coverage ledger must expose 23 distinct city anchors");
 
   const copy = textContent(section);
   assert.match(copy, /qualifying (?:commercial )?accounts/i);

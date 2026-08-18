@@ -20,7 +20,73 @@ const htmlDocuments = walk(dist)
   .map((path) => [relative(dist, path), readFileSync(path, "utf8")]);
 const contact = readFileSync(join(dist, "contact", "index.html"), "utf8");
 const spanish = readFileSync(join(dist, "espanol", "index.html"), "utf8");
+const home = readFileSync(join(dist, "index.html"), "utf8");
 const css = readFileSync(join(dist, "style.css"), "utf8");
+
+function textContent(html) {
+  return html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function contentsOf(html, pattern) {
+  return [...html.matchAll(pattern)].map((match) => textContent(match[1]));
+}
+
+function titleCaseLocale(html) {
+  return /<html lang="es">/.test(html) ? "es" : "en";
+}
+
+function titleCaseWords(locale) {
+  return locale === "es"
+    ? new Set(["a", "al", "ante", "bajo", "cabe", "con", "contra", "de", "del", "desde", "durante", "e", "el", "en", "entre", "hacia", "hasta", "la", "las", "lo", "los", "o", "para", "por", "según", "sin", "so", "sobre", "tras", "u", "un", "una", "unas", "unos", "y"])
+    : new Set(["a", "an", "and", "as", "at", "but", "by", "for", "from", "in", "nor", "of", "on", "or", "per", "so", "the", "to", "vs", "via", "with", "yet"]);
+}
+
+function capitalizeToken(token, locale) {
+  const lower = token.toLocaleLowerCase(locale);
+  const letterIndex = lower.search(/\p{L}/u);
+  if (letterIndex === -1) return token;
+  return `${lower.slice(0, letterIndex)}${lower[letterIndex].toLocaleUpperCase(locale)}${lower.slice(letterIndex + 1)}`;
+}
+
+function titleCaseText(value, locale) {
+  const minorWords = titleCaseWords(locale);
+  const words = value.split(/\s+/).filter(Boolean);
+
+  return words.map((word, index) => {
+    const parts = word.split("-");
+    const casedParts = parts.map((part, partIndex) => {
+      if (!part) return part;
+      if (/^[A-Z0-9]{2,}$/u.test(part)) return part;
+
+      const stripped = part.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}.?!]+$/gu, "");
+      const lower = stripped.toLocaleLowerCase(locale);
+      const globalIndex = index === 0 && partIndex === 0
+        ? 0
+        : index === words.length - 1 && partIndex === parts.length - 1
+          ? words.length - 1
+          : index;
+      const shouldLower = parts.length === 1 && globalIndex !== 0 && globalIndex !== words.length - 1 && minorWords.has(lower);
+      const cased = shouldLower ? part.toLocaleLowerCase(locale) : capitalizeToken(part, locale);
+      return cased;
+    });
+
+    return casedParts.join("-");
+  }).join(" ");
+}
+
+function titleCaseTargets(html) {
+  return [
+    ...contentsOf(html, /<p class="(?:eyebrow|answer-index|hero-kicker|hero-review-label|legacy-caption)">([\s\S]*?)<\/p>/g),
+    ...contentsOf(html, /<h2\b[^>]*>([\s\S]*?)<\/h2>/g),
+    ...contentsOf(html, /<h3\b[^>]*>([\s\S]*?)<\/h3>/g),
+    ...contentsOf(html, /<details class="material-guide">[\s\S]*?<summary>[\s\S]*?<span>([\s\S]*?)<\/span><\/summary>/g),
+    ...contentsOf(html, /<a\b[^>]*>\s*<span(?:\s[^>]*)?>([\s\S]*?)<\/span>\s*<h[23]\b/g)
+  ];
+}
 
 function skipCssComment(source, start) {
   const end = source.indexOf("*/", start + 2);
@@ -186,13 +252,53 @@ test("the generated contract covers every published HTML document", () => {
   assert.equal(htmlDocuments.length, 39);
 });
 
-test("mobile fixed chrome is removed while the desktop material guide remains available", () => {
+test("every generated route authors eyebrow, small-label, H2, and H3 copy in Title Case", () => {
+  const mismatches = [];
+
+  for (const [name, html] of htmlDocuments) {
+    const locale = titleCaseLocale(html);
+    for (const text of titleCaseTargets(html)) {
+      const expected = titleCaseText(text, locale);
+      if (text !== expected) mismatches.push(`${name}: "${text}" -> "${expected}"`);
+    }
+  }
+
+  assert.deepEqual(mismatches, []);
+});
+
+test("interior routes keep the approved Title Case exemplars outside the homepage", () => {
+  const acceptedMaterials = readFileSync(join(dist, "accepted-materials", "index.html"), "utf8");
+  assert.match(acceptedMaterials, />Silver-Plated Materials<\/p>/);
+  assert.match(acceptedMaterials, />Sell Silver-Plated Materials in Houston\.<\/h2>/);
+  assert.match(acceptedMaterials, />Tell Us What You Have\.<\/h2>/);
+  assert.match(acceptedMaterials, />Start with the Material\.<\/h2>/);
+
+  const hospital = readFileSync(join(dist, "hospital-silver-recycling", "index.html"), "utf8");
+  assert.match(hospital, />Simple Next Steps<\/p>/);
+  assert.match(hospital, />Know What Happens Next\.<\/h2>/);
+  assert.match(hospital, />Start with the Material<\/h3>/);
+  assert.match(hospital, />Scrap Silver Jewelry<\/span>/);
+
+  assert.match(spanish, />Servicio en Español<\/p>/);
+  assert.match(spanish, />Comience Hoy<\/p>/);
+  assert.match(spanish, />Solicite una Recogida\.<\/h2>/);
+});
+
+test("Title Case normalization preserves nested inline heading markup", () => {
+  const serviceAreas = readFileSync(join(dist, "service-areas", "index.html"), "utf8");
+  assert.match(
+    serviceAreas,
+    /<h2 id="featured-service-areas">Choose Your <span class="service-area-heading-emphasis">Service Area<\/span>\.<\/h2>/
+  );
+});
+
+test("the single pickup action is available only on mobile while the desktop material guide remains available", () => {
   const touchProfile = { pointer: "coarse", hover: "none", motion: "no-preference" };
   for (const width of [320, 390, 768, 900]) {
     assert.equal(
       generatedDisplayAtWidth(".mobile-actions", width, touchProfile, "block"),
-      "none",
-      `${width}px: mobile actions must not occupy or cover the reading workspace`
+      "flex",
+      `${width}px: the mobile pickup action must be available`
     );
     assert.equal(
       generatedDisplayAtWidth(".material-guide", width, touchProfile, "block"),
@@ -202,6 +308,11 @@ test("mobile fixed chrome is removed while the desktop material guide remains av
   }
 
   const desktopProfile = { pointer: "fine", hover: "hover", motion: "no-preference" };
+  assert.equal(
+    generatedDisplayAtWidth(".mobile-actions", 901, desktopProfile, "block"),
+    "none",
+    "the pickup dock must disappear above the mobile breakpoint"
+  );
   assert.equal(
     generatedDisplayAtWidth(".material-guide", 1440, desktopProfile, "block"),
     "block",
