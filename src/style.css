@@ -833,6 +833,10 @@ html[data-loader-state="ready"] .home-loader {
   display: grid;
 }
 
+.materials-disclosure[data-materials-enhanced="true"] .materials-panel:not([hidden]) {
+  display: grid;
+}
+
 .materials-panel section {
   min-width: 0;
   padding-inline: clamp(0.8rem, 1.5vw, 1.4rem);

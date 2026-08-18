@@ -725,6 +725,18 @@ async function runInteractions(browser, baseUrl, viewport) {
       rootHovered: document.querySelector("[data-materials-disclosure]")?.matches(":hover")
     }));
     assert.equal(await page.locator("[data-materials-panel]").isVisible(), true, `${viewport.name}: fine-pointer hover did not open materials panel: ${JSON.stringify({ ...materials.hoverEnvironment, ...hoverState })}`);
+    const pointerPath = await page.evaluate(() => {
+      const trigger = document.querySelector(".materials-link").getBoundingClientRect();
+      const panel = document.querySelector("[data-materials-panel]").getBoundingClientRect();
+      return {
+        start: { x: trigger.left + (trigger.width / 2), y: trigger.bottom - 2 },
+        end: { x: panel.left + Math.min(panel.width / 2, 320), y: panel.top + 30 }
+      };
+    });
+    await page.mouse.move(pointerPath.start.x, pointerPath.start.y);
+    await page.mouse.move(pointerPath.end.x, pointerPath.end.y, { steps: 12 });
+    await page.waitForTimeout(240);
+    assert.equal(await page.locator("[data-materials-panel]").isVisible(), true, `${viewport.name}: materials panel collapsed while crossing from the tab into its options`);
     const panelHeader = await page.evaluate(() => {
       const header = document.querySelector("[data-site-header]").getBoundingClientRect();
       const panel = document.querySelector("[data-materials-panel]").getBoundingClientRect();
