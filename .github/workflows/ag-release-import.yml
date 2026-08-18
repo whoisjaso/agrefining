@@ -40,7 +40,7 @@ jobs:
       - name: Replace Repository With Tested Tree
         run: |
           set -euo pipefail
-          git rm --recursive .
+          git rm -r .
           unzip -q "$RUNNER_TEMP/ag-release-masters.zip" -d .
           unzip -q "$RUNNER_TEMP/ag-release-qa.zip" -d .
           unzip -q "$RUNNER_TEMP/ag-release-site.zip" -d .
