@@ -44,7 +44,7 @@ jobs:
           unzip -q "$RUNNER_TEMP/ag-release-masters.zip" -d .
           unzip -q "$RUNNER_TEMP/ag-release-qa.zip" -d .
           unzip -q "$RUNNER_TEMP/ag-release-site.zip" -d .
-          git add --all
+          git add --all --force
           git diff --cached --check
           test "$(git write-tree)" = "64bb3455f5c653dd475be211747e030fac960a26"
 
