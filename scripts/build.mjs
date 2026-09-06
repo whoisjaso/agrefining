@@ -29,7 +29,18 @@ cpSync(join(root, "node_modules", "three", "build", "three.core.min.js"), join(o
 cpSync(join(root, "node_modules", "three", "LICENSE"), join(out, "assets", "vendor", "three.LICENSE.txt"));
 cpSync(join(root, "src", "assay-scene.js"), join(out, "assay-scene.js"));
 
-const siteUrl = "https://agrefining.com";
+// Vercel serves the site on the www host and 308-redirects the apex there, so
+// every canonical, sitemap entry, and schema URL must use the www host or
+// search engines see a canonical that redirects.
+const siteUrl = "https://www.agrefining.com";
+const siteName = "AG Refining";
+const firstPublished = "2026-07-30";
+const lastUpdated = process.env.AG_CONTENT_DATE || "2026-09-06";
+const geoCoordinates = { latitude: 29.6522061, longitude: -95.2579947 };
+const indexNowKey = "c8325a3fa9a6acb1e94923fd669bb439";
+const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION || "";
+const bingSiteVerification = process.env.BING_SITE_VERIFICATION || "";
+const businessDescription = "AG Refining is a family-owned silver buyer in Houston, Texas. We purchase qualifying scrap silver, silver oxide watch batteries, X-ray film, dental scrap, silver coins, sterling, and industrial silver-bearing material from commercial, industrial, medical, educational, and business accounts across the Houston Metro Area, with free qualifying pickup and on-site weighing.";
 const phoneDisplay = "(281) 898-2719";
 const phoneHref = "+12818982719";
 const email = "dennis@agrefining.com";
@@ -1024,6 +1035,8 @@ const footerNavigationGroups = [
       [primaryCta, "/contact?intent=pickup"],
       [phoneDisplay, `tel:${phoneHref}`],
       [email, `mailto:${email}`],
+      ["FAQ", "/faq"],
+      ["Site Index", "/sitemap"],
       ["Privacy", "/privacy"]
     ]
   }
@@ -1080,6 +1093,8 @@ const spanishFooterNavigationGroups = [
       [spanishPrimaryCta, "#solicitud"],
       [phoneDisplay, `tel:${phoneHref}`],
       [email, `mailto:${email}`],
+      [`Preguntas Frecuentes ${languageNote}`, "/faq"],
+      [`Índice del Sitio ${languageNote}`, "/sitemap"],
       [`Privacidad ${languageNote}`, "/privacy"]
     ]
   }
@@ -1179,13 +1194,41 @@ function schemaTag(data) {
   return `<script type="application/ld+json">${JSON.stringify(data).replaceAll("<", "\\u003c")}</script>`;
 }
 
+function xmlEscape(text) {
+  return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function plainText(markup) {
+  return String(markup).replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+}
+
+const serviceCities = [...new Set(serviceCoverageLinks.map(([city]) => city))];
+const organizationId = `${siteUrl}/#organization`;
+const websiteId = `${siteUrl}/#website`;
+const founderId = `${siteUrl}/about#dennis-stevens`;
+
+const founderSchema = {
+  "@type": "Person",
+  "@id": founderId,
+  name: "Dennis Stevens",
+  jobTitle: "Owner",
+  worksFor: { "@id": organizationId },
+  email,
+  telephone: phoneHref,
+  workLocation: { "@type": "Place", address: { "@type": "PostalAddress", streetAddress: street, addressLocality: "Houston", addressRegion: "TX", postalCode: "77061", addressCountry: "US" } }
+};
+
 const organizationSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "@id": `${siteUrl}/#organization`,
-  name: "AG Refining",
+  "@type": ["LocalBusiness", "Organization"],
+  "@id": organizationId,
+  name: siteName,
+  alternateName: ["Ag Refining", "AG Refining Houston"],
+  legalName: "AG Refining",
+  description: businessDescription,
+  slogan: "Your silver, valued precisely.",
   url: `${siteUrl}/`,
-  logo: `${siteUrl}/assets/ag-mark-path.svg`,
+  logo: { "@type": "ImageObject", url: `${siteUrl}/assets/ag-mark-path.svg` },
+  image: [`${siteUrl}/assets/ag-silver-social.jpg`, `${siteUrl}/assets/ag-silver-hero-1600.webp`],
   telephone: phoneHref,
   email,
   address: {
@@ -1196,11 +1239,114 @@ const organizationSchema = {
     postalCode: "77061",
     addressCountry: "US"
   },
-  areaServed: {
-    "@type": "AdministrativeArea",
-    name: "Greater Houston Metro Area"
+  geo: { "@type": "GeoCoordinates", ...geoCoordinates },
+  hasMap: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${street}, ${cityLine}`)}`,
+  areaServed: [
+    { "@type": "AdministrativeArea", name: "Greater Houston Metro Area" },
+    ...serviceCities.map((name) => ({ "@type": "City", name, containedInPlace: { "@type": "State", name: "Texas" } }))
+  ],
+  founder: { "@id": founderId },
+  employee: { "@id": founderId },
+  contactPoint: [
+    { "@type": "ContactPoint", contactType: "sales", telephone: phoneHref, email, areaServed: "US", availableLanguage: ["English", "Spanish"] },
+    { "@type": "ContactPoint", contactType: "customer service", telephone: phoneHref, email, areaServed: "US", availableLanguage: ["English", "Spanish"] }
+  ],
+  knowsLanguage: ["en", "es"],
+  knowsAbout: [
+    "Scrap silver buying",
+    "Silver refining",
+    "Silver oxide watch battery recycling",
+    "X-ray film silver recovery",
+    "Industrial NDT film recycling",
+    "Dental scrap buying",
+    "Silver coin and bullion buying",
+    "Sterling silver and flatware buying",
+    "Industrial silver scrap recovery",
+    "Electronics silver recovery",
+    "Laboratory silver recovery",
+    "Commercial silver pickup in Houston"
+  ],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Silver materials AG Refining buys",
+    itemListElement: materialPages.map((page) => ({
+      "@type": "Offer",
+      itemOffered: { "@type": "Service", "@id": `${siteUrl}/${page.path}#service`, name: page.title.split(" | ")[0], url: `${siteUrl}/${page.path}` }
+    }))
   }
 };
+
+const websiteSchema = {
+  "@type": "WebSite",
+  "@id": websiteId,
+  url: `${siteUrl}/`,
+  name: siteName,
+  description: businessDescription,
+  publisher: { "@id": organizationId },
+  inLanguage: ["en", "es"]
+};
+
+function serviceSchema(page) {
+  const name = page.title.split(" | ")[0];
+  const location = Boolean(page.city);
+  return {
+    "@type": "Service",
+    "@id": `${siteUrl}/${page.path}#service`,
+    name,
+    description: page.description,
+    url: `${siteUrl}/${page.path}`,
+    serviceType: location ? `Silver buying and pickup in ${page.city}, Texas` : name,
+    category: "Precious metal recycling",
+    image: `${siteUrl}/assets/${page.image}`,
+    provider: { "@id": organizationId },
+    areaServed: location
+      ? { "@type": "City", name: page.city, containedInPlace: { "@type": "State", name: "Texas" } }
+      : { "@type": "AdministrativeArea", name: "Greater Houston Metro Area" },
+    availableChannel: {
+      "@type": "ServiceChannel",
+      serviceUrl: `${siteUrl}/contact?intent=pickup`,
+      servicePhone: { "@type": "ContactPoint", telephone: phoneHref, contactType: "sales", availableLanguage: ["English", "Spanish"] }
+    }
+  };
+}
+
+function breadcrumbSchema(content, canonical) {
+  const list = /<nav class="breadcrumbs"[^>]*><ol>([\s\S]*?)<\/ol><\/nav>/.exec(content);
+  if (!list) return null;
+  const items = [...list[1].matchAll(/<li>([\s\S]*?)<\/li>/g)].map(([, inner]) => {
+    const link = /<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/.exec(inner);
+    return link ? { name: plainText(link[2]), href: link[1] } : { name: plainText(inner), href: null };
+  });
+  if (items.length < 2) return null;
+  return {
+    "@type": "BreadcrumbList",
+    "@id": `${canonical}#breadcrumb`,
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: item.href ? `${siteUrl}${item.href === "/" ? "/" : item.href}` : canonical
+    }))
+  };
+}
+
+function webPageSchema({ canonical, title, description, lang, pageType, image, datePublished, dateModified, breadcrumb }) {
+  const size = ogSize(image);
+  return {
+    "@type": pageType,
+    "@id": `${canonical}#webpage`,
+    url: canonical,
+    name: title,
+    description,
+    isPartOf: { "@id": websiteId },
+    about: { "@id": organizationId },
+    inLanguage: lang,
+    datePublished,
+    dateModified,
+    primaryImageOfPage: { "@type": "ImageObject", url: `${siteUrl}/assets/${image}`, width: size.w, height: size.h },
+    ...(breadcrumb ? { breadcrumb: { "@id": breadcrumb["@id"] } } : {})
+  };
+}
 
 // og:image dimensions have to match the file actually referenced, or link
 // previews crop to the wrong ratio. Sizes come from the presets in
@@ -1223,11 +1369,35 @@ function document({
   image = "ag-silver-social.webp",
   robots = "index,follow,max-image-preview:large",
   materialGuide = true,
-  moduleScripts = []
+  moduleScripts = [],
+  pageType = "WebPage",
+  datePublished = firstPublished,
+  dateModified = lastUpdated
 }) {
   const locale = lang === "es" ? "es" : "en";
   const canonical = path ? `${siteUrl}/${path}` : `${siteUrl}/`;
-  const schema = [organizationSchema, ...pageSchema];
+  const indexable = !robots.includes("noindex");
+  const breadcrumb = indexable ? breadcrumbSchema(content, canonical) : null;
+  const schema = [
+    organizationSchema,
+    websiteSchema,
+    ...(indexable ? [webPageSchema({ canonical, title, description, lang: locale, pageType, image, datePublished, dateModified, breadcrumb })] : []),
+    ...(breadcrumb ? [breadcrumb] : []),
+    ...pageSchema
+  ];
+  const bilingual = path === "" || path === "espanol";
+  const alternateLinks = bilingual
+    ? `<link rel="alternate" hreflang="en" href="${siteUrl}/">
+    <link rel="alternate" hreflang="es" href="${siteUrl}/espanol">
+    <link rel="alternate" hreflang="x-default" href="${siteUrl}/">`
+    : `<link rel="alternate" hreflang="${locale}" href="${canonical}">
+    <link rel="alternate" hreflang="x-default" href="${canonical}">`;
+  const extraHead = [
+    bilingual ? `<meta property="og:locale:alternate" content="${locale === "es" ? "en_US" : "es_US"}">` : "",
+    alternateLinks,
+    googleSiteVerification ? `<meta name="google-site-verification" content="${googleSiteVerification}">` : "",
+    bingSiteVerification ? `<meta name="msvalidate.01" content="${bingSiteVerification}">` : ""
+  ].filter(Boolean).join("\n    ");
   const homepage = bodyClass.split(/\s+/).includes("home-page");
   const themeColor = homepage ? "#102a43" : "#f1ede4";
   return normalizeTitleCaseMarkup(`<!DOCTYPE html>
@@ -1251,7 +1421,18 @@ function document({
     <meta property="og:image" content="${siteUrl}/assets/${image}">
     <meta property="og:image:width" content="${ogSize(image).w}">
     <meta property="og:image:height" content="${ogSize(image).h}">
+    <meta property="og:image:alt" content="${siteName}: Houston silver buyer with free qualifying pickup and on-site weighing">
+    <meta property="og:locale" content="${locale === "es" ? "es_US" : "en_US"}">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="${title}">
+    <meta name="twitter:description" content="${description}">
+    <meta name="twitter:image" content="${siteUrl}/assets/${image}">
+    <meta name="author" content="${siteName}">
+    <meta name="geo.region" content="US-TX">
+    <meta name="geo.placename" content="Houston, Texas">
+    <meta name="geo.position" content="${geoCoordinates.latitude};${geoCoordinates.longitude}">
+    <meta name="ICBM" content="${geoCoordinates.latitude}, ${geoCoordinates.longitude}">
+    ${extraHead}
     <link rel="icon" href="/assets/ag-mark-path.svg" type="image/svg+xml">
     <link rel="preload" href="/assets/fonts/newsreader-latin-opsz.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/assets/fonts/manrope-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
@@ -1399,6 +1580,7 @@ const home = `
       <div><p class="eyebrow">Houston's Trusted Silver Buyer</p><h2>Sell Your Silver with Confidence.</h2></div>
       <div>
         <p class="answer-lede">Experience, honesty, and service matter when you sell silver.</p>
+        <p>AG Refining is a family-owned silver buyer based at ${street}, ${cityLine}. We purchase qualifying scrap silver, silver oxide watch batteries, X-ray film, dental scrap, silver coins, sterling, and industrial silver-bearing material from commercial, industrial, medical, and educational accounts across the Houston Metro Area.</p>
         <p>AG Refining makes the process simple. We help with small commercial lots and large industrial loads. You see the weight, hear the offer, and choose what happens next.</p>
         <div class="inline-actions">
           <a class="text-link" href="/how-it-works">See how it works ${arrow}</a>
@@ -1628,7 +1810,7 @@ function servicePage(page) {
     path: page.path,
     content,
     image: page.image,
-    pageSchema: [faqSchema(page.faqs)]
+    pageSchema: [faqSchema(page.faqs), serviceSchema(page)]
   }));
 }
 
@@ -1779,7 +1961,7 @@ function coinServicePage(page) {
     path: page.path,
     content,
     image: page.image,
-    pageSchema: [faqSchema(page.faqs)]
+    pageSchema: [faqSchema(page.faqs), serviceSchema(page)]
   }));
 }
 
@@ -1912,7 +2094,7 @@ function longMaterialPage(page) {
     path: page.path,
     content,
     image: page.image,
-    pageSchema: [faqSchema(page.faqs)]
+    pageSchema: [faqSchema(page.faqs), serviceSchema(page)]
   }));
 }
 
@@ -2045,7 +2227,7 @@ function xrayHubPage(page) {
     path: page.path,
     content,
     image: page.image,
-    pageSchema: [faqSchema(page.faqs)]
+    pageSchema: [faqSchema(page.faqs), serviceSchema(page)]
   }));
 }
 
@@ -2177,7 +2359,7 @@ function houstonHubPage(page) {
     path: page.path,
     content,
     image: page.image,
-    pageSchema: [faqSchema(page.faqs)]
+    pageSchema: [faqSchema(page.faqs), serviceSchema(page)]
   }));
 }
 
@@ -2229,7 +2411,7 @@ function taxonomyPage({ path, title, description, eyebrow, heading, intro, items
     <section class="conversion-band"><div class="shell"><p class="eyebrow">Not sure?</p><h2>Tell us what you have.</h2><p>We will help you find the right material page and pickup path.</p><a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></div></section>`;
   const dir = join(out, path);
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, "index.html"), document({ title, description, path, content }));
+  writeFileSync(join(dir, "index.html"), document({ title, description, path, content, pageType: "CollectionPage" }));
 }
 
 function serviceAreasPage() {
@@ -2264,7 +2446,8 @@ function serviceAreasPage() {
     title: "Houston Metro Silver Pickup Service Areas | AG Refining",
     description: "See AG Refining silver pickup service areas across Houston, Pearland, Pasadena, Sugar Land, Katy, The Woodlands, Conroe, and nearby cities.",
     path,
-    content
+    content,
+    pageType: "CollectionPage"
   }));
 }
 
@@ -2318,7 +2501,9 @@ writeFileSync(join(out, "about", "index.html"), document({
   title: "About AG Refining | Houston Family-Owned Silver Buyer",
   description: "Meet the Stevens family and learn how AG Refining brings fairness, hard work, and clear service to Houston silver buying.",
   path: "about",
-  content: about
+  content: about,
+  pageType: "AboutPage",
+  pageSchema: [founderSchema]
 }));
 
 const contact = `
@@ -2337,7 +2522,8 @@ writeFileSync(join(out, "contact", "index.html"), document({
   title: "Schedule Silver Pickup in Houston | Contact AG Refining",
   description: "Schedule a qualifying silver pickup or request a quote from AG Refining in Houston. Share your material, amount, and location.",
   path: "contact",
-  content: contact
+  content: contact,
+  pageType: "ContactPage"
 }));
 
 const spanish = `
@@ -2383,12 +2569,214 @@ writeFileSync(join(out, "privacy", "index.html"), document({
   content: privacy
 }));
 
-writeFileSync(join(out, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: ${siteUrl}/sitemap.xml\n`);
+// Answer-engine hub: every question the site answers, in one crawlable place.
+const faqGroups = [];
+const seenQuestions = new Set();
+function collectFaqs(label, intro, sources) {
+  const items = [];
+  for (const source of sources) {
+    for (const [question, answer] of source.faqs || source) {
+      const key = plainText(question).toLowerCase();
+      if (seenQuestions.has(key)) continue;
+      seenQuestions.add(key);
+      items.push([question, answer]);
+    }
+  }
+  if (items.length) faqGroups.push({ label, intro, items });
+}
+collectFaqs("General questions", "How AG Refining works with Houston accounts.", [homeFaqs, allServicePagesByPath.get("houston-silver-buyer").faqs]);
+collectFaqs("Material questions", "What qualifies, what to share, and how each material is reviewed.", materialPages);
+collectFaqs("Industry questions", "How hospitals, dental labs, manufacturers, universities, and energy companies work with us.", industryPages);
+collectFaqs("Service area questions", "Pickup coverage across the Houston Metro Area.", locationPages.filter((page) => page.path !== "houston-silver-buyer"));
+const allFaqItems = faqGroups.flatMap((group) => group.items);
 
-const staticPaths = ["", "accepted-materials", "industries", "service-areas", "how-it-works", "about", "contact", "espanol", "privacy"];
+const quickFacts = [
+  ["What AG Refining is", businessDescription],
+  ["Where AG Refining is located", `${street}, ${cityLine}. Call first before shipping or visiting so we can confirm the material, pickup option, and next step.`],
+  ["How to reach AG Refining", `Phone ${phoneDisplay} or email ${email}. Service is available in English and Spanish.`],
+  ["Who runs AG Refining", "AG Refining is run by the Stevens family. Owner Dennis Stevens returned to silver refining after years of family experience in the trade."],
+  ["Where AG Refining picks up", `Free pickup may be available for qualifying commercial accounts in ${serviceCities.slice(0, -1).join(", ")}, and ${serviceCities.at(-1)}.`],
+  ["How pricing works", "Offers depend on the confirmed material, recoverable silver, weight, condition, and current silver market values. Payment timing is confirmed with the offer."]
+];
+
+const faqContent = `
+  <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["FAQ", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Frequently asked questions</p><h1>Answers about selling silver in Houston.</h1></div><p>Every question AG Refining answers across the site, gathered in one place. If your question is not here, call ${phoneDisplay}.</p></div></div></section>
+  <section class="section detail-section"><div class="shell detail-grid">
+    <aside class="detail-rail"><p class="eyebrow">Quick facts</p><h2>AG Refining at a glance.</h2><a class="text-link" href="/about">Meet the family ${arrow}</a></aside>
+    <div class="detail-copy">${quickFacts.map(([heading, text]) => `<article><h3>${heading}</h3><p>${text}</p></article>`).join("")}</div>
+  </div></section>
+  ${faqGroups.map((group) => `<section class="section faq-section"><div class="shell faq-grid"><div><p class="eyebrow">${group.label}</p><h2>${group.intro}</h2></div>${faqMarkup(group.items)}</div></section>`).join("")}
+  <section class="conversion-band"><div class="shell"><p class="eyebrow">Still have a question?</p><h2>Tell us what silver you have.</h2><p>We will confirm whether the lot qualifies and explain the next step.</p><a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></div></section>`;
+mkdirSync(join(out, "faq"), { recursive: true });
+writeFileSync(join(out, "faq", "index.html"), document({
+  title: "Silver Selling FAQ | Houston Silver Buyer Questions | AG Refining",
+  description: "Answers about selling scrap silver, X-ray film, silver oxide batteries, dental scrap, coins, and industrial silver to AG Refining in Houston, including pickup, weighing, and payment.",
+  path: "faq",
+  content: faqContent,
+  pageSchema: [faqSchema(allFaqItems)]
+}));
+
+// Human-readable site index: one page that links every public route so
+// crawlers, answer engines, and people can reach any page in one hop.
+const siteIndexGroups = [
+  ["Core pages", "Start here.", [["Home", "/"], ["Materials We Buy", "/accepted-materials"], ["Industries We Serve", "/industries"], ["Service Areas", "/service-areas"], ["How It Works", "/how-it-works"], ["Our Story", "/about"], ["FAQ", "/faq"], ["Contact and Pickup", "/contact"], ["Español", "/espanol"], ["Privacy", "/privacy"]]],
+  ["Material pages", "Each page explains what qualifies and how pickup works.", materialPages.map((page) => [page.title.split(" | ")[0], `/${page.path}`])],
+  ["Industry pages", "Silver service by the kind of business you run.", industryPages.map((page) => [page.heading, `/${page.path}`])],
+  ["Service area pages", "Pickup routes across the Houston Metro Area.", locationPages.map((page) => [`${page.city} silver buyer`, `/${page.path}`])],
+  ["Machine-readable resources", "For search engines and AI assistants.", [["XML sitemap", "/sitemap.xml"], ["robots.txt", "/robots.txt"], ["llms.txt", "/llms.txt"], ["llms-full.txt", "/llms-full.txt"]]]
+];
+const siteIndexContent = `
+  <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["Site index", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Site index</p><h1>Every AG Refining page in one place.</h1></div><p>A complete index of the site. The XML sitemap for search engines is at <a href="/sitemap.xml">/sitemap.xml</a>.</p></div></div></section>
+  ${siteIndexGroups.map(([label, intro, links]) => `<section class="section service-coverage"><div class="shell service-coverage-grid"><div><h2>${label}</h2><p>${intro}</p></div><ul>${links.map(([text, href]) => `<li><a href="${href}">${text}</a></li>`).join("")}</ul></div></section>`).join("")}
+  <section class="conversion-band"><div class="shell"><p class="eyebrow">Ready to sell?</p><h2>Schedule a Houston pickup.</h2><p>Tell us what you have and where it is.</p><a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></div></section>`;
+mkdirSync(join(out, "sitemap"), { recursive: true });
+writeFileSync(join(out, "sitemap", "index.html"), document({
+  title: "Site Index | All AG Refining Pages | Houston Silver Buyer",
+  description: "A complete index of AG Refining pages: silver materials we buy, industries we serve, Houston Metro service areas, how pickup works, FAQ, and contact.",
+  path: "sitemap",
+  content: siteIndexContent,
+  pageType: "CollectionPage"
+}));
+
+// robots.txt: open to search engines and to the crawlers behind AI answer
+// engines (ChatGPT, Claude, Perplexity, Gemini, Copilot, Apple, Meta).
+const aiCrawlers = [
+  "GPTBot", "OAI-SearchBot", "ChatGPT-User",
+  "ClaudeBot", "Claude-SearchBot", "Claude-User", "anthropic-ai",
+  "PerplexityBot", "Perplexity-User",
+  "Google-Extended", "Googlebot", "Bingbot", "Applebot", "Applebot-Extended",
+  "DuckAssistBot", "Amazonbot", "meta-externalagent", "CCBot", "cohere-ai", "YouBot"
+];
+writeFileSync(join(out, "robots.txt"), [
+  "User-agent: *",
+  "Allow: /",
+  "Disallow: /api/",
+  "",
+  "# Search and AI answer-engine crawlers are welcome to index AG Refining.",
+  ...aiCrawlers.map((agent) => `User-agent: ${agent}`),
+  "Allow: /",
+  "Disallow: /api/",
+  "",
+  `Sitemap: ${siteUrl}/sitemap.xml`,
+  ""
+].join("\n"));
+
+// llms.txt (https://llmstxt.org): a plain-markdown briefing that language
+// models can read directly, plus a long form with every answer on the site.
+const llmsHeader = [
+  `# ${siteName}`,
+  "",
+  `> ${businessDescription}`,
+  "",
+  "## Key facts",
+  "",
+  `- Business: ${siteName}, family-owned, run by owner Dennis Stevens`,
+  `- Address: ${street}, ${cityLine}, United States (call before shipping or visiting)`,
+  `- Phone: ${phoneDisplay} (${phoneHref})`,
+  `- Email: ${email}`,
+  `- Website: ${siteUrl}/`,
+  "- Languages: English and Spanish",
+  `- Service area: ${serviceCities.join(", ")}, and nearby Houston Metro communities`,
+  "- Customers: commercial, industrial, medical, dental, educational, manufacturing, recycling, and other approved accounts; individual inquiries are reviewed, but free pickup is focused on qualifying commercial accounts",
+  "- Process: tell us the material, we review it, we schedule pickup if it qualifies, we weigh on-site, you review the offer, you get paid on the terms confirmed with the offer",
+  "- Pricing: offers depend on confirmed material, recoverable silver, weight, condition, and current silver market values",
+  "- Free pickup and fast payment depend on material, location, account type, and schedule",
+  ""
+];
+const llmsIndex = [
+  ...llmsHeader,
+  "## Materials we buy",
+  "",
+  ...materialPages.map((page) => `- [${page.title.split(" | ")[0]}](${siteUrl}/${page.path}): ${page.description}`),
+  "",
+  "## Industries we serve",
+  "",
+  ...industryPages.map((page) => `- [${page.heading}](${siteUrl}/${page.path}): ${plainText(page.intro)}`),
+  "",
+  "## Service areas",
+  "",
+  ...locationPages.map((page) => `- [${page.city} silver buyer](${siteUrl}/${page.path}): ${plainText(page.intro)}`),
+  "",
+  "## Company pages",
+  "",
+  `- [How it works](${siteUrl}/how-it-works): the six-step process from first call to payment`,
+  `- [About the Stevens family](${siteUrl}/about): who runs AG Refining and why`,
+  `- [FAQ](${siteUrl}/faq): every question the site answers, in one place`,
+  `- [Contact and pickup request](${siteUrl}/contact): schedule a qualifying pickup or ask for a quote`,
+  `- [Español](${siteUrl}/espanol): Spanish-language service page`,
+  `- [Site index](${siteUrl}/sitemap): every page on the site`,
+  "",
+  "## Optional",
+  "",
+  `- [Full text for language models](${siteUrl}/llms-full.txt)`,
+  `- [XML sitemap](${siteUrl}/sitemap.xml)`,
+  ""
+];
+writeFileSync(join(out, "llms.txt"), llmsIndex.join("\n"));
+
+const llmsFull = [
+  ...llmsHeader,
+  "## Frequently asked questions",
+  "",
+  ...allFaqItems.flatMap(([question, answer]) => [`### ${plainText(question)}`, "", plainText(answer), ""]),
+  "## Materials we buy",
+  "",
+  ...materialPages.flatMap((page) => [
+    `### ${page.title.split(" | ")[0]}`,
+    "",
+    `URL: ${siteUrl}/${page.path}`,
+    "",
+    plainText(page.intro),
+    "",
+    `${plainText(page.answerHeading)} ${plainText(page.answerText)}`,
+    "",
+    ...(page.details || []).map(([heading, text]) => `- ${plainText(heading)}: ${plainText(text)}`),
+    ""
+  ]),
+  "## Industries we serve",
+  "",
+  ...industryPages.flatMap((page) => [`### ${page.heading}`, "", `URL: ${siteUrl}/${page.path}`, "", plainText(page.intro), "", plainText(page.answerText), ""]),
+  "## Service areas",
+  "",
+  ...locationPages.flatMap((page) => [`### ${page.city}`, "", `URL: ${siteUrl}/${page.path}`, "", plainText(page.intro), "", ...(page.details || []).map(([heading, text]) => `- ${plainText(heading)}: ${plainText(text)}`), ""]),
+  "## How it works",
+  "",
+  "1. Tell us what you have: material type, amount, condition, location, and whether it is a one-time or repeat lot.",
+  "2. We review the details and may ask for markings, weights, photos, or box counts.",
+  "3. If the lot qualifies, we schedule the pickup. Free pickup is available for qualifying Houston Metro commercial accounts.",
+  "4. We weigh on-site so you see the weight before payment.",
+  "5. You review the offer, which depends on confirmed material, recoverable silver, weight, condition, and current silver market values.",
+  "6. You get paid. Fast payment is available for qualifying transactions, with timing confirmed in the offer.",
+  "",
+  "## Handling notes",
+  "",
+  "- Call first before shipping material or visiting the facility.",
+  "- Do not send patient records, readable X-ray images, passwords, financial account data, or identity documents through the website form.",
+  "- AG Refining does not strengthen claims about insurance, assay method, fees, exact payment timing, compliance, licenses, minimums, or shipping beyond what is written on the site.",
+  ""
+];
+writeFileSync(join(out, "llms-full.txt"), llmsFull.join("\n"));
+
+// IndexNow key file so Bing, Yandex, and partners accept instant URL pings
+// from scripts/indexnow.mjs after each deploy.
+writeFileSync(join(out, `${indexNowKey}.txt`), indexNowKey);
+
+const staticPaths = ["", "accepted-materials", "industries", "service-areas", "how-it-works", "about", "contact", "espanol", "privacy", "faq", "sitemap"];
 const sitemapPaths = [...staticPaths, ...allServicePages.map((page) => page.path)];
-const sitemapUrls = sitemapPaths.map((path) => `<url><loc>${siteUrl}/${path}</loc><lastmod>2026-07-30</lastmod></url>`).join("");
-writeFileSync(join(out, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${sitemapUrls}</urlset>`);
+function sitemapEntry(path) {
+  const loc = path ? `${siteUrl}/${path}` : `${siteUrl}/`;
+  const page = allServicePagesByPath.get(path);
+  const priority = path === "" ? "1.0" : page ? "0.8" : ["privacy", "sitemap"].includes(path) ? "0.3" : "0.7";
+  const changefreq = path === "" ? "weekly" : page ? "monthly" : "monthly";
+  const alternates = path === "" || path === "espanol"
+    ? `<xhtml:link rel="alternate" hreflang="en" href="${siteUrl}/"/><xhtml:link rel="alternate" hreflang="es" href="${siteUrl}/espanol"/><xhtml:link rel="alternate" hreflang="x-default" href="${siteUrl}/"/>`
+    : "";
+  const image = page
+    ? `<image:image><image:loc>${siteUrl}/assets/${page.image}</image:loc><image:title>${xmlEscape(page.imageAlt)}</image:title></image:image>`
+    : "";
+  return `<url><loc>${loc}</loc><lastmod>${lastUpdated}</lastmod><changefreq>${changefreq}</changefreq><priority>${priority}</priority>${alternates}${image}</url>`;
+}
+writeFileSync(join(out, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${sitemapPaths.map(sitemapEntry).join("")}</urlset>`);
 
 writeFileSync(join(out, "404.html"), document({
   title: "Page Not Found | AG Refining",

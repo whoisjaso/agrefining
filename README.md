@@ -12,7 +12,7 @@ npm run build
 npm run verify
 ```
 
-The generated site is written to `dist`. Verification covers 39 generated HTML files, 38 indexed routes, the shared Silver Atelier shell, representative page families, exact protected SEO fields, local route and asset targets, and the homepage conversion sequence.
+The generated site is written to `dist`. Verification covers 41 generated HTML files, 40 indexed routes, the shared Silver Atelier shell, representative page families, exact protected SEO fields, local route and asset targets, and the homepage conversion sequence.
 
 ## Lead delivery
 
@@ -23,6 +23,20 @@ The pickup form posts to `/api/leads`. Configure these Vercel environment variab
 - `AG_LEAD_TO_EMAIL` (optional, defaults to `dennis@agrefining.com`)
 
 The `agrefining.com` domain must remain verified in Resend. If online delivery is unavailable, the form gives the visitor a prefilled email fallback instead of dropping the request.
+
+## Search and AI visibility
+
+The build publishes `sitemap.xml` (with hreflang and image entries), an HTML site index at `/sitemap`, an FAQ hub at `/faq`, `robots.txt` that welcomes search and AI answer-engine crawlers, `llms.txt` and `llms-full.txt` for language models, and an IndexNow key file. Every page carries LocalBusiness, WebSite, WebPage, BreadcrumbList, and (where relevant) Service, FAQPage, and Person structured data.
+
+All canonical URLs use `https://www.agrefining.com` because Vercel redirects the apex domain to www. Optional Vercel environment variables `GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION` print the matching verification meta tags.
+
+After a content deploy, push the URL list to Bing and partners:
+
+```bash
+npm run build && npm run submit:indexnow
+```
+
+See `docs/seo/search-and-ai-visibility-playbook.md` for Search Console, Bing, Google Business Profile, citation, and Reddit steps.
 
 ## Content system
 

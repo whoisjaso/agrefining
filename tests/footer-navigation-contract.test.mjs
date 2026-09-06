@@ -74,6 +74,8 @@ const footerGroups = [
     ["Schedule a Free Pickup", "/contact?intent=pickup"],
     ["(281) 898-2719", "tel:+12818982719"],
     ["dennis@agrefining.com", "mailto:dennis@agrefining.com"],
+    ["FAQ", "/faq"],
+    ["Site Index", "/sitemap"],
     ["Privacy", "/privacy"]
   ]]
 ];
@@ -202,6 +204,8 @@ test("Spanish footer preserves localized contact actions and identifies English 
     "Programar Una Recogida Gratis",
     "(281) 898-2719",
     "dennis@agrefining.com",
+    "Preguntas Frecuentes en ingles",
+    "Índice del Sitio en ingles",
     "Privacidad en ingles"
   ]);
   assert.deepEqual(
