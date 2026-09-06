@@ -249,7 +249,7 @@ function generatedDisplayAtWidth(selector, width, inputProfile, defaultDisplay) 
 }
 
 test("the generated contract covers every published HTML document", () => {
-  assert.equal(htmlDocuments.length, 39);
+  assert.equal(htmlDocuments.length, 41);
 });
 
 test("every generated route authors eyebrow, small-label, H2, and H3 copy in Title Case", () => {

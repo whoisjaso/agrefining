@@ -7,25 +7,120 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    },
+    {
+      "source": "/(sitemap.xml|robots.txt|llms.txt|llms-full.txt)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, s-maxage=3600, must-revalidate"
+        }
       ]
     }
   ],
   "redirects": [
-    { "source": "/home", "destination": "/", "permanent": true },
-    { "source": "/about-us", "destination": "/about", "permanent": true },
-    { "source": "/silver-coin-buyers-houston", "destination": "/sell-silver-coins-houston", "permanent": true },
-    { "source": "/dental-scrap", "destination": "/dental-scrap-buyer-houston", "permanent": true },
-    { "source": "/dental-scrap-buyer", "destination": "/dental-scrap-buyer-houston", "permanent": true },
-    { "source": "/silver-oxide-battery-recycling", "destination": "/silver-oxide-watch-battery-recycling-houston", "permanent": true },
-    { "source": "/watch-battery-recycling", "destination": "/silver-oxide-watch-battery-recycling-houston", "permanent": true },
-    { "source": "/silver-oxide-watch-batteries", "destination": "/silver-oxide-watch-battery-recycling-houston", "permanent": true },
-    { "source": "/x-ray-recycling", "destination": "/x-ray-recycling-services-houston", "permanent": true },
-    { "source": "/x-ray-film-recycling", "destination": "/x-ray-recycling-services-houston", "permanent": true },
-    { "source": "/silver-scrap-buyer-houston", "destination": "/scrap-silver-buyer-houston", "permanent": true },
-    { "source": "/sell-scrap-silver", "destination": "/scrap-silver-buyer-houston", "permanent": true },
-    { "source": "/contact-us", "destination": "/contact", "permanent": true }
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/about-us",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/silver-coin-buyers-houston",
+      "destination": "/sell-silver-coins-houston",
+      "permanent": true
+    },
+    {
+      "source": "/dental-scrap",
+      "destination": "/dental-scrap-buyer-houston",
+      "permanent": true
+    },
+    {
+      "source": "/dental-scrap-buyer",
+      "destination": "/dental-scrap-buyer-houston",
+      "permanent": true
+    },
+    {
+      "source": "/silver-oxide-battery-recycling",
+      "destination": "/silver-oxide-watch-battery-recycling-houston",
+      "permanent": true
+    },
+    {
+      "source": "/watch-battery-recycling",
+      "destination": "/silver-oxide-watch-battery-recycling-houston",
+      "permanent": true
+    },
+    {
+      "source": "/silver-oxide-watch-batteries",
+      "destination": "/silver-oxide-watch-battery-recycling-houston",
+      "permanent": true
+    },
+    {
+      "source": "/x-ray-recycling",
+      "destination": "/x-ray-recycling-services-houston",
+      "permanent": true
+    },
+    {
+      "source": "/x-ray-film-recycling",
+      "destination": "/x-ray-recycling-services-houston",
+      "permanent": true
+    },
+    {
+      "source": "/silver-scrap-buyer-houston",
+      "destination": "/scrap-silver-buyer-houston",
+      "permanent": true
+    },
+    {
+      "source": "/sell-scrap-silver",
+      "destination": "/scrap-silver-buyer-houston",
+      "permanent": true
+    },
+    {
+      "source": "/contact-us",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/index",
+      "destination": "/sitemap",
+      "permanent": true
+    },
+    {
+      "source": "/site-map",
+      "destination": "/sitemap",
+      "permanent": true
+    },
+    {
+      "source": "/site-index",
+      "destination": "/sitemap",
+      "permanent": true
+    },
+    {
+      "source": "/faqs",
+      "destination": "/faq",
+      "permanent": true
+    },
+    {
+      "source": "/frequently-asked-questions",
+      "destination": "/faq",
+      "permanent": true
+    }
   ]
 }

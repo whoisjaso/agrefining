@@ -283,7 +283,7 @@ for (const page of seoPages) {
   const expected = [
     `<title>${page.title}</title>`,
     `<meta name="description" content="${page.description}">`,
-    `<link rel="canonical" href="https://agrefining.com/${page.path}">`,
+    `<link rel="canonical" href="https://www.agrefining.com/${page.path}">`,
     `<h1>${page.h1}</h1>`
   ];
   for (const check of expected) {
@@ -437,12 +437,12 @@ if (!privacyPage.includes('<nav aria-label="Privacy sections">')) {
 
 const sitemap = readFileSync(join(out, "sitemap.xml"), "utf8");
 const sitemapEntries = (sitemap.match(/<url>/g) || []).length;
-if (sitemapEntries !== 38) failures.push(`Expected 38 sitemap pages, found ${sitemapEntries}`);
+if (sitemapEntries !== 40) failures.push(`Expected 40 sitemap pages, found ${sitemapEntries}`);
 const sitemapLocations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
 if (new Set(sitemapLocations).size !== sitemapLocations.length) failures.push("Sitemap contains a duplicate URL");
 
 for (const page of seoPages) {
-  if (!sitemap.includes(`<loc>https://agrefining.com/${page.path}</loc>`)) {
+  if (!sitemap.includes(`<loc>https://www.agrefining.com/${page.path}</loc>`)) {
     failures.push(`Sitemap is missing ${page.path}`);
   }
 }
@@ -454,7 +454,7 @@ const replacedPaths = [
   "silver-scrap-buyer-houston"
 ];
 for (const path of replacedPaths) {
-  if (sitemap.includes(`<loc>https://agrefining.com/${path}</loc>`)) {
+  if (sitemap.includes(`<loc>https://www.agrefining.com/${path}</loc>`)) {
     failures.push(`Sitemap still includes replaced route ${path}`);
   }
 }

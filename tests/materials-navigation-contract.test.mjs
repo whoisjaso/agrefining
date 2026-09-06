@@ -169,7 +169,7 @@ test("the sitemap contains every public route once", () => {
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
   assert.equal(new Set(locations).size, locations.length);
   for (const path of expectedPaths) {
-    assert.equal(locations.filter((location) => location === `https://agrefining.com${path}`).length, 1);
+    assert.equal(locations.filter((location) => location === `https://www.agrefining.com${path}`).length, 1);
   }
 });
 
