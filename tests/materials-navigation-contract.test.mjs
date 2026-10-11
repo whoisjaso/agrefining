@@ -38,6 +38,9 @@ const taxonomy = [
 const expectedItems = taxonomy.flatMap(([, items]) => items);
 const expectedPaths = expectedItems.map(([, path]) => path);
 
+// The Buy Desk at /desk is a private counter app with its own tests, not a public page.
+const isPrivateApp = (path) => /[\\/]dist[\\/]desk[\\/]/.test(path);
+
 function walk(directory) {
   return readdirSync(directory).flatMap((name) => {
     const path = join(directory, name);
@@ -46,7 +49,7 @@ function walk(directory) {
 }
 
 const htmlDocuments = walk(dist)
-  .filter((path) => path.endsWith(".html"))
+  .filter((path) => path.endsWith(".html") && !isPrivateApp(path))
   .map((path) => readFileSync(path, "utf8"));
 const englishDocuments = htmlDocuments.filter((html) => /<html lang="en">/.test(html));
 const home = readFileSync(join(dist, "index.html"), "utf8");

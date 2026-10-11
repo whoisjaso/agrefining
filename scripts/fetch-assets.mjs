@@ -16,7 +16,7 @@ const manifest = {
   "material-xray-film-1280.webp": "cdefb82a03790190dc886bdfe3c725c314dc074a6235073771fbcd0aab813ae9",
   "material-xray-film-800.webp": "3208ec921a46f4515eb44487a1e564a40ad31e942ef1a3bba31ef88b68c18c17",
   "fonts/newsreader-latin-opsz.woff2": "6e4f2958c3a7c4a80acde4e5a679abe7e01bc1e30b92be3c7a8b696ef401d101",
-  "fonts/manrope-latin-wght.woff2": "6e4f2958c3a7c4a80acde4e5a679abe7e01bc1e30b92be3c7a8b696ef401d101"
+  "fonts/manrope-latin-wght.woff2": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972"
 };
 
 function hash(bytes) {

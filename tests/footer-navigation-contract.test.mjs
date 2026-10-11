@@ -80,6 +80,9 @@ const footerGroups = [
   ]]
 ];
 
+// The Buy Desk at /desk is a private counter app with its own tests, not a public page.
+const isPrivateApp = (path) => /[\\/]dist[\\/]desk[\\/]/.test(path);
+
 function walk(directory) {
   return readdirSync(directory).flatMap((name) => {
     const path = join(directory, name);
@@ -107,7 +110,7 @@ function anchorsOf(html) {
 }
 
 const documents = walk(dist)
-  .filter((path) => path.endsWith(".html"))
+  .filter((path) => path.endsWith(".html") && !isPrivateApp(path))
   .sort()
   .map((path) => [relative(dist, path), readFileSync(path, "utf8")]);
 const englishDocuments = documents.filter(([, html]) => /<html lang="en">/.test(html));

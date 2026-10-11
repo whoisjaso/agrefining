@@ -8,6 +8,9 @@ import sharp from "sharp";
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const dist = join(root, "dist");
 
+// The Buy Desk at /desk is a private counter app with its own tests, not a public page.
+const isPrivateApp = (path) => /[\\/]dist[\\/]desk[\\/]/.test(path);
+
 function walk(directory) {
   return readdirSync(directory).flatMap((name) => {
     const path = join(directory, name);
@@ -161,7 +164,7 @@ test("the permanent hero poster decodes at its first-paint dimensions within bud
 
 test("build output keeps authoring state private and retains the 41-document route contract", () => {
   const files = walk(dist);
-  const html = files.filter((path) => path.endsWith(".html"));
+  const html = files.filter((path) => path.endsWith(".html") && !isPrivateApp(path));
   assert.equal(html.length, 41);
   assert.ok(existsSync(join(root, "assets", "material-masters")), "committed source masters must remain available to authors");
   assert.equal(existsSync(join(dist, "assets", "material-masters")), false, "source masters must not be published");
