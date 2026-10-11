@@ -139,5 +139,17 @@
       "destination": "/faq",
       "permanent": true
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.agrefining.com"
+        }
+      ],
+      "destination": "/desk"
+    }
   ]
 }
