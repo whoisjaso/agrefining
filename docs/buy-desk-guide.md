@@ -1,6 +1,6 @@
 # AG Refining Buy Desk
 
-A private counter app for buying silver in front of a client. Open it on the tablet at **app.agrefining.com** (or www.agrefining.com/desk), then tap Share → **Add to Home Screen** so it opens like an app.
+A private counter app for buying silver in front of a client. Open it on the tablet at **www.agrefining.com/app**, then tap Share → **Add to Home Screen** so it opens like an app.
 
 The desk is not linked from the website and is hidden from search engines.
 
