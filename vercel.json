@@ -138,6 +138,11 @@
       "source": "/frequently-asked-questions",
       "destination": "/faq",
       "permanent": true
+    },
+    {
+      "source": "/app",
+      "destination": "/desk",
+      "permanent": false
     }
   ]
 }
