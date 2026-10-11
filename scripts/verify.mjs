@@ -64,7 +64,8 @@ function anchorsIn(source) {
   }));
 }
 
-const htmlFiles = walk(out).filter((path) => path.endsWith(".html"));
+// The Buy Desk is a private counter app, not a public page; it has its own tests.
+const htmlFiles = walk(out).filter((path) => path.endsWith(".html") && !relative(out, path).startsWith("desk"));
 for (const path of htmlFiles) {
   const source = readFileSync(path, "utf8");
   const displayPath = relative(out, path);

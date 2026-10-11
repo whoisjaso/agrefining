@@ -7,6 +7,9 @@ import { fileURLToPath } from "node:url";
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const dist = join(root, "dist");
 
+// The Buy Desk at /desk is a private counter app with its own tests, not a public page.
+const isPrivateApp = (path) => /[\\/]dist[\\/]desk[\\/]/.test(path);
+
 function walk(directory) {
   return readdirSync(directory).flatMap((name) => {
     const path = join(directory, name);
@@ -15,7 +18,7 @@ function walk(directory) {
 }
 
 const htmlDocuments = walk(dist)
-  .filter((path) => path.endsWith(".html"))
+  .filter((path) => path.endsWith(".html") && !isPrivateApp(path))
   .sort()
   .map((path) => [relative(dist, path), readFileSync(path, "utf8")]);
 const contact = readFileSync(join(dist, "contact", "index.html"), "utf8");

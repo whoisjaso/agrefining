@@ -24,6 +24,16 @@ The pickup form posts to `/api/leads`. Configure these Vercel environment variab
 
 The `agrefining.com` domain must remain verified in Resend. If online delivery is unavailable, the form gives the visitor a prefilled email fallback instead of dropping the request.
 
+Each request emails AG Refining (reply-to the visitor, with a one-tap call button) and sends the visitor a short confirmation in English or Spanish. Visitors can name a preferred pickup day and time; the confirmation says the exact time will be confirmed by phone or email. Check delivery configuration at `/api/leads?status=health`, which returns `{"delivery": true}` once `RESEND_API_KEY` is set.
+
+## Buy Desk
+
+`/desk` is a private, noindex tablet app for buying silver at the counter: live silver pricing from three market feeds (`/api/spot`), offers per material and purity, a client-facing presentation that never shows spot price or rates, a signed sale agreement, and a PDF receipt that can be emailed (`/api/receipt`), shared, or printed. See `docs/buy-desk-guide.md` for the owner guide.
+
+- `DESK_ACCESS_CODE` (optional): enables receipt email. Must match the code chosen on the tablet. Without it, the desk shares or prints the PDF instead.
+
+Desk source lives in `src/desk/` and is published by `scripts/build-desk.mjs`. Tests: `tests/desk-pricing.test.mjs`, `tests/desk-api.test.mjs`, and the browser simulation `npm run test:desk` (screenshots with `node tests/desk-browser.mjs --shots`).
+
 ## Search and AI visibility
 
 The build publishes `sitemap.xml` (with hreflang and image entries), an HTML site index at `/sitemap`, an FAQ hub at `/faq`, `robots.txt` that welcomes search and AI answer-engine crawlers, `llms.txt` and `llms-full.txt` for language models, and an IndexNow key file. Every page carries LocalBusiness, WebSite, WebPage, BreadcrumbList, and (where relevant) Service, FAQPage, and Person structured data.

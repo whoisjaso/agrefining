@@ -15,6 +15,13 @@ const MATERIAL_OPTIONS = [
   ["unknown", "Not sure", "No estoy seguro"]
 ];
 
+const WINDOW_OPTIONS = [
+  ["any", "Any time", "Cualquier hora"],
+  ["morning", "Morning", "Mañana"],
+  ["midday", "Midday", "Mediodía"],
+  ["afternoon", "Afternoon", "Tarde"]
+];
+
 const FREQUENCY_OPTIONS = [
   ["one_time", "One-time lot", "Lote único"],
   ["recurring", "Recurring material", "Material recurrente"],
@@ -24,8 +31,20 @@ const FREQUENCY_OPTIONS = [
 export const REVIEW_FORM_ENUMS = Object.freeze({
   materials: Object.freeze(MATERIAL_OPTIONS.map(([value]) => value)),
   frequencies: Object.freeze(FREQUENCY_OPTIONS.map(([value]) => value)),
-  contactMethods: Object.freeze(["phone", "email"])
+  contactMethods: Object.freeze(["phone", "email"]),
+  pickupWindows: Object.freeze(WINDOW_OPTIONS.map(([value]) => value))
 });
+
+export function materialLabel(value, locale = "en") {
+  const option = MATERIAL_OPTIONS.find(([key]) => key === value);
+  if (!option) return String(value || "");
+  return normalizeLocale(locale) === "es" ? option[2] : option[1];
+}
+
+export function pickupWindowLabel(value, locale = "en") {
+  const option = WINDOW_OPTIONS.find(([key]) => key === value) || WINDOW_OPTIONS[0];
+  return normalizeLocale(locale) === "es" ? option[2] : option[1];
+}
 
 const COPY = {
   en: {
@@ -41,6 +60,9 @@ const COPY = {
     location: "Pickup location",
     locationPlaceholder: "City or business address",
     frequency: "How often?",
+    pickupDate: "Preferred pickup day",
+    pickupWindow: "Preferred time",
+    scheduleNote: "We will call or email to confirm the exact time.",
     details: "What should we know?",
     detailsPlaceholder: "Describe the material, condition, source, and anything that may affect pickup.",
     preferred: "Preferred contact",
@@ -65,6 +87,9 @@ const COPY = {
     location: "Lugar de recogida",
     locationPlaceholder: "Ciudad o dirección de la empresa",
     frequency: "¿Con qué frecuencia?",
+    pickupDate: "Día preferido de recogida",
+    pickupWindow: "Horario preferido",
+    scheduleNote: "Le llamaremos o escribiremos para confirmar la hora exacta.",
     details: "¿Qué debemos saber?",
     detailsPlaceholder: "Describa el material, su condición, procedencia y cualquier detalle que pueda afectar la recogida.",
     preferred: "Medio de contacto preferido",
@@ -90,6 +115,8 @@ const KNOWN_VALUES = new Set([
   "frequency",
   "preferred_contact",
   "details",
+  "pickup_date",
+  "pickup_window",
   "form_started",
   "submission_key",
   "locale"
@@ -160,6 +187,11 @@ export function renderReviewForm({
   const materialOptions = MATERIAL_OPTIONS
     .map(([value, english, spanish]) => `<option value="${value}"${selected(material, value)}>${language === "es" ? spanish : english}</option>`)
     .join("");
+  const pickupWindow = WINDOW_OPTIONS.some(([value]) => value === clean.pickup_window) ? clean.pickup_window : "any";
+  const pickupDate = /^\d{4}-\d{2}-\d{2}$/.test(clean.pickup_date || "") ? clean.pickup_date : "";
+  const windowOptions = WINDOW_OPTIONS
+    .map(([value, english, spanish]) => `<option value="${value}"${selected(pickupWindow, value)}>${language === "es" ? spanish : english}</option>`)
+    .join("");
   const frequencyOptions = FREQUENCY_OPTIONS
     .map(([value, english, spanish]) => `<option value="${value}"${selected(frequency, value)}>${language === "es" ? spanish : english}</option>`)
     .join("");
@@ -181,6 +213,9 @@ export function renderReviewForm({
     <div class="field"><label for="quantity">${copy.quantity}</label><input id="quantity" name="quantity" type="text" maxlength="120" value="${escapeHtml(clean.quantity || "")}" placeholder="${copy.quantityPlaceholder}"></div>
     <div class="field"><label for="location">${copy.location} <span>${copy.required}</span></label><input id="location" name="location" type="text" maxlength="180" value="${escapeHtml(clean.location || "")}" placeholder="${copy.locationPlaceholder}" required${locationState.attrs}>${locationState.error}</div>
     <div class="field"><label for="frequency">${copy.frequency}</label><select id="frequency" name="frequency">${frequencyOptions}</select></div>
+    <div class="field"><label for="pickup_date">${copy.pickupDate}</label><input id="pickup_date" name="pickup_date" type="date" value="${escapeHtml(pickupDate)}" aria-describedby="schedule-note" data-pickup-date></div>
+    <div class="field"><label for="pickup_window">${copy.pickupWindow}</label><select id="pickup_window" name="pickup_window" aria-describedby="schedule-note">${windowOptions}</select></div>
+    <p id="schedule-note" class="form-note field-wide schedule-note">${copy.scheduleNote}</p>
     <div class="field field-wide"><label for="details">${copy.details} <span>${copy.required}</span></label><textarea id="details" name="details" required minlength="20" placeholder="${copy.detailsPlaceholder}"${detailsState.attrs}>${escapeHtml(clean.details || "")}</textarea>${detailsState.error}</div>
     <fieldset class="field field-wide preferred-contact"><legend>${copy.preferred}</legend><label><input type="radio" name="preferred_contact" value="phone"${checked(preferred, "phone")}> ${copy.phoneChoice}</label><label><input type="radio" name="preferred_contact" value="email"${checked(preferred, "email")}> ${copy.emailChoice}</label></fieldset>
     <div class="honeypot" aria-hidden="true"><label for="company_url">${copy.companyWebsite}</label><input id="company_url" name="company_url" type="text" tabindex="-1" autocomplete="off"></div>

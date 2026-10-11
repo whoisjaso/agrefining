@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#102a43">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AG Desk">
+  <title>AG Refining Buy Desk</title>
+  <link rel="manifest" href="/desk/manifest.webmanifest">
+  <link rel="icon" href="/assets/ag-mark-path.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/desk/icon-180.png">
+  <link rel="preload" href="/assets/fonts/manrope-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/desk/desk.css">
+</head>
+<body data-screen="lock">
+  <!-- Lock -->
+  <section class="screen screen-lock" data-view="lock" aria-labelledby="lock-title">
+    <div class="lock-card">
+      <img class="lock-mark" src="/assets/ag-mark-path.svg" alt="" width="84" height="84">
+      <p class="eyebrow">AG Refining · Buy Desk</p>
+      <h1 id="lock-title" data-lock-title>Enter your desk code</h1>
+      <p class="lock-hint" data-lock-hint>Four to six digits.</p>
+      <div class="pin-dots" data-pin-dots aria-live="polite"></div>
+      <div class="keypad keypad-pin" data-pin-pad></div>
+    </div>
+  </section>
+
+  <!-- Desk -->
+  <section class="screen screen-desk" data-view="desk" aria-label="Buy desk">
+    <header class="desk-bar">
+      <div class="brand"><img src="/assets/ag-mark-path.svg" alt="" width="44" height="44"><span><strong>AG</strong> Refining</span></div>
+      <div class="live" data-live-chip title="Silver market feed">
+        <span class="live-dot" aria-hidden="true"></span><span data-live-text>Connecting to market</span>
+      </div>
+      <nav class="desk-nav" aria-label="Desk menu">
+        <button class="ghost" type="button" data-open="history"><span class="i i-clock" aria-hidden="true"></span>Receipts</button>
+        <button class="ghost" type="button" data-open="settings"><span class="i i-gear" aria-hidden="true"></span>Settings</button>
+        <button class="ghost" type="button" data-action="lock"><span class="i i-lock" aria-hidden="true"></span>Lock</button>
+      </nav>
+    </header>
+
+    <main class="desk-main">
+      <section class="pick" aria-labelledby="pick-title">
+        <div class="pick-head">
+          <p class="eyebrow">Step 1</p>
+          <h2 id="pick-title">What did they bring?</h2>
+        </div>
+        <div class="tiles" data-tiles></div>
+      </section>
+
+      <aside class="lot" aria-labelledby="lot-title">
+        <div class="lot-head">
+          <p class="eyebrow">Step 2</p>
+          <h2 id="lot-title">The offer</h2>
+        </div>
+        <ol class="lot-lines" data-lot-lines></ol>
+        <div class="lot-empty" data-lot-empty>
+          <span class="lot-empty-mark" aria-hidden="true">Ag</span>
+          <p>Tap a material to begin.</p>
+        </div>
+        <div class="lot-total">
+          <span>Offer total</span>
+          <strong data-lot-total>$0.00</strong>
+        </div>
+        <button class="private-toggle" type="button" data-private-hold aria-describedby="private-help">
+          <span class="i i-eye" aria-hidden="true"></span><span>Hold to view private numbers</span>
+        </button>
+        <p id="private-help" class="sr-only">Press and hold. Private numbers hide when you let go.</p>
+        <div class="private" data-private hidden>
+          <dl>
+            <div><dt>Silver spot</dt><dd data-p-spot>–</dd></div>
+            <div><dt>Fine silver</dt><dd data-p-fine>–</dd></div>
+            <div><dt>Market value</dt><dd data-p-market>–</dd></div>
+            <div><dt>Refinery return</dt><dd data-p-return>–</dd></div>
+            <div class="private-spread"><dt>Your spread</dt><dd data-p-spread>–</dd></div>
+          </dl>
+        </div>
+        <div class="lot-actions">
+          <button class="btn btn-primary btn-xl" type="button" data-action="present" disabled>Show the offer <span class="i i-arrow" aria-hidden="true"></span></button>
+          <button class="btn btn-quiet" type="button" data-action="clear" disabled>Start over</button>
+        </div>
+      </aside>
+    </main>
+    <div class="lot-dock" data-lot-dock hidden>
+      <button class="dock-sum" type="button" data-action="scroll-lot"><small data-dock-count>1 item</small><strong data-dock-total>$0.00</strong></button>
+      <button class="btn btn-primary" type="button" data-action="present">Show the offer <span class="i i-arrow" aria-hidden="true"></span></button>
+    </div>
+  </section>
+
+  <!-- Presentation (client-facing) -->
+  <section class="screen screen-present" data-view="present" aria-labelledby="present-title">
+    <div class="present-inner">
+      <header class="present-head">
+        <img src="/assets/ag-mark-path.svg" alt="" width="64" height="64">
+        <div><p class="eyebrow eyebrow-light">AG Refining · Houston</p><p class="present-for" data-present-for>Prepared for you today</p></div>
+      </header>
+      <h1 id="present-title" class="present-label">Our offer for your silver</h1>
+      <p class="present-total" data-present-total>$0.00</p>
+      <ul class="present-lines" data-present-lines></ul>
+      <ul class="present-included">
+        <li><span class="i i-check" aria-hidden="true"></span>Evaluation and weighing, included</li>
+        <li><span class="i i-check" aria-hidden="true"></span>No fees and no deductions</li>
+        <li><span class="i i-check" aria-hidden="true"></span>Paid today, before you leave</li>
+      </ul>
+      <p class="present-hold" data-present-hold>Based on today's silver market. This offer is held for you for 15 minutes.</p>
+      <div class="present-actions">
+        <button class="btn btn-paper btn-xl" type="button" data-action="accept">Accept offer <span class="i i-arrow" aria-hidden="true"></span></button>
+        <button class="btn btn-ghost-light" type="button" data-action="back-to-desk">Back</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Agreement -->
+  <section class="screen screen-agree" data-view="agree" aria-labelledby="agree-title">
+    <header class="flow-head">
+      <button class="ghost" type="button" data-action="back-to-present"><span class="i i-back" aria-hidden="true"></span>Back</button>
+      <div><p class="eyebrow">Step 3</p><h1 id="agree-title">Sale agreement</h1></div>
+      <p class="flow-total"><span>Amount</span><strong data-agree-total>$0.00</strong></p>
+    </header>
+    <form class="agree-form" data-agree-form novalidate>
+      <fieldset>
+        <legend>Seller</legend>
+        <div class="grid-2">
+          <label class="field">Full name <span class="req">Required</span><input name="name" autocomplete="name" autocapitalize="words" required></label>
+          <label class="field">Phone<input name="phone" type="tel" inputmode="tel" autocomplete="tel"></label>
+          <label class="field">Email for receipt<input name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off"></label>
+          <label class="field">Address<input name="address" autocomplete="street-address" autocapitalize="words"></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Identification</legend>
+        <div class="chips" data-chip-group="idType" role="radiogroup" aria-label="ID type">
+          <button type="button" class="chip" data-value="Texas driver license" aria-pressed="true">Driver license</button>
+          <button type="button" class="chip" data-value="State ID" aria-pressed="false">State ID</button>
+          <button type="button" class="chip" data-value="Passport" aria-pressed="false">Passport</button>
+          <button type="button" class="chip" data-value="Other ID" aria-pressed="false">Other</button>
+        </div>
+        <label class="field field-narrow">ID number<input name="idNumber" autocomplete="off" autocapitalize="characters"></label>
+      </fieldset>
+      <fieldset>
+        <legend>Payment</legend>
+        <div class="chips" data-chip-group="payment" role="radiogroup" aria-label="Payment method">
+          <button type="button" class="chip" data-value="Cash" aria-pressed="true">Cash</button>
+          <button type="button" class="chip" data-value="Check" aria-pressed="false">Check</button>
+          <button type="button" class="chip" data-value="Zelle" aria-pressed="false">Zelle</button>
+          <button type="button" class="chip" data-value="Bank transfer" aria-pressed="false">Bank transfer</button>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Seller's statement</legend>
+        <label class="affirm"><input type="checkbox" name="affirm" required><span>I am the lawful owner of these items, they are free of any lien or claim, I am 18 or older, and I accept the amount above as payment in full. Ownership passes to AG Refining when I am paid. I agree to sign electronically and to receive my receipt electronically.</span></label>
+        <div class="sign">
+          <div class="sign-head"><span>Sign here</span><button class="ghost" type="button" data-action="clear-signature">Clear</button></div>
+          <canvas class="sign-pad" data-sign-pad aria-label="Signature area" role="img"></canvas>
+          <span class="sign-line" aria-hidden="true">×</span>
+        </div>
+      </fieldset>
+      <p class="form-alert" data-agree-alert role="alert" hidden></p>
+      <button class="btn btn-primary btn-xl" type="submit">Complete the sale <span class="i i-arrow" aria-hidden="true"></span></button>
+    </form>
+  </section>
+
+  <!-- Done / receipt -->
+  <section class="screen screen-done" data-view="done" aria-labelledby="done-title">
+    <div class="done-layout">
+      <div class="done-side">
+        <svg class="done-check" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29"/><path d="M19 33.5 28 42l17-19"/></svg>
+        <h1 id="done-title">Sale complete.</h1>
+        <p class="done-sub" data-done-sub>Receipt saved.</p>
+        <div class="done-actions">
+          <button class="btn btn-primary btn-xl" type="button" data-action="email-receipt"><span class="i i-mail" aria-hidden="true"></span>Email receipt</button>
+          <button class="btn btn-secondary" type="button" data-action="share-receipt"><span class="i i-share" aria-hidden="true"></span>Share or save PDF</button>
+          <button class="btn btn-secondary" type="button" data-action="print-receipt"><span class="i i-print" aria-hidden="true"></span>Print</button>
+          <p class="done-status" data-done-status aria-live="polite"></p>
+          <button class="btn btn-quiet" type="button" data-action="new-client">Next client <span class="i i-arrow" aria-hidden="true"></span></button>
+        </div>
+      </div>
+      <div class="receipt-stage"><article class="receipt" data-receipt></article></div>
+    </div>
+  </section>
+
+  <!-- Item sheet -->
+  <div class="sheet-backdrop" data-sheet-backdrop hidden></div>
+  <section class="sheet" data-sheet role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+    <header class="sheet-head">
+      <img data-sheet-img src="" alt="" width="88" height="88">
+      <div><p class="eyebrow" data-sheet-note></p><h2 id="sheet-title" data-sheet-title></h2></div>
+      <button class="icon-btn" type="button" data-action="close-sheet" aria-label="Close"><span class="i i-close" aria-hidden="true"></span></button>
+    </header>
+    <div class="sheet-body">
+      <div class="sheet-left">
+        <div class="sheet-group" data-coin-group hidden>
+          <p class="group-label">Which coins?</p>
+          <div class="chips chips-wrap" data-coin-chips></div>
+          <div class="seg" data-coin-mode role="radiogroup" aria-label="Count coins by">
+            <button type="button" data-value="count" aria-pressed="true">Count pieces</button>
+            <button type="button" data-value="face" aria-pressed="false">Face value</button>
+          </div>
+        </div>
+        <div class="sheet-group" data-purity-group hidden>
+          <p class="group-label">Purity</p>
+          <div class="chips chips-wrap" data-purity-chips></div>
+        </div>
+        <div class="sheet-group" data-unit-group hidden>
+          <p class="group-label">Weighed in</p>
+          <div class="seg seg-units" data-unit-chips role="radiogroup" aria-label="Weight unit"></div>
+        </div>
+        <div class="readout">
+          <p class="readout-label" data-amount-label>Weight</p>
+          <p class="readout-value"><span data-amount>0</span><small data-amount-unit></small></p>
+        </div>
+        <div class="item-offer">
+          <span>Offer for this item</span>
+          <strong data-item-offer>$0.00</strong>
+        </div>
+      </div>
+      <div class="sheet-right">
+        <div class="keypad" data-amount-pad></div>
+        <div class="sheet-actions">
+          <button class="btn btn-quiet btn-danger" type="button" data-action="remove-item" hidden>Remove</button>
+          <button class="btn btn-primary btn-xl" type="button" data-action="save-item" disabled>Add to offer</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Settings -->
+  <section class="panel" data-panel="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+    <header class="panel-head"><h2 id="settings-title">Settings</h2><button class="btn btn-primary" type="button" data-action="close-panel">Done</button></header>
+    <div class="panel-body">
+      <section>
+        <h3>Offer rates</h3>
+        <p class="panel-note">The share of market value you offer, and what your refinery returns to you. Private, never shown to clients.</p>
+        <div class="rates" data-rates></div>
+      </section>
+      <section>
+        <h3>Silver price</h3>
+        <p class="panel-note">The desk follows the live market. If the feed is down, enter today's price here.</p>
+        <label class="field field-narrow">Manual price per troy oz<input data-manual-spot type="number" inputmode="decimal" step="0.01" min="0" placeholder="Live"></label>
+      </section>
+      <section>
+        <h3>Offer rounding</h3>
+        <div class="seg" data-rounding role="radiogroup" aria-label="Offer rounding">
+          <button type="button" data-value="cents" aria-pressed="true">Exact cents</button>
+          <button type="button" data-value="dollar" aria-pressed="false">Whole dollars</button>
+        </div>
+        <p class="panel-note">Exact cents reads as measured, not negotiated.</p>
+      </section>
+      <section>
+        <h3>Desk code</h3>
+        <button class="btn btn-secondary" type="button" data-action="change-pin">Change desk code</button>
+      </section>
+      <section>
+        <button class="btn btn-quiet" type="button" data-action="reset-rates">Restore default rates</button>
+      </section>
+    </div>
+  </section>
+
+  <!-- History -->
+  <section class="panel" data-panel="history" role="dialog" aria-modal="true" aria-labelledby="history-title" hidden>
+    <header class="panel-head"><h2 id="history-title">Receipts</h2><button class="btn btn-primary" type="button" data-action="close-panel">Done</button></header>
+    <div class="panel-body">
+      <div class="history-summary" data-history-summary></div>
+      <ol class="history" data-history></ol>
+      <div class="history-actions">
+        <button class="btn btn-secondary" type="button" data-action="export-csv"><span class="i i-share" aria-hidden="true"></span>Export spreadsheet</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" data-toast role="status" aria-live="polite" hidden></div>
+
+  <script src="/desk/vendor/jspdf.umd.min.js" defer></script>
+  <script type="module" src="/desk/desk.js"></script>
+</body>
+</html>

@@ -200,7 +200,7 @@ const formUi = {
     networkError: "The request could not be sent. Please call (281) 898-2719 or try again.",
     submit: "Send request",
     subject: (intent) => `AG Refining ${intent === "quote" ? "quote" : "pickup"} request`,
-    labels: ["Name", "Business", "Phone", "Email", "Material", "Amount", "Location", "Frequency"],
+    labels: ["Name", "Business", "Phone", "Email", "Material", "Amount", "Location", "Frequency", "Preferred pickup"],
     notProvided: "Not provided"
   },
   es: {
@@ -216,7 +216,7 @@ const formUi = {
     networkError: "No se pudo enviar la solicitud. Llame al (281) 898-2719 o inténtelo de nuevo.",
     submit: "Enviar solicitud",
     subject: () => "Solicitud de recogida de AG Refining",
-    labels: ["Nombre", "Empresa", "Teléfono", "Correo electrónico", "Material", "Cantidad", "Ubicación", "Frecuencia"],
+    labels: ["Nombre", "Empresa", "Teléfono", "Correo electrónico", "Material", "Cantidad", "Ubicación", "Frecuencia", "Recogida preferida"],
     notProvided: "No indicado"
   }
 }[formLocale];
@@ -224,6 +224,12 @@ const formUi = {
 function prefillReviewForm(form) {
   if (!form) return;
   const params = new URLSearchParams(window.location.search);
+  const pickupDate = form.querySelector("[data-pickup-date]");
+  if (pickupDate) {
+    const today = new Date();
+    const local = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    pickupDate.min = local;
+  }
   ["intent", "material", "quantity", "frequency"].forEach((name) => {
     const field = form.elements.namedItem(name);
     const requested = params.get(name)?.trim();
@@ -360,6 +366,8 @@ function formPayload(form) {
     frequency: String(data.get("frequency") || "unknown").trim(),
     preferred_contact: String(data.get("preferred_contact") || "phone").trim(),
     details: String(data.get("details") || "").trim(),
+    pickup_date: String(data.get("pickup_date") || "").trim(),
+    pickup_window: String(data.get("pickup_window") || "any").trim(),
     company_url: String(data.get("company_url") || "").trim(),
     form_started: String(data.get("form_started") || ""),
     submission_key: String(data.get("submission_key") || ""),
@@ -379,7 +387,8 @@ function fallbackMailto(payload, recipient) {
     payload.material.replaceAll("_", " "),
     payload.quantity || formUi.notProvided,
     payload.location,
-    payload.frequency.replaceAll("_", " ")
+    payload.frequency.replaceAll("_", " "),
+    [payload.pickup_date, payload.pickup_window === "any" ? "" : payload.pickup_window].filter(Boolean).join(" ") || formUi.notProvided
   ];
   const body = [
     ...formUi.labels.map((label, index) => `${label}: ${values[index]}`),

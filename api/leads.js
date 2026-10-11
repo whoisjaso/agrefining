@@ -1,6 +1,7 @@
 import {
   REVIEW_FORM_ENUMS,
   escapeHtml,
+  materialLabel,
   normalizeLocale,
   renderReviewForm
 } from "../src/review-form.mjs";
@@ -13,6 +14,7 @@ const PHONE_HREF = "+12818982719";
 const MATERIALS = new Set(REVIEW_FORM_ENUMS.materials);
 const FREQUENCIES = new Set(REVIEW_FORM_ENUMS.frequencies);
 const CONTACT_METHODS = new Set(REVIEW_FORM_ENUMS.contactMethods);
+const PICKUP_WINDOWS = new Set(REVIEW_FORM_ENUMS.pickupWindows);
 
 const RESPONSE_COPY = {
   en: {
@@ -137,6 +139,29 @@ function validate(payload) {
   return fields;
 }
 
+// Accept only a real calendar date (YYYY-MM-DD) from today up to a year out.
+export function cleanPickupDate(value, now = new Date()) {
+  const raw = text(value, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return "";
+  const date = new Date(`${raw}T12:00:00Z`);
+  if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== raw) return "";
+  const today = new Date(now.getTime() - 36 * 3600 * 1000).toISOString().slice(0, 10);
+  const limit = new Date(now.getTime() + 366 * 86400 * 1000).toISOString().slice(0, 10);
+  return raw >= today && raw <= limit ? raw : "";
+}
+
+export function pickupSummary(payload, locale = "en") {
+  if (!payload.pickup_date && payload.pickup_window === "any") return "";
+  const date = payload.pickup_date
+    ? new Date(`${payload.pickup_date}T12:00:00Z`).toLocaleDateString(locale === "es" ? "es-US" : "en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" })
+    : "";
+  const phrases = locale === "es"
+    ? { morning: "por la mañana", midday: "al mediodía", afternoon: "por la tarde" }
+    : { morning: "in the morning", midday: "around midday", afternoon: "in the afternoon" };
+  const window = phrases[payload.pickup_window] || "";
+  return [date, window].filter(Boolean).join(", ");
+}
+
 function label(value) {
   return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
@@ -152,6 +177,7 @@ function emailContent(payload) {
     ["Amount", payload.quantity || "Not provided"],
     ["Pickup location", payload.location],
     ["Frequency", label(payload.frequency)],
+    ["Preferred pickup", pickupSummary(payload) || "Flexible"],
     ["Preferred contact", label(payload.preferred_contact)],
     ["Details", payload.details]
   ];
@@ -167,8 +193,93 @@ function emailContent(payload) {
 
   return {
     text: `New AG Refining pickup request\n\n${plainRows}${plainAttribution}`,
-    html: `<div style="font-family:Arial,sans-serif;color:#14232c;line-height:1.5"><h1 style="color:#061724">New pickup request</h1><table>${htmlRows}</table>${htmlAttribution}</div>`
+    html: `<div style="font-family:Arial,sans-serif;color:#14232c;line-height:1.5"><h1 style="color:#061724">New pickup request</h1><p style="margin:0 0 18px"><a href="tel:${escapeHtml(payload.phone.replace(/[^\d+]/g, ""))}" style="display:inline-block;background:#102a43;color:#faf8f2;padding:10px 18px;border-radius:3px;text-decoration:none;font-weight:bold">Call ${escapeHtml(payload.name)}</a> &nbsp; <a href="mailto:${escapeHtml(payload.email)}" style="color:#1d5e96">Reply by email</a></p><table>${htmlRows}</table>${htmlAttribution}</div>`
   };
+}
+
+const CONFIRMATION_COPY = {
+  en: {
+    subject: "We received your AG Refining pickup request",
+    hello: (name) => `Hello ${name},`,
+    body: "Thank you for reaching out to AG Refining. We received your pickup request and will contact you to confirm the details and a time.",
+    requested: "You asked for",
+    summary: "Your request",
+    material: "Material",
+    location: "Pickup location",
+    next: "If anything changes, simply reply to this email or call us.",
+    sign: "Dennis Stevens, AG Refining"
+  },
+  es: {
+    subject: "Recibimos su solicitud de recogida de AG Refining",
+    hello: (name) => `Hola ${name}:`,
+    body: "Gracias por comunicarse con AG Refining. Recibimos su solicitud de recogida y nos comunicaremos con usted para confirmar los detalles y la hora.",
+    requested: "Usted pidió",
+    summary: "Su solicitud",
+    material: "Material",
+    location: "Lugar de recogida",
+    next: "Si algo cambia, responda a este correo o llámenos.",
+    sign: "Dennis Stevens, AG Refining"
+  }
+};
+
+export function confirmationContent(payload) {
+  const copy = CONFIRMATION_COPY[payload.locale];
+  const first = payload.name.split(/\s+/)[0] || payload.name;
+  const schedule = pickupSummary(payload, payload.locale);
+  const material = materialLabel(payload.material, payload.locale);
+  const lines = [
+    copy.hello(first),
+    "",
+    copy.body,
+    schedule ? `${copy.requested}: ${schedule}.` : "",
+    "",
+    `${copy.material}: ${material}`,
+    `${copy.location}: ${payload.location}`,
+    "",
+    copy.next,
+    "",
+    copy.sign,
+    `${PHONE_DISPLAY} · ${DEFAULT_TO_EMAIL}`
+  ].filter((line, index, all) => line !== "" || all[index - 1] !== "");
+  return {
+    subject: copy.subject,
+    text: lines.join("\n"),
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;color:#20354c;line-height:1.6;max-width:560px">
+  <p style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#416b94;margin:0 0 18px">AG Refining · Houston</p>
+  <p>${escapeHtml(copy.hello(first))}</p>
+  <p>${escapeHtml(copy.body)}</p>
+  ${schedule ? `<p><strong>${escapeHtml(copy.requested)}:</strong> ${escapeHtml(schedule)}</p>` : ""}
+  <table style="border-collapse:collapse;margin:18px 0"><tr><th align="left" style="padding:4px 14px 4px 0;color:#586b7e;font-weight:normal">${escapeHtml(copy.material)}</th><td>${escapeHtml(material)}</td></tr><tr><th align="left" style="padding:4px 14px 4px 0;color:#586b7e;font-weight:normal">${escapeHtml(copy.location)}</th><td>${escapeHtml(payload.location)}</td></tr></table>
+  <p>${escapeHtml(copy.next)}</p>
+  <p style="margin-top:26px">${escapeHtml(copy.sign)}<br><a href="tel:${PHONE_HREF}" style="color:#1d5e96">${PHONE_DISPLAY}</a> · <a href="mailto:${DEFAULT_TO_EMAIL}" style="color:#1d5e96">${DEFAULT_TO_EMAIL}</a></p>
+</div>`
+  };
+}
+
+// Courtesy confirmation to the visitor. Never blocks or fails the lead itself.
+async function sendConfirmation(payload) {
+  try {
+    const content = confirmationContent(payload);
+    const owner = process.env.AG_LEAD_TO_EMAIL || DEFAULT_TO_EMAIL;
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+        "Idempotency-Key": `${payload.submission_key}-confirmation`
+      },
+      body: JSON.stringify({
+        from: process.env.AG_LEAD_FROM_EMAIL || DEFAULT_FROM_EMAIL,
+        to: [payload.email],
+        reply_to: owner,
+        subject: content.subject,
+        text: content.text,
+        html: content.html
+      })
+    });
+  } catch {
+    // The owner already has the lead; a missed courtesy email is not a failed request.
+  }
 }
 
 async function sendResend(payload) {
@@ -194,6 +305,7 @@ async function sendResend(payload) {
   });
 
   if (!response.ok) throw new Error("Lead email delivery failed");
+  await sendConfirmation(payload);
   return { configured: true };
 }
 
@@ -242,8 +354,8 @@ function actionLinks(locale, { includeEmail = "" } = {}) {
 function fallbackMailto(payload, recipient) {
   const copy = RESPONSE_COPY[payload.locale];
   const labels = payload.locale === "es"
-    ? ["Nombre", "Empresa", "Teléfono", "Correo electrónico", "Material", "Cantidad", "Ubicación", "Frecuencia", "Detalles"]
-    : ["Name", "Business", "Phone", "Email", "Material", "Amount", "Location", "Frequency", "Details"];
+    ? ["Nombre", "Empresa", "Teléfono", "Correo electrónico", "Material", "Cantidad", "Ubicación", "Frecuencia", "Recogida preferida", "Detalles"]
+    : ["Name", "Business", "Phone", "Email", "Material", "Amount", "Location", "Frequency", "Preferred pickup", "Details"];
   const values = [
     payload.name,
     payload.business || copy.notProvided,
@@ -253,6 +365,7 @@ function fallbackMailto(payload, recipient) {
     payload.quantity || copy.notProvided,
     payload.location,
     payload.frequency,
+    pickupSummary(payload, payload.locale) || copy.notProvided,
     payload.details
   ];
   const body = labels.map((name, index) => `${name}: ${values[index]}`).join("\n");
@@ -281,6 +394,10 @@ export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   const format = responseFormat(req);
   const queryLocale = normalizeLocale(queryValue(req, "lang"));
+
+  if (req.method === "GET" && queryValue(req, "status") === "health") {
+    return res.status(200).json({ delivery: Boolean(process.env.RESEND_API_KEY) });
+  }
 
   if (req.method === "GET" && format === "html" && queryValue(req, "status") === "received") {
     const copy = RESPONSE_COPY[queryLocale];
@@ -327,6 +444,8 @@ export default async function handler(req, res) {
     frequency: FREQUENCIES.has(frequency) ? frequency : "unknown",
     preferred_contact: CONTACT_METHODS.has(preferredContact) ? preferredContact : "phone",
     details: text(body.details, 4000),
+    pickup_date: cleanPickupDate(body.pickup_date),
+    pickup_window: PICKUP_WINDOWS.has(text(body.pickup_window, 20)) ? text(body.pickup_window, 20) : "any",
     company_url: text(body.company_url, 300),
     form_started: formStarted,
     submission_key: text(body.submission_key, 100) || `lead-${Date.now()}`,

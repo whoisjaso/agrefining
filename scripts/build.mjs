@@ -2556,8 +2556,8 @@ writeFileSync(join(out, "espanol", "index.html"), document({
 const privacy = `
   <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["Privacy", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Privacy</p><h1>How we handle website requests.</h1></div><p>This page explains the information collected through the AG Refining website.</p></div></div></section>
   <section class="section"><div class="shell legal-grid"><nav aria-label="Privacy sections"><a href="#collect">What we collect</a><a href="#use">How we use it</a><a href="#avoid">What not to send</a><a href="#contact-privacy">Contact</a></nav><div>
-    <section id="collect"><h2>What we collect</h2><p>The pickup form asks for your name, business, phone, email, material, amount, location, preferred contact method, and details you choose to provide. The site also attaches the form page, first landing page, referring page, and supported campaign or ad identifiers to your form details. These website attribution fields are sent with your request to help AG Refining understand how you found the site.</p></section>
-    <section id="use"><h2>How we use it</h2><p>AG Refining uses the information to review your request, contact you, plan a possible pickup, and improve the website. We do not promise a quote or pickup from a form submission alone.</p></section>
+    <section id="collect"><h2>What we collect</h2><p>The pickup form asks for your name, business, phone, email, material, amount, location, preferred pickup day and time, preferred contact method, and details you choose to provide. The site also attaches the form page, first landing page, referring page, and supported campaign or ad identifiers to your form details. These website attribution fields are sent with your request to help AG Refining understand how you found the site.</p></section>
+    <section id="use"><h2>How we use it</h2><p>AG Refining uses the information to review your request, contact you, plan a possible pickup, and improve the website. When you submit the form, we email you one confirmation that your request was received. We do not promise a quote or pickup from a form submission alone.</p></section>
     <section id="avoid"><h2>What not to send</h2><p>Do not send patient records, passwords, financial account data, identity documents, controlled records, or other sensitive information through the public form.</p></section>
     <section id="contact-privacy"><h2>Contact</h2><p>Questions can be sent to <a href="mailto:${email}">${email}</a> or discussed by phone at <a href="tel:${phoneHref}">${phoneDisplay}</a>.</p></section>
   </div></div></section>`;
@@ -2787,3 +2787,6 @@ writeFileSync(join(out, "404.html"), document({
 }));
 
 console.log(`Built ${sitemapPaths.length} public pages in dist`);
+
+// The private Buy Desk app ships with every build so no build path can drop it.
+await import("./build-desk.mjs");

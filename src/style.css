@@ -3032,6 +3032,19 @@ html[data-loader-state="ready"] .home-loader {
   resize: vertical;
 }
 
+.field input[type="date"] {
+  color: var(--ink);
+  display: block;
+}
+
+.field input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+.schedule-note {
+  margin-top: -0.35rem;
+}
+
 .field input:focus,
 .field select:focus,
 .field textarea:focus {
