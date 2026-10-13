@@ -6,12 +6,18 @@ import { createServer } from "node:http";
 import { dirname, extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright-core";
+import qrcode from "qrcode-generator";
+import sharp from "sharp";
 import { priceLot } from "../src/desk/pricing.mjs";
+import { GOOGLE_REVIEW_URL } from "../src/desk/review-link.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
 const shots = process.argv.includes("--shots") ? join(root, "docs", "qa", "buy-desk-captures") : null;
 if (shots) mkdirSync(shots, { recursive: true });
+// --growth-shots captures only the review card and hallmark reading for docs/qa/growth-captures.
+const growthShots = process.argv.includes("--growth-shots") ? join(root, "docs", "qa", "growth-captures") : null;
+if (growthShots) mkdirSync(growthShots, { recursive: true });
 
 const types = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".webp": "image/webp", ".png": "image/png", ".woff2": "font/woff2", ".webmanifest": "application/manifest+json" };
 const server = createServer((req, res) => {
@@ -32,7 +38,10 @@ const browser = await chromium.launch({ executablePath, headless: true });
 let spot = 60;
 let spotDown = false;
 const mail = [];
-async function desk(viewport, { emailConfigured = true, isMobile = false } = {}) {
+const identifyCalls = [];
+const identifyAnswers = [];
+const REVIEW_OVERRIDE = "https://g.page/r/ag-refining-test/review";
+async function desk(viewport, { emailConfigured = true, isMobile = false, reviewUrl, identify = true } = {}) {
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1, hasTouch: true, isMobile, acceptDownloads: true });
   const page = await context.newPage();
   const errors = [];
@@ -42,9 +51,14 @@ async function desk(viewport, { emailConfigured = true, isMobile = false } = {})
     ? route.fulfill({ status: 502, contentType: "application/json", body: JSON.stringify({ message: "down" }) })
     : route.fulfill({ contentType: "application/json", body: JSON.stringify({ price: spot, source: "test", fetchedAt: new Date().toISOString() }) }));
   await page.route("**/api/receipt", (route) => {
-    if (route.request().method() === "GET") return route.fulfill({ contentType: "application/json", body: JSON.stringify({ email: emailConfigured }) });
+    if (route.request().method() === "GET") return route.fulfill({ contentType: "application/json", body: JSON.stringify({ email: emailConfigured, ...(reviewUrl ? { reviewUrl } : {}) }) });
     mail.push(JSON.parse(route.request().postData()));
     return route.fulfill({ contentType: "application/json", body: JSON.stringify({ ok: true }) });
+  });
+  await page.route("**/api/identify", (route) => {
+    if (route.request().method() === "GET") return route.fulfill({ contentType: "application/json", body: JSON.stringify({ available: identify }) });
+    identifyCalls.push(JSON.parse(route.request().postData()));
+    return route.fulfill({ contentType: "application/json", body: JSON.stringify(identifyAnswers.shift()) });
   });
   await page.goto(`${base}/desk`);
   return { context, page, errors };
@@ -55,10 +69,25 @@ const pin = async (page, digits) => { for (const d of digits) await page.click(`
 const text = (page, sel) => page.locator(sel).innerText();
 const settle = (page, ms = 1700) => page.waitForTimeout(ms);
 const money = (n) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+// The same modules the desk should draw for a link, as an SVG path.
+const qrPath = (text) => {
+  const qr = qrcode(0, "M");
+  qr.addData(text);
+  qr.make();
+  let path = "";
+  for (let r = 0; r < qr.getModuleCount(); r += 1) for (let c = 0; c < qr.getModuleCount(); c += 1) if (qr.isDark(r, c)) path += `M${c + 3} ${r + 3}h1v1h-1z`;
+  return path;
+};
+const counterPhoto = await sharp({ create: { width: 2400, height: 1800, channels: 3, background: { r: 196, g: 199, b: 204 } } }).jpeg({ quality: 80 }).toBuffer();
+const readHallmark = async (page, answer) => {
+  identifyAnswers.push(answer);
+  const [chooser] = await Promise.all([page.waitForEvent("filechooser"), page.click("[data-action='identify']")]);
+  await chooser.setFiles({ name: "hallmark.jpg", mimeType: "image/jpeg", buffer: counterPhoto });
+};
 
 // ---------- Scenario 1: a full sale on an iPad in landscape ----------
 {
-  const { context, page, errors } = await desk({ width: 1180, height: 820 });
+  const { context, page, errors } = await desk({ width: 1180, height: 820 }, { reviewUrl: REVIEW_OVERRIDE });
   await settle(page, 600);
   await shot(page, "01-first-run-code");
   assert.equal(await text(page, "[data-lock-title]"), "Choose a desk code");
@@ -75,6 +104,46 @@ const money = (n) => new Intl.NumberFormat("en-US", { style: "currency", currenc
   assert.equal(await page.locator(".lot-actions [data-action='present']").isDisabled(), true);
   await settle(page, 700);
   await shot(page, "02-desk-empty");
+
+  // Hallmark reader: a photo pre-selects the sheet, the owner stays in control.
+  await page.waitForSelector("[data-action='identify']", { state: "visible" });
+  assert.equal(await page.locator("[data-identify-input]").getAttribute("capture"), "environment");
+  assert.equal(await page.locator("[data-identify-input]").getAttribute("accept"), "image/*");
+  await readHallmark(page, { material: "sterling", purity: 0.958, coin: null, marks: ["BRITANNIA", "958"], confidence: "medium", note: "Britannia standard mark on the base." });
+  await page.waitForSelector("[data-sheet]", { state: "visible" });
+  assert.equal(identifyCalls.length, 1);
+  assert.equal(identifyCalls[0].code, "4747", "the desk code travels with the photo");
+  const sent = await sharp(Buffer.from(identifyCalls[0].imageBase64, "base64")).metadata();
+  assert.deepEqual([sent.format, sent.width, sent.height], ["jpeg", 1600, 1200], "photo is downsized to 1600 px JPEG");
+  assert.equal(await text(page, "[data-sheet-title]"), "Sterling silver");
+  assert.equal(await page.locator("[data-purity='0.958']").getAttribute("aria-pressed"), "true");
+  assert.equal(await page.locator("[data-purity='0.925']").getAttribute("aria-pressed"), "false");
+  assert.match(await text(page, "[data-identify-marks]"), /BRITANNIA · 958/);
+  assert.match(await text(page, "[data-identify-confidence]"), /medium confidence/i);
+  assert.match(await text(page, "[data-identify-note]"), /suggestion only/i);
+  assert.equal(await page.locator("[data-action='save-item']").isDisabled(), true, "nothing is added until the owner weighs it");
+  await shot(page, "15-hallmark-reading");
+  if (growthShots) {
+    await settle(page, 500);
+    await page.screenshot({ path: join(growthShots, "desk-hallmark-reading.jpg"), type: "jpeg", quality: 84 });
+  }
+  await page.click("[data-purity='0.925']");
+  assert.equal(await page.locator("[data-purity='0.925']").getAttribute("aria-pressed"), "true", "the owner can change the suggestion");
+  await page.click("[data-action='close-sheet']");
+  assert.equal(await page.locator("[data-lot-lines] li").count(), 0, "a reading never adds an item by itself");
+
+  await readHallmark(page, { material: "coins", purity: null, coin: "dime90", marks: ["1958", "D"], confidence: "high", note: "A 1958-D Roosevelt dime." });
+  await page.waitForSelector("[data-sheet]", { state: "visible" });
+  assert.equal(await page.locator("[data-coin='dime90']").getAttribute("aria-pressed"), "true");
+  await page.click("[data-action='close-sheet']");
+  await page.click("[data-material='sterling']");
+  assert.equal(await page.locator("[data-identify-note]").isHidden(), true, "a plain tap opens a sheet without the old reading");
+  await page.click("[data-action='close-sheet']");
+
+  await readHallmark(page, { material: null, purity: null, coin: null, marks: [], confidence: "low", note: "Could not read the marks clearly. Choose the material by hand." });
+  await page.waitForFunction(() => /Choose the material by hand/.test(document.querySelector("[data-toast]").textContent));
+  assert.equal(await page.locator("[data-sheet]").isHidden(), true);
+  assert.equal(await text(page, "[data-identify-label]"), "Read the hallmark");
 
   // Sterling flatware, 250 g
   await page.click("[data-material='sterling']");
@@ -212,6 +281,21 @@ const money = (n) => new Intl.NumberFormat("en-US", { style: "currency", currenc
   assert.match(receipt, /Signed electronically .* Record fingerprint [0-9A-F]{16}\./, "receipt carries the e-signature record");
   await shot(page, "09-sale-complete-receipt");
 
+  // Review card: QR for the server's review link, plus a prefilled text to the seller's phone.
+  await page.waitForSelector("[data-review-qr] svg path");
+  assert.equal(await page.locator("[data-review-card]").getAttribute("data-review-url"), REVIEW_OVERRIDE);
+  assert.equal(await page.locator("[data-review-qr] path").getAttribute("d"), qrPath(REVIEW_OVERRIDE), "QR encodes the review link");
+  const sms = await page.locator("[data-review-text]").getAttribute("href");
+  assert.match(sms, /^sms:\+17135550142\?&body=/);
+  const smsBody = decodeURIComponent(sms.split("body=")[1]);
+  assert.match(smsBody, /^Hi Ruth, thank you for choosing AG Refining today\./);
+  assert.ok(smsBody.endsWith(REVIEW_OVERRIDE));
+  assert.equal(await page.locator("[data-review-text]").isVisible(), true);
+  if (growthShots) {
+    await page.screenshot({ path: join(growthShots, "desk-review-card.jpg"), type: "jpeg", quality: 84 });
+    await page.locator("[data-review-card]").screenshot({ path: join(growthShots, "desk-review-card-detail.png") });
+  }
+
   // PDF via Share (falls back to a download in a desktop browser)
   const [download] = await Promise.all([page.waitForEvent("download"), page.click("[data-action='share-receipt']")]);
   const pdf = readFileSync(await download.path());
@@ -289,11 +373,13 @@ const money = (n) => new Intl.NumberFormat("en-US", { style: "currency", currenc
 // ---------- Scenario 2: market feed down, email not configured, portrait tablet ----------
 {
   spotDown = true;
-  const { context, page, errors } = await desk({ width: 820, height: 1180 }, { emailConfigured: false });
+  const { context, page, errors } = await desk({ width: 820, height: 1180 }, { emailConfigured: false, identify: false });
   await pin(page, "2468"); await page.click("[data-pin='ok']");
   await pin(page, "2468"); await page.click("[data-pin='ok']");
   await page.waitForFunction(() => document.querySelector("[data-live-chip]").dataset.state === "offline");
   assert.match(await text(page, "[data-live-text]"), /Market offline/);
+  await settle(page, 300);
+  assert.equal(await page.locator("[data-action='identify']").isHidden(), true, "no reader button when the reader is not set up");
   await page.click("[data-material='bullion']");
   await tapKeys(page, "10");
   assert.equal(await page.locator("[data-action='save-item']").isDisabled(), true, "no price, no offer");
@@ -325,6 +411,9 @@ const money = (n) => new Intl.NumberFormat("en-US", { style: "currency", currenc
   await page.mouse.move(pad.x + 200, pad.y + 60, { steps: 12 }); await page.mouse.up();
   await page.click(".agree-form button[type='submit']");
   await page.waitForSelector(".screen-done", { state: "visible" });
+  await page.waitForSelector("[data-review-qr] svg path");
+  assert.equal(await page.locator("[data-review-card]").getAttribute("data-review-url"), GOOGLE_REVIEW_URL);
+  assert.equal(await page.locator("[data-review-text]").isHidden(), true, "no text button without a phone number");
   // No email on file and email not configured: falls back to the PDF.
   page.once("dialog", (dialog) => dialog.accept("marcus@example.com"));
   const [download] = await Promise.all([page.waitForEvent("download"), page.click("[data-action='email-receipt']")]);

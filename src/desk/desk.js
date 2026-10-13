@@ -4,6 +4,7 @@ import {
   coinById, describeItem, formatMoney, formatNumber, materialById, priceItem, priceLot, receiptNumber
 } from "./pricing.mjs";
 import { agreementFingerprint, buildReceiptPdf, logoPng, renderReceiptHtml } from "./receipt.mjs";
+import { GOOGLE_REVIEW_URL, reviewTextLink, safeReviewUrl } from "./review-link.mjs";
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -12,6 +13,7 @@ const HOLD_MINUTES = 15;
 const SPOT_REFRESH_MS = 30_000;
 const SPOT_STALE_MS = 10 * 60_000;
 const HISTORY_LIMIT = 300;
+const IDENTIFY_MAX_PX = 1600;
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ---------- storage ----------
@@ -58,7 +60,10 @@ const state = {
   draft: null,
   editIndex: -1,
   currentSale: null,
-  emailConfigured: null
+  emailConfigured: null,
+  reviewUrl: GOOGLE_REVIEW_URL,
+  identifyAvailable: false,
+  identifying: false
 };
 if (!Array.isArray(state.lot.items)) state.lot = { items: [] };
 
@@ -192,6 +197,21 @@ function unlock(code) {
   lock.entry = "";
   renderDesk();
   show("desk");
+  loadDeskConfig();
+}
+
+// Server-side switches: receipt email, the review link override, and the hallmark reader.
+let configLoaded = false;
+async function loadDeskConfig() {
+  if (configLoaded) return;
+  configLoaded = true;
+  const getJson = (url) => fetch(url, { headers: { Accept: "application/json" } }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+  const [receipt, identify] = await Promise.all([getJson("/api/receipt"), getJson("/api/identify")]);
+  if (typeof receipt.email === "boolean") state.emailConfigured = receipt.email;
+  state.reviewUrl = safeReviewUrl(receipt.reviewUrl) || GOOGLE_REVIEW_URL;
+  state.identifyAvailable = identify.available === true;
+  $("[data-action='identify']").hidden = !state.identifyAvailable;
+  if (state.currentSale) renderReviewCard(state.currentSale);
 }
 
 function buildPinPad() {
@@ -337,7 +357,7 @@ function bindPrivateHold() {
 const WEIGHT_UNITS = ["g", "dwt", "ozt", "oz", "lb"];
 const UNIT_SHORT = { g: "Grams", dwt: "Pennyweight", ozt: "Troy oz", oz: "Ounces", lb: "Pounds", kg: "Kilograms" };
 
-function openSheet(materialId, editIndex = -1) {
+function openSheet(materialId, editIndex = -1, suggestion = null) {
   const material = materialById(materialId);
   if (!material) return;
   const existing = editIndex >= 0 ? state.lot.items[editIndex] : null;
@@ -367,9 +387,31 @@ function openSheet(materialId, editIndex = -1) {
   $("[data-action='remove-item']").hidden = editIndex < 0;
   $("[data-action='save-item']").innerHTML = editIndex >= 0 ? "Update offer" : `Add to offer <span class="i i-arrow" aria-hidden="true"></span>`;
   $("[data-item-offer]").dataset.value = "0";
+  renderSuggestion(suggestion);
   $("[data-sheet-backdrop]").hidden = false;
   $("[data-sheet]").hidden = false;
   renderDraft();
+}
+
+// A hallmark reading pre-selects chips in a fresh sheet. The owner still enters the
+// weight and taps Add, and can change any choice first.
+function renderSuggestion(suggestion) {
+  const note = $("[data-identify-note]");
+  if (!suggestion) {
+    note.hidden = true;
+    return;
+  }
+  const d = state.draft;
+  const material = materialById(d.material);
+  if (material.purities?.some(([p]) => p === suggestion.purity)) d.purity = suggestion.purity;
+  if (material.mode === "coins" && coinById(suggestion.coin)) d.coin = suggestion.coin;
+  const confidence = ["high", "medium", "low"].includes(suggestion.confidence) ? suggestion.confidence : "low";
+  $("[data-identify-confidence]").textContent = `${confidence[0].toUpperCase()}${confidence.slice(1)} confidence`;
+  $("[data-identify-confidence]").dataset.level = confidence;
+  const marks = Array.isArray(suggestion.marks) ? suggestion.marks.filter(Boolean) : [];
+  $("[data-identify-marks]").textContent = marks.length ? `Marks read: ${marks.join(" · ")}` : "No marks could be read.";
+  $("[data-identify-text]").textContent = suggestion.note || "";
+  note.hidden = false;
 }
 
 function closeSheet() {
@@ -473,6 +515,70 @@ function removeDraft() {
   renderTiles();
   renderLot();
   toast("Removed");
+}
+
+// ---------- hallmark reader ----------
+function setIdentifying(busy) {
+  state.identifying = busy;
+  const button = $("[data-action='identify']");
+  button.disabled = busy;
+  button.classList.toggle("busy", busy);
+  $("[data-identify-label]").textContent = busy ? "Reading the hallmark…" : "Read the hallmark";
+}
+
+// Downsize on the tablet so the upload is small and fast: longest side 1600 px, JPEG.
+function downsizePhoto(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, IDENTIFY_MAX_PX / Math.max(img.naturalWidth, img.naturalHeight));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL("image/jpeg", 0.85).split(",")[1] || "");
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("That photo could not be opened."));
+    };
+    img.src = url;
+  });
+}
+
+async function identifyPhoto(file) {
+  if (!file || state.identifying) return;
+  setIdentifying(true);
+  try {
+    const imageBase64 = await downsizePhoto(file);
+    const response = await fetch("/api/identify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ code: session.get("agdesk:code") || "", imageBase64 })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (response.status === 503) {
+      state.identifyAvailable = false;
+      $("[data-action='identify']").hidden = true;
+    }
+    if (!response.ok) throw new Error(result.message || "The photo could not be read right now.");
+    if (!materialById(result.material)) {
+      toast(result.note || "Could not read the marks clearly. Choose the material by hand.");
+      return;
+    }
+    closePanels();
+    openSheet(result.material, -1, result);
+  } catch (error) {
+    toast(error.message || "The photo could not be read right now.");
+  } finally {
+    setIdentifying(false);
+    $("[data-identify-input]").value = "";
+  }
 }
 
 // ---------- presentation ----------
@@ -705,9 +811,52 @@ function openDone(sale, { fresh = false, saved = true } = {}) {
   const svg = $(".done-check");
   svg.replaceWith(svg.cloneNode(true));
   $(".done-check").style.display = fresh ? "" : "none";
+  renderReviewCard(sale);
   closePanels();
   show("done");
 }
+
+// ---------- review card ----------
+let qrModule = null;
+async function qrSvg(text) {
+  qrModule = qrModule || import("/desk/vendor/qrcode.js");
+  const { default: qrcode } = await qrModule;
+  const qr = qrcode(0, "M");
+  qr.addData(text);
+  qr.make();
+  const count = qr.getModuleCount();
+  const quiet = 3;
+  let path = "";
+  for (let r = 0; r < count; r += 1) {
+    for (let c = 0; c < count; c += 1) {
+      if (qr.isDark(r, c)) path += `M${c + quiet} ${r + quiet}h1v1h-1z`;
+    }
+  }
+  const size = count + quiet * 2;
+  return `<svg viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges" aria-hidden="true"><rect width="${size}" height="${size}" class="qr-bg"/><path d="${path}" class="qr-fg"/></svg>`;
+}
+
+async function renderReviewCard(sale) {
+  const link = state.reviewUrl;
+  const box = $("[data-review-qr]");
+  const card = $("[data-review-card]");
+  card.dataset.reviewUrl = link;
+  const sms = reviewTextLink(sale?.seller?.phone, link, String(sale?.seller?.name || "").split(/\s+/)[0]);
+  const text = $("[data-review-text]");
+  text.hidden = !sms;
+  text.href = sms || "#";
+  if (box.dataset.for === link && box.innerHTML) return;
+  box.dataset.for = link;
+  try {
+    box.innerHTML = await qrSvg(link);
+    box.hidden = false;
+  } catch {
+    box.innerHTML = "";
+    box.hidden = true;
+  }
+}
+
+
 
 async function receiptPdf() {
   const sale = state.currentSale;
@@ -956,6 +1105,7 @@ function bind() {
         renderLot();
         return toast("Default rates restored");
       case "export-csv": return exportCsv();
+      case "identify": return $("[data-identify-input]").click();
       default:
     }
   });
@@ -967,6 +1117,7 @@ function bind() {
     renderLiveChip();
     renderLot();
   });
+  $("[data-identify-input]").addEventListener("change", (event) => identifyPhoto(event.target.files?.[0]));
   $("[data-agree-form]").addEventListener("submit", completeSale);
   $("[data-agree-form]").addEventListener("input", (event) => {
     event.target.removeAttribute?.("aria-invalid");
