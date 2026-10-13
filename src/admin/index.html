@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#f1ede4">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="AG Office">
+  <title>AG Refining Dashboard</title>
+  <link rel="icon" href="/assets/ag-mark-path.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/desk/icon-180.png">
+  <link rel="preload" href="/assets/fonts/manrope-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/desk/receipt.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body data-stage="boot">
+  <!-- Login -->
+  <section class="login" data-login aria-labelledby="login-title" hidden>
+    <div class="login-card">
+      <img class="login-mark" src="/assets/ag-mark-path.svg" alt="" width="104" height="104">
+      <p class="eyebrow">AG Refining · Owner dashboard</p>
+      <h1 id="login-title" data-login-title>Welcome back</h1>
+      <p class="login-hint" data-login-hint aria-live="polite">Enter your desk code.</p>
+      <div class="pin-dots" data-pin-dots aria-hidden="true"></div>
+      <div class="keypad" data-pin-pad></div>
+    </div>
+  </section>
+
+  <!-- Loading -->
+  <section class="loader" data-loader aria-live="polite" hidden>
+    <div class="loader-tile" aria-hidden="true">
+      <svg class="loader-frame" viewBox="0 0 132 132"><rect x="3" y="3" width="126" height="126" rx="4" pathLength="100"/></svg>
+      <img class="loader-mark" src="/assets/ag-mark-path.svg" alt="" width="104" height="104">
+    </div>
+    <div class="bead" role="progressbar" aria-label="Opening your records" aria-valuemin="0" aria-valuemax="100"><span class="bead-fill"></span><span class="bead-dot"></span></div>
+    <p class="loader-text">Opening your records</p>
+  </section>
+
+  <!-- Dashboard -->
+  <div class="app" data-app hidden>
+    <header class="bar">
+      <div class="brand"><img src="/assets/ag-mark-path.svg" alt="" width="48" height="48"><span><strong>AG</strong> Refining</span></div>
+      <nav class="tabs" aria-label="Dashboard">
+        <button type="button" class="tab" data-nav="home" aria-current="page"><span class="i i-home" aria-hidden="true"></span><span>Home</span></button>
+        <button type="button" class="tab" data-nav="records"><span class="i i-list" aria-hidden="true"></span><span>Records</span></button>
+      </nav>
+      <button type="button" class="lock-btn" data-action="lock"><span class="i i-lock" aria-hidden="true"></span><span class="lock-label">Lock</span></button>
+    </header>
+
+    <main class="main">
+      <!-- Home -->
+      <section class="page page-home" data-page="home" aria-labelledby="greeting">
+        <div class="hello">
+          <div class="hello-text">
+            <p class="today" data-today></p>
+            <h1 id="greeting" data-greeting>Hello, Dennis.</h1>
+            <p class="sync" data-sync data-state="local"><span class="sync-dot" aria-hidden="true"></span><span data-sync-text>Saved on this iPad</span></p>
+          </div>
+          <button type="button" class="desk-cta" data-action="open-desk">
+            <img src="/assets/ag-mark-path.svg" alt="" width="72" height="72">
+            <span class="desk-cta-text"><strong>Open the Buy Desk</strong><small>Buy silver at the counter</small></span>
+            <span class="i i-arrow" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <div class="kpis" data-kpis>
+          <div class="kpi"><span class="kpi-label">Paid today</span><strong data-kpi="today">$0</strong><small data-kpi-sub="today">No sales yet</small></div>
+          <div class="kpi"><span class="kpi-label">This week</span><strong data-kpi="week">$0</strong><small data-kpi-sub="week">Since Monday</small></div>
+          <div class="kpi"><span class="kpi-label">This month</span><strong data-kpi="month">$0</strong><small data-kpi-sub="month">Paid out</small></div>
+          <div class="kpi"><span class="kpi-label">Sales this month</span><strong data-kpi="count">0</strong><small data-kpi-sub="count">Receipts</small></div>
+          <div class="kpi kpi-private"><span class="kpi-label">Spread this month</span><strong data-kpi="spread">$0</strong><small>Private</small></div>
+        </div>
+
+        <section class="card chart-card" aria-labelledby="chart-title">
+          <header class="card-head">
+            <h2 id="chart-title">Paid, last 14 days</h2>
+            <p data-chart-total></p>
+          </header>
+          <div class="chart" data-chart></div>
+        </section>
+
+        <section class="card" aria-labelledby="recent-title">
+          <header class="card-head">
+            <h2 id="recent-title">Recent receipts</h2>
+            <button type="button" class="btn btn-secondary" data-nav="records">See all records</button>
+          </header>
+          <ol class="rows" data-recent></ol>
+        </section>
+      </section>
+
+      <!-- Records -->
+      <section class="page page-records" data-page="records" aria-labelledby="records-title" hidden>
+        <header class="records-head">
+          <h1 id="records-title">Records</h1>
+          <p class="records-sum" data-records-sum aria-live="polite"></p>
+        </header>
+        <div class="filters">
+          <label class="search">
+            <span class="i i-search" aria-hidden="true"></span>
+            <span class="sr-only">Search by name or receipt number</span>
+            <input type="search" data-search placeholder="Search name or receipt number" autocomplete="off" autocapitalize="words" enterkeyhint="search">
+          </label>
+          <div class="ranges" role="group" aria-label="Dates">
+            <button type="button" class="chip" data-range="all" aria-pressed="true">All dates</button>
+            <button type="button" class="chip" data-range="today" aria-pressed="false">Today</button>
+            <button type="button" class="chip" data-range="week" aria-pressed="false">This week</button>
+            <button type="button" class="chip" data-range="month" aria-pressed="false">This month</button>
+            <button type="button" class="chip" data-range="custom" aria-pressed="false">Choose dates</button>
+          </div>
+          <div class="custom-range" data-custom-range hidden>
+            <label class="field">From<input type="date" data-from></label>
+            <label class="field">To<input type="date" data-to></label>
+          </div>
+        </div>
+        <ol class="rows rows-full" data-records></ol>
+        <div class="records-actions">
+          <button type="button" class="btn btn-secondary" data-action="export-csv"><span class="i i-share" aria-hidden="true"></span>Export spreadsheet</button>
+          <button type="button" class="btn btn-quiet btn-danger" data-action="delete-all"><span class="i i-trash" aria-hidden="true"></span>Delete all records</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Receipt detail -->
+  <section class="detail" data-detail role="dialog" aria-modal="true" aria-labelledby="detail-name" hidden>
+    <header class="detail-bar">
+      <button type="button" class="btn btn-secondary" data-action="close-detail"><span class="i i-back" aria-hidden="true"></span>Back</button>
+      <p class="detail-no" data-detail-no></p>
+    </header>
+    <div class="detail-body" data-detail-body></div>
+  </section>
+
+  <!-- Confirm -->
+  <div class="confirm-backdrop" data-confirm hidden>
+    <div class="confirm" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-text">
+      <span class="confirm-icon i i-trash" aria-hidden="true"></span>
+      <h2 id="confirm-title" data-confirm-title>Delete this receipt?</h2>
+      <p id="confirm-text" class="confirm-text" data-confirm-text>This cannot be undone.</p>
+      <p class="confirm-what" data-confirm-what></p>
+      <label class="field confirm-type" data-confirm-type hidden>Type DELETE to confirm<input data-confirm-input autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done"></label>
+      <button type="button" class="hold" data-hold><span class="hold-fill" aria-hidden="true"></span><span class="hold-label" data-hold-label>Press and hold to delete</span></button>
+      <button type="button" class="btn btn-secondary btn-wide" data-action="cancel-confirm">Keep it</button>
+    </div>
+  </div>
+
+  <div class="print-area" data-print aria-hidden="true"><article class="receipt" data-print-receipt></article></div>
+  <div class="toast" data-toast role="status" aria-live="polite" hidden></div>
+
+  <script src="/desk/vendor/jspdf.umd.min.js" defer></script>
+  <script type="module" src="/admin/admin.js"></script>
+</body>
+</html>

@@ -4,14 +4,16 @@ import {
   coinById, describeItem, formatMoney, formatNumber, materialById, priceItem, priceLot, receiptNumber
 } from "./pricing.mjs";
 import { agreementFingerprint, buildReceiptPdf, logoPng, renderReceiptHtml } from "./receipt.mjs";
+import { GOOGLE_REVIEW_URL, reviewTextLink, safeReviewUrl } from "./review-link.mjs";
+import { cloudClient, openRecords, toCsv } from "./records.mjs";
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-const KEYS = { pin: "agdesk:pin", settings: "agdesk:settings", lot: "agdesk:lot", history: "agdesk:history", spot: "agdesk:spot" };
+const KEYS = { pin: "agdesk:pin", settings: "agdesk:settings", lot: "agdesk:lot", spot: "agdesk:spot" };
 const HOLD_MINUTES = 15;
 const SPOT_REFRESH_MS = 30_000;
 const SPOT_STALE_MS = 10 * 60_000;
-const HISTORY_LIMIT = 300;
+const IDENTIFY_MAX_PX = 1600;
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ---------- storage ----------
@@ -58,8 +60,25 @@ const state = {
   draft: null,
   editIndex: -1,
   currentSale: null,
-  emailConfigured: null
+  emailConfigured: null,
+  reviewUrl: GOOGLE_REVIEW_URL,
+  identifyAvailable: false,
+  identifying: false,
+  history: [] // completed sales, newest first, mirrored from the shared records store
 };
+
+// Sale records live in the shared "agdesk" IndexedDB store (src/desk/records.mjs), which the
+// owner dashboard at /admin reads too. Older receipts in localStorage are imported once.
+const records = openRecords();
+const cloud = () => cloudClient({ code: session.get("agdesk:code") || "" });
+async function loadHistory() {
+  try {
+    state.history = await records.list();
+  } catch {
+    state.history = state.history || [];
+  }
+  return state.history;
+}
 if (!Array.isArray(state.lot.items)) state.lot = { items: [] };
 
 function saveLot() { store.set(KEYS.lot, state.lot); }
@@ -192,6 +211,23 @@ function unlock(code) {
   lock.entry = "";
   renderDesk();
   show("desk");
+  loadDeskConfig();
+  // Quietly send any receipts the cloud has not seen yet (only when cloud records are set up).
+  loadHistory().then(() => records.sync(cloud())).then((result) => { if (result?.changed) loadHistory(); }).catch(() => {});
+}
+
+// Server-side switches: receipt email, the review link override, and the hallmark reader.
+let configLoaded = false;
+async function loadDeskConfig() {
+  if (configLoaded) return;
+  configLoaded = true;
+  const getJson = (url) => fetch(url, { headers: { Accept: "application/json" } }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+  const [receipt, identify] = await Promise.all([getJson("/api/receipt"), getJson("/api/identify")]);
+  if (typeof receipt.email === "boolean") state.emailConfigured = receipt.email;
+  state.reviewUrl = safeReviewUrl(receipt.reviewUrl) || GOOGLE_REVIEW_URL;
+  state.identifyAvailable = identify.available === true;
+  $("[data-action='identify']").hidden = !state.identifyAvailable;
+  if (state.currentSale) renderReviewCard(state.currentSale);
 }
 
 function buildPinPad() {
@@ -318,6 +354,8 @@ function bindPrivateHold() {
   const panel = $("[data-private]");
   const on = (event) => {
     event.preventDefault();
+    // Keep the hold even when the panel opening shifts the button under the finger or mouse.
+    try { if (event.pointerId != null) button.setPointerCapture(event.pointerId); } catch { /* not a pointer event */ }
     renderLot();
     panel.hidden = false;
     button.classList.add("held");
@@ -337,7 +375,7 @@ function bindPrivateHold() {
 const WEIGHT_UNITS = ["g", "dwt", "ozt", "oz", "lb"];
 const UNIT_SHORT = { g: "Grams", dwt: "Pennyweight", ozt: "Troy oz", oz: "Ounces", lb: "Pounds", kg: "Kilograms" };
 
-function openSheet(materialId, editIndex = -1) {
+function openSheet(materialId, editIndex = -1, suggestion = null) {
   const material = materialById(materialId);
   if (!material) return;
   const existing = editIndex >= 0 ? state.lot.items[editIndex] : null;
@@ -367,9 +405,31 @@ function openSheet(materialId, editIndex = -1) {
   $("[data-action='remove-item']").hidden = editIndex < 0;
   $("[data-action='save-item']").innerHTML = editIndex >= 0 ? "Update offer" : `Add to offer <span class="i i-arrow" aria-hidden="true"></span>`;
   $("[data-item-offer]").dataset.value = "0";
+  renderSuggestion(suggestion);
   $("[data-sheet-backdrop]").hidden = false;
   $("[data-sheet]").hidden = false;
   renderDraft();
+}
+
+// A hallmark reading pre-selects chips in a fresh sheet. The owner still enters the
+// weight and taps Add, and can change any choice first.
+function renderSuggestion(suggestion) {
+  const note = $("[data-identify-note]");
+  if (!suggestion) {
+    note.hidden = true;
+    return;
+  }
+  const d = state.draft;
+  const material = materialById(d.material);
+  if (material.purities?.some(([p]) => p === suggestion.purity)) d.purity = suggestion.purity;
+  if (material.mode === "coins" && coinById(suggestion.coin)) d.coin = suggestion.coin;
+  const confidence = ["high", "medium", "low"].includes(suggestion.confidence) ? suggestion.confidence : "low";
+  $("[data-identify-confidence]").textContent = `${confidence[0].toUpperCase()}${confidence.slice(1)} confidence`;
+  $("[data-identify-confidence]").dataset.level = confidence;
+  const marks = Array.isArray(suggestion.marks) ? suggestion.marks.filter(Boolean) : [];
+  $("[data-identify-marks]").textContent = marks.length ? `Marks read: ${marks.join(" · ")}` : "No marks could be read.";
+  $("[data-identify-text]").textContent = suggestion.note || "";
+  note.hidden = false;
 }
 
 function closeSheet() {
@@ -473,6 +533,70 @@ function removeDraft() {
   renderTiles();
   renderLot();
   toast("Removed");
+}
+
+// ---------- hallmark reader ----------
+function setIdentifying(busy) {
+  state.identifying = busy;
+  const button = $("[data-action='identify']");
+  button.disabled = busy;
+  button.classList.toggle("busy", busy);
+  $("[data-identify-label]").textContent = busy ? "Reading the hallmark…" : "Read the hallmark";
+}
+
+// Downsize on the tablet so the upload is small and fast: longest side 1600 px, JPEG.
+function downsizePhoto(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, IDENTIFY_MAX_PX / Math.max(img.naturalWidth, img.naturalHeight));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL("image/jpeg", 0.85).split(",")[1] || "");
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("That photo could not be opened."));
+    };
+    img.src = url;
+  });
+}
+
+async function identifyPhoto(file) {
+  if (!file || state.identifying) return;
+  setIdentifying(true);
+  try {
+    const imageBase64 = await downsizePhoto(file);
+    const response = await fetch("/api/identify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ code: session.get("agdesk:code") || "", imageBase64 })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (response.status === 503) {
+      state.identifyAvailable = false;
+      $("[data-action='identify']").hidden = true;
+    }
+    if (!response.ok) throw new Error(result.message || "The photo could not be read right now.");
+    if (!materialById(result.material)) {
+      toast(result.note || "Could not read the marks clearly. Choose the material by hand.");
+      return;
+    }
+    closePanels();
+    openSheet(result.material, -1, result);
+  } catch (error) {
+    toast(error.message || "The photo could not be read right now.");
+  } finally {
+    setIdentifying(false);
+    $("[data-identify-input]").value = "";
+  }
 }
 
 // ---------- presentation ----------
@@ -672,14 +796,15 @@ async function completeSale(event) {
     sale.esign.fingerprint = "";
   }
 
-  const history = store.get(KEYS.history, []);
-  history.unshift(sale);
-  let saved = store.set(KEYS.history, history.slice(0, HISTORY_LIMIT));
-  // If storage is full, keep the record and drop signatures from the oldest receipts.
-  for (let i = history.length - 1; !saved && i > 0; i -= 1) {
-    history[i].signature = "";
-    saved = store.set(KEYS.history, history.slice(0, HISTORY_LIMIT));
+  let saved = true;
+  try {
+    await records.save(sale);
+  } catch {
+    saved = false;
   }
+  state.history = [sale, ...state.history.filter((r) => r.receiptNo !== sale.receiptNo)];
+  // Cloud copy, when set up. A failure here is retried by the next sync.
+  if (saved) records.push(sale, cloud());
 
   state.lot = { items: [] };
   state.held = null;
@@ -705,9 +830,52 @@ function openDone(sale, { fresh = false, saved = true } = {}) {
   const svg = $(".done-check");
   svg.replaceWith(svg.cloneNode(true));
   $(".done-check").style.display = fresh ? "" : "none";
+  renderReviewCard(sale);
   closePanels();
   show("done");
 }
+
+// ---------- review card ----------
+let qrModule = null;
+async function qrSvg(text) {
+  qrModule = qrModule || import("/desk/vendor/qrcode.js");
+  const { default: qrcode } = await qrModule;
+  const qr = qrcode(0, "M");
+  qr.addData(text);
+  qr.make();
+  const count = qr.getModuleCount();
+  const quiet = 3;
+  let path = "";
+  for (let r = 0; r < count; r += 1) {
+    for (let c = 0; c < count; c += 1) {
+      if (qr.isDark(r, c)) path += `M${c + quiet} ${r + quiet}h1v1h-1z`;
+    }
+  }
+  const size = count + quiet * 2;
+  return `<svg viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges" aria-hidden="true"><rect width="${size}" height="${size}" class="qr-bg"/><path d="${path}" class="qr-fg"/></svg>`;
+}
+
+async function renderReviewCard(sale) {
+  const link = state.reviewUrl;
+  const box = $("[data-review-qr]");
+  const card = $("[data-review-card]");
+  card.dataset.reviewUrl = link;
+  const sms = reviewTextLink(sale?.seller?.phone, link, String(sale?.seller?.name || "").split(/\s+/)[0]);
+  const text = $("[data-review-text]");
+  text.hidden = !sms;
+  text.href = sms || "#";
+  if (box.dataset.for === link && box.innerHTML) return;
+  box.dataset.for = link;
+  try {
+    box.innerHTML = await qrSvg(link);
+    box.hidden = false;
+  } catch {
+    box.innerHTML = "";
+    box.hidden = true;
+  }
+}
+
+
 
 async function receiptPdf() {
   const sale = state.currentSale;
@@ -801,7 +969,11 @@ function newClient() {
 function openPanel(name) {
   closePanels();
   if (name === "settings") renderSettings();
-  if (name === "history") renderHistory();
+  if (name === "history") {
+    renderHistory();
+    // Pick up anything changed on the dashboard since the desk opened.
+    loadHistory().then(() => { if (!$("[data-panel='history']").hidden) renderHistory(); });
+  }
   $(`[data-panel='${name}']`).hidden = false;
 }
 
@@ -823,7 +995,7 @@ function renderSettings() {
 }
 
 function renderHistory() {
-  const history = store.get(KEYS.history, []);
+  const history = state.history;
   const today = new Date().toDateString();
   const todays = history.filter((sale) => new Date(sale.createdAt).toDateString() === today);
   const sum = (list, pick) => list.reduce((t, sale) => t + (pick(sale) || 0), 0);
@@ -845,27 +1017,10 @@ function escapeText(value) {
   return div.innerHTML;
 }
 
-function csvCell(value) {
-  const text = String(value ?? "");
-  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-}
-
 function exportCsv() {
-  const history = store.get(KEYS.history, []);
+  const history = state.history;
   if (!history.length) return toast("No receipts yet");
-  const header = ["Receipt", "Date", "Time", "Seller", "Phone", "Email", "Address", "ID type", "ID number", "Payment", "Items", "Paid", "Silver spot", "Fine oz", "Market value", "Refinery return", "Spread", "Signed at", "Signing device", "Record fingerprint"];
-  const rows = history.map((sale) => {
-    const when = new Date(sale.createdAt);
-    const p = sale.private || {};
-    return [
-      sale.receiptNo, when.toLocaleDateString("en-US"), when.toLocaleTimeString("en-US"),
-      sale.seller?.name, sale.seller?.phone, sale.seller?.email, sale.seller?.address, sale.seller?.idType, sale.seller?.idNumber,
-      sale.payment, sale.items.map((i) => `${i.title} (${i.detail})`).join("; "),
-      sale.total.toFixed(2), p.spot?.toFixed?.(3) ?? "", p.fine?.toFixed?.(4) ?? "", p.marketValue?.toFixed?.(2) ?? "", p.expectedReturn?.toFixed?.(2) ?? "", p.spread?.toFixed?.(2) ?? "",
-      sale.esign?.signedAt || "", sale.esign?.device || "", sale.esign?.fingerprint || ""
-    ].map(csvCell).join(",");
-  });
-  const blob = new Blob([[header.join(","), ...rows].join("\n")], { type: "text/csv" });
+  const blob = new Blob([toCsv(history)], { type: "text/csv" });
   const name = `AG-Refining-Receipts-${new Date().toISOString().slice(0, 10)}.csv`;
   const file = new File([blob], name, { type: "text/csv" });
   if (navigator.canShare?.({ files: [file] })) {
@@ -890,7 +1045,7 @@ function bind() {
     if (target.dataset.material) return openSheet(target.dataset.material);
     if (target.dataset.edit) return openSheet(state.lot.items[Number(target.dataset.edit)].material, Number(target.dataset.edit));
     if (target.dataset.open) return openPanel(target.dataset.open);
-    if (target.dataset.receiptIndex) return openDone(store.get(KEYS.history, [])[Number(target.dataset.receiptIndex)]);
+    if (target.dataset.receiptIndex) return openDone(state.history[Number(target.dataset.receiptIndex)]);
     if (target.dataset.coin && state.draft) { state.draft.coin = target.dataset.coin; return renderDraft(); }
     if (target.dataset.purity && state.draft) { state.draft.purity = Number(target.dataset.purity); return renderDraft(); }
     if (target.dataset.unit && state.draft) { state.draft.unit = target.dataset.unit; return renderDraft(); }
@@ -942,6 +1097,9 @@ function bind() {
       case "close-panel":
         closePanels();
         return renderDesk();
+      case "dashboard":
+        document.body.classList.add("leaving");
+        return void setTimeout(() => { window.location.href = "/admin"; }, reduceMotion ? 0 : 260);
       case "lock":
         session.remove("agdesk:code");
         return startLock("unlock");
@@ -956,6 +1114,7 @@ function bind() {
         renderLot();
         return toast("Default rates restored");
       case "export-csv": return exportCsv();
+      case "identify": return $("[data-identify-input]").click();
       default:
     }
   });
@@ -967,6 +1126,7 @@ function bind() {
     renderLiveChip();
     renderLot();
   });
+  $("[data-identify-input]").addEventListener("change", (event) => identifyPhoto(event.target.files?.[0]));
   $("[data-agree-form]").addEventListener("submit", completeSale);
   $("[data-agree-form]").addEventListener("input", (event) => {
     event.target.removeAttribute?.("aria-invalid");
@@ -985,6 +1145,7 @@ function bind() {
 }
 
 function init() {
+  loadHistory();
   buildPinPad();
   buildAmountPad();
   bindPrivateHold();

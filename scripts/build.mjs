@@ -2,6 +2,7 @@ import { cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderReviewForm } from "../src/review-form.mjs";
+import { COINS } from "../src/desk/pricing.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const out = join(root, "dist");
@@ -23,6 +24,7 @@ cpSync(join(root, "src", "home-header-reveal.js"), join(out, "home-header-reveal
 cpSync(join(root, "src", "home-loader.js"), join(out, "home-loader.js"));
 cpSync(join(root, "src", "materials-disclosure.js"), join(out, "materials-disclosure.js"));
 cpSync(join(root, "src", "cinematic-hero-video.js"), join(out, "cinematic-hero-video.js"));
+cpSync(join(root, "src", "silver-price.js"), join(out, "silver-price.js"));
 mkdirSync(join(out, "assets", "vendor"), { recursive: true });
 cpSync(join(root, "node_modules", "three", "build", "three.module.min.js"), join(out, "assets", "vendor", "three.module.min.js"));
 cpSync(join(root, "node_modules", "three", "build", "three.core.min.js"), join(out, "assets", "vendor", "three.core.min.js"));
@@ -1031,6 +1033,7 @@ const footerNavigationGroups = [
     links: [
       ["Our Story", "/about"],
       ["How It Works", "/how-it-works"],
+      ["Silver Price Today", "/silver-price-houston"],
       ["Contact AG Refining", "/contact"],
       [primaryCta, "/contact?intent=pickup"],
       [phoneDisplay, `tel:${phoneHref}`],
@@ -1089,6 +1092,7 @@ const spanishFooterNavigationGroups = [
     links: [
       [`Nuestra historia ${languageNote}`, "/about"],
       [`Cómo funciona ${languageNote}`, "/how-it-works"],
+      [`Precio de la Plata Hoy ${languageNote}`, "/silver-price-houston"],
       [`Contacto AG Refining ${languageNote}`, "/contact"],
       [spanishPrimaryCta, "#solicitud"],
       [phoneDisplay, `tel:${phoneHref}`],
@@ -1436,7 +1440,7 @@ function document({
     <link rel="icon" href="/assets/ag-mark-path.svg" type="image/svg+xml">
     <link rel="preload" href="/assets/fonts/newsreader-latin-opsz.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/assets/fonts/manrope-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/style.css?v=20260804-hero-v2">
+    <link rel="stylesheet" href="/style.css?v=20261013-price">
     ${homepage ? '<script>document.documentElement.classList.add("home-header-pending");window.__agHeaderFailOpen=setTimeout(function(){document.documentElement.classList.remove("home-header-pending","home-header-ready","home-header-revealed")},1500);if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.dataset.loaderState="ready"}else{document.documentElement.dataset.loaderState="loading";window.__agLoaderFailOpen=setTimeout(function(){document.documentElement.dataset.loaderState="ready";var loader=document.querySelector("[data-home-loader]");if(loader){loader.dataset.loaderState="ready";loader.setAttribute("aria-hidden","true");loader.setAttribute("inert","");loader.inert=true}},1200)}</script>' : ""}
     ${schemaTag({ "@context": "https://schema.org", "@graph": schema })}
   </head>
@@ -1714,7 +1718,7 @@ const home = `
           <a class="button button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
           <a class="phone-link" href="tel:${phoneHref}">Call AG Refining</a>
         </div>
-        <p class="location-note">Please call before visiting. Pickup and service timing depend on the material and schedule.</p>
+        <p class="location-note">Please call before visiting. Pickup and service timing depend on the material and schedule. <a href="/silver-price-houston">See today's silver price</a>.</p>
       </div>
     </div>
   </section>
@@ -2616,10 +2620,73 @@ writeFileSync(join(out, "faq", "index.html"), document({
   pageSchema: [faqSchema(allFaqItems)]
 }));
 
+// Houston silver price today: live spot (client-side from /api/spot), a 30-day chart,
+// and fine silver CONTENT only. Business rule: never publish melt values, offer
+// rates, or any other pricing math on the public site.
+const ozt = (grams) => grams / 31.1034768;
+const coinFine = Object.fromEntries(COINS.map((coin) => [coin.id, coin]));
+const silverContentRows = [
+  ["Sterling silver, 100 grams", "92.5% (.925)", ozt(100) * 0.925],
+  ["Dime, 1964 and earlier", "90%", coinFine.dime90.fine],
+  ["Quarter, 1964 and earlier", "90%", coinFine.quarter90.fine],
+  ["Half dollar, 1964 and earlier", "90%", coinFine.half90.fine],
+  ["Morgan or Peace dollar", "90%", coinFine.dollar90.fine],
+  ["Kennedy half dollar, 1965 to 1970", "40%", coinFine.half40.fine],
+  ["War nickel, 1942 to 1945", "35%", coinFine.nickel35.fine],
+  ["American Silver Eagle, 1 oz", "99.9%", coinFine.eagle.fine],
+  ["$1 face value of 90% dimes, quarters, or halves", "90%", coinFine.dime90.fine / coinFine.dime90.face]
+];
+const priceFaqs = [
+  ["What is the silver spot price?", "The spot price is the current market price for one troy ounce of pure silver traded in large wholesale amounts. It moves throughout the trading day."],
+  ["Is the spot price what I will be paid?", "No. The spot price is the market price for pure silver. Offers depend on the material, purity, and quantity, and are confirmed after weighing."],
+  ["What is a troy ounce?", "A troy ounce is the standard weight for precious metals. It equals 31.1035 grams, slightly heavier than an ordinary ounce."],
+  ["Where does the price come from?", "The live price comes from public market feeds for silver in U.S. dollars. The 30-day chart shows daily closing prices for COMEX silver futures, which follow the spot price closely."]
+];
+const silverPriceContent = `
+  <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["Silver price today", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Houston silver price</p><h1>Silver price today.</h1></div><p>The live market price for one troy ounce of pure silver, the last 30 days, and how much silver common items contain.</p></div></div></section>
+  <section class="section price-section" aria-labelledby="spot-heading"><div class="shell price-grid">
+    <div class="spot-panel" data-spot-panel data-state="static">
+      <h2 id="spot-heading" class="price-panel-label">Silver Spot Price</h2>
+      <p class="spot-figure" aria-live="polite"><span data-spot-price><a href="tel:${phoneHref}">Call for today's price</a></span><small data-spot-unit hidden>per troy ounce</small></p>
+      <p class="spot-meta" data-spot-updated>Live pricing loads in your browser. Call ${phoneDisplay} for today's price.</p>
+      <p class="spot-note">The spot price is the market price for pure silver. Offers depend on the material, purity, and quantity, and are confirmed after weighing.</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
+        <a class="phone-link" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
+      </div>
+    </div>
+    <figure class="price-chart" data-price-chart>
+      <figcaption><span class="price-chart-title">Last 30 days</span> <span data-chart-summary>Daily closing prices, COMEX silver futures, U.S. dollars per troy ounce.</span></figcaption>
+      <div class="price-chart-plot" data-chart-plot><p class="price-chart-fallback">The 30-day chart loads in your browser. Call ${phoneDisplay} for today's price.</p></div>
+    </figure>
+  </div></section>
+  <section class="section content-section" aria-labelledby="content-heading"><div class="shell detail-grid">
+    <aside class="detail-rail"><p class="eyebrow">Reference</p><h2 id="content-heading">How much silver is in it.</h2><p class="content-intro">Fine silver content of common items, in troy ounces of pure silver. These are weights, not prices.</p></aside>
+    <div class="content-table-wrap">
+      <table class="content-table">
+        <caption class="visually-hidden">Fine silver content of sterling and U.S. silver coins</caption>
+        <thead><tr><th scope="col">Item</th><th scope="col">Silver</th><th scope="col">Fine silver</th></tr></thead>
+        <tbody>${silverContentRows.map(([item, purity, fine]) => `<tr><th scope="row">${item}</th><td>${purity}</td><td>${fine.toFixed(4)} troy oz</td></tr>`).join("")}</tbody>
+      </table>
+      <p class="content-footnote">Figures are for unworn pieces. Worn coins and pieces with other metal attached contain less. We confirm material and purity with you when we weigh.</p>
+    </div>
+  </div></section>
+  <section class="section faq-section"><div class="shell faq-grid"><div><p class="eyebrow">Price questions</p><h2>Spot price, explained.</h2></div>${faqMarkup(priceFaqs)}</div></section>
+  <section class="conversion-band"><div class="shell"><p class="eyebrow">Ready to sell?</p><h2>Schedule a free pickup.</h2><p>Tell us what silver you have and where it is. We will confirm whether it qualifies and explain the next step.</p><div class="hero-actions hero-actions-center"><a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a><a class="phone-link phone-link-inverse" href="tel:${phoneHref}">Call ${phoneDisplay}</a></div></div></section>`;
+mkdirSync(join(out, "silver-price-houston"), { recursive: true });
+writeFileSync(join(out, "silver-price-houston", "index.html"), document({
+  title: "Silver Price Today in Houston | Live Spot Price | AG Refining",
+  description: "Today's live silver spot price per troy ounce, a 30-day price chart, and how much pure silver is in sterling and U.S. silver coins. From AG Refining in Houston.",
+  path: "silver-price-houston",
+  content: silverPriceContent,
+  pageSchema: [faqSchema(priceFaqs)],
+  moduleScripts: ["/silver-price.js?v=20261013-price"]
+}));
+
 // Human-readable site index: one page that links every public route so
 // crawlers, answer engines, and people can reach any page in one hop.
 const siteIndexGroups = [
-  ["Core pages", "Start here.", [["Home", "/"], ["Materials We Buy", "/accepted-materials"], ["Industries We Serve", "/industries"], ["Service Areas", "/service-areas"], ["How It Works", "/how-it-works"], ["Our Story", "/about"], ["FAQ", "/faq"], ["Contact and Pickup", "/contact"], ["Español", "/espanol"], ["Privacy", "/privacy"]]],
+  ["Core pages", "Start here.", [["Home", "/"], ["Materials We Buy", "/accepted-materials"], ["Industries We Serve", "/industries"], ["Service Areas", "/service-areas"], ["How It Works", "/how-it-works"], ["Silver Price Today", "/silver-price-houston"], ["Our Story", "/about"], ["FAQ", "/faq"], ["Contact and Pickup", "/contact"], ["Español", "/espanol"], ["Privacy", "/privacy"]]],
   ["Material pages", "Each page explains what qualifies and how pickup works.", materialPages.map((page) => [page.title.split(" | ")[0], `/${page.path}`])],
   ["Industry pages", "Silver service by the kind of business you run.", industryPages.map((page) => [page.heading, `/${page.path}`])],
   ["Service area pages", "Pickup routes across the Houston Metro Area.", locationPages.map((page) => [`${page.city} silver buyer`, `/${page.path}`])],
@@ -2700,6 +2767,7 @@ const llmsIndex = [
   "## Company pages",
   "",
   `- [How it works](${siteUrl}/how-it-works): the six-step process from first call to payment`,
+  `- [Houston silver price today](${siteUrl}/silver-price-houston): live silver spot price per troy ounce, a 30-day chart, and the fine silver content of sterling and U.S. silver coins`,
   `- [About the Stevens family](${siteUrl}/about): who runs AG Refining and why`,
   `- [FAQ](${siteUrl}/faq): every question the site answers, in one place`,
   `- [Contact and pickup request](${siteUrl}/contact): schedule a qualifying pickup or ask for a quote`,
@@ -2761,13 +2829,13 @@ writeFileSync(join(out, "llms-full.txt"), llmsFull.join("\n"));
 // from scripts/indexnow.mjs after each deploy.
 writeFileSync(join(out, `${indexNowKey}.txt`), indexNowKey);
 
-const staticPaths = ["", "accepted-materials", "industries", "service-areas", "how-it-works", "about", "contact", "espanol", "privacy", "faq", "sitemap"];
+const staticPaths = ["", "accepted-materials", "industries", "service-areas", "how-it-works", "silver-price-houston", "about", "contact", "espanol", "privacy", "faq", "sitemap"];
 const sitemapPaths = [...staticPaths, ...allServicePages.map((page) => page.path)];
 function sitemapEntry(path) {
   const loc = path ? `${siteUrl}/${path}` : `${siteUrl}/`;
   const page = allServicePagesByPath.get(path);
   const priority = path === "" ? "1.0" : page ? "0.8" : ["privacy", "sitemap"].includes(path) ? "0.3" : "0.7";
-  const changefreq = path === "" ? "weekly" : page ? "monthly" : "monthly";
+  const changefreq = path === "silver-price-houston" ? "daily" : path === "" ? "weekly" : "monthly";
   const alternates = path === "" || path === "espanol"
     ? `<xhtml:link rel="alternate" hreflang="en" href="${siteUrl}/"/><xhtml:link rel="alternate" hreflang="es" href="${siteUrl}/espanol"/><xhtml:link rel="alternate" hreflang="x-default" href="${siteUrl}/"/>`
     : "";
@@ -2790,3 +2858,4 @@ console.log(`Built ${sitemapPaths.length} public pages in dist`);
 
 // The private Buy Desk app ships with every build so no build path can drop it.
 await import("./build-desk.mjs");
+await import("./build-admin.mjs");

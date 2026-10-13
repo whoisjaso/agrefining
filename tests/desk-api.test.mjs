@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import spotHandler, { SOURCES, fetchSpot } from "../api/spot.js";
+import spotHandler, { HISTORY_URL, SOURCES, fetchHistory, fetchSpot, parseHistory } from "../api/spot.js";
 import receiptHandler, { codeMatches, receiptEmail } from "../api/receipt.js";
+import { GOOGLE_REVIEW_URL, reviewTextLink, reviewUrl, safeReviewUrl } from "../src/desk/review-link.mjs";
 
 function mockRes() {
   return {
@@ -58,6 +59,70 @@ test("spot handler only answers GET", async () => {
   assert.equal(res.statusCode, 405);
 });
 
+const yahooDaily = {
+  chart: { result: [{
+    timestamp: [1788998400, 1789084800, 1789171200, 1789257600, 1789344000],
+    indicators: { quote: [{ close: [58.112, null, 59.0004, 0.2, 60.4567] }] }
+  }] }
+};
+
+test("30-day history parses daily closes and drops gaps and implausible values", async () => {
+  assert.equal(HISTORY_URL, "https://query1.finance.yahoo.com/v8/finance/chart/SI=F?interval=1d&range=1mo");
+  assert.deepEqual(parseHistory(yahooDaily), [
+    { date: "2026-09-10", close: 58.112 },
+    { date: "2026-09-12", close: 59 },
+    { date: "2026-09-14", close: 60.457 }
+  ]);
+  assert.deepEqual(parseHistory({}), []);
+  const history = await fetchHistory(routeFetch([["SI=F?interval=1d&range=1mo", ok(yahooDaily)]]));
+  assert.equal(history.range, "30d");
+  assert.equal(history.source, "comex");
+  assert.equal(history.points.length, 3);
+  await assert.rejects(fetchHistory(routeFetch([["yahoo", ok({ chart: { result: [] } })]])));
+});
+
+test("spot handler serves the 30-day range with an hour of edge cache", async () => {
+  const res = mockRes();
+  await spotHandler({ method: "GET", url: "/api/spot?range=30d" }, res, { fetchImpl: routeFetch([["range=1mo", ok(yahooDaily)]]) });
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.points.length, 3);
+  assert.match(res.headers["cache-control"], /s-maxage=3600/);
+
+  const viaQuery = mockRes();
+  await spotHandler({ method: "GET", query: { range: "30d" } }, viaQuery, { fetchImpl: routeFetch([["range=1mo", ok(yahooDaily)]]) });
+  assert.equal(viaQuery.statusCode, 200);
+
+  const down = mockRes();
+  await spotHandler({ method: "GET", url: "/api/spot?range=30d" }, down, { fetchImpl: async () => { throw new Error("offline"); } });
+  assert.equal(down.statusCode, 502);
+  assert.equal(down.headers["cache-control"], "no-store");
+
+  const bad = mockRes();
+  await spotHandler({ method: "GET", url: "/api/spot?range=10y" }, bad);
+  assert.equal(bad.statusCode, 400);
+
+  const live = mockRes();
+  await spotHandler({ method: "GET", url: "/api/spot" }, live, { fetchImpl: routeFetch([["gold-api", ok({ price: 61.2 })]]) });
+  assert.equal(live.body.price, 61.2);
+  assert.match(live.headers["cache-control"], /s-maxage=20/);
+});
+
+test("review link has one default, a safe server override, and a prefilled text", () => {
+  assert.equal(GOOGLE_REVIEW_URL, "https://www.google.com/maps/search/?api=1&query=AG+Refining+9125+Airport+Blvd+Houston+TX");
+  assert.equal(reviewUrl({}), GOOGLE_REVIEW_URL);
+  assert.equal(reviewUrl({ GOOGLE_REVIEW_URL: "https://g.page/r/abc123/review" }), "https://g.page/r/abc123/review");
+  assert.equal(reviewUrl({ GOOGLE_REVIEW_URL: "javascript:alert(1)" }), GOOGLE_REVIEW_URL);
+  assert.equal(safeReviewUrl("http://example.com"), null);
+  const sms = reviewTextLink("(713) 555-0142", GOOGLE_REVIEW_URL, "Ruth");
+  assert.match(sms, /^sms:\+17135550142\?&body=/);
+  const body = decodeURIComponent(sms.split("body=")[1]);
+  assert.match(body, /^Hi Ruth, thank you for choosing AG Refining today\./);
+  assert.ok(body.endsWith(GOOGLE_REVIEW_URL));
+  assert.equal(reviewTextLink("555-01"), null);
+  assert.equal(reviewTextLink(""), null);
+  assert.match(reviewTextLink("+1 281 898 2719"), /^sms:\+12818982719/);
+});
+
 test("desk code comparison is exact", () => {
   assert.equal(codeMatches("4747", "4747"), true);
   assert.equal(codeMatches("4748", "4747"), false);
@@ -88,7 +153,7 @@ test("receipt email is disabled until both secrets are configured", async () => 
   await withEnv({ RESEND_API_KEY: "re_test", DESK_ACCESS_CODE: undefined }, async () => {
     const status = mockRes();
     await receiptHandler({ method: "GET" }, status);
-    assert.deepEqual(status.body, { email: false });
+    assert.deepEqual(status.body, { email: false, reviewUrl: GOOGLE_REVIEW_URL });
     const res = mockRes();
     await receiptHandler({ method: "POST", body: validBody }, res);
     assert.equal(res.statusCode, 503);
@@ -135,6 +200,21 @@ test("receipt email copy is warm, short, and contains no pricing detail", () => 
   assert.match(email.text, /^Hello Ruth,/);
   assert.match(email.html, /\$142\.75/);
   assert.doesNotMatch(email.text, /spot|market|spread|margin/i);
+  // One short, warm review invitation with the shared link, never pushy.
+  assert.equal((email.text.match(/Google review/g) || []).length, 1);
+  assert.match(email.text, new RegExp(`Google review helps other people find us: ${GOOGLE_REVIEW_URL.replace(/[?+.]/g, "\\$&")}`));
+  assert.match(email.html, /<a href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=AG\+Refining/);
+  assert.doesNotMatch(email.text, /\bplease\b|5.star|five.star|\bright now\b|today only/i);
+  const override = receiptEmail({ name: "Ruth Ames", receiptNo: "AG-261011-ABCD", total: "$142.75", review: "https://g.page/r/abc123/review" });
+  assert.match(override.text, /https:\/\/g\.page\/r\/abc123\/review/);
+});
+
+test("receipt status shares the review link override with the desk", async () => {
+  await withEnv({ GOOGLE_REVIEW_URL: "https://g.page/r/abc123/review" }, async () => {
+    const res = mockRes();
+    await receiptHandler({ method: "GET" }, res);
+    assert.equal(res.body.reviewUrl, "https://g.page/r/abc123/review");
+  });
 });
 
 test("repeated wrong desk codes are throttled", async () => {

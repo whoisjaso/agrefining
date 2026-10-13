@@ -2,6 +2,7 @@
 // Locked by DESK_ACCESS_CODE so the endpoint cannot be used as an open mail relay.
 import { timingSafeEqual } from "node:crypto";
 import { escapeHtml } from "../src/review-form.mjs";
+import { reviewUrl } from "../src/desk/review-link.mjs";
 
 const MAX_PDF_BYTES = 3_000_000;
 const DEFAULT_TO_EMAIL = "dennis@agrefining.com";
@@ -18,7 +19,7 @@ const FAILURE_WINDOW_MS = 15 * 60 * 1000;
 const MAX_FAILURES = 8;
 const failures = new Map();
 
-function clientKey(req) {
+export function clientKey(req) {
   return String(req.headers?.["x-forwarded-for"] || req.socket?.remoteAddress || "unknown").split(",")[0].trim();
 }
 
@@ -48,7 +49,7 @@ function readBody(req) {
   return typeof raw === "string" && raw ? JSON.parse(raw) : {};
 }
 
-export function receiptEmail({ name, receiptNo, total }) {
+export function receiptEmail({ name, receiptNo, total, review = reviewUrl(process.env) }) {
   const first = name.split(/\s+/)[0] || "there";
   const plain = [
     `Hello ${first},`,
@@ -57,6 +58,8 @@ export function receiptEmail({ name, receiptNo, total }) {
     total ? `Amount paid: ${total}` : "",
     "",
     "If you have more silver in the future, or know someone who does, we are always glad to help.",
+    "",
+    `If we took good care of you, a short Google review helps other people find us: ${review}`,
     "",
     "Dennis Stevens",
     "AG Refining · Houston, Texas",
@@ -68,6 +71,7 @@ export function receiptEmail({ name, receiptNo, total }) {
   <p>Thank you for choosing AG Refining. Your receipt is attached for your records.</p>
   ${total ? `<p style="font-size:22px;color:#102a43;margin:22px 0"><strong>${escapeHtml(total)}</strong> paid</p>` : ""}
   <p>If you have more silver in the future, or know someone who does, we are always glad to help.</p>
+  <p>If we took good care of you, a short <a href="${escapeHtml(review)}" style="color:#1d5e96">Google review</a> helps other people find us.</p>
   <p style="margin-top:28px">Dennis Stevens<br>AG Refining · Houston, Texas<br><a href="tel:+12818982719" style="color:#1d5e96">(281) 898-2719</a> · <a href="mailto:dennis@agrefining.com" style="color:#1d5e96">dennis@agrefining.com</a></p>
 </div>`;
   return { text: plain, html };
@@ -78,7 +82,8 @@ export default async function handler(req, res, { fetchImpl = fetch } = {}) {
   res.setHeader("X-Robots-Tag", "noindex");
   const configured = Boolean(process.env.RESEND_API_KEY && process.env.DESK_ACCESS_CODE);
 
-  if (req.method === "GET") return res.status(200).json({ email: configured });
+  // The desk reads the review link from here so GOOGLE_REVIEW_URL is honored on the tablet too.
+  if (req.method === "GET") return res.status(200).json({ email: configured, reviewUrl: reviewUrl(process.env) });
   if (req.method !== "POST") {
     res.setHeader("Allow", "GET, POST");
     return res.status(405).json({ message: "Use POST." });
