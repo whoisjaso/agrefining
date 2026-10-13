@@ -2858,3 +2858,4 @@ console.log(`Built ${sitemapPaths.length} public pages in dist`);
 
 // The private Buy Desk app ships with every build so no build path can drop it.
 await import("./build-desk.mjs");
+await import("./build-admin.mjs");

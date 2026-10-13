@@ -60,6 +60,8 @@ async function desk(viewport, { emailConfigured = true, isMobile = false, review
     identifyCalls.push(JSON.parse(route.request().postData()));
     return route.fulfill({ contentType: "application/json", body: JSON.stringify(identifyAnswers.shift()) });
   });
+  // Cloud records are off in these scenarios: the desk keeps everything on the tablet.
+  await page.route("**/api/records**", (route) => route.fulfill({ contentType: "application/json", body: JSON.stringify({ cloud: false }) }));
   await page.goto(`${base}/desk`);
   return { context, page, errors };
 }

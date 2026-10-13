@@ -52,8 +52,30 @@ Estimated materials are flagged "(est.)" on the desk. Adjust the rates to match 
 
 - **Receipts** lists every sale with today's count, amount paid, and spread.
 - **Export spreadsheet** creates a CSV with every sale, including the seller's full ID number, silver price, market value, and spread, for your books and records.
-- Receipts are stored on this tablet only. Export the spreadsheet regularly (weekly is a good habit) and keep it somewhere safe. Clearing Safari's website data erases the desk's receipts and code.
+- Receipts are stored on this tablet, and in the private cloud copy when it is set up (see Dashboard). Export the spreadsheet regularly (weekly is a good habit) and keep it somewhere safe. Clearing Safari's website data erases the receipts on the tablet and the desk code.
 - The client's receipt shows only the last four digits of their ID.
+
+## Dashboard
+
+The dashboard is the back office for the desk: every sale in one calm place. Open it at **www.agrefining.com/admin** (add it to the Home Screen too), or tap **Dashboard** at the top of the Buy Desk.
+
+- **Unlock** with the same desk code as the Buy Desk. If no code has been chosen on this iPad yet, the dashboard asks you to choose one. Coming from an unlocked desk, it opens without asking again. Tap **Lock** when you step away; it also locks itself after ten quiet minutes.
+- **Home** shows what you paid today, this week (from Monday), and this month, the number of sales this month, your spread this month, a bar chart of the last 14 days, and the five most recent receipts. The large **Open the Buy Desk** button takes you straight to the counter.
+- **Records** lists every completed sale. Search by the seller's name or the receipt number, or pick **Today**, **This week**, **This month**, or **Choose dates**. Tap a receipt to see everything: seller and full ID number, items, your private numbers (silver price, fine silver, market value, refinery return, spread), the signature, and the electronic signature record. From there you can share or save the receipt PDF, or print it.
+- **Export spreadsheet** saves the receipts you are looking at as a CSV, with the same columns as the desk's export.
+- **Delete this receipt** asks "Delete this receipt? This cannot be undone." Press and hold the red button until the bar fills. **Delete all records** also asks you to type DELETE first. Export the spreadsheet before deleting if you need a copy.
+
+The status line under the greeting says **Saved on this iPad** (receipts live on this tablet only) or **Synced to cloud** (a private copy is kept online, below).
+
+### Cloud copy (optional, one time)
+
+Receipts are saved on the tablet. A private cloud copy protects them if the iPad is lost or Safari's website data is cleared, and lets the dashboard on another device see the same records.
+
+1. In Vercel, open the **agrefining** project, then **Storage** → **Create** → **Blob**. Choose **Private** access and connect it to the agrefining project. This adds `BLOB_READ_WRITE_TOKEN` to the project for you.
+2. In **Settings** → **Environment Variables**, make sure `DESK_ACCESS_CODE` is set to the same digits as your desk code (it is the same setting receipt email uses).
+3. Redeploy. The dashboard's status line changes to **Synced to cloud**.
+
+From then on, the desk sends each completed sale to the cloud, and the dashboard merges the cloud and the tablet by receipt number. Deleting a receipt on the dashboard deletes the cloud copy too. Without these settings everything keeps working on the tablet alone.
 
 ## Live silver price
 

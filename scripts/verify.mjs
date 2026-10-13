@@ -64,8 +64,9 @@ function anchorsIn(source) {
   }));
 }
 
-// The Buy Desk is a private counter app, not a public page; it has its own tests.
-const htmlFiles = walk(out).filter((path) => path.endsWith(".html") && !relative(out, path).startsWith("desk"));
+// The Buy Desk and the owner dashboard are private apps, not public pages; they have their own tests.
+const isPrivateApp = (path) => /^(?:desk|admin)[\\/]/.test(relative(out, path));
+const htmlFiles = walk(out).filter((path) => path.endsWith(".html") && !isPrivateApp(path));
 for (const path of htmlFiles) {
   const source = readFileSync(path, "utf8");
   const displayPath = relative(out, path);

@@ -7,7 +7,7 @@
     "assets": "node scripts/fetch-assets.mjs",
     "build": "npm run assets && node scripts/build.mjs",
     "check": "node scripts/check.mjs",
-    "test": "node --test tests/fetch-assets-contract.test.mjs tests/generated-interaction-contract.test.mjs tests/footer-navigation-contract.test.mjs tests/mobile-homepage-contract.test.mjs tests/materials-navigation-contract.test.mjs tests/material-image-contract.test.mjs tests/leads-response.test.mjs tests/desk-pricing.test.mjs tests/desk-api.test.mjs tests/desk-identify.test.mjs tests/silver-price-page.test.mjs tests/cinematic-hero-markup.test.mjs tests/service-area-artifacts-contract.test.mjs tests/service-area-image-contract.test.mjs && npm run test:hero-runtime && npm run test:materials-runtime",
+    "test": "node --test tests/fetch-assets-contract.test.mjs tests/generated-interaction-contract.test.mjs tests/footer-navigation-contract.test.mjs tests/mobile-homepage-contract.test.mjs tests/materials-navigation-contract.test.mjs tests/material-image-contract.test.mjs tests/leads-response.test.mjs tests/desk-pricing.test.mjs tests/desk-api.test.mjs tests/desk-identify.test.mjs tests/admin-records.test.mjs tests/records-api.test.mjs tests/silver-price-page.test.mjs tests/cinematic-hero-markup.test.mjs tests/service-area-artifacts-contract.test.mjs tests/service-area-image-contract.test.mjs && npm run test:hero-runtime && npm run test:materials-runtime",
     "test:assay": "node --test tests/assay-scene-runtime.test.mjs tests/assay-production-contract.test.mjs",
     "test:media": "node --test tests/cinematic-media-contract.test.mjs",
     "test:hero-markup": "node --test tests/cinematic-hero-markup.test.mjs",
@@ -16,17 +16,22 @@
     "test:site-chrome": "node tests/site-chrome-browser.mjs",
     "test:service-areas": "node --test tests/service-area-artifacts-contract.test.mjs tests/service-area-image-contract.test.mjs",
     "test:materials-runtime": "node --test tests/materials-disclosure-runtime.test.mjs",
-    "verify": "npm run build && npm test && npm run test:assay && npm run check && node scripts/verify.mjs && npm run test:site-chrome && npm run test:desk && npm run test:price",
+    "verify": "npm run build && npm test && npm run test:assay && npm run check && node scripts/verify.mjs && npm run test:site-chrome && npm run test:desk && npm run test:admin && npm run test:price",
     "submit:indexnow": "node scripts/indexnow.mjs",
     "test:desk": "node tests/desk-browser.mjs",
-    "test:price": "node tests/silver-price-browser.mjs"
+    "test:price": "node tests/silver-price-browser.mjs",
+    "test:admin": "node tests/admin-browser.mjs"
   },
   "devDependencies": {
     "@sparticuz/chromium": "^149.0.0",
+    "fake-indexeddb": "6.2.5",
     "jspdf": "^2.5.2",
     "playwright-core": "^1.61.1",
     "qrcode-generator": "2.0.4",
     "sharp": "^0.35.3",
     "three": "0.185.1"
+  },
+  "dependencies": {
+    "@vercel/blob": "2.8.0"
   }
 }

@@ -36,6 +36,17 @@ Each request emails AG Refining (reply-to the visitor, with a one-tap call butto
 
 Desk source lives in `src/desk/` and is published by `scripts/build-desk.mjs`, which also vendors `qrcode-generator` (MIT, pinned) for the review QR code. Tests: `tests/desk-pricing.test.mjs`, `tests/desk-api.test.mjs`, `tests/desk-identify.test.mjs`, and the browser simulation `npm run test:desk` (screenshots with `node tests/desk-browser.mjs --shots`).
 
+## Owner dashboard
+
+`/admin` is a private, noindex dashboard for the owner: a full-screen desk-code login (the same locally stored, hashed code as the Buy Desk), a short loading screen, KPI tiles (paid today, this week, this month, sales this month, spread this month), a 14-day bar chart, recent receipts, and an **Open the Buy Desk** button. **Records** searches and filters every sale, opens the full detail (private numbers, signature, e-sign record), re-shares or prints the receipt PDF, exports the CSV, and deletes one receipt or all of them behind a press-and-hold confirmation.
+
+Sales live in the `agdesk` IndexedDB database through one shared module, `src/desk/records.mjs`, used by both the desk and the dashboard. Receipts that older desks kept in localStorage (`agdesk:history`) are imported once. Optional cloud copy: `/api/records` stores each sale as `sales/<receiptNo>.json` in a private Vercel Blob store (`@vercel/blob`), behind the desk code in the `x-desk-code` header with the same per-IP failure throttle as `/api/receipt`. `GET /api/records?status=1` returns `{"cloud": false}` until both variables are set, and the apps stay fully local.
+
+- `BLOB_READ_WRITE_TOKEN`: added automatically when a Blob store is connected. One-time setup: Vercel → project **agrefining** → **Storage** → **Create** → **Blob** (**Private**) → connect to the project, then redeploy.
+- `DESK_ACCESS_CODE`: the same digits as the desk code (shared with receipt email).
+
+Source lives in `src/admin/` and is published by `scripts/build-admin.mjs`. Tests: `tests/admin-records.test.mjs` (storage, migration, merge, sync, numbers), `tests/records-api.test.mjs` (endpoint with a mocked blob client), and the browser simulation `npm run test:admin` (screenshots with `node tests/admin-browser.mjs --shots` into `docs/qa/admin-captures/`). See the Dashboard section of `docs/buy-desk-guide.md` for the owner guide.
+
 ## Houston silver price page
 
 `/silver-price-houston` shows the live silver spot price per troy ounce (from `/api/spot`, refreshed every minute), a 30-day chart of daily closes (`/api/spot?range=30d`, COMEX silver futures, cached for an hour), and a reference table of fine silver content in sterling and U.S. silver coins. By business decision it never shows melt values, offer rates, or other pricing math. Without JavaScript the page shows a call-for-price fallback. Tests: `tests/silver-price-page.test.mjs` and `npm run test:price`.

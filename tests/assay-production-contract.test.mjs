@@ -8,8 +8,8 @@ import sharp from "sharp";
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const dist = join(root, "dist");
 
-// The Buy Desk at /desk is a private counter app with its own tests, not a public page.
-const isPrivateApp = (path) => /[\\/]dist[\\/]desk[\\/]/.test(path);
+// The Buy Desk at /desk and the owner dashboard at /admin are private apps with their own tests, not public pages.
+const isPrivateApp = (path) => /[\\/]dist[\\/](?:desk|admin)[\\/]/.test(path);
 
 function walk(directory) {
   return readdirSync(directory).flatMap((name) => {

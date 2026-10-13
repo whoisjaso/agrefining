@@ -19,7 +19,7 @@ const FAILURE_WINDOW_MS = 15 * 60 * 1000;
 const MAX_FAILURES = 8;
 const failures = new Map();
 
-function clientKey(req) {
+export function clientKey(req) {
   return String(req.headers?.["x-forwarded-for"] || req.socket?.remoteAddress || "unknown").split(",")[0].trim();
 }
 

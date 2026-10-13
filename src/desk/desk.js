@@ -5,14 +5,14 @@ import {
 } from "./pricing.mjs";
 import { agreementFingerprint, buildReceiptPdf, logoPng, renderReceiptHtml } from "./receipt.mjs";
 import { GOOGLE_REVIEW_URL, reviewTextLink, safeReviewUrl } from "./review-link.mjs";
+import { cloudClient, openRecords, toCsv } from "./records.mjs";
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-const KEYS = { pin: "agdesk:pin", settings: "agdesk:settings", lot: "agdesk:lot", history: "agdesk:history", spot: "agdesk:spot" };
+const KEYS = { pin: "agdesk:pin", settings: "agdesk:settings", lot: "agdesk:lot", spot: "agdesk:spot" };
 const HOLD_MINUTES = 15;
 const SPOT_REFRESH_MS = 30_000;
 const SPOT_STALE_MS = 10 * 60_000;
-const HISTORY_LIMIT = 300;
 const IDENTIFY_MAX_PX = 1600;
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -63,8 +63,22 @@ const state = {
   emailConfigured: null,
   reviewUrl: GOOGLE_REVIEW_URL,
   identifyAvailable: false,
-  identifying: false
+  identifying: false,
+  history: [] // completed sales, newest first, mirrored from the shared records store
 };
+
+// Sale records live in the shared "agdesk" IndexedDB store (src/desk/records.mjs), which the
+// owner dashboard at /admin reads too. Older receipts in localStorage are imported once.
+const records = openRecords();
+const cloud = () => cloudClient({ code: session.get("agdesk:code") || "" });
+async function loadHistory() {
+  try {
+    state.history = await records.list();
+  } catch {
+    state.history = state.history || [];
+  }
+  return state.history;
+}
 if (!Array.isArray(state.lot.items)) state.lot = { items: [] };
 
 function saveLot() { store.set(KEYS.lot, state.lot); }
@@ -198,6 +212,8 @@ function unlock(code) {
   renderDesk();
   show("desk");
   loadDeskConfig();
+  // Quietly send any receipts the cloud has not seen yet (only when cloud records are set up).
+  loadHistory().then(() => records.sync(cloud())).then((result) => { if (result?.changed) loadHistory(); }).catch(() => {});
 }
 
 // Server-side switches: receipt email, the review link override, and the hallmark reader.
@@ -338,6 +354,8 @@ function bindPrivateHold() {
   const panel = $("[data-private]");
   const on = (event) => {
     event.preventDefault();
+    // Keep the hold even when the panel opening shifts the button under the finger or mouse.
+    try { if (event.pointerId != null) button.setPointerCapture(event.pointerId); } catch { /* not a pointer event */ }
     renderLot();
     panel.hidden = false;
     button.classList.add("held");
@@ -778,14 +796,15 @@ async function completeSale(event) {
     sale.esign.fingerprint = "";
   }
 
-  const history = store.get(KEYS.history, []);
-  history.unshift(sale);
-  let saved = store.set(KEYS.history, history.slice(0, HISTORY_LIMIT));
-  // If storage is full, keep the record and drop signatures from the oldest receipts.
-  for (let i = history.length - 1; !saved && i > 0; i -= 1) {
-    history[i].signature = "";
-    saved = store.set(KEYS.history, history.slice(0, HISTORY_LIMIT));
+  let saved = true;
+  try {
+    await records.save(sale);
+  } catch {
+    saved = false;
   }
+  state.history = [sale, ...state.history.filter((r) => r.receiptNo !== sale.receiptNo)];
+  // Cloud copy, when set up. A failure here is retried by the next sync.
+  if (saved) records.push(sale, cloud());
 
   state.lot = { items: [] };
   state.held = null;
@@ -950,7 +969,11 @@ function newClient() {
 function openPanel(name) {
   closePanels();
   if (name === "settings") renderSettings();
-  if (name === "history") renderHistory();
+  if (name === "history") {
+    renderHistory();
+    // Pick up anything changed on the dashboard since the desk opened.
+    loadHistory().then(() => { if (!$("[data-panel='history']").hidden) renderHistory(); });
+  }
   $(`[data-panel='${name}']`).hidden = false;
 }
 
@@ -972,7 +995,7 @@ function renderSettings() {
 }
 
 function renderHistory() {
-  const history = store.get(KEYS.history, []);
+  const history = state.history;
   const today = new Date().toDateString();
   const todays = history.filter((sale) => new Date(sale.createdAt).toDateString() === today);
   const sum = (list, pick) => list.reduce((t, sale) => t + (pick(sale) || 0), 0);
@@ -994,27 +1017,10 @@ function escapeText(value) {
   return div.innerHTML;
 }
 
-function csvCell(value) {
-  const text = String(value ?? "");
-  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-}
-
 function exportCsv() {
-  const history = store.get(KEYS.history, []);
+  const history = state.history;
   if (!history.length) return toast("No receipts yet");
-  const header = ["Receipt", "Date", "Time", "Seller", "Phone", "Email", "Address", "ID type", "ID number", "Payment", "Items", "Paid", "Silver spot", "Fine oz", "Market value", "Refinery return", "Spread", "Signed at", "Signing device", "Record fingerprint"];
-  const rows = history.map((sale) => {
-    const when = new Date(sale.createdAt);
-    const p = sale.private || {};
-    return [
-      sale.receiptNo, when.toLocaleDateString("en-US"), when.toLocaleTimeString("en-US"),
-      sale.seller?.name, sale.seller?.phone, sale.seller?.email, sale.seller?.address, sale.seller?.idType, sale.seller?.idNumber,
-      sale.payment, sale.items.map((i) => `${i.title} (${i.detail})`).join("; "),
-      sale.total.toFixed(2), p.spot?.toFixed?.(3) ?? "", p.fine?.toFixed?.(4) ?? "", p.marketValue?.toFixed?.(2) ?? "", p.expectedReturn?.toFixed?.(2) ?? "", p.spread?.toFixed?.(2) ?? "",
-      sale.esign?.signedAt || "", sale.esign?.device || "", sale.esign?.fingerprint || ""
-    ].map(csvCell).join(",");
-  });
-  const blob = new Blob([[header.join(","), ...rows].join("\n")], { type: "text/csv" });
+  const blob = new Blob([toCsv(history)], { type: "text/csv" });
   const name = `AG-Refining-Receipts-${new Date().toISOString().slice(0, 10)}.csv`;
   const file = new File([blob], name, { type: "text/csv" });
   if (navigator.canShare?.({ files: [file] })) {
@@ -1039,7 +1045,7 @@ function bind() {
     if (target.dataset.material) return openSheet(target.dataset.material);
     if (target.dataset.edit) return openSheet(state.lot.items[Number(target.dataset.edit)].material, Number(target.dataset.edit));
     if (target.dataset.open) return openPanel(target.dataset.open);
-    if (target.dataset.receiptIndex) return openDone(store.get(KEYS.history, [])[Number(target.dataset.receiptIndex)]);
+    if (target.dataset.receiptIndex) return openDone(state.history[Number(target.dataset.receiptIndex)]);
     if (target.dataset.coin && state.draft) { state.draft.coin = target.dataset.coin; return renderDraft(); }
     if (target.dataset.purity && state.draft) { state.draft.purity = Number(target.dataset.purity); return renderDraft(); }
     if (target.dataset.unit && state.draft) { state.draft.unit = target.dataset.unit; return renderDraft(); }
@@ -1091,6 +1097,9 @@ function bind() {
       case "close-panel":
         closePanels();
         return renderDesk();
+      case "dashboard":
+        document.body.classList.add("leaving");
+        return void setTimeout(() => { window.location.href = "/admin"; }, reduceMotion ? 0 : 260);
       case "lock":
         session.remove("agdesk:code");
         return startLock("unlock");
@@ -1136,6 +1145,7 @@ function bind() {
 }
 
 function init() {
+  loadHistory();
   buildPinPad();
   buildAmountPad();
   bindPrivateHold();
