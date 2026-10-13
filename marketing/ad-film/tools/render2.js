@@ -1,4 +1,4 @@
-// render2.js — plan-driven renderer.  node render2.js PLAN.json OUTDIR [workers]
+// render2.js: plan-driven renderer.  node render2.js PLAN.json OUTDIR [workers]
 // PLAN: [{"o":"name.png","t":seconds}, ...]  (sharp pass = one sample per frame; blur pass = many samples per frame)
 const { chromium } = require("playwright-core");
 const path = require("path"), fs = require("fs");

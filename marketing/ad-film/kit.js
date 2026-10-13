@@ -1,4 +1,4 @@
-/* adfilm kit — reusable pieces for code-built ads (pure functions of the frame number f at 60 fps).
+/* adfilm kit: reusable pieces for code-built ads (pure functions of the frame number f at 60 fps).
  * Motion vocabulary adapted from the MIT-licensed `cinetic` skill by Leon Lin (tokens, hitPulse, seams), rebuilt for our seek(t) engine.
  * Rules baked in: ~3 easing characters, zero overshoot (critically damped), one settle constant for type, everything on a whole-frame grid.
  */
