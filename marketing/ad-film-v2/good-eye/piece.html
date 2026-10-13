@@ -1,0 +1,307 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>AG Refining: Good eye</title>
+<style>
+@font-face { font-family: "InterV"; src: url("inter.woff2") format("woff2"); font-weight: 100 900; }
+@font-face { font-family: "MR"; src: url("manrope-latin-wght.woff2") format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "NR"; src: url("newsreader-latin-opsz.woff2") format("woff2"); font-weight: 200 800; font-style: normal; }
+html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #F4F5FA; }
+* { box-sizing: border-box; }
+#stage { position: absolute; inset: 0; overflow: hidden; font-family: "InterV", sans-serif; -webkit-font-smoothing: antialiased; color: #0B0B0F; }
+#bg { position: absolute; inset: 0; }
+.blob { position: absolute; border-radius: 50%; filter: blur(90px); }
+#world { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 960px; }
+.abs { position: absolute; }
+.card { position: absolute; border-radius: 46px; background: rgba(255,255,255,0.78); box-shadow: 0 2px 6px rgba(20,30,60,0.05), 0 24px 60px rgba(20,30,60,0.12); overflow: hidden; }
+.notif { display: flex; gap: 30px; align-items: center; padding: 0 40px; }
+.tile { width: 104px; height: 104px; border-radius: 26px; display: flex; align-items: center; justify-content: center; flex: none; }
+.app { font-size: 30px; font-weight: 600; letter-spacing: 0.02em; color: rgba(11,11,15,0.5); display: flex; justify-content: space-between; text-transform: uppercase; }
+.ttl { font-size: 52px; font-weight: 650; letter-spacing: -0.02em; margin-top: 4px; }
+.sub { font-size: 42px; font-weight: 500; color: rgba(11,11,15,0.62); margin-top: 2px; letter-spacing: -0.01em; }
+.head { position: absolute; left: 0; width: 1080px; text-align: center; font-weight: 750; letter-spacing: -0.045em; white-space: nowrap; }
+.w { display: inline-block; }
+.ph { position: absolute; background-size: cover; background-position: center; border-radius: 10px; }
+.bubble { position: absolute; padding: 30px 42px; border-radius: 52px; font-size: 54px; font-weight: 500; letter-spacing: -0.015em; line-height: 1.22; max-width: 760px; }
+#grain { position: absolute; inset: 0; pointer-events: none; opacity: 0.5; }
+.touch { position: absolute; width: 96px; height: 96px; margin: -48px 0 0 -48px; border-radius: 50%; background: rgba(40,40,60,0.18); border: 3px solid rgba(255,255,255,0.85); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+</style></head>
+<body><div id="stage">
+<div id="bg"><div class="blob" id="b1"></div><div class="blob" id="b2"></div><div class="blob" id="b3"></div></div>
+<div id="world">
+  <!-- lock screen -->
+  <div class="head" id="clock" style="top:150px;font-weight:300;font-size:250px;letter-spacing:-0.04em;color:#1b2840">9:41</div>
+  <div class="head" id="date" style="top:120px;font-weight:600;font-size:46px;letter-spacing:-0.01em;color:#1b2840">Friday, October 17</div>
+  <div class="card notif" id="n1"><div class="tile" style="background:#FF3B30"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></div>
+    <div style="flex:1"><div class="app"><span>Calendar</span><span>now</span></div><div class="ttl">Rent due</div><div class="sub">Friday · Don't forget</div></div></div>
+  <div class="card notif" id="n2"><div class="tile" style="background:#34C759"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-6 9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg></div>
+    <div style="flex:1"><div class="app"><span>Bank</span><span>2m ago</span></div><div class="ttl">Available balance</div><div class="sub">$112.40</div></div></div>
+  <div class="card notif" id="n3"><div class="tile" style="background:#FFCC00"><svg width="60" height="60" viewBox="0 0 24 24" fill="#fff"><path d="M13.2 2.5L5 13.4h5.6L9.8 21.5 18 10.6h-5.6z"/></svg></div>
+    <div style="flex:1"><div class="app"><span>Electric</span><span>1h ago</span></div><div class="ttl">Your bill is ready</div><div class="sub">Due in 5 days</div></div></div>
+  <div class="head" id="h1" style="top:1380px;font-size:124px"></div>
+
+  <!-- photos -->
+  <div class="abs" id="pHead" style="left:60px;top:150px"><div style="font-size:88px;font-weight:760;letter-spacing:-0.035em">Memories</div><div style="font-size:42px;font-weight:550;color:rgba(11,11,15,0.5);margin-top:4px">Grandma's house</div></div>
+  <div id="grid"></div>
+  <div class="head" id="h2" style="top:1560px;font-size:80px;color:#1b2840"></div>
+
+  <!-- the turned spoon -->
+  <div class="card" id="spoon" style="background:#e9e7e2">
+    <div class="abs" id="front" style="inset:0;background:url(img/p8.jpg) center/cover"></div>
+    <div class="abs" id="back" style="inset:0;overflow:hidden;transform:scaleX(-1)"><img id="sterImg" src="img/sterling.jpg" style="position:absolute;left:0;top:0;transform-origin:0 0">
+      <svg class="abs" id="live" style="left:0;top:0;overflow:visible" width="1" height="1"><g id="brk" fill="none" stroke="#FFCC00" stroke-width="7" stroke-linecap="round"></g></svg>
+      <div class="abs" id="chip" style="left:28px;bottom:28px;padding:14px 24px;border-radius:30px;background:rgba(0,0,0,0.55);color:#fff;font-size:30px;font-weight:600;display:flex;gap:12px;align-items:center;transform-origin:0 100%"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M8 10h8M8 14h5"/></svg>Live Text</div></div>
+  </div>
+
+  <!-- spotlight -->
+  <div class="card" id="spot" style="display:flex;align-items:center;gap:24px;padding:0 40px;border-radius:40px">
+    <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="rgba(11,11,15,0.55)" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+    <div id="q" style="font-size:50px;font-weight:550;letter-spacing:-0.02em;white-space:nowrap"></div></div>
+  <div class="card" id="res" style="padding:44px 50px">
+    <div style="font-size:30px;font-weight:650;letter-spacing:0.04em;color:rgba(11,11,15,0.45);text-transform:uppercase">Dictionary</div>
+    <div style="font-size:64px;font-weight:720;letter-spacing:-0.03em;margin-top:14px">sterling silver</div>
+    <div style="font-size:44px;font-weight:500;color:rgba(11,11,15,0.7);margin-top:12px;line-height:1.25">silver that is <span id="pure" style="font-weight:700;color:#0B0B0F">92.5% pure</span>.<br>Often stamped <b>925</b> or <b>STERLING</b>.</div></div>
+  <div class="head" id="h3" style="top:860px;font-size:190px"></div>
+
+  <!-- the two pieces -->
+  <div class="card" id="pieceA" style="padding:48px 50px;overflow:visible"><div id="knob" style="position:absolute;right:-58px;top:50%;margin-top:-58px;width:116px;height:116px;border-radius:50%;background:rgba(255,255,255,0.97)"></div>
+    <div class="tile" style="background:#FF3B30;width:84px;height:84px;border-radius:22px"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></div>
+    <div style="font-size:64px;font-weight:740;letter-spacing:-0.03em;margin-top:40px">Rent due</div><div style="font-size:44px;font-weight:550;color:rgba(11,11,15,0.5)">Friday</div><div style="font-size:44px;font-weight:600;color:#D6291F;margin-top:150px">$112.40 available</div></div>
+  <div class="card" id="seam" style="background:none;box-shadow:none;border-radius:0;overflow:visible"></div>
+
+  <!-- messages -->
+  <div class="abs" id="mHead" style="left:0;width:1080px;top:110px;text-align:center">
+    <div id="avatar" style="width:128px;height:128px;margin:0 auto;border-radius:64px;background:url(img/agmark.png) center/cover"></div>
+    <div style="font-size:36px;font-weight:600;margin-top:16px;letter-spacing:-0.01em">AG Refining</div></div>
+  <div class="bubble" id="m1" style="background:#0A84FF;color:#fff"></div>
+  <div class="bubble" id="dots" style="background:#E9E9EB;padding:30px 36px"><svg width="110" height="30"><circle id="d1" cx="15" cy="15" r="11" fill="#8E8E93"/><circle id="d2" cx="55" cy="15" r="11" fill="#8E8E93"/><circle id="d3" cx="95" cy="15" r="11" fill="#8E8E93"/></svg></div>
+  <div class="bubble" id="m2" style="background:#E9E9EB">Good eye. 👀</div>
+  <div class="bubble" id="m3" style="background:#E9E9EB">925 means sterling silver.<br>Check the back of the rest.</div>
+  <div class="card" id="input" style="border-radius:44px;display:flex;align-items:center;padding:0 36px;font-size:42px;font-weight:500;color:rgba(11,11,15,0.35)"><span id="typed" style="color:#0B0B0F"></span><span id="caret" style="width:4px;height:52px;background:#0A84FF;margin-left:4px;border-radius:2px"></span><span id="ph">iMessage</span></div>
+
+  <!-- end -->
+  <div class="abs" id="logo" style="background:url(img/agmark.png) center/cover;border-radius:24px;box-shadow:0 30px 70px rgba(16,42,67,0.28)"></div>
+  <div class="head" id="word" style="top:1030px;font-family:MR;font-size:140px;letter-spacing:-0.035em;color:#102a43"><span style="font-weight:800">AG</span><span style="font-weight:400"> Refining</span></div>
+  <div class="head" id="tag" style="top:1250px;font-family:NR;font-weight:400;font-style:italic;font-size:64px;letter-spacing:-0.01em;color:#4a5868">Houston's silver buyer</div>
+  <div class="head" id="url" style="top:1380px;font-family:MR;font-weight:650;font-size:32px;letter-spacing:0.3em;color:#416b94">AGREFINING.COM</div>
+
+  <div class="touch" id="t1"></div><div class="touch" id="t2"></div>
+</div>
+<canvas id="grain" width="540" height="960" style="width:1080px;height:1920px"></canvas>
+</div>
+<script>
+// ═════════ pure seek(t): everything below is a function of time ═════════
+const LEN = 18.6;
+const T = {
+  n: [0.30, 0.62, 0.94], h1: 1.05, clear: 2.55,
+  grid: 2.75, h2: 3.15, tap: 4.30, flip: 4.95, zoom: 5.55, live: 6.35,
+  spot: 7.15, type: 7.45, res: 8.35, wait: 8.95,
+  gather: 9.55, snap: 10.70,
+  thread: 11.05, typeMsg: 11.45, send: 13.70, dots: 13.95, m2: 14.40, m3: 14.90,
+  logo: 15.55, word: 16.10, tag: 17.05, url: 17.40,
+};
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const sst = (k) => k * k * (3 - 2 * k);
+function step(tau, w = 18, z = 0.9) {            // closed-form spring step response
+  if (tau <= 0) return 0;
+  if (z >= 1) return 1 - Math.exp(-w * tau) * (1 + w * tau);
+  const wd = w * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w * tau) * (Math.cos(wd * tau) + (z * w / wd) * Math.sin(wd * tau));
+}
+const pop = (tau, w = 20) => step(tau, w, 0.58);  // one ~10% overshoot (r22: pops, cards, landings)
+const glide = (tau, w = 14) => step(tau, w, 1.0); // camera, cards sliding: no overshoot
+const eIn = (k) => k * k * k;                     // exits accelerate away
+const eInOut = (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+const $ = (id) => document.getElementById(id);
+function css(el, o) { for (const k in o) el.style[k] = o[k]; }
+function box(el, x, y, w, h, extra = {}) { css(el, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px', ...extra }); }
+function show(el, v) { el.style.display = v ? '' : 'none'; }
+const R = (a, b, k) => ({ x: lerp(a.x, b.x, k), y: lerp(a.y, b.y, k), w: lerp(a.w, b.w, k), h: lerp(a.h, b.h, k), r: lerp(a.r ?? 46, b.r ?? 46, k) });
+
+// kinetic words: each word arrives pale blue + blurred, settles to ink (CLEAN KINETIC state colouring)
+function words(el, list, t, opt = {}) {
+  if (!el._w) { el.innerHTML = list.map(([w]) => `<span class="w">${w}</span>`).join(' '); el._w = [...el.querySelectorAll('.w')]; }
+  const out = opt.out ?? 1e9, ink = opt.ink || [11, 11, 15];
+  const o = eIn(seg(t, out, out + 0.28));
+  el._w.forEach((s, i) => {
+    const k = t - list[i][1];
+    const p = pop(k, 22), c = sst(seg(k, 0.05, 0.42));
+    const r = lerp(150, ink[0], c), g = lerp(196, ink[1], c), b = lerp(255, ink[2], c);
+    css(s, { opacity: (k <= 0 ? 0 : clamp(k / 0.1)) * (1 - o), transform: `translateY(${(1 - p) * 60 - o * 40}px) scale(${lerp(0.9, 1, p) * (1 - 0.6 * o)})`, filter: `blur(${(1 - clamp(k / 0.18)) * 14 + o * 10}px)`, color: `rgb(${r|0},${g|0},${b|0})` });
+  });
+}
+
+// ── background: drifting colour fields + fixed grain ──
+const BL = [['b1', '#cfe0ff', 760], ['b2', '#ffe9cf', 680], ['b3', '#dfe9f7', 900]];
+function bg(t) {
+  const mood = sst(seg(t, 9.6, 11.0));                       // the room warms once the pieces meet
+  BL.forEach(([id, c, s], i) => {
+    const el = $(id), x = 540 + Math.sin(t * 0.35 + i * 2.1) * 260 - s / 2, y = 960 + Math.cos(t * 0.28 + i * 1.7) * 520 - s / 2;
+    css(el, { width: s + 'px', height: s + 'px', left: x + 'px', top: y + 'px', background: i === 1 ? `rgba(255,${233 - 20 * mood | 0},${207 - 40 * mood | 0},${0.55 + 0.25 * mood})` : c, opacity: 0.85 });
+  });
+}
+(function grain() { const c = $('grain'), g = c.getContext('2d'), im = g.createImageData(540, 960); let s = 7; const r = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+  for (let i = 0; i < im.data.length; i += 4) { const v = r() < 0.5 ? 0 : 255; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 7 * r() | 0; } g.putImageData(im, 0, 0); })();
+
+// ── camera: one continuous move, never a cut ──
+const CAM = [ // t, scale, x, y (world point at screen centre)
+  [0.0, 1.06, 540, 960], [1.8, 1.0, 540, 960], [2.55, 1.0, 540, 960], [2.95, 1.0, 540, 900], [4.25, 1.04, 540, 900],
+  [4.45, 1.0, 540, 960], [9.4, 1.0, 540, 960], [10.65, 1.1, 540, 960], [11.1, 1.0, 540, 960], [13.7, 1.0, 540, 960], [15.35, 1.13, 540, 820], [15.6, 1.0, 540, 960], [18.6, 1.03, 540, 960],
+];
+function cam(t) {
+  let i = 0; while (i < CAM.length - 2 && t >= CAM[i + 1][0]) i++;
+  const a = CAM[i], b = CAM[i + 1], k = eInOut(seg(t, a[0], b[0]));
+  const s = lerp(a[1], b[1], k), x = lerp(a[2], b[2], k), y = lerp(a[3], b[3], k);
+  // a snap shake when the pieces lock
+  const d = t - T.snap, sh = d > 0 && d < 0.5 ? Math.exp(-d * 14) * Math.sin(d * 70) * 7 : 0;
+  $('world').style.transform = `translate(${540 - x + sh}px, ${960 - y}px) scale(${s})`;
+}
+
+// ── photo grid ──
+const GRID = ['p1', 'p3', 'p4', 'p6', 'p8', 'table', 'p2', 'p7', 'p5'], G0 = { x: 30, y: 400 }, GS = 336, GG = 12;
+(function () { const g = $('grid'); GRID.forEach((p, i) => { const d = document.createElement('div'); d.className = 'ph'; d.id = 'g' + i; d.style.backgroundImage = `url(img/${p}.${p === 'table' ? 'png' : 'jpg'})`; if (p === 'table') d.style.filter = 'sepia(.35) contrast(1.05)'; g.appendChild(d); }); })();
+const TAPPED = 4;
+const tileRect = (i) => ({ x: G0.x + (i % 3) * (GS + GG), y: G0.y + Math.floor(i / 3) * (GS + GG), w: GS, h: GS, r: 10 });
+
+// ── live text brackets on the STERLING word (in the zoomed image's coordinates) ──
+const WORD = { x: 640, y: 135, w: 130, h: 46 };     // where STERLING sits in sterling.jpg (1162x338)
+
+function seek(t) {
+  t = clamp(t, 0, LEN - 1e-4);
+  bg(t); cam(t);
+
+  // ═ 1. lock screen: the bills arrive ═
+  const lockOut = eIn(seg(t, T.clear, T.clear + 0.35));
+  show($('clock'), t < T.clear + 0.5); show($('date'), t < T.clear + 0.5);
+  css($('clock'), { opacity: 1 - lockOut, transform: `translateY(${-120 * lockOut}px)`, filter: `blur(${lockOut * 12}px)` });
+  css($('date'), { opacity: 1 - lockOut, transform: `translateY(${-120 * lockOut}px)` });
+  ['n1', 'n2', 'n3'].forEach((id, i) => {
+    const el = $(id), k = t - T.n[i], p = pop(k, 17);
+    // the swipe flings the stack up, staggered
+    const f = eIn(seg(t, T.clear + 0.04 * (2 - i), T.clear + 0.32 + 0.04 * (2 - i)));
+    show(el, k > 0 && f < 1);
+    const y = 640 + i * 222;
+    box(el, 40, y - (1 - p) * 140 - f * 1300, 1000, 196, { opacity: clamp(k / 0.12), filter: `blur(${(1 - clamp(k / 0.2)) * 16}px)`, transform: `scale(${lerp(0.92, 1, p)})` });
+  });
+  show($('h1'), t > T.h1 - 0.1 && t < T.clear + 0.4);
+  words($('h1'), [['Rent', T.h1], ['is', T.h1 + 0.22], ['due', T.h1 + 0.40], ['Friday.', T.h1 + 0.54]], t, { out: T.clear - 0.05, ink: [214, 41, 31] });
+  // the touch that clears the stack
+  const t1 = $('t1'), sw = seg(t, T.clear - 0.25, T.clear + 0.2);
+  show(t1, sw > 0 && sw < 1); css(t1, { left: '540px', top: lerp(1180, 520, eInOut(seg(t, T.clear - 0.05, T.clear + 0.2))) + 'px', opacity: Math.sin(Math.PI * sw), transform: `scale(${lerp(0.7, 1, Math.sin(Math.PI * sw))})` });
+
+  // ═ 2. Photos · Memories · Grandma's house ═
+  const gIn = t - T.grid, flipK = seg(t, T.flip, T.flip + 0.55);
+  const gridOut = eIn(seg(t, T.tap + 0.05, T.tap + 0.45));
+  show($('pHead'), gIn > 0 && t < T.spot); css($('pHead'), { opacity: clamp(gIn / 0.2) * (1 - gridOut), transform: `translateY(${(1 - glide(gIn)) * 50}px)`, filter: `blur(${(1 - clamp(gIn / 0.25)) * 12}px)` });
+  GRID.forEach((p, i) => {
+    const el = $('g' + i), k = gIn - 0.05 * i, pp = pop(k, 16), r = tileRect(i);
+    if (i === TAPPED) { show(el, k > 0 && t < T.tap + 0.02); }
+    else show(el, k > 0 && gridOut < 1);
+    const dx = (i % 3 - 1) * 60 * gridOut, dy = (Math.floor(i / 3) - 1) * 60 * gridOut;
+    box(el, r.x + dx, r.y + dy + (1 - pp) * 120, r.w, r.h, { opacity: clamp(k / 0.12) * (i === TAPPED ? 1 : 1 - gridOut), transform: `scale(${lerp(0.86, 1, pp) * (1 - 0.15 * gridOut)})`, filter: `blur(${(1 - clamp(k / 0.2)) * 14 + gridOut * 12}px)` });
+  });
+  show($('h2'), t > T.h2 - 0.1 && t < T.tap + 0.4);
+  words($('h2'), [['Meanwhile,', T.h2], ['in', T.h2 + 0.22], ['the', T.h2 + 0.32], ['drawer…', T.h2 + 0.46]], t, { out: T.tap - 0.05, ink: [27, 40, 64] });
+  const t2 = $('t2'), tp = seg(t, T.tap - 0.25, T.tap + 0.2), tr = tileRect(TAPPED);
+  show(t2, tp > 0 && tp < 1); css(t2, { left: tr.x + tr.w / 2 + 'px', top: tr.y + tr.h / 2 + 'px', opacity: Math.sin(Math.PI * tp), transform: `scale(${t > T.tap ? 0.82 : 1})` });
+
+  // ═ 3. the tapped photo becomes the card, turns over (the spoon is turned), and the camera reads the stamp ═
+  const sp = $('spoon'), open = glide(t - T.tap, 13);
+  const big = { x: 40, y: 330, w: 1000, h: 1000, r: 46 };
+  const small = { x: 140, y: 1000, w: 800, h: 500, r: 40 };      // tucked under Spotlight
+  const pieceB = { x: 540, y: 700, w: 480, h: 520, r: 40 };       // one Lego piece
+  let rr = R(tr, big, open);
+  rr = R(rr, small, glide(t - T.spot, 13));
+  rr = R(rr, pieceB, glide(t - T.gather, 12));
+  const snapIn = t - T.snap; const lock = snapIn > 0 ? 1 - 0.05 * Math.exp(-snapIn * 10) * Math.cos(snapIn * 30) : 1;
+  show(sp, t > T.tap && t < T.thread + 0.6);
+  const th = seg(t, T.thread, T.thread + 0.5);
+  const ang = 180 * eInOut(flipK);
+  box(sp, rr.x, rr.y, rr.w, rr.h, { borderRadius: rr.r + 'px', transform: `perspective(2400px) rotateY(${ang}deg) scale(${1 + 0.06 * Math.sin(Math.PI * flipK)})`, opacity: 1 - eIn(th), filter: `blur(${eIn(th) * 14}px)` });
+  show($('front'), ang < 90); show($('back'), ang >= 90);
+  const notch = sst(seg(t, T.gather, T.gather + 0.5));
+  sp.style.webkitMaskImage = sp.style.maskImage = notch > 0 ? `radial-gradient(circle at ${ang >= 90 ? 'calc(100% + 0px)' : '0px'} 50%, transparent ${62 * notch}px, #000 ${62 * notch + 1}px)` : 'none';
+  // inside the back: the real photo, pinch-zoomed onto STERLING
+  const z = eInOut(seg(t, T.zoom, T.zoom + 0.9));
+  const img = $('sterImg'), fitS = Math.max(rr.h / 338, rr.w / 1162);
+  const zs = lerp(fitS, rr.w / (WORD.w * 3.0), z);
+  const cx = lerp(1162 / 2, WORD.x + WORD.w / 2, z), cy = lerp(338 / 2, WORD.y + WORD.h / 2, z);
+  css(img, { transform: `translate(${rr.w / 2 - cx * zs}px, ${rr.h / 2 - cy * zs}px) scale(${zs})`, filter: 'contrast(1.06) saturate(0.9)' });
+  // live text: four corner brackets lock on, then the chip
+  const lv = pop(t - T.live, 20), lvo = 1 - eIn(seg(t, T.gather - 0.1, T.gather + 0.2));
+  const bx = rr.w / 2 - cx * zs + WORD.x * zs, by = rr.h / 2 - cy * zs + WORD.y * zs, bw = WORD.w * zs, bh = WORD.h * zs, pad = 18 + (1 - lv) * 40, L = 46;
+  const corners = [[bx - pad, by - pad, 1, 1], [bx + bw + pad, by - pad, -1, 1], [bx - pad, by + bh + pad, 1, -1], [bx + bw + pad, by + bh + pad, -1, -1]];
+  $('brk').innerHTML = corners.map(([x, y, sx, sy]) => `<path d="M${x} ${y + sy * L}V${y}H${x + sx * L}"/>`).join('');
+  show($('live'), t > T.live); css($('live'), { opacity: clamp((t - T.live) / 0.1) * lvo });
+  show($('chip'), t > T.live + 0.15); css($('chip'), { opacity: clamp((t - T.live - 0.15) / 0.15) * lvo, transform: `scale(${lerp(0.7, 1, pop(t - T.live - 0.15))})` });
+
+  // ═ 4. Spotlight: the definition (rehook) ═
+  const spIn = t - T.spot, spOut = eIn(seg(t, T.gather - 0.15, T.gather + 0.2));
+  show($('spot'), spIn > 0 && spOut < 1);
+  box($('spot'), 40, 150 - (1 - pop(spIn, 18)) * 200, 1000, 128, { opacity: clamp(spIn / 0.12) * (1 - spOut), transform: `translateY(${-spOut * 240}px)` });
+  const q = 'sterling silver', nq = Math.floor(clamp((t - T.type) / 0.62) * q.length);
+  $('q').textContent = q.slice(0, nq);
+  const rIn = t - T.res;
+  show($('res'), rIn > 0 && spOut < 1);
+  box($('res'), 40, 310 + (1 - pop(rIn, 16)) * 80, 1000, 380, { opacity: clamp(rIn / 0.12) * (1 - spOut), transform: `translateY(${-spOut * 240}px) scale(${lerp(0.94, 1, pop(rIn, 16))})`, filter: `blur(${(1 - clamp(rIn / 0.2)) * 12 + spOut * 10}px)` });
+  const ul = sst(seg(t, T.res + 0.35, T.res + 0.75));
+  $('pure').style.backgroundImage = `linear-gradient(transparent 62%, rgba(255,204,0,0.55) 62%)`; $('pure').style.backgroundSize = `${ul * 100}% 100%`; $('pure').style.backgroundRepeat = 'no-repeat';
+  show($('h3'), t > T.wait - 0.05 && t < T.gather + 0.4);
+  words($('h3'), [['Hold', T.wait], ['on.', T.wait + 0.22]], t, { out: T.gather + 0.05 });
+
+  // ═ 5. the two Lego pieces: they slide together and lock (no words) ═
+  const pa = $('pieceA'), aIn = t - T.gather;
+  const aStart = { x: 60, y: -400, w: 480, h: 520, r: 40 }, aEnd = { x: 60, y: 700, w: 480, h: 520, r: 40 };
+  let ar = R(aStart, aEnd, glide(aIn, 9));
+  // the final push: both meet at the seam, a hair of overshoot, then locked
+  const meet = pop(t - (T.snap - 0.22), 26);
+  const gap = lerp(10, 0, meet);
+  show(pa, aIn > 0 && t < T.thread + 0.6);
+  box(pa, ar.x + gap + (1 - meet) * -30, ar.y, ar.w, ar.h, { background: 'rgba(255,255,255,0.97)', opacity: clamp(aIn / 0.15) * (1 - eIn(th)), filter: `blur(${(1 - clamp(aIn / 0.25)) * 14 + eIn(th) * 14}px)`, borderRadius: '40px' });
+  // seam: a ring of light where the pieces lock
+  const sm = $('seam'), sk = t - T.snap;
+  show(sm, sk > 0 && sk < 0.7);
+  const rad = 40 + sk * 900;
+  box(sm, 540 - rad, 960 - rad, rad * 2, rad * 2, { borderRadius: '50%', border: `${Math.max(1, 10 - sk * 14)}px solid rgba(255,204,0,${clamp(0.9 - sk * 1.4)})` });
+
+  // ═ 6. their own message, and the reply ═
+  const thIn = t - T.thread;
+  show($('mHead'), thIn > 0 && t < T.logo + 0.05);
+  css($('mHead'), { opacity: clamp(thIn / 0.2), transform: `translateY(${(1 - glide(thIn)) * -60}px)` });
+  show($('avatar'), t < T.logo);
+  const inp = $('input'); show(inp, thIn > 0 && t < T.logo + 0.4);
+  box(inp, 40, 1660 + (1 - glide(thIn)) * 200, 1000, 116, { opacity: clamp(thIn / 0.2) * (1 - eIn(seg(t, T.logo - 0.2, T.logo + 0.2))) });
+  const msg = 'wait… is grandma’s silver worth something??';
+  const nm = t >= T.send ? 0 : Math.floor(clamp((t - T.typeMsg) / (T.send - T.typeMsg - 0.12)) * msg.length);
+  $('typed').textContent = msg.slice(0, nm); show($('ph'), nm === 0); $('caret').style.opacity = (Math.floor(t * 2.4) % 2 === 0 || (t > T.typeMsg && t < T.send)) ? 1 : 0;
+  $('typed').style.whiteSpace = 'nowrap'; $('typed').style.overflow = 'hidden'; $('typed').style.maxWidth = '880px'; $('typed').style.direction = 'rtl'; $('typed').style.textAlign = 'left';
+  // the sent bubble rises from the field
+  const m1 = $('m1'), sIn = t - T.send, endOut = eIn(seg(t, T.logo - 0.15, T.logo + 0.25));
+  m1.textContent = msg; show(m1, sIn > 0 && endOut < 1);
+  const m1p = glide(sIn, 16);
+  css(m1, { right: '40px', left: 'auto', top: lerp(1650, 560, m1p) + 'px', opacity: clamp(sIn / 0.1) * (1 - endOut), transform: `scale(${lerp(0.85, 1, pop(sIn, 18))})`, transformOrigin: '100% 100%', borderBottomRightRadius: '14px' });
+  const dIn = t - T.dots, dOut = t > T.m2;
+  show($('dots'), dIn > 0 && !dOut);
+  css($('dots'), { left: '40px', top: '880px', transform: `scale(${pop(dIn, 20)})`, transformOrigin: '0 100%', borderBottomLeftRadius: '14px' });
+  [1, 2, 3].forEach((i) => { const ph = Math.sin((t - T.dots) * 9 - i * 0.9); $('d' + i).setAttribute('fill', `rgba(142,142,147,${0.45 + 0.4 * Math.max(0, ph)})`); $('d' + i).setAttribute('cy', 15 - 3 * Math.max(0, ph)); });
+  [['m2', T.m2, 880], ['m3', T.m3, 1050]].forEach(([id, t0, y]) => {
+    const el = $(id), k = t - t0; show(el, k > 0 && endOut < 1);
+    css(el, { left: '40px', top: y + 'px', opacity: clamp(k / 0.08) * (1 - endOut), transform: `scale(${pop(k, 20)})`, transformOrigin: '0 100%', borderBottomLeftRadius: '14px' });
+  });
+
+  // ═ 7. the avatar becomes the brand ═
+  const lg = $('logo'), lk = glide(t - T.logo, 11), lp = pop(t - T.logo, 13);
+  show(lg, t > T.logo);
+  const a0 = { x: 476, y: 110, w: 128, h: 128 }, a1 = { x: 370, y: 600, w: 340, h: 340 };
+  const ra = R(a0, a1, lk);
+  box(lg, ra.x, ra.y, ra.w, ra.h, { borderRadius: lerp(64, 56, lk) + 'px', transform: `scale(${lerp(1, 1, lp) * (0.94 + 0.06 * lp)})` });
+  [['word', T.word, 40], ['tag', T.tag, 30], ['url', T.url, 24]].forEach(([id, t0, d]) => {
+    const k = t - t0; show($(id), k > 0);
+    css($(id), { opacity: clamp(k / 0.16), transform: `translateY(${(1 - pop(k, 16)) * d}px)`, filter: `blur(${(1 - clamp(k / 0.22)) * 12}px)` });
+  });
+  return true;
+}
+window.seek = seek; window.LEN = LEN; window.T = T;
+window.READY = (async () => { await document.fonts.load('600 40px InterV'); await document.fonts.load('800 140px MR'); await document.fonts.load('italic 400 64px NR'); await document.fonts.ready;
+  await Promise.all([...document.images].map((i) => i.decode().catch(() => 0))); seek(0); return true; })();
+</script></body></html>
