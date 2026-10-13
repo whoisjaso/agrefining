@@ -9,7 +9,7 @@ This ad targets the bottom of Maslow's pyramid (rent, bills, the bank balance) a
 3. **Piece two (4.3–7.1 s).** Tapping a photo turns the spoon over, and a pinch-zoom finds the stamp. iOS Live Text locks onto **STERLING** (a real 1862 Cooper Hewitt photo, CC0).
 4. **Rehook (7.1–9.5 s).** Spotlight defines sterling silver as "92.5% pure, often stamped 925 or STERLING." The voice says "Hold on."
 5. **The click (9.5–11 s).** The "Rent due" card and the STERLING card slide together and lock, tab into notch, after one beat of total silence. No words appear: the viewer makes the connection themselves.
-6. **Payoff (11–15.5 s).** The viewer's *own* message reads "wait… is grandma's silver worth something??" AG Refining replies "Good eye. 👀", which rewards them for being clever, then "925 means sterling silver. Check the back of the rest."
+6. **Payoff (11–15.5 s).** The viewer's *own* message reads "wait… is grandma's silver worth something??" AG Refining replies "Good eye." with the eyes emoji, which rewards them for being clever, then "925 means sterling silver. Check the back of the rest."
 7. **End (15.5–18.6 s).** The avatar becomes the Ag tile logo with an Apple-Pay-style success chime. "AG Refining · Houston's silver buyer · agrefining.com"
 
 ## Compliance
