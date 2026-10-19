@@ -1,0 +1,812 @@
+[
+{
+"w": "Okay,",
+"s": 0.0667,
+"e": 0.3,
+"s_whisper": 0.0,
+"s_ref": 0.059,
+"s_frame": 4,
+"delta_ms": 59.0,
+"method": "pause-onset"
+},
+{
+"w": "real",
+"s": 0.5333,
+"e": 0.74,
+"s_whisper": 0.6,
+"s_ref": 0.532,
+"s_frame": 32,
+"delta_ms": -68.0,
+"method": "pause-onset"
+},
+{
+"w": "quick",
+"s": 0.7833,
+"e": 0.96,
+"s_whisper": 0.74,
+"s_ref": 0.78,
+"s_frame": 47,
+"delta_ms": 40.0,
+"method": "boundary-valley"
+},
+{
+"w": "question.",
+"s": 1.0,
+"e": 1.34,
+"s_whisper": 0.96,
+"s_ref": 0.999,
+"s_frame": 60,
+"delta_ms": 39.0,
+"method": "boundary-valley"
+},
+{
+"w": "You",
+"s": 1.7833,
+"e": 1.868,
+"s_whisper": 1.728,
+"s_ref": 1.786,
+"s_frame": 107,
+"delta_ms": 58.0,
+"method": "pause-onset"
+},
+{
+"w": "got",
+"s": 1.9,
+"e": 2.008,
+"s_whisper": 1.868,
+"s_ref": 1.892,
+"s_frame": 114,
+"delta_ms": 24.0,
+"method": "boundary-valley"
+},
+{
+"w": "a",
+"s": 2.0167,
+"e": 2.148,
+"s_whisper": 2.008,
+"s_ref": 2.018,
+"s_frame": 121,
+"delta_ms": 10.0,
+"method": "boundary-valley"
+},
+{
+"w": "drawer",
+"s": 2.15,
+"e": 2.428,
+"s_whisper": 2.148,
+"s_ref": 2.155,
+"s_frame": 129,
+"delta_ms": 7.0,
+"method": "boundary-valley"
+},
+{
+"w": "full",
+"s": 2.4333,
+"e": 2.668,
+"s_whisper": 2.428,
+"s_ref": 2.428,
+"s_frame": 146,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "of",
+"s": 2.6667,
+"e": 2.888,
+"s_whisper": 2.668,
+"s_ref": 2.668,
+"s_frame": 160,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "old",
+"s": 2.9,
+"e": 3.168,
+"s_whisper": 2.888,
+"s_ref": 2.908,
+"s_frame": 174,
+"delta_ms": 20.0,
+"method": "boundary-valley"
+},
+{
+"w": "silverware",
+"s": 3.2,
+"e": 3.808,
+"s_whisper": 3.168,
+"s_ref": 3.195,
+"s_frame": 192,
+"delta_ms": 27.0,
+"method": "boundary-valley"
+},
+{
+"w": "that",
+"s": 3.8,
+"e": 4.288,
+"s_whisper": 3.808,
+"s_ref": 3.808,
+"s_frame": 228,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "nobody",
+"s": 4.2667,
+"e": 4.548,
+"s_whisper": 4.288,
+"s_ref": 4.267,
+"s_frame": 256,
+"delta_ms": -21.0,
+"method": "boundary-valley"
+},
+{
+"w": "even",
+"s": 4.5667,
+"e": 4.908,
+"s_whisper": 4.548,
+"s_ref": 4.568,
+"s_frame": 274,
+"delta_ms": 20.0,
+"method": "boundary-valley"
+},
+{
+"w": "uses.",
+"s": 4.9,
+"e": 5.248,
+"s_whisper": 4.908,
+"s_ref": 4.895,
+"s_frame": 294,
+"delta_ms": -13.0,
+"method": "boundary-valley"
+},
+{
+"w": "Cause",
+"s": 6.0167,
+"e": 7.058,
+"s_whisper": 5.958,
+"s_ref": 6.012,
+"s_frame": 361,
+"delta_ms": 54.0,
+"method": "pause-onset"
+},
+{
+"w": "man,",
+"s": 7.0667,
+"e": 7.598,
+"s_whisper": 7.058,
+"s_ref": 7.06,
+"s_frame": 424,
+"delta_ms": 2.0,
+"method": "boundary-valley"
+},
+{
+"w": "rents",
+"s": 8.2833,
+"e": 8.398,
+"s_whisper": 8.398,
+"s_ref": 8.278,
+"s_frame": 497,
+"delta_ms": -120.0,
+"method": "pause-onset"
+},
+{
+"w": "do",
+"s": 8.4167,
+"e": 8.598,
+"s_whisper": 8.398,
+"s_ref": 8.418,
+"s_frame": 505,
+"delta_ms": 20.0,
+"method": "boundary-valley"
+},
+{
+"w": "Friday,",
+"s": 8.6,
+"e": 8.978,
+"s_whisper": 8.598,
+"s_ref": 8.598,
+"s_frame": 516,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "light",
+"s": 9.4667,
+"e": 9.638,
+"s_whisper": 9.478,
+"s_ref": 9.465,
+"s_frame": 568,
+"delta_ms": -13.0,
+"method": "pause-onset"
+},
+{
+"w": "bills",
+"s": 9.6833,
+"e": 9.858,
+"s_whisper": 9.638,
+"s_ref": 9.678,
+"s_frame": 581,
+"delta_ms": 40.0,
+"method": "boundary-valley"
+},
+{
+"w": "do.",
+"s": 9.85,
+"e": 10.178,
+"s_whisper": 9.858,
+"s_ref": 9.858,
+"s_frame": 591,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "And",
+"s": 10.4833,
+"e": 10.656,
+"s_whisper": 10.476,
+"s_ref": 10.476,
+"s_frame": 629,
+"delta_ms": 0.0,
+"method": "pause-onset"
+},
+{
+"w": "that",
+"s": 10.65,
+"e": 10.756,
+"s_whisper": 10.656,
+"s_ref": 10.656,
+"s_frame": 639,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "damn",
+"s": 10.8,
+"e": 11.056,
+"s_whisper": 10.756,
+"s_ref": 10.796,
+"s_frame": 648,
+"delta_ms": 40.0,
+"method": "boundary-valley"
+},
+{
+"w": "drawer's",
+"s": 11.1,
+"e": 11.516,
+"s_whisper": 11.056,
+"s_ref": 11.096,
+"s_frame": 666,
+"delta_ms": 40.0,
+"method": "boundary-valley"
+},
+{
+"w": "just",
+"s": 11.4667,
+"e": 11.616,
+"s_whisper": 11.516,
+"s_ref": 11.474,
+"s_frame": 688,
+"delta_ms": -42.0,
+"method": "boundary-valley"
+},
+{
+"w": "sittin'",
+"s": 11.6167,
+"e": 11.976,
+"s_whisper": 11.616,
+"s_ref": 11.616,
+"s_frame": 697,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "there.",
+"s": 12.0833,
+"e": 12.136,
+"s_whisper": 12.076,
+"s_ref": 12.076,
+"s_frame": 725,
+"delta_ms": 0.0,
+"method": "pause-onset"
+},
+{
+"w": "Flip",
+"s": 12.7,
+"e": 12.998,
+"s_whisper": 12.638,
+"s_ref": 12.693,
+"s_frame": 762,
+"delta_ms": 55.0,
+"method": "pause-onset"
+},
+{
+"w": "one",
+"s": 13.0333,
+"e": 13.258,
+"s_whisper": 12.998,
+"s_ref": 13.037,
+"s_frame": 782,
+"delta_ms": 39.0,
+"method": "boundary-valley"
+},
+{
+"w": "of",
+"s": 13.2333,
+"e": 13.398,
+"s_whisper": 13.258,
+"s_ref": 13.225,
+"s_frame": 794,
+"delta_ms": -33.0,
+"method": "boundary-valley"
+},
+{
+"w": "them",
+"s": 13.3667,
+"e": 13.538,
+"s_whisper": 13.398,
+"s_ref": 13.369,
+"s_frame": 802,
+"delta_ms": -29.0,
+"method": "boundary-valley"
+},
+{
+"w": "over.",
+"s": 13.5333,
+"e": 13.978,
+"s_whisper": 13.538,
+"s_ref": 13.538,
+"s_frame": 812,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "Look",
+"s": 14.5,
+"e": 14.677,
+"s_whisper": 14.437,
+"s_ref": 14.493,
+"s_frame": 870,
+"delta_ms": 56.0,
+"method": "pause-onset"
+},
+{
+"w": "real",
+"s": 14.65,
+"e": 14.957,
+"s_whisper": 14.677,
+"s_ref": 14.648,
+"s_frame": 879,
+"delta_ms": -29.0,
+"method": "boundary-valley"
+},
+{
+"w": "close,",
+"s": 15.0,
+"e": 15.397,
+"s_whisper": 14.957,
+"s_ref": 14.994,
+"s_frame": 900,
+"delta_ms": 37.0,
+"method": "boundary-valley"
+},
+{
+"w": "there's",
+"s": 15.85,
+"e": 16.017,
+"s_whisper": 15.817,
+"s_ref": 15.847,
+"s_frame": 951,
+"delta_ms": 30.0,
+"method": "pause-onset"
+},
+{
+"w": "a",
+"s": 16.0,
+"e": 16.237,
+"s_whisper": 16.017,
+"s_ref": 15.995,
+"s_frame": 960,
+"delta_ms": -22.0,
+"method": "boundary-valley"
+},
+{
+"w": "tiny",
+"s": 16.2333,
+"e": 16.477,
+"s_whisper": 16.237,
+"s_ref": 16.237,
+"s_frame": 974,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "little",
+"s": 16.4833,
+"e": 16.817,
+"s_whisper": 16.477,
+"s_ref": 16.477,
+"s_frame": 989,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "stamp.",
+"s": 16.85,
+"e": 17.217,
+"s_whisper": 16.817,
+"s_ref": 16.845,
+"s_frame": 1011,
+"delta_ms": 28.0,
+"method": "boundary-valley"
+},
+{
+"w": "925.",
+"s": 17.6333,
+"e": 18.501,
+"s_whisper": 17.581,
+"s_ref": 17.637,
+"s_frame": 1058,
+"delta_ms": 56.0,
+"method": "pause-onset"
+},
+{
+"w": "Or",
+"s": 19.05,
+"e": 19.321,
+"s_whisper": 19.061,
+"s_ref": 19.049,
+"s_frame": 1143,
+"delta_ms": -12.0,
+"method": "pause-onset"
+},
+{
+"w": "it",
+"s": 19.3167,
+"e": 19.621,
+"s_whisper": 19.321,
+"s_ref": 19.321,
+"s_frame": 1159,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "straight",
+"s": 19.6,
+"e": 19.981,
+"s_whisper": 19.621,
+"s_ref": 19.602,
+"s_frame": 1176,
+"delta_ms": -19.0,
+"method": "boundary-valley"
+},
+{
+"w": "up",
+"s": 20.0167,
+"e": 20.261,
+"s_whisper": 19.981,
+"s_ref": 20.021,
+"s_frame": 1201,
+"delta_ms": 40.0,
+"method": "boundary-valley"
+},
+{
+"w": "says,",
+"s": 20.2333,
+"e": 20.621,
+"s_whisper": 20.261,
+"s_ref": 20.235,
+"s_frame": 1214,
+"delta_ms": -26.0,
+"method": "boundary-valley"
+},
+{
+"w": "Sterling.",
+"s": 20.8833,
+"e": 21.501,
+"s_whisper": 20.881,
+"s_ref": 20.881,
+"s_frame": 1253,
+"delta_ms": 0.0,
+"method": "pause-onset"
+},
+{
+"w": "That",
+"s": 22.2833,
+"e": 22.523,
+"s_whisper": 22.223,
+"s_ref": 22.28,
+"s_frame": 1337,
+"delta_ms": 57.0,
+"method": "pause-onset"
+},
+{
+"w": "ain't",
+"s": 22.5167,
+"e": 22.863,
+"s_whisper": 22.523,
+"s_ref": 22.514,
+"s_frame": 1351,
+"delta_ms": -9.0,
+"method": "boundary-valley"
+},
+{
+"w": "plated.",
+"s": 22.8167,
+"e": 23.203,
+"s_whisper": 22.863,
+"s_ref": 22.819,
+"s_frame": 1369,
+"delta_ms": -44.0,
+"method": "boundary-valley"
+},
+{
+"w": "That's",
+"s": 23.5,
+"e": 23.823,
+"s_whisper": 23.603,
+"s_ref": 23.508,
+"s_frame": 1410,
+"delta_ms": -95.0,
+"method": "pause-onset"
+},
+{
+"w": "real",
+"s": 23.7833,
+"e": 24.023,
+"s_whisper": 23.823,
+"s_ref": 23.777,
+"s_frame": 1427,
+"delta_ms": -46.0,
+"method": "boundary-valley"
+},
+{
+"w": "silver.",
+"s": 24.0167,
+"e": 24.443,
+"s_whisper": 24.023,
+"s_ref": 24.023,
+"s_frame": 1441,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "So,",
+"s": 25.2167,
+"e": 25.497,
+"s_whisper": 25.157,
+"s_ref": 25.212,
+"s_frame": 1513,
+"delta_ms": 55.0,
+"method": "pause-onset"
+},
+{
+"w": "rents",
+"s": 25.8833,
+"e": 26.077,
+"s_whisper": 25.857,
+"s_ref": 25.886,
+"s_frame": 1553,
+"delta_ms": 29.0,
+"method": "pause-onset"
+},
+{
+"w": "do.",
+"s": 26.1,
+"e": 26.357,
+"s_whisper": 26.077,
+"s_ref": 26.099,
+"s_frame": 1566,
+"delta_ms": 22.0,
+"method": "boundary-valley"
+},
+{
+"w": "And",
+"s": 26.75,
+"e": 26.849,
+"s_whisper": 26.689,
+"s_ref": 26.745,
+"s_frame": 1605,
+"delta_ms": 56.0,
+"method": "pause-onset"
+},
+{
+"w": "you",
+"s": 26.85,
+"e": 26.949,
+"s_whisper": 26.849,
+"s_ref": 26.849,
+"s_frame": 1611,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "got",
+"s": 26.9833,
+"e": 27.149,
+"s_whisper": 26.949,
+"s_ref": 26.978,
+"s_frame": 1619,
+"delta_ms": 29.0,
+"method": "boundary-valley"
+},
+{
+"w": "real",
+"s": 27.15,
+"e": 27.409,
+"s_whisper": 27.149,
+"s_ref": 27.153,
+"s_frame": 1629,
+"delta_ms": 4.0,
+"method": "boundary-valley"
+},
+{
+"w": "silver,",
+"s": 27.4167,
+"e": 27.929,
+"s_whisper": 27.409,
+"s_ref": 27.409,
+"s_frame": 1645,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "just",
+"s": 28.4,
+"e": 28.549,
+"s_whisper": 28.389,
+"s_ref": 28.394,
+"s_frame": 1704,
+"delta_ms": 5.0,
+"method": "pause-onset"
+},
+{
+"w": "sit",
+"s": 28.5333,
+"e": 28.949,
+"s_whisper": 28.549,
+"s_ref": 28.541,
+"s_frame": 1712,
+"delta_ms": -8.0,
+"method": "boundary-valley"
+},
+{
+"w": "in",
+"s": 28.95,
+"e": 29.109,
+"s_whisper": 28.949,
+"s_ref": 28.947,
+"s_frame": 1737,
+"delta_ms": -2.0,
+"method": "boundary-valley"
+},
+{
+"w": "that",
+"s": 29.05,
+"e": 29.249,
+"s_whisper": 29.109,
+"s_ref": 29.055,
+"s_frame": 1743,
+"delta_ms": -54.0,
+"method": "boundary-valley"
+},
+{
+"w": "drawer.",
+"s": 29.25,
+"e": 29.589,
+"s_whisper": 29.249,
+"s_ref": 29.249,
+"s_frame": 1755,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "Yeah,",
+"s": 31.5667,
+"e": 32.06,
+"s_whisper": 31.66,
+"s_ref": 31.568,
+"s_frame": 1894,
+"delta_ms": -92.0,
+"method": "pause-onset"
+},
+{
+"w": "now",
+"s": 32.5333,
+"e": 32.68,
+"s_whisper": 32.48,
+"s_ref": 32.526,
+"s_frame": 1952,
+"delta_ms": 46.0,
+"method": "pause-onset"
+},
+{
+"w": "you",
+"s": 32.6833,
+"e": 32.84,
+"s_whisper": 32.68,
+"s_ref": 32.68,
+"s_frame": 1961,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "see",
+"s": 32.8333,
+"e": 33.02,
+"s_whisper": 32.84,
+"s_ref": 32.84,
+"s_frame": 1970,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "it.",
+"s": 33.05,
+"e": 33.16,
+"s_whisper": 33.02,
+"s_ref": 33.054,
+"s_frame": 1983,
+"delta_ms": 34.0,
+"method": "boundary-valley"
+},
+{
+"w": "A",
+"s": 33.6167,
+"e": 33.701,
+"s_whisper": 33.561,
+"s_ref": 33.617,
+"s_frame": 2017,
+"delta_ms": 56.0,
+"method": "pause-onset"
+},
+{
+"w": "G",
+"s": 33.7333,
+"e": 33.901,
+"s_whisper": 33.701,
+"s_ref": 33.741,
+"s_frame": 2024,
+"delta_ms": 40.0,
+"method": "boundary-valley"
+},
+{
+"w": "Refining,",
+"s": 33.9,
+"e": 34.461,
+"s_whisper": 33.901,
+"s_ref": 33.901,
+"s_frame": 2034,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+},
+{
+"w": "Houston",
+"s": 34.7833,
+"e": 35.081,
+"s_whisper": 34.901,
+"s_ref": 34.781,
+"s_frame": 2087,
+"delta_ms": -120.0,
+"method": "pause-onset"
+},
+{
+"w": "Silver",
+"s": 35.0167,
+"e": 35.501,
+"s_whisper": 35.081,
+"s_ref": 35.021,
+"s_frame": 2101,
+"delta_ms": -60.0,
+"method": "boundary-valley"
+},
+{
+"w": "Buyer.",
+"s": 35.5,
+"e": 36.221,
+"s_whisper": 35.501,
+"s_ref": 35.501,
+"s_frame": 2130,
+"delta_ms": 0.0,
+"method": "whisper (no clear boundary)"
+}
+]

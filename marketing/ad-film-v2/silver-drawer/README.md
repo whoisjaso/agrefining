@@ -44,3 +44,11 @@ No prices, payout amounts or payment-speed promises. No real brand UI. Mild prof
 `spec.py` (type sprites), `export.js`, `plates.py` (graded plates), `gen2.py` (EffectCraft JSX generator),
 `mix.py` (signature mix + cue sheet), `cuesheet.json`, `lint.json`, `whisper.json`, `script.json`,
 `renders/ag-silver-drawer_review_1080x1920_60p.mp4` (review copy; 4K masters delivered separately).
+
+## v3 (Oct 19): Orpheus voice, frame-locked words
+
+- Render: `renders/ag-silver-drawer-v3_review_1080x1920_60p.mp4` (1080x1920, 60 fps, 37.93 s). Sources in `v3/`.
+- Voice: Orpheus-3B TTS (Apache-2.0, Llama 3.2 base), Q8 GGUF on CPU, synthetic preset voice "dan" (not modeled on a real person). Takes per beat with `<sigh>`/`<chuckle>` tags, ranked by Whisper accuracy and pitch range (`v3/score.py`), and picked per beat (`v3/picks_final.json`).
+- Timing: scenes authored on the v2 timeline are warped onto the new read through 81 per-word anchors (`v3/anchors.py`, `v3/warp.json`). Captions reveal word by word.
+- Gates: word sync PASS (75/76 units on the exact frame, 1 at 1 frame), lint PASS 0E/0W, Whisper 98.8% (hook 100%), -14.1 LUFS / -4.5 dBTP.
+- An ElevenLabs v3 read is optional: set `ELEVENLABS_API_KEY` as an environment secret and run `elevenlabs/v3_takes.py`.
