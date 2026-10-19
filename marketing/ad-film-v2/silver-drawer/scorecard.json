@@ -1,0 +1,18 @@
+{
+ "lint_pass": true,
+ "lint_errors": 0,
+ "lint_warnings": 0,
+ "sfx_sync_mean_abs_dev_ms": 1.4,
+ "sfx_sync_max_abs_dev_ms": 50.0,
+ "font_role_compliance_pct": 100.0,
+ "text_animated_pct": 80.8,
+ "text_entrances_per_10s": 7.46,
+ "visual_events_per_10s": 9.18,
+ "longest_static_gap_s": 2.72,
+ "first_spoken_word_s": 0.0,
+ "first_text_s": 0.0,
+ "duration_s": 34.85,
+ "integrated_lufs": -14.3,
+ "true_peak_dbfs": -4.5,
+ "lra_lu": 1.6
+}
