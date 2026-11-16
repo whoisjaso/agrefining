@@ -928,49 +928,7 @@ html[data-loader-state="ready"] .home-loader {
   display: none;
 }
 
-/* Mobile action dock and material guide */
-
-.mobile-actions {
-  align-items: stretch;
-  background: color-mix(in srgb, var(--paper) 96%, transparent);
-  border: 1px solid var(--line-strong);
-  bottom: calc(0.65rem + var(--safe-bottom));
-  box-shadow: var(--shadow-float);
-  display: none;
-  left: calc(0.65rem + var(--safe-left));
-  min-height: 3.7rem;
-  opacity: 0;
-  pointer-events: none;
-  position: fixed;
-  right: calc(0.65rem + var(--safe-right));
-  transform: translateY(calc(100% + 1.5rem));
-  transition:
-    opacity var(--medium) ease,
-    transform var(--medium) var(--ease);
-  z-index: 90;
-}
-
-.mobile-actions a {
-  align-items: center;
-  display: flex;
-  flex: 1;
-  font-size: 0.78rem;
-  font-weight: 700;
-  justify-content: center;
-  padding: 0.85rem 0.7rem;
-}
-
-.mobile-actions[data-visible="true"] {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-@media (min-width: 901px) {
-  .mobile-actions {
-    display: none;
-  }
-}
+/* Material guide (desktop) */
 
 .material-guide {
   bottom: 1rem;
@@ -3548,16 +3506,6 @@ html[data-loader-state="ready"] .home-loader {
     pointer-events: auto;
   }
 
-  .mobile-actions {
-    display: flex;
-  }
-
-  .nav-open .mobile-actions {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(calc(100% + 1.5rem));
-  }
-
   .material-guide {
     display: none;
   }
@@ -4103,10 +4051,6 @@ html[data-loader-state="ready"] .home-loader {
     transform: none;
     width: 100%;
   }
-
-  .mobile-actions {
-    transition: none;
-  }
   html {
     scroll-behavior: auto;
   }
@@ -4124,7 +4068,6 @@ html[data-loader-state="ready"] .home-loader {
 
 @media print {
   .site-header,
-  .mobile-actions,
   .material-guide,
   .footer,
   .conversion-band {
@@ -4144,5 +4087,252 @@ html[data-loader-state="ready"] .home-loader {
     background: transparent;
     break-inside: avoid;
     padding-block: 2rem;
+  }
+}
+
+/* Floating "Get Paid" pill (all widths). Hidden on the first screen, it rises in as the visitor scrolls.
+   Motion: a comet of light orbits the edge, a sheen sweeps across, and the arrow pulses with speed streaks. */
+@property --get-paid-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.get-paid-dock {
+  bottom: calc(1.1rem + var(--safe-bottom));
+  display: flex;
+  justify-content: center;
+  left: 50%;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  transform: translate(-50%, 140%);
+  transition:
+    opacity 280ms ease,
+    transform 520ms cubic-bezier(0.2, 1.35, 0.4, 1);
+  z-index: 85;
+}
+
+.get-paid-dock[data-visible="true"] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+.nav-open .get-paid-dock {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 140%);
+}
+
+.get-paid-pill {
+  align-items: center;
+  background: linear-gradient(135deg, #17375a 0%, var(--navy) 55%, #0b1f33 100%);
+  border-radius: 999px;
+  box-shadow:
+    0 10px 30px rgba(6, 23, 36, 0.35),
+    0 2px 6px rgba(6, 23, 36, 0.25);
+  color: var(--paper);
+  display: inline-flex;
+  font-size: 1.02rem;
+  font-weight: 700;
+  gap: 0.35rem;
+  isolation: isolate;
+  justify-content: center;
+  letter-spacing: 0.01em;
+  min-height: 3.5rem;
+  min-width: 12.5rem;
+  overflow: hidden;
+  padding: 0 1.55rem 0 1.75rem;
+  position: relative;
+  text-decoration: none;
+  transition: transform 220ms var(--ease), box-shadow 220ms var(--ease);
+  white-space: nowrap;
+}
+
+/* Orbiting light: a bright silver head with a fading tail, running around the edge. */
+.get-paid-pill::before {
+  animation: get-paid-orbit 2.6s linear infinite;
+  background: conic-gradient(from var(--get-paid-angle), transparent 0deg, transparent 250deg, rgba(201, 206, 214, 0.25) 300deg, #ffffff 352deg, transparent 360deg);
+  border-radius: inherit;
+  content: "";
+  inset: 0;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  padding: 2px;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
+/* Quiet resting edge so the pill reads on navy and cream sections alike. */
+.get-paid-pill::after {
+  border: 1px solid rgba(250, 248, 242, 0.28);
+  border-radius: inherit;
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+.get-paid-sheen {
+  animation: get-paid-sheen 3.2s cubic-bezier(0.55, 0, 0.25, 1) infinite;
+  background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.28) 45%, rgba(255, 255, 255, 0.04) 60%, transparent 70%);
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-120%);
+  z-index: 0;
+}
+
+.get-paid-label,
+.get-paid-arrow {
+  position: relative;
+  z-index: 3;
+}
+
+.get-paid-arrow {
+  align-items: center;
+  display: inline-flex;
+  height: 1.6rem;
+  justify-content: flex-end;
+  width: 2.6rem;
+}
+
+.get-paid-arrow svg {
+  animation: get-paid-dash 1.6s cubic-bezier(0.5, 0, 0.2, 1) infinite;
+  position: relative;
+}
+
+/* Speed streaks trailing the arrow. */
+.get-paid-arrow i {
+  animation: get-paid-streak 1.6s cubic-bezier(0.5, 0, 0.2, 1) infinite;
+  background: linear-gradient(90deg, transparent, rgba(250, 248, 242, 0.85));
+  border-radius: 2px;
+  height: 2px;
+  opacity: 0;
+  position: absolute;
+  right: 1.2rem;
+  transform-origin: right center;
+  width: 0.8rem;
+}
+
+.get-paid-arrow i:nth-child(1) {
+  top: 0.38rem;
+}
+
+.get-paid-arrow i:nth-child(2) {
+  animation-delay: 70ms;
+  top: 0.75rem;
+  width: 1.05rem;
+}
+
+.get-paid-arrow i:nth-child(3) {
+  animation-delay: 140ms;
+  top: 1.12rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .get-paid-pill:hover {
+    box-shadow:
+      0 14px 38px rgba(6, 23, 36, 0.42),
+      0 2px 6px rgba(6, 23, 36, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .get-paid-pill:hover::before {
+    animation-duration: 1.4s;
+  }
+}
+
+.get-paid-pill:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+
+@keyframes get-paid-orbit {
+  to {
+    --get-paid-angle: 360deg;
+  }
+}
+
+@keyframes get-paid-sheen {
+  0%,
+  45% {
+    transform: translateX(-120%);
+  }
+
+  85%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes get-paid-dash {
+  0%,
+  100% {
+    transform: translateX(-2px);
+  }
+
+  45% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes get-paid-streak {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateX(4px) scaleX(0.3);
+  }
+
+  45% {
+    opacity: 0.9;
+    transform: translateX(-2px) scaleX(1);
+  }
+
+  70% {
+    opacity: 0;
+    transform: translateX(-8px) scaleX(0.6);
+  }
+}
+
+@media (max-width: 700px) {
+  .get-paid-dock {
+    bottom: calc(0.9rem + var(--safe-bottom));
+  }
+
+  .get-paid-pill {
+    min-height: 3.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .get-paid-dock {
+    transition: opacity 200ms ease;
+  }
+
+  .get-paid-pill::before,
+  .get-paid-sheen,
+  .get-paid-arrow svg,
+  .get-paid-arrow i {
+    animation: none !important;
+  }
+
+  .get-paid-pill::before {
+    background: conic-gradient(from 300deg, transparent 0deg, rgba(255, 255, 255, 0.7) 40deg, transparent 90deg);
+  }
+
+  .get-paid-sheen,
+  .get-paid-arrow i {
+    display: none;
+  }
+}
+
+@media print {
+  .get-paid-dock {
+    display: none !important;
   }
 }

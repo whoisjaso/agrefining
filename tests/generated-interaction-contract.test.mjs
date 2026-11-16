@@ -295,14 +295,10 @@ test("Title Case normalization preserves nested inline heading markup", () => {
   );
 });
 
-test("the single pickup action is available only on mobile while the desktop material guide remains available", () => {
+test("the Get Paid pill is available at every width while the desktop material guide remains available", () => {
   const touchProfile = { pointer: "coarse", hover: "none", motion: "no-preference" };
   for (const width of [320, 390, 768, 900]) {
-    assert.equal(
-      generatedDisplayAtWidth(".mobile-actions", width, touchProfile, "block"),
-      "flex",
-      `${width}px: the mobile pickup action must be available`
-    );
+    assert.equal(generatedDisplayAtWidth(".get-paid-dock", width, touchProfile, "block"), "flex", `${width}px: the pill must be available`);
     assert.equal(
       generatedDisplayAtWidth(".material-guide", width, touchProfile, "block"),
       "none",
@@ -311,11 +307,7 @@ test("the single pickup action is available only on mobile while the desktop mat
   }
 
   const desktopProfile = { pointer: "fine", hover: "hover", motion: "no-preference" };
-  assert.equal(
-    generatedDisplayAtWidth(".mobile-actions", 901, desktopProfile, "block"),
-    "none",
-    "the pickup dock must disappear above the mobile breakpoint"
-  );
+  assert.equal(generatedDisplayAtWidth(".get-paid-dock", 1440, desktopProfile, "block"), "flex", "the pill follows desktop visitors too");
   assert.equal(
     generatedDisplayAtWidth(".material-guide", 1440, desktopProfile, "block"),
     "block",

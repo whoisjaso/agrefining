@@ -1172,10 +1172,14 @@ function renderMaterialGuide(locale = "en") {
   </details>`;
 }
 
-function renderMobileActions(locale = "en") {
-  return locale === "es"
-    ? `<nav class="mobile-actions" aria-label="Acciones rápidas" data-visible="false" aria-hidden="true" inert><a class="button-primary" href="#solicitud">${spanishPrimaryCta} ${arrow}</a></nav>`
-    : `<nav class="mobile-actions" aria-label="Quick actions" data-visible="false" aria-hidden="true" inert><a class="button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></nav>`;
+// Floating "Get Paid" pill: hidden over the first screen, it rises in once the visitor scrolls on.
+// It reuses the page's own pickup link, so material pages open the form with their material already chosen.
+function renderMobileActions(locale = "en", content = "") {
+  const spanishPage = locale === "es";
+  const pageLink = content.match(/href="(\/contact\?intent=pickup(?:&(?:amp;)?material=[a-z_]+)?)"/)?.[1];
+  const href = spanishPage ? "#solicitud" : pageLink || "/contact?intent=pickup";
+  const label = spanishPage ? "Reciba Su Pago" : "Get Paid";
+  return `<nav class="mobile-actions get-paid-dock" aria-label="${spanishPage ? "Acciones rápidas" : "Quick actions"}" data-visible="false" aria-hidden="true" inert><a class="get-paid-pill" href="${href}"><span class="get-paid-sheen" aria-hidden="true"></span><span class="get-paid-label">${label}</span><span class="get-paid-arrow" aria-hidden="true"><i></i><i></i><i></i><svg viewBox="0 0 20 20" width="18" height="18"><path d="M3 10h12m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a></nav>`;
 }
 
 function renderHomeLoader() {
@@ -1445,7 +1449,7 @@ function document({
     ${homepage ? renderHomeLoader() : ""}
     ${renderNav(locale, homepage)}
     <main id="main">${content}</main>
-    ${renderMobileActions(locale)}
+    ${renderMobileActions(locale, content)}
     ${renderFooter(locale)}
     ${materialGuide ? renderMaterialGuide(locale) : ""}
     <script src="/site.js?v=20260804-hero-v2" defer></script>

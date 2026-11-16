@@ -18,31 +18,33 @@ function cssRule(selector) {
 }
 
 function mobileDock(html) {
-  return html.match(/<nav class="mobile-actions"[\s\S]*?<\/nav>/)?.[0] || "";
+  return html.match(/<nav class="mobile-actions get-paid-dock"[\s\S]*?<\/nav>/)?.[0] || "";
 }
 
-test("the mobile dock is one localized pickup link with no competing call action", () => {
+test("the Get Paid pill is one localized link that routes to the right form", () => {
   const englishDock = mobileDock(home);
   const spanishDock = mobileDock(spanish);
   assert.equal((englishDock.match(/<a\b/g) || []).length, 1);
-  assert.match(englishDock, /href="\/contact\?intent=pickup"[^>]*>Schedule a Free Pickup/);
+  assert.match(englishDock, /<a class="get-paid-pill" href="\/contact\?intent=pickup">[\s\S]*Get Paid/);
   assert.doesNotMatch(englishDock, /tel:|>Call</);
   assert.equal((spanishDock.match(/<a\b/g) || []).length, 1);
-  assert.match(spanishDock, /href="#solicitud"[^>]*>Programar Una Recogida Gratis/);
-  assert.doesNotMatch(spanishDock, /tel:|>Llamar</);
+  assert.match(spanishDock, /<a class="get-paid-pill" href="#solicitud">[\s\S]*Reciba Su Pago/);
+  const coins = readFileSync(join(dist, "sell-silver-coins-houston", "index.html"), "utf8");
+  assert.match(mobileDock(coins), /href="\/contact\?intent=pickup&material=silver_coins"/, "material pages open the form with their material chosen");
 });
 
-test("the mobile dock is safe-area aware and suppressed by navigation and the footer", () => {
-  const dockRule = cssRule(".mobile-actions");
-  assert.match(dockRule, /bottom:\s*calc\(0\.65rem \+ var\(--safe-bottom\)\)/);
-  assert.match(dockRule, /left:\s*calc\(0\.65rem \+ var\(--safe-left\)\)/);
-  assert.match(dockRule, /right:\s*calc\(0\.65rem \+ var\(--safe-right\)\)/);
-  assert.match(css, /\.mobile-actions\s*\{[\s\S]*?transform:\s*translateY\(calc\(100% \+ 1\.5rem\)\)/);
-  assert.match(css, /\.mobile-actions\[data-visible="true"\]\s*\{[^}]*opacity:\s*1;[^}]*transform:\s*translateY\(0\)/s);
-  assert.match(css, /\.nav-open\s+\.mobile-actions\s*\{[^}]*opacity:\s*0;[^}]*pointer-events:\s*none/s);
+test("the pill is centered, hidden on the first screen, safe-area aware, and suppressed by navigation, forms and the footer", () => {
+  const dockRule = cssRule(".get-paid-dock");
+  assert.match(dockRule, /left:\s*50%/);
+  assert.match(dockRule, /transform:\s*translate\(-50%, 140%\)/);
+  assert.match(dockRule, /bottom:\s*calc\(1\.1rem \+ var\(--safe-bottom\)\)/);
+  assert.match(css, /\.get-paid-dock\[data-visible="true"\]\s*\{[^}]*opacity:\s*1;[^}]*transform:\s*translate\(-50%, 0\)/s);
+  assert.match(css, /\.nav-open \.get-paid-dock\s*\{[^}]*opacity:\s*0;/s);
+  assert.match(css, /\.get-paid-pill::before\s*\{[^}]*animation:\s*get-paid-orbit 2\.6s linear infinite/s);
+  assert.match(css, /@media \(prefers-reduced-motion:\s*reduce\)\s*\{\s*\.get-paid-dock[\s\S]*?animation:\s*none !important/);
   assert.match(site, /document\.body\.classList\.contains\("nav-open"\)/);
   assert.match(site, /footer\.getBoundingClientRect\(\)\.top/);
-  assert.match(site, /!navMedia\.matches/);
+  assert.match(site, /offset > revealOffset\(\)/);
   assert.match(site, /actionDock\.inert\s*=\s*!visible/);
 });
 
