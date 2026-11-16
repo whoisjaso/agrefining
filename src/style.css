@@ -1295,14 +1295,10 @@ html[data-loader-state="ready"] .home-loader {
   margin-top: 1.15rem;
 }
 
+/* The hero film plays for everyone (owner's call); reduced motion only drops the crossfade animation. */
 @media (prefers-reduced-motion: reduce) {
-  .cinematic-hero-video {
-    opacity: 0;
-    transition: none;
-  }
-
+  .cinematic-hero-video,
   .cinematic-hero-poster {
-    opacity: 1;
     transition: none;
   }
 }

@@ -1514,12 +1514,12 @@ const home = `
       </picture>
       <div class="cinematic-hero-video-stack" data-cinematic-video-stack>
         <video class="cinematic-hero-video" autoplay muted playsinline aria-hidden="true" tabindex="-1" preload="none" poster="/images/ag-refining-molten-pour-poster.webp" data-video-layer="0">
-          <source data-video-format="webm" type="video/webm">
-          <source data-video-format="mp4" type="video/mp4">
+          <source data-video-format="webm" type='video/webm; codecs="vp9"'>
+          <source data-video-format="mp4" type='video/mp4; codecs="avc1.64001F"'>
         </video>
         <video class="cinematic-hero-video" autoplay muted playsinline aria-hidden="true" tabindex="-1" preload="none" poster="/images/ag-refining-molten-pour-poster.webp" data-video-layer="1">
-          <source data-video-format="webm" type="video/webm">
-          <source data-video-format="mp4" type="video/mp4">
+          <source data-video-format="webm" type='video/webm; codecs="vp9"'>
+          <source data-video-format="mp4" type='video/mp4; codecs="avc1.64001F"'>
         </video>
       </div>
     </div>

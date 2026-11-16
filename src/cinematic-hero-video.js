@@ -12,22 +12,15 @@ function defaultDocument() {
   return typeof document === "undefined" ? null : document;
 }
 
-function defaultConnection() {
-  return typeof navigator === "undefined" ? null : navigator.connection;
-}
-
-function defaultMotionQuery() {
-  return typeof matchMedia === "undefined"
-    ? { matches: false }
-    : matchMedia("(prefers-reduced-motion: reduce)");
-}
+// The owner wants the hero film on every device, so reduced-motion and Save-Data no longer
+// fall back to the still poster. When a browser blocks autoplay (iOS Low Power Mode, strict
+// autoplay policies), the poster shows until the visitor's first tap, click or key press.
+const GESTURE_EVENTS = ["pointerdown", "touchend", "click", "keydown"];
 
 export class CinematicHeroVideo {
   constructor(root, options = {}) {
     this.root = root;
     this.documentRef = options.documentRef ?? defaultDocument();
-    this.connection = options.connection ?? defaultConnection();
-    this.motionQuery = options.motionQuery ?? defaultMotionQuery();
     this.setTimeoutFn = options.setTimeoutFn ?? globalThis.setTimeout.bind(globalThis);
     this.clearTimeoutFn = options.clearTimeoutFn ?? globalThis.clearTimeout.bind(globalThis);
 
@@ -52,6 +45,7 @@ export class CinematicHeroVideo {
     this.visibilityGeneration = 0;
     this.playGeneration = 0;
     this.currentPlayOperations = new Map();
+    this.gestureCleanup = null;
     this.timerIds = new Set();
     this.listenerCleanupFunctions = new Set();
   }
@@ -61,7 +55,7 @@ export class CinematicHeroVideo {
     this.started = true;
     this.attachLifecycleListener();
 
-    if (this.motionQuery?.matches || this.connection?.saveData || this.layers.length !== 2) {
+    if (this.layers.length !== 2) {
       this.staticMode = true;
       this.transitionPhase = "static";
       return;
@@ -85,8 +79,42 @@ export class CinematicHeroVideo {
       () => {
         if (!this.isCurrentAttempt(startAttempt)) return;
         this.enterStaticMode();
+        this.retryOnGesture();
       }
     );
+  }
+
+  // Autoplay was refused: keep the poster and start the film on the visitor's first gesture.
+  retryOnGesture() {
+    if (this.destroyed || this.gestureCleanup || !this.documentRef) return;
+    const retry = () => {
+      this.clearGestureRetry();
+      if (this.destroyed || !this.staticMode) return;
+      this.staticMode = false;
+      this.transitionPhase = "starting";
+      const attempt = ++this.transitionAttempt;
+      this.startPlayOperation(this.layers[this.activeLayerIndex],
+        () => {
+          if (!this.isCurrentAttempt(attempt) || this.staticMode) return;
+          this.setLayerVisible(this.layers[this.activeLayerIndex], true);
+          this.hidePoster();
+          this.transitionPhase = "idle";
+        },
+        () => {
+          if (!this.isCurrentAttempt(attempt)) return;
+          this.enterStaticMode();
+        }
+      );
+    };
+    for (const type of GESTURE_EVENTS) this.documentRef.addEventListener(type, retry, { passive: true });
+    this.gestureCleanup = () => {
+      for (const type of GESTURE_EVENTS) this.documentRef.removeEventListener(type, retry, { passive: true });
+    };
+  }
+
+  clearGestureRetry() {
+    this.gestureCleanup?.();
+    this.gestureCleanup = null;
   }
 
   destroy() {
@@ -100,6 +128,7 @@ export class CinematicHeroVideo {
     this.hiddenTransitionState = null;
     this.visibilityRecoveryPending = false;
     this.invalidatePlayOperations();
+    this.clearGestureRetry();
 
     for (const removeListener of this.listenerCleanupFunctions) removeListener();
     this.listenerCleanupFunctions.clear();
@@ -160,6 +189,10 @@ export class CinematicHeroVideo {
     layer.poster = clip.poster;
     layer.setAttribute("poster", clip.poster);
     layer.preload = preload;
+    // iOS only autoplays inline, muted media; set the properties as well as the markup attributes.
+    layer.muted = true;
+    layer.defaultMuted = true;
+    layer.playsInline = true;
     const webm = layer.querySelector('[data-video-format="webm"]');
     const mp4 = layer.querySelector('[data-video-format="mp4"]');
     webm?.setAttribute("src", `/videos/ag-refining-${clip.key}.webm`);
@@ -331,7 +364,7 @@ export class CinematicHeroVideo {
 
     const hiddenState = this.hiddenTransitionState;
     this.hiddenTransitionState = null;
-    if (this.staticMode || this.motionQuery?.matches || this.connection?.saveData || !hiddenState) return;
+    if (this.staticMode || !hiddenState) return;
 
     const active = this.layers[hiddenState.activeLayerIndex];
     const interruptedTransition = hiddenState.transitioning
