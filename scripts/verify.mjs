@@ -438,7 +438,7 @@ if (!privacyPage.includes('<nav aria-label="Privacy sections">')) {
 
 const sitemap = readFileSync(join(out, "sitemap.xml"), "utf8");
 const sitemapEntries = (sitemap.match(/<url>/g) || []).length;
-if (sitemapEntries !== 40) failures.push(`Expected 40 sitemap pages, found ${sitemapEntries}`);
+if (sitemapEntries !== 41) failures.push(`Expected 41 sitemap pages, found ${sitemapEntries}`);
 const sitemapLocations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
 if (new Set(sitemapLocations).size !== sitemapLocations.length) failures.push("Sitemap contains a duplicate URL");
 

@@ -12,7 +12,7 @@ npm run build
 npm run verify
 ```
 
-The generated site is written to `dist`. Verification covers 41 generated HTML files, 40 indexed routes, the shared Silver Atelier shell, representative page families, exact protected SEO fields, local route and asset targets, and the homepage conversion sequence.
+The generated site is written to `dist`. Verification covers 42 generated HTML files, 41 indexed routes, the shared Silver Atelier shell, representative page families, exact protected SEO fields, local route and asset targets, and the homepage conversion sequence.
 
 ## Lead delivery
 
@@ -30,9 +30,15 @@ Each request emails AG Refining (reply-to the visitor, with a one-tap call butto
 
 `/desk` is a private, noindex tablet app for buying silver at the counter: live silver pricing from three market feeds (`/api/spot`), offers per material and purity, a client-facing presentation that never shows spot price or rates, a signed sale agreement, and a PDF receipt that can be emailed (`/api/receipt`), shared, or printed. See `docs/buy-desk-guide.md` for the owner guide.
 
-- `DESK_ACCESS_CODE` (optional): enables receipt email. Must match the code chosen on the tablet. Without it, the desk shares or prints the PDF instead.
+- `DESK_ACCESS_CODE` (optional): enables receipt email and the hallmark reader. Must match the code chosen on the tablet. Without it, the desk shares or prints the PDF instead.
+- `ANTHROPIC_API_KEY` (optional): enables "Read the hallmark" (`/api/identify`). The desk photographs an item, and Claude (`claude-sonnet-5-5`, vision) reads the marks and suggests a material, purity, or coin from the desk catalog. The suggestion only pre-selects the item sheet; the owner still weighs, confirms, and adds the item. Without the key (or without `DESK_ACCESS_CODE`) the button is hidden.
+- `GOOGLE_REVIEW_URL` (optional): the Google review link used by the review QR code and "Text the link" on the sale-complete screen, and by the one-line review invitation in receipt emails. Defaults to the Google Maps search for AG Refining in `src/desk/review-link.mjs`; set it to the direct "write a review" link from Google Business Profile when available.
 
-Desk source lives in `src/desk/` and is published by `scripts/build-desk.mjs`. Tests: `tests/desk-pricing.test.mjs`, `tests/desk-api.test.mjs`, and the browser simulation `npm run test:desk` (screenshots with `node tests/desk-browser.mjs --shots`).
+Desk source lives in `src/desk/` and is published by `scripts/build-desk.mjs`, which also vendors `qrcode-generator` (MIT, pinned) for the review QR code. Tests: `tests/desk-pricing.test.mjs`, `tests/desk-api.test.mjs`, `tests/desk-identify.test.mjs`, and the browser simulation `npm run test:desk` (screenshots with `node tests/desk-browser.mjs --shots`).
+
+## Houston silver price page
+
+`/silver-price-houston` shows the live silver spot price per troy ounce (from `/api/spot`, refreshed every minute), a 30-day chart of daily closes (`/api/spot?range=30d`, COMEX silver futures, cached for an hour), and a reference table of fine silver content in sterling and U.S. silver coins. By business decision it never shows melt values, offer rates, or other pricing math. Without JavaScript the page shows a call-for-price fallback. Tests: `tests/silver-price-page.test.mjs` and `npm run test:price`.
 
 ## Search and AI visibility
 

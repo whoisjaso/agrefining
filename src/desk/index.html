@@ -46,8 +46,12 @@
     <main class="desk-main">
       <section class="pick" aria-labelledby="pick-title">
         <div class="pick-head">
-          <p class="eyebrow">Step 1</p>
-          <h2 id="pick-title">What did they bring?</h2>
+          <div>
+            <p class="eyebrow">Step 1</p>
+            <h2 id="pick-title">What did they bring?</h2>
+          </div>
+          <button class="btn btn-secondary btn-identify" type="button" data-action="identify" hidden><span class="i i-camera" aria-hidden="true"></span><span data-identify-label>Read the hallmark</span></button>
+          <input class="sr-only" type="file" accept="image/*" capture="environment" data-identify-input tabindex="-1" aria-hidden="true">
         </div>
         <div class="tiles" data-tiles></div>
       </section>
@@ -178,6 +182,15 @@
           <p class="done-status" data-done-status aria-live="polite"></p>
           <button class="btn btn-quiet" type="button" data-action="new-client">Next client <span class="i i-arrow" aria-hidden="true"></span></button>
         </div>
+        <section class="review-card" data-review-card aria-labelledby="review-title">
+          <div class="review-qr" data-review-qr role="img" aria-label="QR code for AG Refining on Google"></div>
+          <div class="review-copy">
+            <p class="eyebrow">Ask for a review</p>
+            <h2 id="review-title">If today went well</h2>
+            <p>The seller can scan this to leave a Google review.</p>
+            <a class="btn btn-secondary" data-review-text href="#" hidden><span class="i i-chat" aria-hidden="true"></span>Text the link</a>
+          </div>
+        </section>
       </div>
       <div class="receipt-stage"><article class="receipt" data-receipt></article></div>
     </div>
@@ -191,6 +204,12 @@
       <div><p class="eyebrow" data-sheet-note></p><h2 id="sheet-title" data-sheet-title></h2></div>
       <button class="icon-btn" type="button" data-action="close-sheet" aria-label="Close"><span class="i i-close" aria-hidden="true"></span></button>
     </header>
+    <div class="identify-note" data-identify-note role="status" hidden>
+      <p class="identify-head"><span class="i i-camera" aria-hidden="true"></span><b>Hallmark reading</b><span class="identify-confidence" data-identify-confidence></span></p>
+      <p class="identify-marks" data-identify-marks></p>
+      <p class="identify-text" data-identify-text></p>
+      <p class="identify-check">A suggestion only. Check the item, then confirm or change the selection.</p>
+    </div>
     <div class="sheet-body">
       <div class="sheet-left">
         <div class="sheet-group" data-coin-group hidden>

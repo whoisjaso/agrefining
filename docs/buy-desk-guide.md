@@ -17,6 +17,9 @@ The desk is not linked from the website and is hidden from search engines.
 4. Tap **Show the offer** and turn the tablet around. The client sees the total, each item, and what is included. They never see the silver price or your rates. The offer is held at that moment's price for 15 minutes, even if the market moves.
 5. Tap **Accept offer**. Enter the seller's name and ID number, choose how you are paying, have them check the statement and sign with a finger.
 6. **Complete the sale.** The receipt is saved on the tablet. Email it, share it as a PDF (Messages, AirDrop, Files), or print it.
+7. **Ask for a review, if it feels right.** The sale-complete screen shows a QR code the seller can scan to leave a Google review. If they gave a phone number, **Text the link** opens Messages with a short, prefilled thank-you and the link. Receipt emails also carry one line inviting a review.
+
+**Read the hallmark.** Not sure what an item is? Tap **Read the hallmark** above the material tiles and take a close, well-lit photo of the stamp. The desk suggests the material, purity, or coin, shows the marks it read and how confident it is, and opens that item with those choices selected. It is only a suggestion: check the item, change anything that looks wrong, then weigh it and tap **Add to offer**. Nothing is added on its own.
 
 ## Settings
 
@@ -63,6 +66,11 @@ Receipt email uses the same Resend account as the website's pickup form. In Verc
 - `DESK_ACCESS_CODE`: the same digits as your desk code.
 
 Until that is set, **Email receipt** falls back to sharing the PDF, so nothing is blocked. Each emailed receipt also sends a copy to `dennis@agrefining.com`.
+
+Optional, in the same place:
+
+- `ANTHROPIC_API_KEY`: turns on **Read the hallmark**. Without it the button stays hidden.
+- `GOOGLE_REVIEW_URL`: your direct "write a review" link from Google Business Profile. Without it the review QR code and email line point to AG Refining on Google Maps.
 
 ## Forgot the desk code
 
