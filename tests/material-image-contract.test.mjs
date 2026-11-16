@@ -31,12 +31,12 @@ const materialManifest = {
 };
 
 const homeMaterials = [
-  ["sell-silver-coins-houston", "material-coins"],
   ["scrap-silver-jewelry", "material-scrap-jewelry"],
-  ["silver-flatware-buyer-houston", "material-sterling-flatware"],
-  ["dental-scrap-buyer-houston", "material-dental"],
+  ["industrial-x-ray-silver-recycling", "material-industrial-ndt"],
+  ["sell-silver-coins-houston", "material-coins"],
+  ["silver-oxide-watch-battery-recycling-houston", "material-watch-batteries"],
   ["medical-x-ray-recycling", "material-medical-xray"],
-  ["silver-oxide-watch-battery-recycling-houston", "material-watch-batteries"]
+  ["silver-flatware-buyer-houston", "material-sterling-flatware"]
 ];
 
 function routeHtml(route) {

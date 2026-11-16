@@ -3,7 +3,7 @@ const toggle = document.querySelector("[data-nav-toggle]");
 const nav = document.querySelector("[data-nav]");
 const navScrim = document.querySelector("[data-nav-scrim]");
 const toggleLabel = toggle?.querySelector("[data-nav-toggle-label]");
-const navBackground = Array.from(document.querySelectorAll("main, .pay-pill-dock, .footer"));
+const navBackground = Array.from(document.querySelectorAll("main, .material-guide, .mobile-actions, .footer"));
 const navMedia = window.matchMedia("(min-width: 901px)");
 const materialsResetEvent = "materials-disclosure-reset";
 const spanish = document.documentElement.lang.startsWith("es");
@@ -143,12 +143,24 @@ function initializeNav() {
 
 initializeNav();
 
+const actionDock = document.querySelector(".mobile-actions");
 const footer = document.querySelector(".footer");
 let chromeTicking = false;
 
 function updateChrome() {
   chromeTicking = false;
-  siteHeader?.setAttribute("data-stuck", window.scrollY > 12 ? "true" : "false");
+  const offset = window.scrollY;
+  siteHeader?.setAttribute("data-stuck", offset > 12 ? "true" : "false");
+  if (!actionDock) return;
+  const footerTop = footer ? footer.getBoundingClientRect().top : Number.POSITIVE_INFINITY;
+  const viewportHeight = window.visualViewport?.height || window.innerHeight;
+  const navOpen = document.body.classList.contains("nav-open");
+  const visible = !navMedia.matches && offset > 320 && !navOpen && footerTop > viewportHeight + 24;
+  actionDock.setAttribute("data-visible", visible ? "true" : "false");
+  actionDock.setAttribute("aria-hidden", visible ? "false" : "true");
+  actionDock.inert = !visible;
+  if (visible) actionDock.removeAttribute("inert");
+  else actionDock.setAttribute("inert", "");
 }
 
 window.addEventListener("scroll", () => {
@@ -156,69 +168,21 @@ window.addEventListener("scroll", () => {
   chromeTicking = true;
   window.requestAnimationFrame(updateChrome);
 }, { passive: true });
+window.addEventListener("resize", updateChrome, { passive: true });
+window.visualViewport?.addEventListener("resize", updateChrome, { passive: true });
+window.visualViewport?.addEventListener("scroll", updateChrome, { passive: true });
 updateChrome();
 
-// Floating "Get Paid" pill. Hidden while the hero CTA, any form, the closing CTA or the footer is on screen,
-// while the menu is open and while a field has focus (keyboard up), so it never covers content or a submit button.
-const payPill = document.querySelector("[data-pay-pill]");
-if (payPill) {
-  const heroCta = document.querySelector("[data-hero-cta]") || document.querySelector("main > section:first-of-type .button-primary");
-  const hideZones = [heroCta, footer, ...document.querySelectorAll("main form, [data-review-form], .conversion-band, [data-hide-pill]")].filter(Boolean);
-  const onScreen = new Set();
-  let fieldFocused = false;
-
-  const updatePill = () => {
-    const navOpen = document.body.classList.contains("nav-open");
-    const visible = !navOpen && !fieldFocused && onScreen.size === 0;
-    payPill.dataset.visible = visible ? "true" : "false";
-    payPill.setAttribute("aria-hidden", visible ? "false" : "true");
-    payPill.inert = !visible;
-    if (visible) payPill.removeAttribute("inert");
-    else payPill.setAttribute("inert", "");
-  };
-
-  if ("IntersectionObserver" in window) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) onScreen.add(entry.target);
-        else onScreen.delete(entry.target);
-      });
-      updatePill();
-    });
-    hideZones.forEach((zone) => observer.observe(zone));
-  } else {
-    updatePill();
-  }
-
-  const isField = (target) => target instanceof HTMLElement && target.matches("input, select, textarea");
-  document.addEventListener("focusin", (event) => {
-    if (!isField(event.target)) return;
-    fieldFocused = true;
-    updatePill();
-  });
-  document.addEventListener("focusout", (event) => {
-    if (!isField(event.target)) return;
-    fieldFocused = false;
-    updatePill();
-  });
-  new MutationObserver(updatePill).observe(document.body, { attributes: true, attributeFilter: ["class"] });
-
-  // The outline animation rests while the tab is hidden.
-  document.addEventListener("visibilitychange", () => {
-    document.documentElement.classList.toggle("pill-paused", document.hidden);
-  });
-
-  // On the page that holds the form, the pill scrolls to it and focuses the first field.
-  const pillLink = payPill.querySelector(".pay-pill");
-  pillLink?.addEventListener("click", (event) => {
-    const target = new URL(pillLink.href, window.location.href);
-    const form = document.querySelector("[data-review-form]");
-    if (!form || target.pathname !== window.location.pathname) return;
-    event.preventDefault();
-    form.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
-    form.querySelector("input:not([type=hidden]), select, textarea")?.focus({ preventScroll: true });
-  });
-}
+const materialGuide = document.querySelector(".material-guide");
+const materialGuideSummary = materialGuide?.querySelector("summary");
+document.addEventListener("click", (event) => {
+  if (materialGuide?.open && !materialGuide.contains(event.target)) materialGuide.removeAttribute("open");
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape" || !materialGuide?.open) return;
+  materialGuide.removeAttribute("open");
+  materialGuideSummary?.focus();
+});
 
 const reviewForm = document.querySelector("[data-review-form]");
 const formLocale = reviewForm?.dataset.locale === "es" || spanish ? "es" : "en";
@@ -229,12 +193,15 @@ const formUi = {
     invalidEmail: "Enter a valid email.",
     invalidField: (label) => `Enter a valid ${label.toLowerCase()}.`,
     shortDetails: "Add a little more detail so the material can be reviewed.",
-    sendingStatus: "Sending your details.",
-    sendingButton: "Sending...",
-    success: "Got It. We'll Call You Soon. Want to talk now? Call (281) 898-2719.",
-    networkError: "Something went wrong on our end. Please call (281) 898-2719 and we'll take care of you.",
-    call: "Call (281) 898-2719",
-    submit: "Send My Details"
+    sendingButton: "Sending request...",
+    sendingStatus: "Sending your material review request.",
+    success: "Your request was received. AG Refining will review the details and follow up using your preferred contact method.",
+    emailDetails: "Email these details",
+    networkError: "The request could not be sent. Please call (281) 898-2719 or try again.",
+    submit: "Send request",
+    subject: (intent) => `AG Refining ${intent === "quote" ? "quote" : "pickup"} request`,
+    labels: ["Name", "Business", "Phone", "Email", "Material", "Amount", "Location", "Frequency", "Preferred pickup"],
+    notProvided: "Not provided"
   },
   es: {
     errorHeading: "Revise lo siguiente:",
@@ -242,12 +209,15 @@ const formUi = {
     invalidEmail: "Escriba un correo electrónico válido.",
     invalidField: (label) => `Escriba un ${label.toLowerCase()} válido.`,
     shortDetails: "Añada un poco más de información para revisar el material.",
-    sendingButton: "Enviando...",
-    sendingStatus: "Enviando sus datos.",
-    success: "Listo. Le llamaremos pronto. ¿Prefiere hablar ahora? Llame al (281) 898-2719.",
-    networkError: "Algo falló de nuestro lado. Llame al (281) 898-2719 y le atendemos.",
-    call: "Llame al (281) 898-2719",
-    submit: "Enviar Mis Datos"
+    sendingButton: "Enviando solicitud...",
+    sendingStatus: "Enviando su solicitud de revisión del material.",
+    success: "Recibimos su solicitud. AG Refining revisará los detalles y se comunicará por el medio que prefirió.",
+    emailDetails: "Enviar estos datos por correo",
+    networkError: "No se pudo enviar la solicitud. Llame al (281) 898-2719 o inténtelo de nuevo.",
+    submit: "Enviar solicitud",
+    subject: () => "Solicitud de recogida de AG Refining",
+    labels: ["Nombre", "Empresa", "Teléfono", "Correo electrónico", "Material", "Cantidad", "Ubicación", "Frecuencia", "Recogida preferida"],
+    notProvided: "No indicado"
   }
 }[formLocale];
 
@@ -339,6 +309,12 @@ function validateReviewForm(form) {
     }
   });
 
+  const details = form.elements.namedItem("details");
+  if (details && details.value.trim().length > 0 && details.value.trim().length < 20 && !issues.some((issue) => issue.field === details)) {
+    details.setAttribute("aria-invalid", "true");
+    issues.push({ field: details, message: formUi.shortDetails });
+  }
+
   return issues;
 }
 
@@ -401,16 +377,35 @@ function formPayload(form) {
   };
 }
 
-// Delivery failed: the server logged the lead; the visitor gets a big call button, never a send-it-yourself link.
-function showCallFallback(form, message) {
+function fallbackMailto(payload, recipient) {
+  const subject = formUi.subject(payload.intent);
+  const values = [
+    payload.name,
+    payload.business || formUi.notProvided,
+    payload.phone,
+    payload.email,
+    payload.material.replaceAll("_", " "),
+    payload.quantity || formUi.notProvided,
+    payload.location,
+    payload.frequency.replaceAll("_", " "),
+    [payload.pickup_date, payload.pickup_window === "any" ? "" : payload.pickup_window].filter(Boolean).join(" ") || formUi.notProvided
+  ];
+  const body = [
+    ...formUi.labels.map((label, index) => `${label}: ${values[index]}`),
+    "",
+    payload.details
+  ].join("\n");
+  return `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+function showDeliveryFallback(form, message, recipient, payload) {
   const status = form.querySelector("[data-form-status]");
   if (!status) return;
   const text = document.createElement("span");
   text.textContent = `${message} `;
   const link = document.createElement("a");
-  link.className = "button button-primary form-call";
-  link.href = "tel:+12818982719";
-  link.textContent = formUi.call;
+  link.href = fallbackMailto(payload, recipient);
+  link.textContent = formUi.emailDetails;
   status.replaceChildren(text, link);
   status.dataset.state = "error";
 }
@@ -466,8 +461,13 @@ if (reviewForm) {
           });
           if (serverIssues.length) showFormIssues(form, serverIssues);
         }
-        if (response.status >= 500) {
-          showCallFallback(form, result.message || formUi.networkError);
+        if (result.fallback_email) {
+          showDeliveryFallback(
+            form,
+            result.message || formUi.networkError,
+            result.fallback_email,
+            payload
+          );
           return;
         }
         responseErrorMessage = typeof result.message === "string" && result.message
@@ -483,8 +483,7 @@ if (reviewForm) {
       showFormIssues(form, []);
       setFormStatus(form, formUi.success, "success");
     } catch {
-      if (responseErrorMessage) setFormStatus(form, responseErrorMessage, "error");
-      else showCallFallback(form, formUi.networkError);
+      setFormStatus(form, responseErrorMessage || formUi.networkError, "error");
     } finally {
       form.removeAttribute("aria-busy");
       if (button) {

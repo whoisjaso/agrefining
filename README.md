@@ -16,16 +16,15 @@ The generated site is written to `dist`. Verification covers 41 generated HTML f
 
 ## Lead delivery
 
-The form posts to `/api/leads`, which emails each lead through Resend. Set these in Vercel project settings only (never in the repo):
+The pickup form posts to `/api/leads`. Configure these Vercel environment variables:
 
-- `RESEND_API_KEY` (required; without it no lead email goes out)
-- `LEAD_TO`: comma-separated primary recipients (Dorothy once her address is confirmed). Falls back to `AG_LEAD_TO_EMAIL`, then `dennis@agrefining.com`.
-- `LEAD_CC`: comma-separated CC list. Default `dennis@agrefining.com`; an address already in `LEAD_TO` is never repeated. Set it to an empty value to send no CC.
-- `LEAD_FROM`: verified sender, default `AG Refining Website <leads@agrefining.com>`. Falls back to `AG_LEAD_FROM_EMAIL`.
-- `LEAD_REPLY_TO_SUBMITTER`: `false` stops Reply-To being set to the visitor (default on).
-- `LEAD_ROUTES` (optional JSON): `{"business": [...], "individual": [...], "es": [...]}`. Every route defaults to `LEAD_TO`.
+- `RESEND_API_KEY` (required for online delivery)
+- `AG_LEAD_FROM_EMAIL` (optional, defaults to `AG Refining <website@agrefining.com>`)
+- `AG_LEAD_TO_EMAIL` (optional, defaults to `dennis@agrefining.com`)
 
-`/api/leads?status=health` returns `{"delivery": true, "recipients": N}` once `RESEND_API_KEY` is set (it never shows the addresses). Only name, phone and material are required; email, area and notes are optional. If the email cannot be sent, the visitor sees "Please call (281) 898-2719" with a call button (never a send-it-yourself mail link), and the full lead is written to the Vercel function log under `LEAD_UNDELIVERED`. Setup steps for the key and the sending domain: `docs/lead-delivery-setup.md`.
+The `agrefining.com` domain must remain verified in Resend. If online delivery is unavailable, the form gives the visitor a prefilled email fallback instead of dropping the request.
+
+Each request emails AG Refining (reply-to the visitor, with a one-tap call button) and sends the visitor a short confirmation in English or Spanish. Visitors can name a preferred pickup day and time; the confirmation says the exact time will be confirmed by phone or email. Check delivery configuration at `/api/leads?status=health`, which returns `{"delivery": true}` once `RESEND_API_KEY` is set.
 
 ## Buy Desk
 
@@ -53,4 +52,4 @@ See `docs/seo/search-and-ai-visibility-playbook.md` for Search Console, Bing, Go
 
 The build currently publishes the homepage plus dedicated material, industry, and Houston Metro service-area pages. Add future weekly SEO pages to the matching registry in `scripts/build.mjs`. Every new page should answer a distinct customer question, use plain language, and link to the pickup funnel.
 
-Public copy (v2, Nov 2026): everyone is welcome, people and businesses alike. The promise is "We come to you. Quote on the spot." Silver first, gold too. Never write qualify, qualifying or eligible, free pickup, fast or same-day payment, or published hours; payment timing is only "agreed when you accept the quote." Do not add claims about insurance, assay method, fees, payment timing, compliance, licenses, minimums, or shipping without client approval. Headings, buttons and FAQ questions are Title Case with every word capitalized and no trailing period (the build applies it).
+The public copy qualifies pickup and payment claims by material, location, account type, and schedule. Do not strengthen claims about insurance, assay method, fees, exact payment timing, compliance, licenses, minimums, or shipping without client approval.

@@ -73,21 +73,23 @@ test("the hero boundary includes nested sections before locating the following i
 test("the deployable homepage hero states the approved V2 value proposition", () => {
   const { hero } = homepageHero();
 
-  assert.match(hero, /<h1>Sell Your Silver\. We Come To You<\/h1>/);
+  assert.match(hero, /<h1>Your silver, valued precisely\.<\/h1>/);
 });
 
 test("the deployable homepage hero presents both approved V2 actions", () => {
   const { hero } = homepageHero();
   const anchors = heroAnchors(hero);
   const primary = anchors.find((anchor) => anchor.href === "/contact?intent=pickup");
-  const call = anchors.find((anchor) => anchor.href === "tel:+12818982719");
+  const fallback = anchors.find((anchor) => anchor.href === "/accepted-materials");
 
   assert.ok(primary, "the primary pickup CTA must be an anchor to /contact?intent=pickup");
   assert.ok(primary.classes.includes("button"), "the primary pickup CTA must use the shared button class");
   assert.ok(primary.classes.includes("button-primary"), "the primary pickup CTA must use the primary button class");
-  assert.equal(primary.text, "Get Paid");
-  assert.ok(call, "the secondary action is a tap-to-call link");
-  assert.equal(call.text, "Or Call (281) 898-2719");
+  assert.equal(primary.text, "Schedule a Free Pickup");
+  assert.ok(fallback, "the fallback material CTA must be an anchor to /accepted-materials");
+  assert.ok(fallback.classes.includes("button"), "the fallback material CTA must use the shared button class");
+  assert.ok(fallback.classes.includes("button-secondary"), "the fallback material CTA must use the secondary button class");
+  assert.equal(fallback.text, "See what we buy");
 });
 
 test("the deployable homepage hero uses a permanent cinematic poster and two deferred video layers", () => {
@@ -110,7 +112,7 @@ test("the deployable homepage hero uses a permanent cinematic poster and two def
 
 test("the deployable homepage keeps its supported proof rail inside the hero", () => {
   const { hero } = homepageHero();
-  const requiredProof = ["Family-Owned", "We Come To You", "Quote On The Spot", "You Decide. No Pressure."];
+  const requiredProof = ["Houston-based", "Free qualifying pickup", "On-site weighing", "Confirmed payment terms"];
   const rail = (hero.match(/<ul\b[\s\S]*?<\/ul>/g) || []).find((list) => requiredProof.every((proof) => list.includes(proof)));
 
   assert.ok(rail, "the proof rail must remain inside the hero");
@@ -134,13 +136,12 @@ test("the generated homepage removes all assay-stage enhancement markup", () => 
   assert.doesNotMatch(home, /assay-fallback/);
 });
 
-test("one sticky CTA: the material guide is retired everywhere in favor of the Get Paid pill", () => {
+test("the homepage omits the redundant material guide while internal pages retain it", () => {
   const home = readFileSync(deployed("index.html"), "utf8");
   const materials = readFileSync(deployed("accepted-materials/index.html"), "utf8");
 
   assert.doesNotMatch(home, /<details class="material-guide">/);
-  assert.doesNotMatch(materials, /<details class="material-guide">/);
-  assert.match(materials, /class="pay-pill-dock"/);
+  assert.match(materials, /<details class="material-guide">/);
 });
 
 test("the shared site script does not boot the retired assay scene", () => {

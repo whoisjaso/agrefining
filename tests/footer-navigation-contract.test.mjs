@@ -71,7 +71,7 @@ const footerGroups = [
     ["Our Story", "/about"],
     ["How It Works", "/how-it-works"],
     ["Contact AG Refining", "/contact"],
-    ["Get Paid", "/contact?intent=pickup"],
+    ["Schedule a Free Pickup", "/contact?intent=pickup"],
     ["(281) 898-2719", "tel:+12818982719"],
     ["dennis@agrefining.com", "mailto:dennis@agrefining.com"],
     ["FAQ", "/faq"],
@@ -204,7 +204,7 @@ test("Spanish footer preserves localized contact actions and identifies English 
     "Nuestra historia en ingles",
     "Cómo funciona en ingles",
     "Contacto AG Refining en ingles",
-    "Reciba Su Pago",
+    "Programar Una Recogida Gratis",
     "(281) 898-2719",
     "dennis@agrefining.com",
     "Preguntas Frecuentes en ingles",
@@ -220,7 +220,7 @@ test("Spanish footer preserves localized contact actions and identifies English 
       "Navegación del pie de página: Empresa y Contacto"
     ]
   );
-  assert.match(footer, />Reciba Su Pago<\/a>/);
+  assert.match(footer, />Programar Una Recogida Gratis<\/a>/);
   assert.match(footer, /href="#solicitud"/);
   assert.doesNotMatch(footer, /href="\/contact\?intent=pickup"/);
   for (const anchor of footer.matchAll(/<a\b([^>]*)>/g)) {

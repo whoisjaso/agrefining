@@ -17,40 +17,33 @@ function cssRule(selector) {
   return css.match(new RegExp(`^${escaped}\\s*\\{([^}]*)\\}`, "m"))?.[1] || "";
 }
 
-function payPill(html) {
-  return html.match(/<div class="pay-pill-dock"[\s\S]*?<\/div>/)?.[0] || "";
+function mobileDock(html) {
+  return html.match(/<nav class="mobile-actions"[\s\S]*?<\/nav>/)?.[0] || "";
 }
 
-test("one floating Get Paid pill per page, localized, with a round call companion", () => {
-  const englishPill = payPill(home);
-  const spanishPill = payPill(spanish);
-  assert.match(englishPill, /data-visible="false" aria-hidden="true" inert/, "hidden until the hero CTA scrolls away");
-  assert.match(englishPill, /<a class="pay-pill" href="\/contact\?intent=pickup#sell"[^>]*>Get Paid<svg/);
-  assert.match(englishPill, /<a class="pay-pill-call" href="tel:\+12818982719" aria-label="Call AG Refining \(281\) 898-2719">/);
-  assert.match(spanishPill, /<a class="pay-pill" href="#solicitud"[^>]*>Reciba Su Pago<svg/);
-  assert.match(contact, /id="sell"/, "the pill target exists on the contact page");
-  for (const html of [home, contact, spanish]) assert.equal((html.match(/class="pay-pill-dock"/g) || []).length, 1);
-  assert.ok(home.indexOf('class="pay-pill-dock"') > home.indexOf("</main>"), "the pill sits after the main content in the tab order");
+test("the mobile dock is one localized pickup link with no competing call action", () => {
+  const englishDock = mobileDock(home);
+  const spanishDock = mobileDock(spanish);
+  assert.equal((englishDock.match(/<a\b/g) || []).length, 1);
+  assert.match(englishDock, /href="\/contact\?intent=pickup"[^>]*>Schedule a Free Pickup/);
+  assert.doesNotMatch(englishDock, /tel:|>Call</);
+  assert.equal((spanishDock.match(/<a\b/g) || []).length, 1);
+  assert.match(spanishDock, /href="#solicitud"[^>]*>Programar Una Recogida Gratis/);
+  assert.doesNotMatch(spanishDock, /tel:|>Llamar</);
 });
 
-test("the pill is centered, safe-area aware, turns at a steady speed and never covers content", () => {
-  const dock = cssRule(".pay-pill-dock");
-  assert.match(dock, /position:\s*fixed/);
-  assert.match(dock, /left:\s*50%/);
-  assert.match(dock, /transform:\s*translate\(-50%, 12px\)/);
-  assert.match(dock, /bottom:\s*calc\(16px \+ var\(--safe-bottom\)\)/);
-  assert.match(css, /\.pay-pill-dock\[data-visible="true"\]\s*\{[^}]*opacity:\s*1;[^}]*transform:\s*translate\(-50%, 0\)/s);
-  assert.match(css, /\.pay-pill::before\s*\{[^}]*animation:\s*pill-turn 3\.5s linear infinite/s);
-  assert.match(css, /@keyframes pill-turn\s*\{\s*to\s*\{\s*--pill-angle:\s*360deg/);
-  assert.match(css, /@media \(prefers-reduced-motion:\s*reduce\)\s*\{\s*\.pay-pill::before,\s*\.pay-pill::after\s*\{\s*animation:\s*none/);
-  assert.match(css, /\.pill-paused \.pay-pill::before/);
-  assert.match(css, /\.has-pay-pill \.footer\s*\{[^}]*padding-bottom:\s*calc\(96px/);
-  assert.doesNotMatch(cssRule(".pay-pill"), /scale|bounce/);
+test("the mobile dock is safe-area aware and suppressed by navigation and the footer", () => {
+  const dockRule = cssRule(".mobile-actions");
+  assert.match(dockRule, /bottom:\s*calc\(0\.65rem \+ var\(--safe-bottom\)\)/);
+  assert.match(dockRule, /left:\s*calc\(0\.65rem \+ var\(--safe-left\)\)/);
+  assert.match(dockRule, /right:\s*calc\(0\.65rem \+ var\(--safe-right\)\)/);
+  assert.match(css, /\.mobile-actions\s*\{[\s\S]*?transform:\s*translateY\(calc\(100% \+ 1\.5rem\)\)/);
+  assert.match(css, /\.mobile-actions\[data-visible="true"\]\s*\{[^}]*opacity:\s*1;[^}]*transform:\s*translateY\(0\)/s);
+  assert.match(css, /\.nav-open\s+\.mobile-actions\s*\{[^}]*opacity:\s*0;[^}]*pointer-events:\s*none/s);
   assert.match(site, /document\.body\.classList\.contains\("nav-open"\)/);
-  assert.match(site, /main form, \[data-review-form\], \.conversion-band, \[data-hide-pill\]/);
-  assert.match(site, /payPill\.inert = !visible/);
-  assert.match(site, /visibilitychange/);
-  assert.match(home, /<section class="conversion-band" data-hide-pill>/);
+  assert.match(site, /footer\.getBoundingClientRect\(\)\.top/);
+  assert.match(site, /!navMedia\.matches/);
+  assert.match(site, /actionDock\.inert\s*=\s*!visible/);
 });
 
 test("the hero fills the initial viewport without reserving header height", () => {
@@ -83,9 +76,28 @@ test("the mobile navigation scrim stays transparent and unfiltered", () => {
   assert.doesNotMatch(scrimRules, /(?:backdrop-)?filter\s*:/);
 });
 
-test("the intro loader is gone: the homepage paints immediately", () => {
-  assert.doesNotMatch(home, /data-home-loader|home-loader\.js|loaderState|Loading AG Refining/);
-  assert.doesNotMatch(css, /\.home-loader/);
+test("the homepage loader is semantic, homepage-only, and fails open after 1.2 seconds", () => {
+  assert.match(home, /<div class="home-loader" data-home-loader data-loader-state="loading" role="status" aria-live="polite" aria-atomic="true"/);
+  assert.match(home, /<span class="home-loader-assay" data-loader-assay aria-hidden="true">\s*<span class="home-loader-symbol" data-loader-symbol>Ag<\/span>\s*<span class="home-loader-atomic-number" data-loader-atomic-number>47<\/span>\s*<span class="home-loader-purity" data-loader-purity>99\.9<\/span>\s*<\/span>/);
+  assert.match(home, /<span class="visually-hidden">Loading AG Refining<\/span>/);
+  assert.match(home, /document\.documentElement\.dataset\.loaderState\s*=\s*"loading"/);
+  assert.match(home, /__agLoaderFailOpen\s*=\s*setTimeout\([^]*?,\s*1200\)/);
+  assert.match(home, /<script type="module" src="\/home-loader\.js\?v=20260813-loader"><\/script>/);
+  assert.doesNotMatch(spanish, /data-home-loader|home-loader\.js|data-loader-state/);
+
+  const loader = readFileSync(join(dist, "home-loader.js"), "utf8");
+  assert.match(loader, /data-loader-state/);
+  assert.match(loader, /prefers-reduced-motion:\s*reduce/);
+  assert.match(loader, /clearTimeout\(window\.__agLoaderFailOpen\)/);
+
+  const baseLoaderRule = cssRule(".home-loader");
+  assert.match(baseLoaderRule, /display:\s*none/, "without JavaScript the loader must not cover the homepage");
+  assert.match(css, /html\[data-loader-state="loading"\]\s+\.home-loader\s*\{[^}]*display:\s*grid/s);
+  assert.match(css, /html\[data-loader-state="ready"\]\s+\.home-loader\s*\{[^}]*opacity:\s*0;[^}]*pointer-events:\s*none/s);
+  assert.match(css, /\.home-loader-symbol\s*\{[^}]*animation:/s);
+  assert.match(css, /\.home-loader-atomic-number\s*\{[^}]*animation:/s);
+  assert.match(css, /\.home-loader-purity\s*\{[^}]*animation:/s);
+  assert.match(css, /@media \(prefers-reduced-motion:\s*reduce\)[^]*?\.home-loader\s*\{[^}]*display:\s*none/s);
 });
 
 test("homepage keeps a cream-dominant editorial rhythm with blue carried through key bands", () => {
@@ -116,9 +128,12 @@ test("homepage keeps a cream-dominant editorial rhythm with blue carried through
   }
 });
 
-test("the header is always visible so older visitors find the menu right away", () => {
-  assert.doesNotMatch(home, /home-header-pending|home-header-reveal\.js/);
-  assert.doesNotMatch(css, /\.home-header-pending/);
+test("reduced motion keeps the homepage header visible without returning it to layout flow", () => {
+  const reducedMotionRules = [...css.matchAll(/@media \(prefers-reduced-motion:\s*reduce\)\s*\{([\s\S]*?)\n\}/g)]
+    .map((match) => match[1])
+    .join("\n");
+  assert.match(reducedMotionRules, /\.home-page\s+\.site-header,\s*\.home-header-pending\s+\.site-header\s*\{[^}]*position:\s*fixed/s);
+  assert.doesNotMatch(reducedMotionRules, /\.home-header-pending\s+\.site-header\s*\{[^}]*position:\s*sticky/s);
 });
 
 test("the cinematic layers remain unfiltered behind a materially lighter overlay", () => {
@@ -126,4 +141,13 @@ test("the cinematic layers remain unfiltered behind a materially lighter overlay
   assert.doesNotMatch(cinematicRules, /(?:backdrop-)?filter\s*:/);
   assert.match(css, /\.cinematic-hero-overlay\s*\{[\s\S]*?rgba\(3, 22, 36, 0\.58\) 0%[\s\S]*?rgba\(3, 22, 36, 0\.48\) 26%[\s\S]*?rgba\(3, 22, 36, 0\.32\) 44%/);
   assert.doesNotMatch(css, /\.cinematic-hero-overlay\s*\{[\s\S]*?rgba\(3, 22, 36, 0\.98\)/);
+});
+
+test("the production-only hidden header behavior is now part of the repository build", () => {
+  assert.match(home, /document\.documentElement\.classList\.add\("home-header-pending"\)/);
+  assert.match(home, /<script src="\/home-header-reveal\.js/);
+  assert.match(css, /\.home-header-pending\s+\.site-header\s*\{[^}]*opacity:\s*0;[^}]*transform:\s*translateY\(calc\(-100% - 1px\)\)/s);
+  const headerController = readFileSync(join(dist, "home-header-reveal.js"), "utf8");
+  assert.match(headerController, /const threshold = 96/);
+  assert.match(headerController, /window\.scrollY >= threshold/);
 });

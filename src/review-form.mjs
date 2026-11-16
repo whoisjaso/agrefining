@@ -57,23 +57,22 @@ const COPY = {
     selectOne: "Select one",
     quantity: "Approximate amount",
     quantityPlaceholder: "Weight, boxes, drums, or pallets",
-    location: "Where Should We Meet You?",
-    locationPlaceholder: "Zip code or address",
+    location: "Pickup location",
+    locationPlaceholder: "City or business address",
     frequency: "How often?",
     pickupDate: "Preferred pickup day",
     pickupWindow: "Preferred time",
     scheduleNote: "We will call or email to confirm the exact time.",
     details: "What should we know?",
-    detailsPlaceholder: "Anything you want us to know. Optional.",
+    detailsPlaceholder: "Describe the material, condition, source, and anything that may affect pickup.",
     preferred: "Preferred contact",
     companyWebsite: "Company website",
     phoneChoice: "Phone",
     emailChoice: "Email",
-    submit: "Send My Details",
+    submit: "Send request",
     errorHeading: "Please review the following:",
-    reassure: "Dorothy or Dennis will call you back. No obligation to sell.",
-    note: "Please don't send medical records or ID numbers. How we handle your info:",
-    privacy: "Privacy"
+    note: "This request is not a final quote or pickup promise. Free pickup and fast payment depend on the material, location, account type, and schedule. Do not send patient records, passwords, financial data, or identity documents. When you submit, the form page, first landing page, referring page, and supported campaign or ad identifiers are sent with your request. See our",
+    privacy: "privacy notice"
   },
   es: {
     required: "Obligatorio",
@@ -85,23 +84,22 @@ const COPY = {
     selectOne: "Seleccione una opción",
     quantity: "Cantidad aproximada",
     quantityPlaceholder: "Peso, cajas, tambores o palés",
-    location: "¿Dónde Nos Vemos?",
-    locationPlaceholder: "Código postal o dirección",
+    location: "Lugar de recogida",
+    locationPlaceholder: "Ciudad o dirección de la empresa",
     frequency: "¿Con qué frecuencia?",
     pickupDate: "Día preferido de recogida",
     pickupWindow: "Horario preferido",
     scheduleNote: "Le llamaremos o escribiremos para confirmar la hora exacta.",
     details: "¿Qué debemos saber?",
-    detailsPlaceholder: "Lo que quiera contarnos. Opcional.",
+    detailsPlaceholder: "Describa el material, su condición, procedencia y cualquier detalle que pueda afectar la recogida.",
     preferred: "Medio de contacto preferido",
     companyWebsite: "Sitio web de la empresa",
     phoneChoice: "Teléfono",
     emailChoice: "Correo electrónico",
-    submit: "Enviar Mis Datos",
+    submit: "Enviar solicitud",
     errorHeading: "Revise los campos indicados:",
-    reassure: "Dorothy o Dennis le devolverán la llamada. Sin obligación de vender.",
-    note: "No envíe historiales médicos ni números de identificación. Cómo usamos sus datos:",
-    privacy: "Privacidad (en inglés)"
+    note: "Esta solicitud no es una cotización final ni una promesa de recogida. La recogida gratuita y el pago rápido dependen del material, la ubicación, el tipo de cuenta y el horario. No envíe historiales de pacientes, contraseñas, datos financieros ni documentos de identidad. Al enviar, la página del formulario, la primera página de llegada, la página de referencia y los identificadores compatibles de campaña o anuncio se envían con su solicitud. Consulte nuestro",
+    privacy: "aviso de privacidad (en ingles)"
   }
 };
 
@@ -208,21 +206,20 @@ export function renderReviewForm({
     <div class="field"><label for="name">${copy.name} <span>${copy.required}</span></label><input id="name" name="name" type="text" autocomplete="name" value="${escapeHtml(clean.name || "")}" required${nameState.attrs}>${nameState.error}</div>
     <div class="field"><label for="business">${copy.business}</label><input id="business" name="business" type="text" autocomplete="organization" value="${escapeHtml(clean.business || "")}"></div>
     <div class="field"><label for="phone">${copy.phone} <span>${copy.required}</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" value="${escapeHtml(clean.phone || "")}" required${phoneState.attrs}>${phoneState.error}</div>
-    <div class="field"><label for="email">${copy.email}</label><input id="email" name="email" type="email" autocomplete="email" value="${escapeHtml(clean.email || "")}"${emailState.attrs}>${emailState.error}</div>
+    <div class="field"><label for="email">${copy.email} <span>${copy.required}</span></label><input id="email" name="email" type="email" autocomplete="email" value="${escapeHtml(clean.email || "")}" required${emailState.attrs}>${emailState.error}</div>
     <div class="field"><label for="material">${copy.material} <span>${copy.required}</span></label><select id="material" name="material" required${materialState.attrs}>
       <option value=""${selected(material, "")}>${copy.selectOne}</option>${materialOptions}
     </select>${materialState.error}</div>
     <div class="field"><label for="quantity">${copy.quantity}</label><input id="quantity" name="quantity" type="text" maxlength="120" value="${escapeHtml(clean.quantity || "")}" placeholder="${copy.quantityPlaceholder}"></div>
-    <div class="field"><label for="location">${copy.location}</label><input id="location" name="location" type="text" maxlength="180" autocomplete="postal-code" value="${escapeHtml(clean.location || "")}" placeholder="${copy.locationPlaceholder}"${locationState.attrs}>${locationState.error}</div>
+    <div class="field"><label for="location">${copy.location} <span>${copy.required}</span></label><input id="location" name="location" type="text" maxlength="180" value="${escapeHtml(clean.location || "")}" placeholder="${copy.locationPlaceholder}" required${locationState.attrs}>${locationState.error}</div>
     <div class="field"><label for="frequency">${copy.frequency}</label><select id="frequency" name="frequency">${frequencyOptions}</select></div>
     <div class="field"><label for="pickup_date">${copy.pickupDate}</label><input id="pickup_date" name="pickup_date" type="date" value="${escapeHtml(pickupDate)}" aria-describedby="schedule-note" data-pickup-date></div>
     <div class="field"><label for="pickup_window">${copy.pickupWindow}</label><select id="pickup_window" name="pickup_window" aria-describedby="schedule-note">${windowOptions}</select></div>
     <p id="schedule-note" class="form-note field-wide schedule-note">${copy.scheduleNote}</p>
-    <div class="field field-wide"><label for="details">${copy.details}</label><textarea id="details" name="details" placeholder="${copy.detailsPlaceholder}"${detailsState.attrs}>${escapeHtml(clean.details || "")}</textarea>${detailsState.error}</div>
+    <div class="field field-wide"><label for="details">${copy.details} <span>${copy.required}</span></label><textarea id="details" name="details" required minlength="20" placeholder="${copy.detailsPlaceholder}"${detailsState.attrs}>${escapeHtml(clean.details || "")}</textarea>${detailsState.error}</div>
     <fieldset class="field field-wide preferred-contact"><legend>${copy.preferred}</legend><label><input type="radio" name="preferred_contact" value="phone"${checked(preferred, "phone")}> ${copy.phoneChoice}</label><label><input type="radio" name="preferred_contact" value="email"${checked(preferred, "email")}> ${copy.emailChoice}</label></fieldset>
     <div class="honeypot" aria-hidden="true"><label for="company_url">${copy.companyWebsite}</label><input id="company_url" name="company_url" type="text" tabindex="-1" autocomplete="off"></div>
-    <div class="form-actions field-wide"><button class="button button-primary" type="submit" data-submit-button>${copy.submit} <span class="icon-arrow" aria-hidden="true"></span></button><p class="form-status" data-form-status aria-live="polite"></p></div>
-    <p class="form-note field-wide">${copy.reassure}</p>
     <p class="form-note field-wide">${copy.note} <a href="/privacy"${privacyAttributes}>${copy.privacy}</a>.</p>
+    <div class="form-actions field-wide"><button class="button button-primary" type="submit" data-submit-button>${copy.submit} <span class="icon-arrow" aria-hidden="true"></span></button><p class="form-status" data-form-status aria-live="polite"></p></div>
   </form>`;
 }

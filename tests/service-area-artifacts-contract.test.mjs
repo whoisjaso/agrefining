@@ -121,7 +121,7 @@ test("the service-area index renders seven routed city artifacts in the approved
   assertDecorativeEmblems(featured, 7);
 });
 
-test("the marked coverage ledger contains the exact 23-city service list and inclusive visit language", () => {
+test("the marked coverage ledger contains the exact 23-city service list and qualified pickup language", () => {
   const html = htmlFor("service-areas");
   const section = html.match(/<section\b[^>]*class="[^"]*service-coverage[^"]*"[^>]*>[\s\S]*?<\/section>/)?.[0] || "";
   assert.ok(section, "service areas must render the coverage section");
@@ -135,8 +135,8 @@ test("the marked coverage ledger contains the exact 23-city service list and inc
   assert.equal(new Set(values.map(({ text }) => text)).size, 23, "coverage ledger must expose 23 distinct city anchors");
 
   const copy = textContent(section);
-  assert.doesNotMatch(copy, /qualif|eligib/i, "everyone is welcome: no gatekeeping language");
-  assert.match(copy, /We come to homes and businesses/, "coverage copy speaks to people and businesses alike");
+  assert.match(copy, /qualifying (?:commercial )?accounts/i);
+  assert.match(copy, /confirm(?:ed|ing)?[^.]{0,80}schedul/i, "coverage copy must say scheduling is confirmed first");
   assert.doesNotMatch(copy, /(?:office|location) in (?:each|every) city/i);
 });
 

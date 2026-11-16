@@ -127,16 +127,16 @@ test("the generated hero keeps the stable overlay behind the streamlined commerc
   assert.ok(hero.indexOf('class="cinematic-hero-media"') < hero.indexOf('class="cinematic-hero-overlay"'));
   assert.ok(hero.indexOf('class="cinematic-hero-overlay"') < hero.indexOf('class="shell hero-commercial-grid"'));
   assert.equal((hero.match(/<h1(?:\s[^>]*)?>/g) || []).length, 1);
-  assert.match(hero, /<h1>Sell Your Silver\. We Come To You<\/h1>/, "v2 hero: no trailing period on headings");
+  assert.match(hero, /<h1>Your silver, valued precisely\.<\/h1>/);
   assert.doesNotMatch(hero, /class="hero-kicker"/, "the hero kicker should be removed to keep the first screen quieter");
-  assert.match(hero, /Old forks, coins, a tea set, a broken chain\. A lot of it is silver\. Gold too\. Dennis comes to your home or business and gives you a quote on the spot\. You decide\./);
-  assert.doesNotMatch(hero, /qualif|[Ff]ree pickup|[Tt]oday|same day/i, "no gatekeeping, no unconfirmed free pickup or same-day promise in the hero");
-  assert.match(hero, /href="\/contact\?intent=pickup">Get Paid<\/a>/);
-  assert.match(hero, /href="tel:\+12818982719">Or Call \(281\) 898-2719<\/a>/);
+  assert.match(hero, /Free pickup for qualifying Houston accounts\. See the weight, review the offer, and choose what happens next\./);
+  assert.match(hero, /href="\/contact\?intent=pickup">Schedule a Free Pickup<\/a>/);
+  assert.match(hero, /href="\/accepted-materials">See what we buy<\/a>/);
+  assert.match(hero, /href="tel:\+12818982719">Call \(281\) 898-2719<\/a>/);
   const proofRail = outerElement(hero, "hero-proof-rail");
   assert.ok(proofRail, "the proof rail must remain inside the hero");
   const proofItems = [...proofRail.inner.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((match) => match[1].trim());
-  assert.deepEqual(proofItems, ["Family-Owned", "We Come To You", "Quote On The Spot", "You Decide. No Pressure."]);
+  assert.deepEqual(proofItems, ["Houston-based", "Free qualifying pickup", "On-site weighing", "Confirmed payment terms"]);
   assert.ok(home.indexOf('<form class="intake-panel"') > heroEnd, "the material intake form must begin after the closing hero");
 });
 
