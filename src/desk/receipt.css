@@ -1,0 +1,31 @@
+/* Client receipt (screen and print). Shared by the Buy Desk and the owner dashboard. */
+.receipt { width: min(680px, 100%); background: #fff; color: #20354c; border-radius: 4px; box-shadow: var(--shadow-lift); padding: 44px 46px 40px; font-size: 14px; line-height: 1.5; animation: receipt-in 700ms var(--ease) both 200ms; -webkit-user-select: text; user-select: text; }
+@keyframes receipt-in { from { opacity: 0; transform: translateY(26px) rotate(-0.4deg); } to { opacity: 1; transform: none; } }
+.r-head { display: flex; justify-content: space-between; gap: 24px; padding-bottom: 20px; border-bottom: 2px solid #102a43; }
+.r-brand { display: flex; gap: 14px; align-items: center; }
+.r-brand img { width: 56px; height: 56px; border-radius: 2px; }
+.r-brand strong { display: block; font-size: 20px; color: #102a43; letter-spacing: -0.01em; }
+.r-brand span { display: block; font-size: 12px; color: #586b7e; line-height: 1.45; }
+.r-meta { text-align: right; font-size: 12px; color: #586b7e; }
+.r-meta b { display: block; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #416b94; margin-bottom: 4px; }
+.r-meta strong { color: #102a43; font-size: 15px; font-variant-numeric: tabular-nums; }
+.r-title { font: 400 26px/1.15 var(--serif); color: #102a43; margin: 24px 0 4px; letter-spacing: -0.01em; }
+.r-party { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 16px 0 22px; font-size: 13px; }
+.r-party h4, .r-sign h4 { margin: 0 0 4px; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #416b94; }
+.r-party p { color: #20354c; }
+.r-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.r-table th { text-align: left; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #586b7e; padding: 8px 0; border-bottom: 1px solid #d6dde3; font-weight: 700; }
+.r-table th:last-child, .r-table td:last-child { text-align: right; }
+.r-table td { padding: 11px 0; border-bottom: 1px solid #ece8de; vertical-align: top; font-variant-numeric: tabular-nums; }
+.r-table td small { display: block; color: #586b7e; font-size: 12px; }
+.r-total { display: flex; justify-content: space-between; align-items: baseline; padding: 16px 0 6px; border-bottom: 2px solid #102a43; }
+.r-total span { font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-size: 12px; color: #102a43; }
+.r-total strong { font: 400 30px/1 var(--serif); color: #102a43; font-variant-numeric: tabular-nums; }
+.r-paid { display: flex; justify-content: space-between; font-size: 12.5px; color: #40566d; padding: 8px 0 0; }
+.r-included { margin: 18px 0 0; padding: 12px 14px; background: #faf8f2; border-radius: 4px; font-size: 12.5px; color: #40566d; }
+.r-statement { margin-top: 20px; font-size: 12px; color: #40566d; }
+.r-sign { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; margin-top: 18px; align-items: end; }
+.r-sign img { display: block; height: 70px; max-width: 100%; object-fit: contain; object-position: left bottom; }
+.r-sign .r-sigline { border-top: 1px solid #8796a5; padding-top: 6px; font-size: 12px; color: #586b7e; }
+.r-esign { margin-top: 14px; font-size: 10.5px; color: #8796a5; letter-spacing: 0.01em; }
+.r-foot { margin-top: 28px; padding-top: 14px; border-top: 1px solid #d6dde3; display: flex; justify-content: space-between; gap: 16px; font-size: 11.5px; color: #586b7e; }

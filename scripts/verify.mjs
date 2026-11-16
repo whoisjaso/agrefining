@@ -64,8 +64,9 @@ function anchorsIn(source) {
   }));
 }
 
-// The Buy Desk is a private counter app, not a public page; it has its own tests.
-const htmlFiles = walk(out).filter((path) => path.endsWith(".html") && !relative(out, path).startsWith("desk"));
+// The Buy Desk and the owner dashboard are private apps, not public pages; they have their own tests.
+const isPrivateApp = (path) => /^(?:desk|admin)[\\/]/.test(relative(out, path));
+const htmlFiles = walk(out).filter((path) => path.endsWith(".html") && !isPrivateApp(path));
 for (const path of htmlFiles) {
   const source = readFileSync(path, "utf8");
   const displayPath = relative(out, path);
@@ -438,7 +439,7 @@ if (!privacyPage.includes('<nav aria-label="Privacy sections">')) {
 
 const sitemap = readFileSync(join(out, "sitemap.xml"), "utf8");
 const sitemapEntries = (sitemap.match(/<url>/g) || []).length;
-if (sitemapEntries !== 40) failures.push(`Expected 40 sitemap pages, found ${sitemapEntries}`);
+if (sitemapEntries !== 41) failures.push(`Expected 41 sitemap pages, found ${sitemapEntries}`);
 const sitemapLocations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
 if (new Set(sitemapLocations).size !== sitemapLocations.length) failures.push("Sitemap contains a duplicate URL");
 
