@@ -42,12 +42,6 @@ function titleCaseLocale(html) {
   return /<html lang="es">/.test(html) ? "es" : "en";
 }
 
-function titleCaseWords(locale) {
-  return locale === "es"
-    ? new Set(["a", "al", "ante", "bajo", "cabe", "con", "contra", "de", "del", "desde", "durante", "e", "el", "en", "entre", "hacia", "hasta", "la", "las", "lo", "los", "o", "para", "por", "según", "sin", "so", "sobre", "tras", "u", "un", "una", "unas", "unos", "y"])
-    : new Set(["a", "an", "and", "as", "at", "but", "by", "for", "from", "in", "nor", "of", "on", "or", "per", "so", "the", "to", "vs", "via", "with", "yet"]);
-}
-
 function capitalizeToken(token, locale) {
   const lower = token.toLocaleLowerCase(locale);
   const letterIndex = lower.search(/\p{L}/u);
@@ -55,38 +49,26 @@ function capitalizeToken(token, locale) {
   return `${lower.slice(0, letterIndex)}${lower[letterIndex].toLocaleUpperCase(locale)}${lower.slice(letterIndex + 1)}`;
 }
 
+// Client rule (Nov 15 2026): every word starts with a capital, small words included; headings and
+// buttons drop the trailing period. All-caps tokens (AG, NDT, TX) and both halves of hyphenated words are kept.
 function titleCaseText(value, locale) {
-  const minorWords = titleCaseWords(locale);
-  const words = value.split(/\s+/).filter(Boolean);
-
-  return words.map((word, index) => {
-    const parts = word.split("-");
-    const casedParts = parts.map((part, partIndex) => {
-      if (!part) return part;
-      if (/^[A-Z0-9]{2,}$/u.test(part)) return part;
-
-      const stripped = part.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}.?!]+$/gu, "");
-      const lower = stripped.toLocaleLowerCase(locale);
-      const globalIndex = index === 0 && partIndex === 0
-        ? 0
-        : index === words.length - 1 && partIndex === parts.length - 1
-          ? words.length - 1
-          : index;
-      const shouldLower = parts.length === 1 && globalIndex !== 0 && globalIndex !== words.length - 1 && minorWords.has(lower);
-      const cased = shouldLower ? part.toLocaleLowerCase(locale) : capitalizeToken(part, locale);
-      return cased;
-    });
-
-    return casedParts.join("-");
-  }).join(" ");
+  const cased = value.split(/\s+/).filter(Boolean).map((word) => word.split("-").map((part) => {
+    if (!part || /^[A-Z0-9]{2,}$/u.test(part) || /^&[#\w]+;$/u.test(part)) return part;
+    return capitalizeToken(part, locale);
+  }).join("-")).join(" ");
+  return cased.replace(/(?<!\.)\.((?:\s|<[^>]+>)*)$/, "$1");
 }
 
 function titleCaseTargets(html) {
   return [
     ...contentsOf(html, /<p class="(?:eyebrow|answer-index|hero-kicker|hero-review-label|legacy-caption)">([\s\S]*?)<\/p>/g),
+    ...contentsOf(html, /<h1\b[^>]*>([\s\S]*?)<\/h1>/g),
     ...contentsOf(html, /<h2\b[^>]*>([\s\S]*?)<\/h2>/g),
     ...contentsOf(html, /<h3\b[^>]*>([\s\S]*?)<\/h3>/g),
-    ...contentsOf(html, /<details class="material-guide">[\s\S]*?<summary>[\s\S]*?<span>([\s\S]*?)<\/span><\/summary>/g),
+    ...contentsOf(html, /<h4\b[^>]*>([\s\S]*?)<\/h4>/g),
+    ...contentsOf(html, /<a\b[^>]*class="button\b[^"]*"[^>]*>([\s\S]*?)<\/a>/g),
+    ...contentsOf(html, /<button\b[^>]*>([\s\S]*?)<\/button>/g),
+    ...contentsOf(html, /<summary>([^<]+)<span aria-hidden="true"><\/span><\/summary>/g),
     ...contentsOf(html, /<a\b[^>]*>\s*<span(?:\s[^>]*)?>([\s\S]*?)<\/span>\s*<h[23]\b/g)
   ];
 }
@@ -255,7 +237,7 @@ test("the generated contract covers every published HTML document", () => {
   assert.equal(htmlDocuments.length, 41);
 });
 
-test("every generated route authors eyebrow, small-label, H2, and H3 copy in Title Case", () => {
+test("every generated route authors headings, labels, buttons and FAQ questions in Title Case with no trailing period", () => {
   const mismatches = [];
 
   for (const [name, html] of htmlDocuments) {
@@ -271,56 +253,39 @@ test("every generated route authors eyebrow, small-label, H2, and H3 copy in Tit
 
 test("interior routes keep the approved Title Case exemplars outside the homepage", () => {
   const acceptedMaterials = readFileSync(join(dist, "accepted-materials", "index.html"), "utf8");
+  assert.match(acceptedMaterials, /<h1>Everything We Buy<\/h1>/);
   assert.match(acceptedMaterials, />Silver-Plated Materials<\/p>/);
-  assert.match(acceptedMaterials, />Sell Silver-Plated Materials in Houston\.<\/h2>/);
-  assert.match(acceptedMaterials, />Tell Us What You Have\.<\/h2>/);
-  assert.match(acceptedMaterials, />Start with the Material\.<\/h2>/);
+  assert.match(acceptedMaterials, />Industrial And Laboratory<\/h2>/, "small words are capitalized too");
 
   const hospital = readFileSync(join(dist, "hospital-silver-recycling", "index.html"), "utf8");
   assert.match(hospital, />Simple Next Steps<\/p>/);
-  assert.match(hospital, />Know What Happens Next\.<\/h2>/);
-  assert.match(hospital, />Start with the Material<\/h3>/);
+  assert.match(hospital, />Know What Happens Next<\/h2>/);
+  assert.match(hospital, />Start With The Material<\/h3>/);
   assert.match(hospital, />Scrap Silver Jewelry<\/span>/);
 
-  assert.match(spanish, />Servicio en Español<\/p>/);
+  assert.match(spanish, /<h1>Compramos Su Plata En El Sureste De Houston<\/h1>/);
+  assert.match(spanish, />Servicio En Español<\/p>/);
   assert.match(spanish, />Comience Hoy<\/p>/);
-  assert.match(spanish, />Solicite una Recogida\.<\/h2>/);
 });
 
 test("Title Case normalization preserves nested inline heading markup", () => {
   const serviceAreas = readFileSync(join(dist, "service-areas", "index.html"), "utf8");
   assert.match(
     serviceAreas,
-    /<h2 id="featured-service-areas">Choose Your <span class="service-area-heading-emphasis">Service Area<\/span>\.<\/h2>/
+    /<h2 id="featured-service-areas">Choose Your <span class="service-area-heading-emphasis">Service Area<\/span><\/h2>/
   );
 });
 
-test("the single pickup action is available only on mobile while the desktop material guide remains available", () => {
-  const touchProfile = { pointer: "coarse", hover: "none", motion: "no-preference" };
-  for (const width of [320, 390, 768, 900]) {
-    assert.equal(
-      generatedDisplayAtWidth(".mobile-actions", width, touchProfile, "block"),
-      "flex",
-      `${width}px: the mobile pickup action must be available`
-    );
-    assert.equal(
-      generatedDisplayAtWidth(".material-guide", width, touchProfile, "block"),
-      "none",
-      `${width}px: material guide must not occupy or cover the reading workspace`
-    );
+test("one sticky CTA: the centered Get Paid pill replaces the old mobile bar and the material guide", () => {
+  for (const [name, html] of htmlDocuments) {
+    assert.doesNotMatch(html, /class="mobile-actions"|class="material-guide"/, `${name}: retired floating controls must stay gone`);
   }
-
+  const touchProfile = { pointer: "coarse", hover: "none", motion: "no-preference" };
   const desktopProfile = { pointer: "fine", hover: "hover", motion: "no-preference" };
-  assert.equal(
-    generatedDisplayAtWidth(".mobile-actions", 901, desktopProfile, "block"),
-    "none",
-    "the pickup dock must disappear above the mobile breakpoint"
-  );
-  assert.equal(
-    generatedDisplayAtWidth(".material-guide", 1440, desktopProfile, "block"),
-    "block",
-    "desktop material guide must remain available"
-  );
+  for (const width of [320, 390, 768]) {
+    assert.equal(generatedDisplayAtWidth(".pay-pill-dock", width, touchProfile, "block"), "flex", `${width}px: the pill must be available`);
+  }
+  assert.equal(generatedDisplayAtWidth(".pay-pill-dock", 1440, desktopProfile, "block"), "flex", "the pill follows desktop visitors too");
 });
 
 test("static forms keep native validation before enhancement", () => {
@@ -358,19 +323,18 @@ test("Spanish stays Spanish through the lead form", () => {
   assert.match(spanish, /id="solicitud"/);
   assert.match(spanish, /<form[^>]*data-review-form[^>]*>/);
   assert.match(spanish, /name="locale" value="es"/);
-  assert.match(spanish, />Enviar solicitud/);
+  assert.match(spanish, />Enviar Mis Datos/);
   assert.doesNotMatch(spanish, /href="\/contact\?intent=pickup"/);
 });
 
 test("Spanish shared chrome does not masquerade English labels as Spanish", () => {
   const chrome = [
     spanish.match(/<header class="site-header"[\s\S]*?<\/header>/)?.[0] || "",
-    spanish.match(/<nav class="mobile-actions"[\s\S]*?<\/nav>/)?.[0] || "",
-    spanish.match(/<footer class="footer"[\s\S]*?<\/footer>/)?.[0] || "",
-    spanish.match(/<details class="material-guide"[\s\S]*?<\/details>/)?.[0] || ""
+    spanish.match(/<div class="pay-pill-dock"[\s\S]*?<\/div>/)?.[0] || "",
+    spanish.match(/<footer class="footer"[\s\S]*?<\/footer>/)?.[0] || ""
   ].join("\n");
   const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  for (const englishLabel of ["Materials", "Industries", "Service areas", "How it works", "Our story", "Schedule a Free Pickup", "Quick actions", "Identify your material", "Request a review"]) {
+  for (const englishLabel of ["Materials", "Industries", "Service areas", "How it works", "Our story", "Get Paid", "Call AG Refining", "Request a review"]) {
     assert.doesNotMatch(chrome, new RegExp(`>${escapeRegex(englishLabel)}<`), `unexpected English control: ${englishLabel}`);
   }
   assert.match(chrome, /hreflang="en"/);

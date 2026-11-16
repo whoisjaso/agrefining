@@ -118,7 +118,7 @@ Photography is operational evidence.
 
 ### Mobile action model
 
-- Fixed action docks and the material guide are hidden at `900px` and below.
+- One sticky CTA on every public page except `/desk` and `/privacy`: the centered "Get Paid" pill with a round call button (v2, Nov 2026). It hides while the hero CTA, any form, the closing CTA or the footer is on screen, while the menu is open and while a field has focus. The old mobile action dock and the material guide are retired.
 - Pickup, phone, and material paths remain available as in-flow controls in the page and navigation.
 - Coarse-pointer targets are at least `44px`, and no fixed control may cover reading or form content.
 
