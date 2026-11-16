@@ -103,8 +103,9 @@ test("the deployable homepage hero uses a permanent cinematic poster and two def
   const videos = stacks[0].match(/<video class="cinematic-hero-video"[\s\S]*?<\/video>/g) || [];
   assert.equal(videos.length, 2, "the hero must contain exactly two video layers");
   for (const video of videos) {
-    assert.match(video, /<source data-video-format="webm" type="video\/webm">/);
-    assert.match(video, /<source data-video-format="mp4" type="video\/mp4">/);
+    // Exact codecs let a browser that cannot decode VP9 (older iPhones) skip straight to the H.264 MP4.
+    assert.match(video, /<source data-video-format="webm" type='video\/webm; codecs="vp9"'>/);
+    assert.match(video, /<source data-video-format="mp4" type='video\/mp4; codecs="avc1\.64001F"'>/);
     assert.doesNotMatch(video, /<source[^>]*\bsrc=/);
   }
   assert.doesNotMatch(hero, /\/assets\/ag-refining-hero-v2-[^"']+\.webp/);

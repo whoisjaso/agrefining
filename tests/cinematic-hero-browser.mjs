@@ -399,14 +399,14 @@ async function assertStaticPreference(browser, baseUrl, viewport, mode) {
   const page = await context.newPage();
   const diagnostics = attachDiagnostics(page, `${viewport.name}-${mode}`, baseUrl);
   await page.goto(`${baseUrl}/`, { waitUntil: "load" });
-  await page.waitForTimeout(200);
+  // Owner's call (Nov 2026): the film plays on every device, so reduced motion and Save-Data start it too.
+  await page.waitForFunction(() => document.querySelector("[data-cinematic-hero-media]")?.cinematicHeroVideoController?.transitionPhase === "idle", null, { timeout: 8000 });
   const state = await pageState(page);
-  assert.equal(state.sourceRecords.flat().filter(Boolean).length, 0, `${viewport.name} ${mode}: video sources were assigned`);
-  assert.ok(state.posterOpacity > 0, `${viewport.name} ${mode}: poster is not visible`);
+  assert.ok(state.sourceRecords.flat().filter(Boolean).length > 0, `${viewport.name} ${mode}: the hero film did not load`);
   assert.equal(state.overflow.scrollWidth, state.overflow.clientWidth, `${viewport.name} ${mode}: horizontal overflow`);
   assert.deepEqual(diagnostics, { label: `${viewport.name}-${mode}`, consoleErrors: [], pageErrors: [], failedLocalRequests: [], localHttpErrors: [] });
   await context.close();
-  return { posterOpacity: state.posterOpacity, assignedSources: 0, diagnostics };
+  return { posterOpacity: state.posterOpacity, assignedSources: state.sourceRecords.flat().filter(Boolean).length, diagnostics };
 }
 
 async function assertAutoplayRejection(browser, baseUrl, viewport) {
@@ -662,17 +662,22 @@ async function tabUntil(page, selector, limit = 40) {
   throw new Error(`Keyboard focus did not reach ${selector} in ${limit} Tabs`);
 }
 
+// UI checks run against the still poster: playback is refused (as with blocked autoplay) so the hero settles in static mode.
 async function createInteractionContext(browser, viewport) {
-  return browser.newContext(contextOptions(viewport, { reducedMotion: "reduce" }));
+  const context = await browser.newContext(contextOptions(viewport, { reducedMotion: "reduce" }));
+  await context.addInitScript(() => {
+    HTMLMediaElement.prototype.play = function play() {
+      return Promise.reject(new DOMException("Playback refused for UI checks", "NotAllowedError"));
+    };
+  });
+  return context;
 }
 
 async function runInteractions(browser, baseUrl, viewport) {
   const probeContext = await createInteractionContext(browser, viewport);
   const probePage = await probeContext.newPage();
   await probePage.goto(`${baseUrl}/`, { waitUntil: "load" });
-  const probeMedia = await pageState(probePage);
-  assert.equal(probeMedia.controller?.transitionPhase, "static", `${viewport.name}: interactions must stabilize the hero in static mode before UI checks`);
-  assert.equal(probeMedia.sourceRecords.flat().filter(Boolean).length, 0, `${viewport.name}: interactions must not assign cinematic video sources`);
+  await probePage.waitForFunction(() => document.querySelector("[data-cinematic-hero-media]")?.cinematicHeroVideoController?.transitionPhase === "static", null, { timeout: 8000 });
   const selectors = [".atelier-hero .button-primary", ".atelier-hero .button-secondary", ".atelier-hero .hero-call"];
   const hitTargets = {};
   for (const selector of selectors) {
@@ -705,9 +710,9 @@ async function runInteractions(browser, baseUrl, viewport) {
   const page = await context.newPage();
   const diagnostics = attachDiagnostics(page, `${viewport.name}-interactions`, baseUrl);
   await page.goto(`${baseUrl}/`, { waitUntil: "load" });
+  await page.waitForFunction(() => document.querySelector("[data-cinematic-hero-media]")?.cinematicHeroVideoController?.transitionPhase === "static", null, { timeout: 8000 });
   const interactionMedia = await pageState(page);
   assert.equal(interactionMedia.controller?.transitionPhase, "static", `${viewport.name}: interactions chrome checks must start from static mode`);
-  assert.equal(interactionMedia.sourceRecords.flat().filter(Boolean).length, 0, `${viewport.name}: interactions chrome checks must not assign cinematic video sources`);
 
   const materials = {};
   if (viewport.width > 900) {
@@ -784,9 +789,11 @@ async function runInteractions(browser, baseUrl, viewport) {
     assert.equal(await page.evaluate(() => document.body.classList.contains("nav-open")), true, `${viewport.name}: first Escape incorrectly closed mobile sheet`);
     await page.keyboard.press("Escape");
     assert.equal(await page.evaluate(() => document.body.classList.contains("nav-open")), false, `${viewport.name}: second Escape did not close mobile sheet`);
-    await page.evaluate(() => scrollTo(0, 420));
+    // The Get Paid pill appears once most of the hero has scrolled away.
+    await page.evaluate(() => scrollTo({ top: 1400, behavior: "instant" }));
     await page.waitForFunction(() => document.querySelector(".mobile-actions")?.dataset.visible === "true");
-    const pickupDock = await topmostState(page, ".mobile-actions a");
+    await page.waitForTimeout(600);
+    const pickupDock = await topmostState(page, ".mobile-actions .get-paid-pill");
     assert.equal(pickupDock.topmost, true, `${viewport.name}: mobile pickup action is not topmost after its upward entrance`);
     assert.ok(pickupDock.rect.height >= 44, `${viewport.name}: mobile pickup action is below 44px`);
     await page.evaluate(() => scrollTo(0, document.body.scrollHeight));

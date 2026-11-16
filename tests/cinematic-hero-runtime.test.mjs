@@ -334,31 +334,19 @@ test("kills mutation: clip records are reordered, a third clip is eagerly assign
   assert.deepEqual([harness.controller.activeIndex, harness.controller.nextIndex], [0, 1]);
 });
 
-test("kills mutation: reduced-motion mode assigns a source or calls load before returning", () => {
-  const harness = createHarness({ reducedMotion: true });
-  harness.controller.start();
-
-  for (const video of harness.root.videos) {
-    assert.deepEqual(video.sources.map((source) => source.src), ["", ""]);
-    assert.equal(video.preload, "none");
-    assert.equal(video.networkState, 0);
-    assert.equal(video.loadCount, 0);
-  }
-  assert.equal(harness.controller.transitionPhase, "static");
-});
-
-test("kills mutation: Save-Data mode assigns a source or calls load before returning", () => {
-  const harness = createHarness({ saveData: true });
-  harness.controller.start();
-
-  for (const video of harness.root.videos) {
-    assert.deepEqual(video.sources.map((source) => source.src), ["", ""]);
-    assert.equal(video.preload, "none");
-    assert.equal(video.networkState, 0);
-    assert.equal(video.loadCount, 0);
-  }
-  assert.equal(harness.controller.transitionPhase, "static");
-});
+// Owner's call (Nov 2026): the film plays on every device, so reduced-motion and Save-Data start it too.
+for (const [label, flags] of [["reduced motion", { reducedMotion: true }], ["Save-Data", { saveData: true }]]) {
+  test(`the hero film still plays with ${label} on`, async () => {
+    const harness = createHarness(flags);
+    await startPlaying(harness);
+    const [active] = harness.root.videos;
+    assert.deepEqual(active.assignments.map(({ format }) => format), ["webm", "mp4"]);
+    assert.equal(harness.controller.staticMode, false);
+    assert.equal(harness.controller.transitionPhase, "idle");
+    assert.equal(active.muted, true, "iOS needs the muted property for inline autoplay");
+    assert.equal(active.playsInline, true);
+  });
+}
 
 test("kills mutation: start loses its idempotence guard and prepares or plays the layers twice", async () => {
   const harness = createHarness();
@@ -754,6 +742,28 @@ test("kills mutation: the initial play rejection is not caught and the poster is
   assert.equal(harness.controller.transitioning, false);
 });
 
+test("blocked autoplay (iOS Low Power Mode) starts the film on the visitor's first tap", async () => {
+  const harness = createHarness();
+  harness.root.videos[0].playOutcomes.push(new Error("autoplay denied"));
+  harness.controller.start();
+  await settle();
+  assert.equal(harness.controller.transitionPhase, "static");
+  assert.equal(harness.root.poster.style.opacity, "1");
+
+  harness.documentRef.dispatchEvent(new Event("pointerdown"));
+  await settle();
+  assert.equal(harness.controller.staticMode, false);
+  assert.equal(harness.controller.transitionPhase, "idle");
+  assert.equal(harness.root.videos[0].paused, false);
+  assert.equal(harness.root.videos[0].style.opacity, "1");
+  assert.equal(harness.root.poster.style.opacity, "0");
+
+  const plays = harness.root.videos[0].playCount;
+  harness.documentRef.dispatchEvent(new Event("click"));
+  await settle();
+  assert.equal(harness.root.videos[0].playCount, plays, "the gesture retry runs once, then its listeners are gone");
+});
+
 test("kills mutation: an incoming decode/play rejection hard-cuts or retries recursively instead of deferring", async () => {
   const harness = createHarness();
   await startPlaying(harness);
@@ -850,8 +860,6 @@ test("kills mutation: destroy omits listener, source, pause, timer cleanup or al
 
 test("kills mutation: pagehide is registered only after dynamic media startup and misses static fallback controllers", () => {
   const scenarios = [
-    { label: "reduced motion", reducedMotion: true, saveData: false, invalidShell: false },
-    { label: "Save-Data", reducedMotion: false, saveData: true, invalidShell: false },
     { label: "invalid shell", reducedMotion: false, saveData: false, invalidShell: true }
   ];
 

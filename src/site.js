@@ -145,7 +145,15 @@ initializeNav();
 
 const actionDock = document.querySelector(".mobile-actions");
 const footer = document.querySelector(".footer");
+const firstSection = document.querySelector("main > section");
+const reviewFormZone = document.querySelector("[data-review-form]");
 let chromeTicking = false;
+
+// The pill stays out of the first screen: it appears once most of the opening section has scrolled away.
+function revealOffset() {
+  const height = firstSection?.offsetHeight || 0;
+  return Math.max(320, Math.round(height * 0.6));
+}
 
 function updateChrome() {
   chromeTicking = false;
@@ -155,7 +163,9 @@ function updateChrome() {
   const footerTop = footer ? footer.getBoundingClientRect().top : Number.POSITIVE_INFINITY;
   const viewportHeight = window.visualViewport?.height || window.innerHeight;
   const navOpen = document.body.classList.contains("nav-open");
-  const visible = !navMedia.matches && offset > 320 && !navOpen && footerTop > viewportHeight + 24;
+  const typing = document.activeElement?.matches?.("input, select, textarea") ?? false;
+  const formOnScreen = reviewFormZone ? reviewFormZone.getBoundingClientRect().top < viewportHeight && reviewFormZone.getBoundingClientRect().bottom > 0 : false;
+  const visible = offset > revealOffset() && !navOpen && !typing && !formOnScreen && footerTop > viewportHeight + 24;
   actionDock.setAttribute("data-visible", visible ? "true" : "false");
   actionDock.setAttribute("aria-hidden", visible ? "false" : "true");
   actionDock.inert = !visible;
@@ -169,6 +179,8 @@ window.addEventListener("scroll", () => {
   window.requestAnimationFrame(updateChrome);
 }, { passive: true });
 window.addEventListener("resize", updateChrome, { passive: true });
+document.addEventListener("focusin", updateChrome);
+document.addEventListener("focusout", () => window.requestAnimationFrame(updateChrome));
 window.visualViewport?.addEventListener("resize", updateChrome, { passive: true });
 window.visualViewport?.addEventListener("scroll", updateChrome, { passive: true });
 updateChrome();

@@ -178,17 +178,24 @@ async function verifyMobileChrome(browser, baseUrl) {
   await page.waitForFunction(() => !document.body.classList.contains("nav-open"));
   assert.equal(await page.evaluate(() => document.activeElement === document.querySelector("[data-nav-toggle]")), true);
 
-  await page.evaluate(() => window.scrollTo(0, 500));
+  // Hidden over the first screen, then it rises in once most of the hero has scrolled away.
+  await page.evaluate(() => window.scrollTo({ top: 120, behavior: "instant" }));
+  await page.waitForTimeout(200);
+  assert.equal(await page.locator(".mobile-actions").getAttribute("data-visible"), "false");
+  await page.evaluate(() => window.scrollTo({ top: 1400, behavior: "instant" }));
   await page.waitForFunction(() => document.querySelector(".mobile-actions")?.dataset.visible === "true");
+  await page.waitForTimeout(600);
   const visibleDock = await page.evaluate(() => {
     const dock = document.querySelector(".mobile-actions");
+    const pill = dock.querySelector(".get-paid-pill").getBoundingClientRect();
     return {
       inert: dock.inert,
       linkCount: dock.querySelectorAll("a").length,
-      label: dock.querySelector("a")?.textContent.trim()
+      label: dock.querySelector("a")?.textContent.trim(),
+      centered: Math.abs(pill.left + pill.width / 2 - window.innerWidth / 2) <= 1
     };
   });
-  assert.deepEqual(visibleDock, { inert: false, linkCount: 1, label: "Schedule a Free Pickup" });
+  assert.deepEqual(visibleDock, { inert: false, linkCount: 1, label: "Get Paid", centered: true });
 
   await page.locator("[data-nav-toggle]").click();
   await page.waitForFunction(() => document.body.classList.contains("nav-open"));
@@ -200,14 +207,10 @@ async function verifyMobileChrome(browser, baseUrl) {
   await page.keyboard.press("Escape");
   await page.waitForFunction(() => document.querySelector(".mobile-actions")?.dataset.visible === "true");
 
-  await page.setViewportSize({ width: 901, height: 844 });
-  await page.waitForFunction(() => document.querySelector(".mobile-actions")?.dataset.visible === "false");
-  assert.deepEqual(await page.locator(".mobile-actions").evaluate((dock) => ({
-    ariaHidden: dock.getAttribute("aria-hidden"),
-    inert: dock.inert
-  })), { ariaHidden: "true", inert: true });
-  await page.setViewportSize({ width: 900, height: 844 });
+  // Desktop gets the same pill.
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.waitForFunction(() => document.querySelector(".mobile-actions")?.dataset.visible === "true");
+  await page.setViewportSize({ width: 390, height: 844 });
 
   await page.locator(".footer").scrollIntoViewIfNeeded();
   await page.waitForFunction(() => document.querySelector(".mobile-actions")?.dataset.visible === "false");

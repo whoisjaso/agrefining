@@ -112,9 +112,9 @@ test("the generated hero directly nests the permanent poster and exactly two ine
     const sources = [...video.inner.matchAll(/<source\b([^>]*)>/g)].map((match) => match[1]);
     assert.equal(sources.length, 2, `video ${index} must defer exactly two source formats`);
     assert.match(sources[0], /data-video-format="webm"/);
-    assert.match(sources[0], /type="video\/webm"/);
+    assert.match(sources[0], /type='video\/webm; codecs="vp9"'/);
     assert.match(sources[1], /data-video-format="mp4"/);
-    assert.match(sources[1], /type="video\/mp4"/);
+    assert.match(sources[1], /type='video\/mp4; codecs="avc1\.64001F"'/);
     for (const source of sources) assert.doesNotMatch(source, /\bsrc=/, `video ${index} sources must not load in server HTML`);
   }
   assert.doesNotMatch(hero, /\/assets\/ag-refining-hero-v2-[^"']+\.webp/);
@@ -168,7 +168,9 @@ test("the built stylesheet isolates layered hero media with stationary overlay a
   assert.match(stylesheet, /\.cinematic-hero-poster img,\s*\.cinematic-hero-video[\s\S]*?object-position:\s*70% center/);
   assert.match(stylesheet, /@media \(max-width: 1100px\)[\s\S]*?\.cinematic-hero-poster img,\s*\.cinematic-hero-video[\s\S]*?object-position:\s*74% center/);
   assert.match(stylesheet, /@media \(max-width: 700px\)[\s\S]*?\.cinematic-hero-poster img,\s*\.cinematic-hero-video[\s\S]*?object-position:\s*78% center/);
-  assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.cinematic-hero-video\s*\{[^}]*opacity:\s*0;[^}]*transition:\s*none;[^}]*\}[\s\S]*?\.cinematic-hero-poster\s*\{[^}]*opacity:\s*1/);
+  // The film plays for everyone; reduced motion only drops the crossfade, it never hides the video.
+  assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.cinematic-hero-video,\s*\.cinematic-hero-poster\s*\{\s*transition:\s*none;\s*\}/);
+  assert.doesNotMatch(stylesheet, /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.cinematic-hero-video\s*\{[^}]*opacity:\s*0/);
 });
 
 // Mutation killed: compact desktop reserves 6.5rem for a header that renders at 7rem.
@@ -182,7 +184,7 @@ test("the compact-desktop materials panel clears the complete sticky header", ()
 test("the first poster crossfades with the active video instead of exposing the hero background", () => {
   const stylesheet = readFileSync(join(dist, "style.css"), "utf8");
   assert.match(stylesheet, /\.cinematic-hero-poster\s*\{[^}]*opacity:\s*1;[^}]*transition:\s*opacity 800ms cubic-bezier\(0\.4, 0, 0\.2, 1\);/);
-  assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.cinematic-hero-poster\s*\{[^}]*opacity:\s*1;[^}]*transition:\s*none;/);
+  assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.cinematic-hero-video,\s*\.cinematic-hero-poster\s*\{\s*transition:\s*none;/);
 });
 
 test("tablet and mobile phone targets retain the 44px coarse-pointer craft floor", () => {
