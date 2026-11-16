@@ -101,8 +101,7 @@ async function verifyMobileChrome(browser, baseUrl) {
   });
   const page = await homepage(context, baseUrl);
 
-  await page.waitForFunction(() => document.documentElement.dataset.loaderState === "ready");
-  assert.equal(await page.locator("[data-home-loader]").getAttribute("aria-hidden"), "true");
+  assert.equal(await page.locator("[data-home-loader]").count(), 0, "the intro loader is retired");
   assert.equal(await page.locator("[data-site-header]").getAttribute("data-nav-enhanced"), "true");
 
   const homepageColors = await page.evaluate(() => ({
@@ -118,10 +117,9 @@ async function verifyMobileChrome(browser, baseUrl) {
 
   const sectionColors = await page.evaluate(() => Object.fromEntries([
     ["intake", ".hero-intake-section"],
-    ["answer", ".answer-home"],
+    ["everyone", ".everyone-welcome"],
     ["materials", ".material-editorial"],
     ["process", ".assay-process"],
-    ["industries", ".industry-index"],
     ["service", ".service-area-section"],
     ["story", ".provenance-story"],
     ["location", ".location-section"],
@@ -129,10 +127,9 @@ async function verifyMobileChrome(browser, baseUrl) {
   ].map(([name, selector]) => [name, getComputedStyle(document.querySelector(selector)).backgroundColor])));
   assert.deepEqual(sectionColors, {
     intake: "rgb(241, 237, 228)",
-    answer: "rgb(241, 237, 228)",
+    everyone: "rgb(250, 248, 242)",
     materials: "rgb(250, 248, 242)",
     process: "rgb(16, 42, 67)",
-    industries: "rgb(250, 248, 242)",
     service: "rgb(16, 42, 67)",
     story: "rgb(250, 248, 242)",
     location: "rgb(241, 237, 228)",
@@ -142,13 +139,13 @@ async function verifyMobileChrome(browser, baseUrl) {
   const heroHeight = await page.locator(".atelier-hero").evaluate((hero) => hero.getBoundingClientRect().height);
   assert.ok(heroHeight >= 844, `mobile hero must fill the 844px viewport, received ${heroHeight}px`);
 
-  await page.evaluate(() => window.scrollTo(0, 120));
+  await page.evaluate(() => window.scrollTo({ top: 1200, behavior: "instant" }));
   await page.locator("[data-nav-toggle]").waitFor({ state: "visible" });
   assert.equal(await page.locator("[data-site-header] .brand").getAttribute("href"), "#top");
   await page.locator("[data-site-header] .brand").click();
   assert.ok(await page.evaluate(() => window.scrollY > 0), "homepage brand must animate rather than jump immediately");
   await page.waitForFunction(() => window.scrollY === 0);
-  await page.evaluate(() => window.scrollTo(0, 120));
+  await page.evaluate(() => window.scrollTo({ top: 120, behavior: "instant" }));
   await page.locator("[data-nav-toggle]").focus();
   await page.keyboard.press("Enter");
   await page.waitForFunction(() => document.body.classList.contains("nav-open"));
@@ -161,7 +158,7 @@ async function verifyMobileChrome(browser, baseUrl) {
       panel: { top: rect.top, right: rect.right, bottom: rect.bottom, left: rect.left, width: rect.width },
       scrim: { background: scrimStyle.backgroundColor, backdropFilter: scrimStyle.backdropFilter, filter: scrimStyle.filter },
       mainInert: document.querySelector("main").inert,
-      dockInert: document.querySelector(".mobile-actions").inert
+      pillInert: document.querySelector("[data-pay-pill]").inert
     };
   });
   assert.ok(navState.panel.left > 0, "the mobile panel must not be a full-width sheet");
@@ -172,46 +169,69 @@ async function verifyMobileChrome(browser, baseUrl) {
   assert.equal(navState.scrim.backdropFilter, "none");
   assert.equal(navState.scrim.filter, "none");
   assert.equal(navState.mainInert, true);
-  assert.equal(navState.dockInert, true);
+  assert.equal(navState.pillInert, true);
 
   await page.keyboard.press("Escape");
   await page.waitForFunction(() => !document.body.classList.contains("nav-open"));
   assert.equal(await page.evaluate(() => document.activeElement === document.querySelector("[data-nav-toggle]")), true);
 
-  await page.evaluate(() => window.scrollTo(0, 500));
-  await page.waitForFunction(() => document.querySelector(".mobile-actions")?.dataset.visible === "true");
-  const visibleDock = await page.evaluate(() => {
-    const dock = document.querySelector(".mobile-actions");
+  // The pill stays hidden while the hero CTA is on screen, then rises in once it scrolls away.
+  assert.equal(await page.locator("[data-pay-pill]").getAttribute("data-visible"), "false");
+  await page.locator(".material-editorial h2").scrollIntoViewIfNeeded();
+  await page.waitForFunction(() => document.querySelector("[data-pay-pill]")?.dataset.visible === "true");
+  await page.waitForTimeout(300); // let the 200ms rise-in settle before measuring
+  const visiblePill = await page.evaluate(() => {
+    const dock = document.querySelector("[data-pay-pill]");
+    const pill = dock.querySelector(".pay-pill").getBoundingClientRect();
+    const group = dock.getBoundingClientRect();
     return {
       inert: dock.inert,
       linkCount: dock.querySelectorAll("a").length,
-      label: dock.querySelector("a")?.textContent.trim()
+      label: dock.querySelector(".pay-pill")?.textContent.trim(),
+      groupCenterOffset: Math.abs(group.left + group.width / 2 - window.innerWidth / 2),
+      pillHeight: Math.round(pill.height),
+      gapToBottom: Math.round(window.innerHeight - group.bottom)
     };
   });
-  assert.deepEqual(visibleDock, { inert: false, linkCount: 1, label: "Schedule a Free Pickup" });
+  assert.ok(visiblePill.groupCenterOffset <= 1, `the pill group must be centered within 1px, off by ${visiblePill.groupCenterOffset}px`);
+  assert.equal(visiblePill.pillHeight, 60, "60px pill on phones");
+  assert.ok(visiblePill.gapToBottom >= 16, "the pill floats above the bottom edge");
+  delete visiblePill.groupCenterOffset;
+  delete visiblePill.pillHeight;
+  delete visiblePill.gapToBottom;
+  assert.deepEqual(visiblePill, { inert: false, linkCount: 2, label: "Get Paid" });
 
   await page.locator("[data-nav-toggle]").click();
   await page.waitForFunction(() => document.body.classList.contains("nav-open"));
-  assert.deepEqual(await page.locator(".mobile-actions").evaluate((dock) => ({
+  assert.deepEqual(await page.locator("[data-pay-pill]").evaluate((dock) => ({
     visible: dock.dataset.visible,
     ariaHidden: dock.getAttribute("aria-hidden"),
     inert: dock.inert
   })), { visible: "false", ariaHidden: "true", inert: true });
   await page.keyboard.press("Escape");
-  await page.waitForFunction(() => document.querySelector(".mobile-actions")?.dataset.visible === "true");
+  await page.waitForFunction(() => document.querySelector("[data-pay-pill]")?.dataset.visible === "true");
 
-  await page.setViewportSize({ width: 901, height: 844 });
-  await page.waitForFunction(() => document.querySelector(".mobile-actions")?.dataset.visible === "false");
-  assert.deepEqual(await page.locator(".mobile-actions").evaluate((dock) => ({
-    ariaHidden: dock.getAttribute("aria-hidden"),
-    inert: dock.inert
-  })), { ariaHidden: "true", inert: true });
-  await page.setViewportSize({ width: 900, height: 844 });
-  await page.waitForFunction(() => document.querySelector(".mobile-actions")?.dataset.visible === "true");
+  // Desktop visitors get the pill too, centered.
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.locator(".material-editorial h2").scrollIntoViewIfNeeded();
+  await page.waitForFunction(() => document.querySelector("[data-pay-pill]")?.dataset.visible === "true");
+  const desktopOffset = await page.evaluate(() => {
+    const group = document.querySelector("[data-pay-pill]").getBoundingClientRect();
+    return Math.abs(group.left + group.width / 2 - window.innerWidth / 2);
+  });
+  assert.ok(desktopOffset <= 1, `desktop pill off center by ${desktopOffset}px`);
+  await page.setViewportSize({ width: 390, height: 844 });
 
   await page.locator(".footer").scrollIntoViewIfNeeded();
-  await page.waitForFunction(() => document.querySelector(".mobile-actions")?.dataset.visible === "false");
-  assert.equal(await page.locator(".mobile-actions").evaluate((dock) => dock.inert), true);
+  await page.waitForFunction(() => document.querySelector("[data-pay-pill]")?.dataset.visible === "false");
+  assert.equal(await page.locator("[data-pay-pill]").evaluate((dock) => dock.inert), true);
+
+  // On the contact page the pill never covers the form or its submit button, and hides while typing.
+  await page.goto(`${baseUrl}/contact/`, { waitUntil: "load" });
+  await page.locator("[data-submit-button]").scrollIntoViewIfNeeded();
+  await page.waitForFunction(() => document.querySelector("[data-pay-pill]")?.dataset.visible === "false");
+  await page.locator("#name").focus();
+  assert.equal(await page.locator("[data-pay-pill]").getAttribute("data-visible"), "false");
 
   await page.goto(`${baseUrl}/contact/`, { waitUntil: "load" });
   const internalCanvas = await page.evaluate(() => ({
@@ -234,19 +254,16 @@ async function verifyNoJsFallback(browser, baseUrl) {
   });
   const page = await homepage(context, baseUrl);
   const state = await page.evaluate(() => {
-    const loader = document.querySelector("[data-home-loader]");
     const nav = document.querySelector("[data-nav]");
     return {
-      loaderDisplay: getComputedStyle(loader).display,
-      loaderState: document.documentElement.dataset.loaderState ?? null,
       navDisplay: getComputedStyle(nav).display,
-      navHeight: nav.getBoundingClientRect().height
+      navHeight: nav.getBoundingClientRect().height,
+      pillOpacity: getComputedStyle(document.querySelector("[data-pay-pill]")).opacity
     };
   });
-  assert.equal(state.loaderDisplay, "none");
-  assert.equal(state.loaderState, null);
   assert.notEqual(state.navDisplay, "none");
   assert.ok(state.navHeight > 200, "the no-JavaScript mobile navigation must remain exposed");
+  assert.equal(state.pillOpacity, "0", "without JavaScript the pill stays out of the way");
   await context.close();
 }
 
@@ -256,69 +273,16 @@ async function verifyReducedMotion(browser, baseUrl) {
     viewport: { width: 390, height: 844 }
   });
   const page = await homepage(context, baseUrl);
-  await page.waitForFunction(() => document.documentElement.dataset.loaderState === "ready");
   const state = await page.evaluate(() => ({
-    loader: getComputedStyle(document.querySelector("[data-home-loader]")).display,
     headerOpacity: getComputedStyle(document.querySelector("[data-site-header]")).opacity,
     headerPosition: getComputedStyle(document.querySelector("[data-site-header]")).position,
-    hero: (() => {
-      const rect = document.querySelector(".atelier-hero").getBoundingClientRect();
-      return { top: rect.top, height: rect.height };
-    })()
+    pillAnimation: getComputedStyle(document.querySelector(".pay-pill"), "::before").animationName,
+    hero: document.querySelector(".atelier-hero").getBoundingClientRect().height
   }));
-  assert.equal(state.loader, "none");
   assert.equal(state.headerOpacity, "1");
-  assert.equal(state.headerPosition, "fixed");
-  assert.equal(state.hero.top, 0);
-  assert.ok(state.hero.height >= 844, `reduced-motion hero must fill the 844px viewport, received ${state.hero.height}px`);
-  await context.close();
-}
-
-async function verifyLoaderFailOpen(browser, baseUrl) {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
-  const page = await context.newPage();
-  await page.route(/\.(?:mp4|webm|webp|woff2)(?:\?.*)?$/, (route) => route.abort());
-  let releaseLoader;
-  const loaderGate = new Promise((resolveGate) => { releaseLoader = resolveGate; });
-  await page.route("**/home-loader.js*", async (route) => {
-    await loaderGate;
-    await route.continue();
-  });
-  const startedAt = performance.now();
-  const navigation = page.goto(`${baseUrl}/`, { waitUntil: "load" });
-  await page.waitForFunction(() => document.documentElement.dataset.loaderState === "loading");
-  assert.equal(await page.evaluate(() => document.documentElement.dataset.loaderState), "loading");
-  await page.waitForFunction(() => document.documentElement.dataset.loaderState === "ready", null, { timeout: 1600 });
-  const elapsed = performance.now() - startedAt;
-  assert.ok(elapsed >= 1050, `loader fail-open fired too early at ${elapsed.toFixed(0)}ms`);
-  assert.ok(elapsed < 1600, `loader fail-open exceeded its recovery window at ${elapsed.toFixed(0)}ms`);
-  await page.evaluate(() => {
-    window.__loaderStates = [document.documentElement.dataset.loaderState ?? null];
-    new MutationObserver(() => {
-      window.__loaderStates.push(document.documentElement.dataset.loaderState ?? null);
-    }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-loader-state"] });
-  });
-  releaseLoader();
-  await navigation;
-  await page.evaluate(() => new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame))));
-  const states = await page.evaluate(() => window.__loaderStates);
-  assert.equal(states.slice(1).includes("loading"), false, `a delayed module reopened the loader: ${JSON.stringify(states)}`);
-  await context.close();
-}
-
-async function verifyLoaderAssaySequence(browser, baseUrl) {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
-  const page = await context.newPage();
-  await page.route(/\.(?:mp4|webm|webp|woff2)(?:\?.*)?$/, (route) => route.abort());
-  await page.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
-  const assay = page.locator("[data-loader-assay]");
-  await assay.waitFor({ state: "visible" });
-  assert.deepEqual(await assay.evaluate((element) => ({
-    text: element.textContent.replace(/\s+/g, " ").trim(),
-    symbol: element.querySelector("[data-loader-symbol]")?.textContent,
-    atomicNumber: element.querySelector("[data-loader-atomic-number]")?.textContent,
-    purity: element.querySelector("[data-loader-purity]")?.textContent
-  })), { text: "Ag 47 99.9", symbol: "Ag", atomicNumber: "47", purity: "99.9" });
+  assert.equal(state.headerPosition, "sticky", "the header is always visible");
+  assert.equal(state.pillAnimation, "none", "the pill outline stays still under reduced motion");
+  assert.ok(state.hero >= 844, `reduced-motion hero must fill the 844px viewport, received ${state.hero}px`);
   await context.close();
 }
 
@@ -352,8 +316,6 @@ try {
   await runScenario("mobile chrome", verifyMobileChrome);
   await runScenario("no-JavaScript fallback", verifyNoJsFallback);
   await runScenario("reduced motion", verifyReducedMotion);
-  await runScenario("loader assay sequence", verifyLoaderAssaySequence);
-  await runScenario("loader fail-open", verifyLoaderFailOpen);
   console.log("SITE_CHROME_BROWSER_OK");
 } finally {
   await new Promise((resolveClose) => server.close(resolveClose));

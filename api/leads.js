@@ -8,7 +8,7 @@ import {
 
 const MAX_BODY_BYTES = 32_000;
 const DEFAULT_TO_EMAIL = "dennis@agrefining.com";
-const DEFAULT_FROM_EMAIL = "AG Refining <website@agrefining.com>";
+const DEFAULT_FROM_EMAIL = "AG Refining Website <leads@agrefining.com>";
 const PHONE_DISPLAY = "(281) 898-2719";
 const PHONE_HREF = "+12818982719";
 const MATERIALS = new Set(REVIEW_FORM_ENUMS.materials);
@@ -29,23 +29,20 @@ const RESPONSE_COPY = {
       location: "Enter the pickup city or address.",
       details: "Add a little more detail about the material."
     },
-    deliverySetup: "Online delivery is being set up. Call AG Refining or email these details instead.",
-    deliveryFailure: "The request could not be delivered. Call AG Refining or email these details instead.",
-    deliveryHeading: "Keep your request moving.",
-    emailDetails: "Email these details",
+    deliverySetup: `Something went wrong on our end. Please call ${PHONE_DISPLAY} and we'll take care of you.`,
+    deliveryFailure: `Something went wrong on our end. Please call ${PHONE_DISPLAY} and we'll take care of you.`,
+    deliveryHeading: "Please Give Us A Call",
     call: `Call ${PHONE_DISPLAY}`,
     returnToForm: "Return to the pickup form",
-    successHeading: "Your request was received.",
-    successMessage: "AG Refining will review the details and follow up using your preferred contact method.",
+    successHeading: "Got It. We'll Call You Soon",
+    successMessage: `Want to talk now? Call ${PHONE_DISPLAY}.`,
     receiptLabel: "Request receipt",
     oversized: "The request is too large. Please call AG Refining.",
     malformed: "The request could not be read. Please review the form.",
     method: "Use the pickup request form.",
     requestHeading: "Use the pickup request form.",
     skip: "Skip to content",
-    siteLabel: "AG Refining",
-    emailSubject: "AG Refining pickup request",
-    notProvided: "Not provided"
+    siteLabel: "AG Refining"
   },
   es: {
     validationMessage: "Revise los campos indicados.",
@@ -59,25 +56,57 @@ const RESPONSE_COPY = {
       location: "Escriba la ciudad o dirección de recogida.",
       details: "Añada un poco más de información sobre el material."
     },
-    deliverySetup: "El envío en línea se está configurando. Llame a AG Refining o envíe estos datos por correo.",
-    deliveryFailure: "No se pudo entregar la solicitud. Llame a AG Refining o envíe estos datos por correo.",
-    deliveryHeading: "Mantenga su solicitud en marcha.",
-    emailDetails: "Enviar estos datos por correo",
+    deliverySetup: `Algo falló de nuestro lado. Llame al ${PHONE_DISPLAY} y le atendemos.`,
+    deliveryFailure: `Algo falló de nuestro lado. Llame al ${PHONE_DISPLAY} y le atendemos.`,
+    deliveryHeading: "Por Favor Llámenos",
     call: `Llame al ${PHONE_DISPLAY}`,
     returnToForm: "Volver al formulario de recogida",
-    successHeading: "Recibimos su solicitud.",
-    successMessage: "AG Refining revisará los datos y se comunicará por el medio de contacto que prefirió.",
+    successHeading: "Listo. Le Llamaremos Pronto",
+    successMessage: `¿Prefiere hablar ahora? Llame al ${PHONE_DISPLAY}.`,
     receiptLabel: "Comprobante de solicitud",
     oversized: "La solicitud es demasiado grande. Llame a AG Refining.",
     malformed: "No se pudo leer la solicitud. Revise el formulario.",
     method: "Use el formulario de solicitud de recogida.",
     requestHeading: "Use el formulario de solicitud de recogida.",
     skip: "Saltar al contenido",
-    siteLabel: "AG Refining",
-    emailSubject: "Solicitud de recogida de AG Refining",
-    notProvided: "No indicado"
+    siteLabel: "AG Refining"
   }
 };
+
+// Recipients live in Vercel env vars only (never in the repo):
+//   LEAD_TO   comma-separated primary recipients (falls back to AG_LEAD_TO_EMAIL, then dennis@agrefining.com)
+//   LEAD_CC   comma-separated CC list (default dennis@agrefining.com; never duplicates a LEAD_TO address)
+//   LEAD_FROM verified sender (falls back to AG_LEAD_FROM_EMAIL)
+//   LEAD_REPLY_TO_SUBMITTER  "false" turns off Reply-To = the visitor's email (default on)
+//   LEAD_ROUTES optional JSON {"business": [...], "individual": [...], "es": [...]}; every route defaults to LEAD_TO
+function emailList(value) {
+  return String(value || "").split(",").map((item) => item.trim()).filter((item) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item));
+}
+
+function leadRoutes() {
+  try {
+    const routes = JSON.parse(process.env.LEAD_ROUTES || "{}");
+    return routes && typeof routes === "object" && !Array.isArray(routes) ? routes : {};
+  } catch {
+    return {};
+  }
+}
+
+export function leadRecipients(payload = {}) {
+  const base = emailList(process.env.LEAD_TO || process.env.AG_LEAD_TO_EMAIL);
+  const primary = base.length ? base : [DEFAULT_TO_EMAIL];
+  const routes = leadRoutes();
+  const routeKey = payload.locale === "es" && routes.es ? "es" : payload.selling_as === "business" ? "business" : payload.selling_as === "myself" ? "individual" : "";
+  const routed = routeKey ? emailList([].concat(routes[routeKey] || []).join(",")) : [];
+  const to = routed.length ? routed : primary;
+  const ccSource = process.env.LEAD_CC === undefined ? DEFAULT_TO_EMAIL : process.env.LEAD_CC;
+  const cc = emailList(ccSource).filter((address) => !to.some((item) => item.toLowerCase() === address.toLowerCase()));
+  return { to, cc };
+}
+
+function senderAddress() {
+  return process.env.LEAD_FROM || process.env.AG_LEAD_FROM_EMAIL || DEFAULT_FROM_EMAIL;
+}
 
 function text(value, max = 1000) {
   return String(value || "").trim().slice(0, max);
@@ -131,11 +160,9 @@ function validate(payload) {
   const fields = {};
   const copy = RESPONSE_COPY[payload.locale].fields;
   if (payload.name.length < 2) fields.name = copy.name;
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) fields.email = copy.email;
+  if (payload.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) fields.email = copy.email;
   if (payload.phone.replace(/\D/g, "").length < 7) fields.phone = copy.phone;
   if (!MATERIALS.has(payload.material)) fields.material = copy.material;
-  if (payload.location.length < 2) fields.location = copy.location;
-  if (payload.details.length < 20) fields.details = copy.details;
   return fields;
 }
 
@@ -166,34 +193,53 @@ function label(value) {
   return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function emailContent(payload) {
+function centralTime(date = new Date()) {
+  return date.toLocaleString("en-US", { timeZone: "America/Chicago", dateStyle: "medium", timeStyle: "short" }) + " CT";
+}
+
+function sellingAsLabel(value) {
+  return value === "business" ? "Business" : value === "myself" ? "Myself" : "Not said";
+}
+
+export function leadSubject(payload) {
+  return ["New Seller: " + payload.name, materialLabel(payload.material), sellingAsLabel(payload.selling_as), payload.location || "No area given"].join(" | ");
+}
+
+export function emailContent(payload, now = new Date()) {
+  const phoneHref = payload.phone.replace(/[^\d+]/g, "");
   const rows = [
     ["Name", payload.name],
-    ["Business", payload.business || "Not provided"],
     ["Phone", payload.phone],
-    ["Email", payload.email],
-    ["Request", label(payload.intent)],
-    ["Material", label(payload.material)],
+    ["Email", payload.email || "Not provided"],
+    ["Material", materialLabel(payload.material)],
+    ["Selling as", sellingAsLabel(payload.selling_as)],
+    ["Business", payload.business || "Not provided"],
+    ["Zip or area", payload.location || "Not provided"],
     ["Amount", payload.quantity || "Not provided"],
-    ["Pickup location", payload.location],
-    ["Frequency", label(payload.frequency)],
-    ["Preferred pickup", pickupSummary(payload) || "Flexible"],
-    ["Preferred contact", label(payload.preferred_contact)],
-    ["Details", payload.details]
+    ["One-time or repeat", label(payload.frequency)],
+    ["Preferred time", pickupSummary(payload) || "Flexible"],
+    ["Extra details", payload.details || "None"],
+    ["Page", payload.attribution.submission_page || payload.attribution.landing_page || "Not recorded"],
+    ["Language", payload.locale === "es" ? "Spanish" : "English"],
+    ["Received", centralTime(now)]
   ];
   const attribution = Object.entries(payload.attribution);
   const plainRows = rows.map(([name, value]) => `${name}: ${value}`).join("\n");
   const plainAttribution = attribution.length
     ? `\n\nWebsite attribution:\n${attribution.map(([name, value]) => `${name}: ${value}`).join("\n")}`
     : "";
-  const htmlRows = rows.map(([name, value]) => `<tr><th align="left" style="padding:8px 12px 8px 0;vertical-align:top">${escapeHtml(name)}</th><td style="padding:8px 0;white-space:pre-wrap">${escapeHtml(value)}</td></tr>`).join("");
+  const htmlRows = rows.map(([name, value]) => {
+    const cell = name === "Phone" ? `<a href="tel:${escapeHtml(phoneHref)}" style="color:#102a43;font-weight:bold">${escapeHtml(value)}</a>` : escapeHtml(value);
+    return `<tr><th align="left" style="padding:8px 12px 8px 0;vertical-align:top">${escapeHtml(name)}</th><td style="padding:8px 0;white-space:pre-wrap">${cell}</td></tr>`;
+  }).join("");
   const htmlAttribution = attribution.length
     ? `<h2 style="font-size:16px;margin:28px 0 8px">Website attribution</h2><table>${attribution.map(([name, value]) => `<tr><th align="left" style="padding:6px 12px 6px 0">${escapeHtml(name)}</th><td style="padding:6px 0">${escapeHtml(value)}</td></tr>`).join("")}</table>`
     : "";
+  const replyLink = payload.email ? ` &nbsp; <a href="mailto:${escapeHtml(payload.email)}" style="color:#1d5e96">Reply by email</a>` : "";
 
   return {
-    text: `New AG Refining pickup request\n\n${plainRows}${plainAttribution}`,
-    html: `<div style="font-family:Arial,sans-serif;color:#14232c;line-height:1.5"><h1 style="color:#061724">New pickup request</h1><p style="margin:0 0 18px"><a href="tel:${escapeHtml(payload.phone.replace(/[^\d+]/g, ""))}" style="display:inline-block;background:#102a43;color:#faf8f2;padding:10px 18px;border-radius:3px;text-decoration:none;font-weight:bold">Call ${escapeHtml(payload.name)}</a> &nbsp; <a href="mailto:${escapeHtml(payload.email)}" style="color:#1d5e96">Reply by email</a></p><table>${htmlRows}</table>${htmlAttribution}</div>`
+    text: `New seller from the AG Refining website\n\n${plainRows}${plainAttribution}`,
+    html: `<div style="font-family:Arial,sans-serif;color:#14232c;line-height:1.5;font-size:16px"><h1 style="color:#061724;font-size:22px">New seller</h1><p style="margin:0 0 18px"><a href="tel:${escapeHtml(phoneHref)}" style="display:inline-block;background:#102a43;color:#faf8f2;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:bold">Call ${escapeHtml(payload.name)}</a>${replyLink}</p><table>${htmlRows}</table>${htmlAttribution}</div>`
   };
 }
 
@@ -258,9 +304,10 @@ export function confirmationContent(payload) {
 
 // Courtesy confirmation to the visitor. Never blocks or fails the lead itself.
 async function sendConfirmation(payload) {
+  if (!payload.email) return;
   try {
     const content = confirmationContent(payload);
-    const owner = process.env.AG_LEAD_TO_EMAIL || DEFAULT_TO_EMAIL;
+    const owner = leadRecipients(payload).to[0];
     await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -269,7 +316,7 @@ async function sendConfirmation(payload) {
         "Idempotency-Key": `${payload.submission_key}-confirmation`
       },
       body: JSON.stringify({
-        from: process.env.AG_LEAD_FROM_EMAIL || DEFAULT_FROM_EMAIL,
+        from: senderAddress(),
         to: [payload.email],
         reply_to: owner,
         subject: content.subject,
@@ -287,6 +334,17 @@ async function sendResend(payload) {
   if (!apiKey) return { configured: false };
 
   const content = emailContent(payload);
+  const { to, cc } = leadRecipients(payload);
+  const replyToSubmitter = process.env.LEAD_REPLY_TO_SUBMITTER !== "false" && payload.email;
+  const message = {
+    from: senderAddress(),
+    to,
+    subject: leadSubject(payload),
+    text: content.text,
+    html: content.html
+  };
+  if (cc.length) message.cc = cc;
+  if (replyToSubmitter) message.reply_to = payload.email;
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -294,19 +352,19 @@ async function sendResend(payload) {
       "Content-Type": "application/json",
       "Idempotency-Key": payload.submission_key
     },
-    body: JSON.stringify({
-      from: process.env.AG_LEAD_FROM_EMAIL || DEFAULT_FROM_EMAIL,
-      to: [process.env.AG_LEAD_TO_EMAIL || DEFAULT_TO_EMAIL],
-      reply_to: payload.email,
-      subject: `Pickup request: ${label(payload.material)} from ${payload.name}`,
-      text: content.text,
-      html: content.html
-    })
+    body: JSON.stringify(message)
   });
 
   if (!response.ok) throw new Error("Lead email delivery failed");
   await sendConfirmation(payload);
   return { configured: true };
+}
+
+// Durable record when the email cannot go out: Vercel keeps function logs (search "LEAD_UNDELIVERED").
+// A KV/Blob store is the next step, pending Jason's approval.
+function logUndelivered(payload, reason) {
+  const { company_url, form_started, ...lead } = payload;
+  console.error(`LEAD_UNDELIVERED ${JSON.stringify({ reason, received: centralTime(), lead })}`);
 }
 
 function renderLeadPage({ locale, state, heading, message, content = "" }) {
@@ -321,7 +379,7 @@ function renderLeadPage({ locale, state, heading, message, content = "" }) {
     <meta name="robots" content="noindex,nofollow">
     <title>${escapeHtml(heading)} | AG Refining</title>
     <link rel="icon" href="/assets/ag-mark-path.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="/style.css?v=20260803-silver-atelier">
+    <link rel="stylesheet" href="/style.css?v=20261115-phase1">
   </head>
   <body data-design="silver-atelier" class="lead-result-page">
     <a class="skip" href="#main">${copy.skip}</a>
@@ -343,33 +401,9 @@ function sendHtml(res, status, html) {
   return res.status(status).send(html);
 }
 
-function actionLinks(locale, { includeEmail = "" } = {}) {
+function actionLinks(locale) {
   const copy = RESPONSE_COPY[locale];
-  const emailAction = includeEmail
-    ? `<a class="button button-secondary" href="${escapeHtml(includeEmail)}">${copy.emailDetails}</a>`
-    : "";
-  return `<div class="lead-result-actions"><a class="button button-primary" href="tel:${PHONE_HREF}">${copy.call}</a>${emailAction}<a class="text-link" href="${formPath(locale)}">${copy.returnToForm}</a></div>`;
-}
-
-function fallbackMailto(payload, recipient) {
-  const copy = RESPONSE_COPY[payload.locale];
-  const labels = payload.locale === "es"
-    ? ["Nombre", "Empresa", "Teléfono", "Correo electrónico", "Material", "Cantidad", "Ubicación", "Frecuencia", "Recogida preferida", "Detalles"]
-    : ["Name", "Business", "Phone", "Email", "Material", "Amount", "Location", "Frequency", "Preferred pickup", "Details"];
-  const values = [
-    payload.name,
-    payload.business || copy.notProvided,
-    payload.phone,
-    payload.email,
-    payload.material,
-    payload.quantity || copy.notProvided,
-    payload.location,
-    payload.frequency,
-    pickupSummary(payload, payload.locale) || copy.notProvided,
-    payload.details
-  ];
-  const body = labels.map((name, index) => `${name}: ${values[index]}`).join("\n");
-  return `mailto:${recipient}?subject=${encodeURIComponent(copy.emailSubject)}&body=${encodeURIComponent(body)}`;
+  return `<div class="lead-result-actions"><a class="button button-primary" href="tel:${PHONE_HREF}">${copy.call}</a><a class="text-link" href="${formPath(locale)}">${copy.returnToForm}</a></div>`;
 }
 
 function requestErrorResponse(res, format, locale, status, message) {
@@ -396,7 +430,8 @@ export default async function handler(req, res) {
   const queryLocale = normalizeLocale(queryValue(req, "lang"));
 
   if (req.method === "GET" && queryValue(req, "status") === "health") {
-    return res.status(200).json({ delivery: Boolean(process.env.RESEND_API_KEY) });
+    const { to, cc } = leadRecipients();
+    return res.status(200).json({ delivery: Boolean(process.env.RESEND_API_KEY), recipients: to.length + cc.length });
   }
 
   if (req.method === "GET" && format === "html" && queryValue(req, "status") === "received") {
@@ -435,6 +470,7 @@ export default async function handler(req, res) {
   const payload = {
     name: text(body.name, 120),
     business: text(body.business, 180),
+    selling_as: ["myself", "business"].includes(text(body.selling_as, 20)) ? text(body.selling_as, 20) : "",
     phone: text(body.phone, 80),
     email: text(body.email, 254).toLowerCase(),
     intent: ["pickup", "quote"].includes(text(body.intent, 20)) ? text(body.intent, 20) : "pickup",
@@ -475,39 +511,25 @@ export default async function handler(req, res) {
     }));
   }
 
-  try {
-    const delivery = await sendResend(payload);
-    if (!delivery.configured) {
-      if (format === "json") {
-        return res.status(503).json({
-          message: copy.deliverySetup,
-          fallback_email: process.env.AG_LEAD_TO_EMAIL || DEFAULT_TO_EMAIL
-        });
-      }
-      const mailto = fallbackMailto(payload, process.env.AG_LEAD_TO_EMAIL || DEFAULT_TO_EMAIL);
-      return sendHtml(res, 503, renderLeadPage({
-        locale,
-        state: "delivery-failure",
-        heading: copy.deliveryHeading,
-        message: copy.deliverySetup,
-        content: actionLinks(locale, { includeEmail: mailto })
-      }));
-    }
-    return receiptResponse(res, format, locale);
-  } catch {
-    if (format === "json") {
-      return res.status(502).json({
-        message: copy.deliveryFailure,
-        fallback_email: process.env.AG_LEAD_TO_EMAIL || DEFAULT_TO_EMAIL
-      });
-    }
-    const mailto = fallbackMailto(payload, process.env.AG_LEAD_TO_EMAIL || DEFAULT_TO_EMAIL);
-    return sendHtml(res, 502, renderLeadPage({
+  const failure = (status, message) => {
+    if (format === "json") return res.status(status).json({ message, call: PHONE_DISPLAY, call_href: `tel:${PHONE_HREF}` });
+    return sendHtml(res, status, renderLeadPage({
       locale,
       state: "delivery-failure",
       heading: copy.deliveryHeading,
-      message: copy.deliveryFailure,
-      content: actionLinks(locale, { includeEmail: mailto })
+      message,
+      content: actionLinks(locale)
     }));
+  };
+  try {
+    const delivery = await sendResend(payload);
+    if (!delivery.configured) {
+      logUndelivered(payload, "RESEND_API_KEY not set");
+      return failure(503, copy.deliverySetup);
+    }
+    return receiptResponse(res, format, locale);
+  } catch (error) {
+    logUndelivered(payload, error?.message || "send failed");
+    return failure(502, copy.deliveryFailure);
   }
 }
