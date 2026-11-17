@@ -1,0 +1,49 @@
+{
+ "pass": true,
+ "errors": [],
+ "warnings": [],
+ "info": [
+  "l1_lead (leadin): intentional silence (long lead-in (7 words): silence allowed for leadin; hero carries the signature)",
+  "l1_lead2 (leadin): intentional silence (lead-in under VO: silence allowed (font-sound-signatures.md soft_roles); the paired hero carries the signature)",
+  "l2_lead (leadin): intentional silence (lead-in under VO: silence allowed (font-sound-signatures.md soft_roles); the paired hero carries the signature)",
+  "l2_lead2 (leadin): intentional silence (second lead-in of the line; the emphasis swap carries it)",
+  "l2_emph (emphasis): intentional silence (emphasis under VO: silence (role default))",
+  "l3_lead (leadin): intentional silence (lead-in under VO: silence allowed (font-sound-signatures.md soft_roles); the paired hero carries the signature)",
+  "l5_lead (leadin): intentional silence (5-word lead-in under VO; the hero carries the signature)",
+  "l6_lead (leadin): intentional silence (lead-in under VO: silence allowed (font-sound-signatures.md soft_roles); the paired hero carries the signature)",
+  "cap1 (caption): intentional silence (caption riding the voice: silent)",
+  "cap2 (caption): intentional silence (caption riding the voice: silent)",
+  "cap3 (caption): intentional silence (caption riding the voice: silent)",
+  "cap4 (caption): intentional silence (caption riding the voice: silent)",
+  "t=5.611 pop on a non-text object move (not a text entrance; allowed)",
+  "t=9.358 whoosh on a non-text object move (not a text entrance; allowed)",
+  "t=13.492 whoosh on a non-text object move (not a text entrance; allowed)",
+  "t=16.793 pop on a non-text object move (not a text entrance; allowed)",
+  "t=21.216 shimmer on a non-text object move (not a text entrance; allowed)",
+  "t=24.349 shimmer on a non-text object move (not a text entrance; allowed)",
+  "t=23.132 click on a non-text object move (not a text entrance; allowed)",
+  "t=25.451 whoosh on a non-text object move (not a text entrance; allowed)",
+  "t=26.949 whoosh on a non-text object move (not a text entrance; allowed)",
+  "t=31.536 impact on a non-text object move (not a text entrance; allowed)",
+  "t=31.561 impact on a non-text object move (not a text entrance; allowed)",
+  "t=33.583 pop on a non-text object move (not a text entrance; allowed)",
+  "t=33.988 shimmer on a non-text object move (not a text entrance; allowed)"
+ ],
+ "metrics": {
+  "text_events": 26,
+  "sfx_events": 49,
+  "paired_sfx": 33,
+  "sync_mean_abs_dev_ms": 1.8,
+  "sync_max_abs_dev_ms": 65.6,
+  "family_median_peak_dbfs": {
+   "whoosh": -19.0,
+   "pop": -21.0,
+   "riser": -19.0,
+   "shimmer": -21.0,
+   "click": -21.0,
+   "impact": -13.0
+  },
+  "errors": 0,
+  "warnings": 0
+ }
+}

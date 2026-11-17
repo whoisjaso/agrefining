@@ -1,0 +1,236 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>AG Refining: silver hides</title>
+<style>
+@font-face { font-family: "NR"; src: url("../../assets/fonts/newsreader-latin-opsz.woff2") format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "MR"; src: url("../../assets/fonts/manrope-latin-wght.woff2") format("woff2"); font-weight: 200 800; }
+html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; }
+#stage { position: absolute; inset: 0; background: #f1ede4; overflow: hidden; }
+.L { position: absolute; left: 0; top: 0; }
+.shot { position: absolute; left: 0; top: 0; max-width: none; }
+.print { }   /* plates are printed on the stage creme already; multiply would darken the paper */
+.line { position: absolute; left: 0; width: 1080px; text-align: center; white-space: nowrap; line-height: 1.2; }
+svg { overflow: visible; }
+</style>
+<script src="kit.js"></script>
+</head><body><div id="stage">
+  <div id="night" class="L" style="width:1080px;height:1920px;background:#102a43;display:none"></div>
+  <div id="world" class="L" style="width:1080px;height:1920px"></div>
+  <svg id="geo" class="L" width="1080" height="1920"></svg>
+  <div id="flip" class="L" style="width:1080px;height:1920px;display:none;background:#f1ede4"></div>
+  <div id="flipWorld" class="L" style="width:1080px;height:1920px;display:none"></div>
+  <div id="lineA" class="line"></div>
+  <div id="dev3d" class="L" style="width:1080px;height:1920px;perspective:1300px">
+    <div id="devWrap" style="position:absolute;transform-style:preserve-3d"></div>
+  </div>
+  <div id="shadow" class="L" style="display:none;border-radius:50%;background:radial-gradient(closest-side, rgba(16,42,67,.24), rgba(16,42,67,0));"></div>
+  <div id="name" class="L" style="display:none;white-space:nowrap;color:#102a43;font-family:MR"></div>
+  <div id="url" class="line" style="display:none;font-family:MR"></div>
+</div>
+<script>
+const { clamp, lerp, lmix, ease, E, hit, crit, prog } = K;
+const LEN = 900;                                                  // FPS (60) comes from kit.js
+const G = K.grid(120), b = G.b;                                  // 30 f beats, 120 f bars
+// Brand-supplied exceptions to the taste bans (recorded): creme paper #f1ede4, navy ink #102a43,
+// Newsreader serif (brand display face), Manrope wordmark. Accent = the cobalt of the Ag tile; meaning: "your silver".
+const INK = "#102a43", PAPER = "#f1ede4", COBALT = "#1a6aa6";
+const $ = (id) => document.getElementById(id);
+
+// ═════════ the device: one bead of silver, fed a drop by every material, struck into the Ag tile ═════════
+const AWARD = [124, 162, 200, 238, 276, 316];                   // one drop per material (frame the drop lands)
+const R0 = 17, GROW = 1.19;
+const radiusAt = (f) => { let r = R0; AWARD.forEach((a) => { r *= lerp(1, GROW, ease(f, a, 14, E.out)); }); return r; };
+const devWrap = $("devWrap");
+const devSvg = K.svg("svg", { width: 800, height: 800, viewBox: "-400 -400 800 800", style: "position:absolute;left:-400px;top:-400px" }, devWrap);
+const defs = K.svg("defs", {}, devSvg);
+const rg = K.svg("radialGradient", { id: "metal", cx: "0.36", cy: "0.32", r: "0.78" }, defs);
+K.svg("stop", { offset: "0", "stop-color": "#4f93c9" }, rg); K.svg("stop", { offset: "0.45", "stop-color": COBALT }, rg); K.svg("stop", { offset: "1", "stop-color": "#0a4470" }, rg);
+const body = K.svg("rect", { fill: "url(#metal)" }, devSvg);
+const spec = K.svg("ellipse", { fill: "#f1ede4", opacity: 0.85 }, devSvg);
+const markImg = document.createElement("img"); markImg.src = "mark.svg"; markImg.style.cssText = "position:absolute;display:none;transform:translateZ(1px);backface-visibility:hidden"; devWrap.appendChild(markImg);
+const markBack = document.createElement("div"); markBack.style.cssText = "position:absolute;display:none;background:#061f36;transform:rotateY(180deg) translateZ(1px);backface-visibility:hidden"; devWrap.appendChild(markBack);
+function drawBead(R, sq, sx = 1, sy = 1) {      // sq 0 = sphere, 1 = struck square bar
+  const half = R, rx = lerp(R, R * 0.06, sq);
+  body.setAttribute("x", -half * sx); body.setAttribute("y", -half * sy); body.setAttribute("width", 2 * half * sx); body.setAttribute("height", 2 * half * sy); body.setAttribute("rx", rx); body.setAttribute("ry", rx);
+  spec.setAttribute("cx", -R * 0.34 * sx); spec.setAttribute("cy", -R * 0.38 * sy); spec.setAttribute("rx", R * 0.26 * (1 - 0.5 * sq) * sx); spec.setAttribute("ry", R * 0.15 * (1 - 0.5 * sq) * sy);
+  spec.setAttribute("opacity", 0.85 * (1 - sq));
+}
+
+// ═════════ plates: every image is anchored on where the silver hides in it ═════════
+// [id, asset, t0, t1, fx, fy, width, rot, entry, exit, print]
+const SHOTS = [
+  ["xray", "ag_xray-film", 104, 142, 0.44, 0.40, 1240, 0, "scale", "whip", true],
+  ["batt", "ag_batteries", 142, 180, 0.40, 0.52, 1300, 0, "vel", "cut", true],
+  ["dent", "ag_dental", 180, 218, 0.62, 0.50, 1240, 0, "cut", "drop", true],
+  ["flat", "ag_sterling-flatware", 218, 256, 0.48, 0.40, 1240, -4, "rise", "cut", true],
+  ["coin", "ag_coins", 256, 294, 0.55, 0.50, 1240, 0, "cut", "cut", true],
+  ["smith", "silversmith", 294, 357, 0.83, 0.62, 1300, 0, "cut", "implode", true],
+  ["bal", "michael", 419, 486, 0.89, 0.60, 1250, 0, "flip", "whip", true],
+  ["mint", "mint", 486, 548, 0.598, 0.83, 1500, 0, "vel", "collapse", true],
+];
+const world = $("world"), flipWorld = $("flipWorld");
+const shotEl = {};
+for (const s of SHOTS) {
+  const img = document.createElement("img"); img.src = `img/${s[1]}.webp`; img.className = "shot" + (s[10] ? " print" : "");
+  (s[0] === "bal" ? flipWorld : world).appendChild(img); shotEl[s[0]] = img;
+}
+// hook: silver's own symbols swap inside one compass circle around the bead
+const HOOK = [["moon", 0.5, 0.47, 980], ["thaler", 0.5, 0.5, 860], ["compass", 0.53, 0.43, 1050], ["moon", 0.5, 0.47, 980]];
+const HOOK_SWAP = [46, 58, 70];
+const hookBox = document.createElement("div"); hookBox.className = "L"; hookBox.style.cssText = "width:1080px;height:1920px"; world.appendChild(hookBox);
+const hookImgs = HOOK.map(([n]) => { const i = document.createElement("img"); i.src = `img/${n}.webp`; i.className = "shot print"; hookBox.appendChild(i); return i; });
+const pour = document.createElement("img"); pour.src = "img/pour_night.webp"; pour.className = "shot"; $("night").appendChild(pour);
+
+// geometry: compass rings and the pen strokes that carry each drop to the bead
+const geo = $("geo");
+const ring = K.svg("circle", { fill: "none", stroke: INK, "stroke-width": 3, pathLength: 1, "stroke-dasharray": "1 3" }, geo);
+const ring2 = K.svg("circle", { fill: "none", stroke: INK, "stroke-width": 2.5, pathLength: 1, "stroke-dasharray": "1 3" }, geo);
+const PEN_ANG = [-150, -30, 200, -95, 25, -165];                 // each drop arrives from a different side
+const pens = AWARD.map(() => K.svg("line", { stroke: COBALT, "stroke-width": 5, "stroke-linecap": "round", pathLength: 1, "stroke-dasharray": "1 3" }, geo));
+
+// ═════════ device path ═════════
+const HOME_Y = 760, LINE_Y = 1330, LINE_SIZE = 132, SERIF = (s) => K.font(s, 600, "NR"), TRACK = -0.04;
+const periodX = (word) => 540 + K.measure(word, SERIF(LINE_SIZE), TRACK, LINE_SIZE) / 2 + 20;
+const PERIOD_Y = LINE_Y + LINE_SIZE * 0.97;
+
+function devPos(f) {
+  if (f < 16) { const p = E.contact(prog(f, 0, 16)); return [540, lerp(HOME_Y - 240, HOME_Y, p)]; }     // the drop falls in at frame 0
+  let x = 540, y = HOME_Y;
+  x += 250 * (crit(f - 404, 0.11) - crit(f - 476, 0.13));
+  if (f >= 548) {                                                                             // to the period of "Silver hides"
+    const g1 = crit(f - 548, 0.12), g2 = crit(f - 604, 0.14), g3 = crit(f - 690, 0.13);
+    const px1 = periodX("Silver hides"), px2 = periodX("Silver pays");
+    x = lerp(540, px1, g1) + (px2 - px1) * g2 + (540 - px2) * g3;
+    y = lerp(HOME_Y, PERIOD_Y, g1) + (860 - PERIOD_Y) * g3;
+  }
+  if (f >= 556 && f < 702) { const k = lmix(1, 1.035, E.dolly(prog(f, 570, 120))); x = 540 + (x - 540) * k; y = LINE_Y + LINE_SIZE * 0.6 + (y - LINE_Y - LINE_SIZE * 0.6) * k; }
+  return [x, y];
+}
+
+// ═════════ render ═════════
+function seek(t) {
+  const f = clamp(t * FPS, 0, LEN - 1e-3);
+  const [dx, dy] = devPos(f);
+
+  // ── hook: the bead lands, a compass ring is drawn round it, silver's symbols swap inside ──
+  const hookOn = f < 104;
+  hookBox.style.display = hookOn ? "" : "none";
+  if (hookOn) {
+    const RR = 340;
+    const iris = f < 18 ? 0 : Math.min(RR, 8 * Math.pow(1.27, f - 18));
+    const shrink = lmix(1, 0.75, E.in(prog(f, 86, 18)));
+    let k = 0; HOOK_SWAP.forEach((s, i) => { if (f >= s) k = i + 1; });
+    const punch = 1 + 0.015 * Math.max(...HOOK_SWAP.map((s) => hit(f - s, 2, 5)));
+    hookImgs.forEach((im, i) => { im.style.display = i === k ? "" : "none"; });
+    const [, fx, fy, w] = HOOK[k];
+    K.anchor(hookImgs[k], dx, dy, w, fx, fy, 0, shrink * punch * lmix(1.08, 1, ease(f, 18, 44, E.out)));
+    hookBox.style.clipPath = `circle(${iris * shrink}px at ${dx}px ${dy}px)`;
+    ring.setAttribute("cx", dx); ring.setAttribute("cy", dy); ring.setAttribute("r", (RR + 16) * shrink);
+    K.drawOn(ring, f, 8, 34, 88, 14);
+  } else ring.style.display = "none";
+
+  // ── plates ──
+  for (const s of SHOTS) {
+    const [id, , t0, t1, fx, fy, w, rot, entry, exit] = s;
+    const img = shotEl[id];
+    const on = f >= t0 && f < t1;
+    img.style.display = on ? "" : "none"; if (!on) continue;
+    let k = lmix(1, 1.05, E.dolly(prog(f, t0, t1 - t0))), ox = 0, oy = 0, r = rot;
+    if (entry === "scale") k *= lmix(1.8, 1, ease(f, t0, 34, E.out));
+    if (entry === "vel") ox += 520 * (1 - ease(f, t0, 46, E.out));
+    if (entry === "rise") oy += 420 * (1 - ease(f, t0, 40, E.out));
+    if (entry === "cut") k *= lmix(1.07, 1, ease(f, t0, 14, E.out));
+    if (entry === "flip") k *= lmix(1.12, 1, ease(f, t0, 30, E.out));
+    if (exit === "whip") ox -= 240 * E.exit(prog(f, t1 - 16, 16));
+    if (exit === "drop") oy += 300 * E.exit(prog(f, t1 - 16, 16));
+    if (exit === "implode") { const q = E.in(prog(f, 338, 19)); k *= lmix(1, 0.03, q); r += -14 * q; }
+    if (exit === "collapse") k *= lmix(1, 0.02, E.in(prog(f, t1 - 19, 19)));
+    if (id === "bal") r += -3 * (1 - ease(f, 432, 30, E.out));             // the pan settles under the bead's weight
+    K.anchor(img, dx + ox, dy + oy, w, fx, fy, r, k);
+  }
+
+  // ── drops: a pen stroke from the material into the bead, absorbed as the bead grows ──
+  AWARD.forEach((a, i) => {
+    const pen = pens[i], on = f >= a - 10 && f < a + 14;
+    pen.style.display = on ? "" : "none"; if (!on) return;
+    const ang = (PEN_ANG[i] * Math.PI) / 180, R = radiusAt(a - 10);
+    pen.setAttribute("x1", dx + Math.cos(ang) * 300); pen.setAttribute("y1", dy + Math.sin(ang) * 300);
+    pen.setAttribute("x2", dx + Math.cos(ang) * (R + 6)); pen.setAttribute("y2", dy + Math.sin(ang) * (R + 6));
+    K.drawOn(pen, f, a - 10, 10, a, 12);
+  });
+  // a compass ring round the silversmith's plate
+  const r2 = f >= 300 && f < 340; ring2.style.display = r2 ? "" : "none";
+  if (r2) { ring2.setAttribute("cx", dx); ring2.setAttribute("cy", dy); ring2.setAttribute("r", 150); K.drawOn(ring2, f, 300, 22, 326, 12); }
+
+  // ── the drop: the world implodes into the bead; navy; the melt; the bead floods the frame once ──
+  const nightOn = f >= 358 && f < 451;
+  $("night").style.display = nightOn ? "" : "none";
+  if (nightOn) K.anchor(pour, dx, dy, 3500, 0.70, 0.47, 0, lmix(1.3, 1, ease(f, 358, 34, E.out)) * lmix(1, 1.05, E.dolly(prog(f, 380, 70))));
+  const flipOn = f >= 419 && f < 451;
+  [$("flip"), flipWorld].forEach((el) => (el.style.display = flipOn ? "" : "none"));
+  if (flipOn) { const rr = Math.min(2300, 34 * Math.pow(1.28, f - 419)); const cp = `circle(${rr}px at ${dx}px ${dy}px)`; $("flip").style.clipPath = cp; flipWorld.style.clipPath = cp; }
+  if (f >= 451 && f < 486) { flipWorld.style.display = ""; flipWorld.style.clipPath = "none"; }
+
+  // ── words: one line at a time; at the end the bead is the period ──
+  const lineA = $("lineA");
+  const tx = { y: LINE_Y, size: LINE_SIZE, wt: 600, fam: "NR", track: TRACK, color: INK, accent: COBALT };
+  lineA.style.opacity = 1; lineA.style.transform = "";
+  if (f < 104) K.maskLine(lineA, [{ t: 28, w: "Silver" }, { t: 34, w: "hides" }], f, { ...tx, out: 88 });
+  else if (f < 300) K.maskLine(lineA, [{ t: 186, w: "in" }, { t: 192, w: "plain" }, { t: 198, w: "sight" }], f, { ...tx, out: 278 });
+  else if (f < 604) K.maskLine(lineA, f < 552 ? [] : [{ t: 556, w: "Silver" }, { t: 562, w: "hides" }], f, tx);
+  else K.morphLine(lineA, "Silver hides", "Silver pays", f, 604, { ...tx, dur: 24, spread: 14 });
+  const creep = f >= 556 && f < 702 ? lmix(1, 1.035, E.dolly(prog(f, 570, 120))) : 1;
+  lineA.style.transformOrigin = `540px ${LINE_SIZE * 0.6}px`;
+  if (creep !== 1) lineA.style.transform = `scale(${creep})`;
+  if (f >= 690) { const q = E.in(prog(f, 690, 12)); lineA.style.opacity = 1 - q; lineA.style.transform = `translateY(${q * 60}px) scale(${creep})`; }
+
+  // ── device: size, squash, the strike, the 3D turn, the lockup ──
+  let R = radiusAt(f), sq = 0, sx = 1, sy = 1, rotY = 0, tilt = 0, px = dx, py = dy;
+  const land = hit(f - 16, 2, 6); sx *= 1 + 0.08 * land; sy *= 1 - 0.10 * land;                // first landing: contact squash
+  if (f >= 338 && f < 360) R *= lmix(1, 1.25, E.in(prog(f, 338, 19)));                          // grows while the world implodes
+  if (f >= 358 && f < 420) R *= lmix(1.25, 7.5, ease(f, 360, 22, E.out)) / lmix(1, 7.5, ease(f, 398, 22, E.inOut)); // the melt: floods once
+  if (f >= 548 && f < 700) R = lerp(R, 12, ease(f, 548, 30, E.out));                            // becomes the period
+  if (f >= 690) R = lerp(12, 150, ease(f, 690, 26, E.out));                                     // lifts off the line
+  if (f >= 712) { sq = ease(f, 712, 8, E.contact); const h2 = hit(f - 720, 2, 6); sx *= 1 + 0.08 * h2; sy *= 1 - 0.10 * h2; }  // struck into a bar
+  const H0 = 722;                                                                                // the hero turn
+  let showMark = false;
+  if (f >= H0) {
+    const p = ease(f, H0, 56, E.smooth); rotY = 360 * p; tilt = 12 * Math.sin(Math.PI * p);
+    if (rotY >= 90) showMark = true;
+    R *= 1 + 0.012 * hit(f - H0, 3, 7) + 0.1 * Math.sin(Math.PI * p);
+  }
+  // lockup: the tile shrinks and slides left; the name arrives beside it
+  const NAME_SIZE = 92, TILE = 110, GAP = 28;
+  const nameW = K.measure("AG", K.font(NAME_SIZE, 800, "MR"), -0.02, NAME_SIZE) + K.measure(" Refining", K.font(NAME_SIZE, 400, "MR"), -0.02, NAME_SIZE);
+  const LX = 540 - (TILE + GAP + nameW) / 2, LY = 900;
+  const lk = ease(f, 770, 30, E.inOut);
+  if (f >= 770) { R = lerp(R, TILE / 2, lk); px = lerp(dx, LX + TILE / 2, lk); py = lerp(dy, LY, lk); }
+  const push = lmix(1, 1.08, E.dolly(prog(f, 798, 102)));
+  devWrap.style.left = px + "px"; devWrap.style.top = py + "px";
+  devWrap.style.transform = `rotateX(${tilt}deg) rotateY(${rotY}deg)`;
+  $("dev3d").style.transformOrigin = `540px ${LY}px`; $("dev3d").style.transform = `scale(${push})`;
+  devSvg.style.display = showMark ? "none" : "";
+  drawBead(R, sq, sx, sy);
+  [markImg, markBack].forEach((el) => { el.style.display = showMark ? "" : "none"; el.style.width = 2 * R + "px"; el.style.height = 2 * R + "px"; el.style.left = -R + "px"; el.style.top = -R + "px"; });
+  markBack.style.borderRadius = R * 0.04 + "px";
+  // contact shadow only while it turns
+  const sh = $("shadow"), shOn = f >= H0 && f < H0 + 56; sh.style.display = shOn ? "" : "none";
+  if (shOn) { const w = 2 * R * 1.05 * (0.55 + 0.45 * Math.abs(Math.cos((rotY * Math.PI) / 180))); Object.assign(sh.style, { left: px - w / 2 + "px", top: py + R * 1.18 + "px", width: w + "px", height: w * 0.14 + "px", opacity: Math.sin(Math.PI * ease(f, H0, 56, E.smooth)) }); }
+  // the name: tracking collapses, cobalt relaxes to ink
+  const nm = $("name");
+  if (f >= 792) {
+    const q = ease(f, 792, 26, E.out), c = ease(f, 792, 24, E.smooth);
+    const col = `rgb(${Math.round(lerp(26, 16, c))},${Math.round(lerp(106, 42, c))},${Math.round(lerp(166, 67, c))})`;
+    nm.style.display = ""; nm.innerHTML = `<span style="font-weight:800">AG</span><span style="font-weight:400"> Refining</span>`;
+    Object.assign(nm.style, { left: LX + TILE + GAP + "px", top: LY - NAME_SIZE * 0.66 + "px", fontSize: NAME_SIZE + "px", letterSpacing: lerp(0.6, -0.02, q) + "em", color: col, opacity: clamp(prog(f, 792, 6)), transformOrigin: `${540 - (LX + TILE + GAP)}px ${NAME_SIZE * 0.66}px`, transform: `scale(${push})` });
+  } else nm.style.display = "none";
+  const url = $("url");
+  if (f >= 796) {
+    const q = ease(f, 796, 22, E.out);
+    url.style.display = ""; url.textContent = "agrefining.com";
+    Object.assign(url.style, { top: LY + 150 + "px", fontSize: "62px", fontWeight: 500, letterSpacing: "-0.01em", color: INK, opacity: clamp(q * 1.4) * 0.92, transform: `translateY(${(1 - q) * 28}px) scale(${push})`, transformOrigin: `540px ${-150}px` });
+  } else url.style.display = "none";
+}
+window.seek = seek;
+window.ready = () => seek(0);
+window.CUE_LIST = () => ({ land: 16, ticks: AWARD, swaps: HOOK_SWAP, whoosh: [{ apex: 102 }, { apex: 140 }, { apex: 484 }], drop: 360, silence: [356, 360], flip: 420, pan: 434, morph: 604, strike: 720, turn: 750, stop: 720, name: 802, words: [28, 34, 186, 192, 198, 556, 562] });
+</script></body></html>

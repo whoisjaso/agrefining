@@ -1,0 +1,131 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+/* iOS geometry at 1 pt = 2.75 px (a 393 pt iPhone across a 1080 px frame). Exported at 2x for camera push-ins. */
+@font-face { font-family: "InterV"; src: url("src/inter.woff2") format("woff2"); font-weight: 100 900; }
+@font-face { font-family: "MR"; src: url("src/manrope-latin-wght.woff2") format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "NR"; src: url("src/newsreader-latin-opsz.woff2") format("woff2"); font-weight: 200 800; }
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; background: transparent; }
+body { font-family: "InterV", "Noto Color Emoji", sans-serif; -webkit-font-smoothing: antialiased; color: #000; }
+.a { display: inline-block; margin: 40px; vertical-align: top; position: relative; }
+/* lock screen notification: iOS glass platter */
+.notif { width: 993px; height: 206px; border-radius: 66px; background: rgba(246,247,250,0.86); box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(0,0,0,0.04); display: flex; align-items: center; padding: 0 40px 0 38px; gap: 30px; }
+.icon { width: 104px; height: 104px; border-radius: 24px; flex: none; display: flex; align-items: center; justify-content: center; }
+.nt { flex: 1; }
+.nrow { display: flex; justify-content: space-between; align-items: baseline; }
+.ntitle { font-size: 41px; font-weight: 640; letter-spacing: -0.015em; }
+.ntime { font-size: 36px; font-weight: 450; color: rgba(60,60,67,0.6); }
+.nbody { font-size: 41px; font-weight: 420; letter-spacing: -0.01em; margin-top: 3px; color: #111; }
+/* type */
+.kin { font-weight: 800; letter-spacing: -0.045em; white-space: nowrap; line-height: 1; }
+/* iMessage */
+.bub { position: relative; display: inline-block; font-size: 47px; line-height: 60px; font-weight: 430; letter-spacing: -0.01em; padding: 20px 34px 22px; border-radius: 50px; max-width: 760px; }
+.sent { background: #0A7CFF; color: #fff; }
+.recv { background: #E9E9EB; color: #000; }
+.tail { position: absolute; bottom: 0; width: 52px; height: 58px; }
+.kl { white-space: pre; line-height: 1; padding: 30px 40px; }
+.kl .c { display: inline-block; padding: 0.12em 0.14em; margin: -0.12em -0.14em; }
+</style></head><body>
+
+<!-- 1. wallpaper (our own abstract, brand colours) -->
+<div class="a" id="wallpaper" style="width:1080px;height:1920px;margin:0;background:
+  radial-gradient(900px 800px at 18% 12%, #5f86b4 0%, rgba(95,134,180,0) 70%),
+  radial-gradient(1000px 900px at 85% 40%, #2c4f78 0%, rgba(44,79,120,0) 72%),
+  radial-gradient(1200px 1000px at 50% 105%, #e8d9c2 0%, rgba(232,217,194,0) 60%),
+  linear-gradient(180deg, #0f2740 0%, #1d4166 45%, #6f86a0 78%, #c9b9a1 100%);"></div>
+
+<!-- 2. lock screen clock -->
+<div class="a" id="clock" style="width:1000px;text-align:center;color:#fff">
+  <div style="font-size:58px;font-weight:600;letter-spacing:-0.01em;opacity:.92">Friday, October 17</div>
+  <div style="font-size:300px;font-weight:700;letter-spacing:-0.035em;line-height:.95;margin-top:-6px">9:41</div></div>
+
+<!-- 3. notifications -->
+<div class="a notif" id="n_rent"><div class="icon" style="background:linear-gradient(#ff5f57,#ff3b30)"><svg width="62" height="62" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></div>
+  <div class="nt"><div class="nrow"><span class="ntitle">Rent due Friday</span><span class="ntime">now</span></div><div class="nbody">Reminder · $1,150</div></div></div>
+<div class="a notif" id="n_bank"><div class="icon" style="background:linear-gradient(#3ddc6a,#28b44f)"><svg width="62" height="62" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-6 9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg></div>
+  <div class="nt"><div class="nrow"><span class="ntitle">Low balance</span><span class="ntime">2m ago</span></div><div class="nbody">Available: $112.40</div></div></div>
+<div class="a notif" id="n_bill"><div class="icon" style="background:linear-gradient(#ffd60a,#ffbf00)"><svg width="62" height="62" viewBox="0 0 24 24" fill="#fff"><path d="M13.2 2.5L5 13.4h5.6L9.8 21.5 18 10.6h-5.6z"/></svg></div>
+  <div class="nt"><div class="nrow"><span class="ntitle">Electric bill ready</span><span class="ntime">1h ago</span></div><div class="nbody">Due in 5 days</div></div></div>
+
+<!-- 4. kinetic words -->
+<div class="a kin" id="w_rent" style="font-size:150px;color:#fff">Rent</div>
+<div class="a kin" id="w_is" style="font-size:150px;color:#fff">is</div>
+<div class="a kin" id="w_due" style="font-size:150px;color:#fff">due</div>
+<div class="a kin" id="w_friday" style="font-size:150px;color:#FFD9D4">Friday.</div>
+<div class="a kin" id="w_mean" style="font-size:96px;color:#0d1b2a">Meanwhile,</div>
+<div class="a kin" id="w_drawer" style="font-size:96px;color:#0d1b2a">in the drawer…</div>
+<div class="a kin" id="w_hold" style="font-size:210px;color:#fff">Hold on.</div>
+
+<!-- 5. Photos album header -->
+<div class="a" id="album" style="width:1000px">
+  <div style="font-size:94px;font-weight:760;letter-spacing:-0.03em">Grandma’s house</div>
+  <div style="font-size:42px;font-weight:500;color:rgba(60,60,67,0.6);margin-top:6px">9 Photos · Houston</div></div>
+
+<!-- 6. Live Text: viewfinder brackets + the Live Text button -->
+<div class="a" id="brackets" style="width:640px;height:220px"><svg width="640" height="220" viewBox="0 0 640 220" fill="none" stroke="#FFD60A" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 66V6h60M574 6h60v60M634 154v60h-60M66 214H6v-60"/></svg></div>
+<div class="a" id="ltbtn" style="width:122px;height:122px;border-radius:61px;background:rgba(255,214,10,1);display:flex;align-items:center;justify-content:center"><svg width="66" height="66" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M8 10h8M8 14h5"/></svg></div>
+
+<!-- 7. Spotlight -->
+<div class="a" id="spot" style="width:993px;height:132px;border-radius:66px;background:rgba(242,242,247,0.96);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.9);display:flex;align-items:center;padding:0 40px;gap:24px">
+  <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="rgba(60,60,67,0.6)" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+  <span style="font-size:47px;font-weight:450;letter-spacing:-0.01em">sterling silver</span></div>
+<div class="a" id="spotph" style="width:993px;height:132px;border-radius:66px;background:rgba(242,242,247,0.96);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.9);display:flex;align-items:center;padding:0 40px;gap:24px">
+  <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="rgba(60,60,67,0.6)" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+  <span style="font-size:47px;font-weight:450;color:rgba(60,60,67,0.45)">Search</span></div>
+<div class="a" id="dict" style="width:993px;border-radius:56px;background:#fff;padding:46px 52px 52px;box-shadow:0 2px 0 rgba(0,0,0,0.02)">
+  <div style="font-size:34px;font-weight:650;letter-spacing:0.03em;color:rgba(60,60,67,0.6);text-transform:uppercase">Dictionary</div>
+  <div style="font-size:70px;font-weight:720;letter-spacing:-0.025em;margin-top:16px">ster·ling sil·ver</div>
+  <div style="font-size:36px;font-style:italic;color:rgba(60,60,67,0.6);margin-top:6px">noun</div>
+  <div style="font-size:46px;font-weight:430;line-height:1.3;margin-top:16px;color:#1c1c1e">silver that is <span style="background:linear-gradient(transparent 58%, rgba(255,214,10,.6) 58%)">92.5% pure</span>, often stamped <b>925</b> or <b>STERLING</b>.</div></div>
+
+<!-- 8. the two pieces -->
+<div class="a" id="piece_rent" style="width:560px;height:600px;padding-right:70px"><div style="position:absolute;left:0;top:0;width:490px;height:600px;border-radius:56px;background:#fff;padding:56px 54px">
+  <div class="icon" style="background:linear-gradient(#ff5f57,#ff3b30);width:110px;height:110px;border-radius:26px"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></div>
+  <div style="font-size:74px;font-weight:760;letter-spacing:-0.035em;margin-top:44px;line-height:1.02">Rent due<br>Friday</div>
+  <div style="font-size:46px;font-weight:600;color:#ff3b30;margin-top:120px">$112.40 available</div></div>
+  <div style="position:absolute;left:418px;top:228px;width:144px;height:144px;border-radius:72px;background:#fff"></div></div>
+<div class="a" id="piece_spoon" style="width:490px;height:600px;border-radius:56px;overflow:hidden;background:#d9d6cf;-webkit-mask:radial-gradient(circle 74px at 0 300px, transparent 73px, #000 74px)">
+  <img src="src/sterling_hi.jpg" style="position:absolute;height:600px;left:-963px;top:25px;filter:contrast(1.08)">
+  <svg style="position:absolute;left:150px;top:250px" width="320" height="100" viewBox="0 0 320 100" fill="none" stroke="#FFD60A" stroke-width="7" stroke-linecap="round"><path d="M4 30V4h26M290 4h26v26M316 70v26h-26M30 96H4V70"/></svg></div>
+
+<!-- 9. Messages -->
+<div class="a" id="msg_head" style="width:600px;text-align:center">
+  <div style="width:138px;height:138px;border-radius:69px;margin:0 auto;background:url(src/agmark.png) center/cover, #102a43;box-shadow:0 0 0 1px rgba(0,0,0,0.04)"></div>
+  <div style="display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:12px 26px;border-radius:40px;background:rgba(242,242,247,0.95);font-size:36px;font-weight:560;letter-spacing:-0.01em">AG Refining <svg width="22" height="34" viewBox="0 0 8 13" fill="none" stroke="rgba(60,60,67,0.45)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 1.5l5 5-5 5"/></svg></div></div>
+<div class="a" id="input" style="width:993px;height:122px;display:flex;align-items:center;gap:18px">
+  <div style="width:110px;height:110px;border-radius:55px;background:rgba(242,242,247,0.96);display:flex;align-items:center;justify-content:center;flex:none"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="rgba(60,60,67,0.8)" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+  <div style="flex:1;height:110px;border-radius:55px;background:rgba(255,255,255,1);box-shadow:inset 0 0 0 2px rgba(60,60,67,0.18);display:flex;align-items:center;padding:0 36px;font-size:44px;color:rgba(60,60,67,0.35)">iMessage</div></div>
+<div class="a" id="input_text" style="font-size:44px;font-weight:430;letter-spacing:-0.01em;white-space:nowrap;color:#000">wait… is grandma’s silver worth something??</div>
+<div class="a" id="b_sent"><div class="bub sent">wait… is grandma’s silver<br>worth something??</div><svg class="tail" style="right:-14px" viewBox="0 0 52 58"><path d="M0 0 C 2 34, 16 48, 46 56 C 30 58, 12 56, 0 48 Z" fill="#0A7CFF"/></svg></div>
+<div class="a" id="b_typing"><div class="bub recv" style="padding:30px 36px"><svg width="122" height="32" viewBox="0 0 122 32"><circle cx="16" cy="16" r="13" fill="#8E8E93"/><circle cx="61" cy="16" r="13" fill="#8E8E93"/><circle cx="106" cy="16" r="13" fill="#8E8E93"/></svg></div><svg class="tail" style="left:-14px;transform:scaleX(-1)" viewBox="0 0 52 58"><path d="M0 0 C 2 34, 16 48, 46 56 C 30 58, 12 56, 0 48 Z" fill="#E9E9EB"/></svg></div>
+<div class="a" id="b_recv1"><div class="bub recv">Good eye. &#128064;</div></div>
+<div class="a" id="b_recv2"><div class="bub recv">925 means sterling silver.<br>Check the back of the rest.</div><svg class="tail" style="left:-14px;transform:scaleX(-1)" viewBox="0 0 52 58"><path d="M0 0 C 2 34, 16 48, 46 56 C 30 58, 12 56, 0 48 Z" fill="#E9E9EB"/></svg></div>
+<div class="a" id="delivered" style="font-size:30px;font-weight:500;color:rgba(60,60,67,0.6)">Delivered</div>
+
+<!-- 10. brand -->
+<div class="a" id="wordmark" style="font-family:MR;font-size:150px;letter-spacing:-0.035em;color:#102a43;white-space:nowrap"><span style="font-weight:800">AG</span><span style="font-weight:400"> Refining</span></div>
+<div class="a" id="tagline" style="font-family:NR;font-style:italic;font-size:70px;color:#4a5868;white-space:nowrap">Houston’s silver buyer</div>
+<div class="a" id="url" style="font-family:MR;font-weight:650;font-size:34px;letter-spacing:0.32em;color:#416b94;white-space:nowrap">AGREFINING.COM</div>
+<div class="a" id="touch" style="width:120px;height:120px;border-radius:60px;background:rgba(255,255,255,0.35);box-shadow:0 0 0 4px rgba(255,255,255,0.9), 0 8px 30px rgba(0,0,0,0.15)"></div>
+<div class="a" id="glow" style="width:900px;height:900px;border-radius:50%;background:radial-gradient(circle, rgba(255,214,10,0.9) 0%, rgba(255,214,10,0.25) 30%, rgba(255,214,10,0) 65%)"></div>
+<div class="a" id="bokeh" style="width:600px;height:600px;border-radius:50%;background:radial-gradient(circle, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 45%, rgba(255,255,255,0) 70%)"></div>
+
+<div class="a" id="input2" style="width:993px;height:122px;display:flex;align-items:center;gap:18px">
+  <div style="width:110px;height:110px;border-radius:55px;background:rgba(242,242,247,0.96);display:flex;align-items:center;justify-content:center;flex:none"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="rgba(60,60,67,0.8)" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+  <div style="flex:1;height:110px;border-radius:55px;background:#fff;box-shadow:inset 0 0 0 2px rgba(60,60,67,0.18)"></div></div>
+<div class="a" id="sendbtn" style="width:80px;height:80px;border-radius:40px;background:#0A7CFF;display:flex;align-items:center;justify-content:center"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/></svg></div>
+<div class="a" id="avatar" style="width:360px;height:360px;border-radius:180px;background:url(src/agmark.png) center/cover, #102a43"></div>
+<div class="a" id="namepill" style="display:inline-flex;align-items:center;gap:8px;padding:12px 26px;border-radius:40px;background:rgba(242,242,247,0.95);font-size:36px;font-weight:560;letter-spacing:-0.01em">AG Refining <svg width="22" height="34" viewBox="0 0 8 13" fill="none" stroke="rgba(60,60,67,0.45)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 1.5l5 5-5 5"/></svg></div>
+<div class="a" id="homebar" style="width:385px;height:14px;border-radius:7px;background:#000"></div>
+<div class="a" id="homebar_w" style="width:385px;height:14px;border-radius:7px;background:#fff"></div>
+<div class="a" id="stamp" style="font-size:30px;font-weight:500;color:rgba(60,60,67,0.6);text-align:center;white-space:nowrap"><b style="font-weight:640">iMessage</b><br>Today 9:41 AM</div>
+<div class="a kl" id="k_rent1" style="font-weight:800;letter-spacing:-0.045em;font-size:158px;color:#fff"><span class="c">R</span><span class="c">e</span><span class="c">n</span><span class="c">t</span> <span class="c">i</span><span class="c">s</span> <span class="c">d</span><span class="c">u</span><span class="c">e</span></div>
+<div class="a kl" id="k_friday" style="font-weight:800;letter-spacing:-0.05em;font-size:250px;color:#FFB4AB"><span class="c">F</span><span class="c">r</span><span class="c">i</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">.</span></div>
+<div class="a kl" id="k_mean" style="font-weight:800;letter-spacing:-0.045em;font-size:112px;color:#0d1b2a"><span class="c">M</span><span class="c">e</span><span class="c">a</span><span class="c">n</span><span class="c">w</span><span class="c">h</span><span class="c">i</span><span class="c">l</span><span class="c">e</span><span class="c">,</span></div>
+<div class="a kl" id="k_drawer" style="font-weight:800;letter-spacing:-0.045em;font-size:112px;color:#0d1b2a"><span class="c">i</span><span class="c">n</span> <span class="c">t</span><span class="c">h</span><span class="c">e</span> <span class="c">d</span><span class="c">r</span><span class="c">a</span><span class="c">w</span><span class="c">e</span><span class="c">r</span><span class="c">…</span></div>
+<div class="a kl" id="k_hold" style="font-weight:800;letter-spacing:-0.05em;font-size:240px;color:#fff"><span class="c">Hold</span> <span class="c">on.</span></div>
+<div class="a kl" id="k_brand" style="font-family:MR;font-size:150px;letter-spacing:-0.035em;color:#102a43;font-weight:600"><span class="c">A</span><span class="c">G</span> <span class="c">R</span><span class="c">e</span><span class="c">f</span><span class="c">i</span><span class="c">n</span><span class="c">i</span><span class="c">n</span><span class="c">g</span></div>
+<div class="a kl" id="k_tag" style="font-family:NR;font-style:italic;font-size:72px;color:#4a5868"><span class="c">Houston’s</span> <span class="c">silver</span> <span class="c">buyer</span></div>
+<div class="a kl" id="k_url" style="font-family:MR;font-weight:650;font-size:34px;letter-spacing:0.32em;color:#416b94"><span class="c">A</span><span class="c">G</span><span class="c">R</span><span class="c">E</span><span class="c">F</span><span class="c">I</span><span class="c">N</span><span class="c">I</span><span class="c">N</span><span class="c">G</span><span class="c">.</span><span class="c">C</span><span class="c">O</span><span class="c">M</span></div>
+</body></html>

@@ -1,0 +1,15 @@
+{"note": "One beat per take (voiceover-human.md section 5.5). Tags follow the house style: billed, not spoken. Clean alt swaps the one cuss for Facebook reach.",
+ "beats": [
+  {"id": "b00", "text": "[casual, a little grin] Okay, real quick question."},
+  {"id": "b01", "text": "[curious, leaning in] You got a drawer full of old silverware... that nobody even uses?"},
+  {"id": "b02", "text": "[low, real, half-sigh] 'Cause man... rent's due Friday. Light bill's due..."},
+  {"id": "b03", "text": "[frustrated, knowing] and that damn drawer's just sittin' there.", "clean": "[frustrated, knowing] and that drawer's just sittin' there."},
+  {"id": "b04", "text": "[easy, conspiratorial] Flip one of 'em over."},
+  {"id": "b05", "text": "[quieter, slower] Look real close... there's a tiny little stamp."},
+  {"id": "b06", "text": "[lighting up] Nine-twenty-five. Or it straight up says... sterling."},
+  {"id": "b07", "text": "[firm, plain] That ain't plated. That's real silver."},
+  {"id": "b08", "text": "[slow, letting it land] So... rent's due."},
+  {"id": "b09", "text": "[warmer, slower] And you got real silver... just sittin' in a drawer."},
+  {"id": "b10", "text": "[half-laugh, knowing] Yeah. Now you see it."},
+  {"id": "b11", "text": "[warm, steady] A-G Refining. Houston's silver buyer."}
+ ]}

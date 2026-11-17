@@ -1,0 +1,127 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>AG Refining: the silver inside</title>
+<style>
+@font-face { font-family: "NR"; src: url("newsreader-latin-opsz.woff2") format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "MR"; src: url("manrope-latin-wght.woff2") format("woff2"); font-weight: 200 800; }
+html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; }
+.t, .lbl { text-shadow: 0 2px 34px rgba(0,0,0,0.55), 0 1px 3px rgba(0,0,0,0.35); }
+#gl { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+.t { position: absolute; left: 0; width: 1080px; text-align: center; color: #f4f1ea; will-change: transform, opacity; white-space: nowrap; }
+.w { display: inline-block; will-change: transform, opacity; }
+.serif { font-family: "NR"; font-weight: 400; font-size: 104px; letter-spacing: -0.02em; line-height: 1; }
+.serif i { font-style: italic; }
+.cap { font-family: "MR"; font-weight: 600; font-size: 26px; letter-spacing: 0.32em; text-transform: uppercase; color: #d9d6cf; }
+.lbl { position: absolute; font-family: "MR"; font-weight: 600; font-size: 30px; letter-spacing: 0.3em; color: #e8e5de; white-space: nowrap; }
+.lbl b { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #8fb4d8; margin-right: 16px; vertical-align: 3px; }
+#name { font-family: "MR"; font-size: 132px; letter-spacing: -0.02em; line-height: 1; }
+#grain { position: absolute; inset: 0; pointer-events: none; }
+</style></head>
+<body>
+<div id="hook" class="t serif" style="top:250px"></div>
+<div id="pay" class="t serif" style="top:236px"></div>
+<div id="see" class="t serif" style="top:250px"></div>
+<div id="lockup" class="t" style="top:300px">
+  <div id="name"><span style="font-weight:800">AG</span><span style="font-weight:400"> Refining</span></div>
+  <div id="tag" class="serif" style="font-size:64px;margin-top:34px;color:#e6e2d9"><i>Houston's silver buyer</i></div>
+</div>
+<div id="url" class="t cap" style="top:1700px;font-size:30px">agrefining.com</div>
+<div id="labels"></div>
+<script>
+// ═════════ timeline (seconds). One source for picture, labels and sound. ═════════
+const DUR = 15.0;
+const T = {
+  hookIn: [0.30, 0.52, 0.74, 1.02, 1.24],   // "What's" "your" "silver" "really" "worth?"
+  slap: 2.40,                                // the coin falls flat; rest until 3.05
+  drops: [3.18, 3.52, 3.70, 4.26],           // spoon, ring, bullion, scrap: a burst, not a metronome
+  heat: [4.80, 5.45], melt: [5.40, 7.15],    // glow rises, then everything flows into one
+  payIn: [5.55, 5.72, 5.89, 6.30, 6.47],     // "We" "pay" "for" / "the silver" "inside."
+  rise: [7.35, 8.55],                        // the drop lifts into a sphere; held dead still to the strike
+  strike: 9.30,                              // sphere struck into the bar (the loudest moment)
+  seeIn: [10.05, 10.28, 10.70, 10.92],       // "See" "the weight." / "Then" "decide."
+  sweep: 11.0,                               // one strip of light crosses the bar
+  lock: 12.55,                               // lockup
+  still: 13.55,                              // dead still to the end
+};
+
+// ═════════ math ═════════
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const sst = (k) => k * k * (3 - 2 * k);
+const ease = {
+  sineIO: (k) => 0.5 - 0.5 * Math.cos(Math.PI * k),
+  cubicIO: (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2),
+  quintIO: (k) => (k < 0.5 ? 16 * k ** 5 : 1 - Math.pow(-2 * k + 2, 5) / 2),
+  expoIO: (k) => (k <= 0 ? 0 : k >= 1 ? 1 : k < 0.5 ? Math.pow(2, 20 * k - 10) / 2 : (2 - Math.pow(2, -20 * k + 10)) / 2),
+  out: (k) => 1 - Math.pow(1 - k, 3),
+  outQ: (k) => 1 - Math.pow(1 - k, 5),
+  in: (k) => k * k * k,
+};
+// spring step response, closed form (pure in t)
+const spring = (tau, zeta = 0.55, omega = 15) => {
+  if (tau <= 0) return 0;
+  if (zeta >= 1) return 1 - Math.exp(-omega * tau) * (1 + omega * tau);
+  const wd = omega * Math.sqrt(1 - zeta * zeta);
+  return 1 - Math.exp(-zeta * omega * tau) * (Math.cos(wd * tau) + (zeta * omega / wd) * Math.sin(wd * tau));
+};
+// decaying deterministic shake, zero before the hit
+const shake = (t, th, amp, decay = 9, freq = 23, seed = 1) => {
+  const d = t - th; if (d < 0 || d > 1.2) return [0, 0];
+  const e = amp * Math.exp(-decay * d);
+  return [e * Math.sin(freq * d * 6.283 + seed), e * Math.sin(freq * 0.83 * d * 6.283 + seed * 2.1)];
+};
+// a word that lands: opacity leads a spring rise
+const wordRise = (t, t0, dist = 46) => {
+  const k = t - t0; if (k <= 0) return { op: 0, y: dist, s: 0.96 };
+  const s = spring(k, 0.62, 13);
+  return { op: clamp(k / 0.12), y: dist * (1 - s), s: 0.96 + 0.04 * s };
+};
+// mulberry32
+const rng = (seed) => () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+
+// ═════════ text ═════════
+const $ = (id) => document.getElementById(id);
+const words = (el, list) => { el.innerHTML = ""; return list.map((w) => { if (w === "\n") { el.appendChild(document.createElement("br")); return null; } const s = document.createElement("span"); s.className = "w"; s.innerHTML = w; el.appendChild(s); el.appendChild(document.createTextNode(" ")); return s; }).filter(Boolean); };
+let HW, PW, SW;
+const LBL = [];
+function setupText() {
+  HW = words($("hook"), ["What's", "your", "<i>silver</i>", "\n", "really", "worth?"]);
+  PW = words($("pay"), ["We", "pay", "for", "\n", "the&nbsp;<i>silver</i>", "inside."]);
+  SW = words($("see"), ["See", "the&nbsp;weight.", "\n", "Then", "<i>decide.</i>"]);
+  for (const n of ["Sterling", "Jewelry", "Bullion", "Scrap", "Coins"]) { const d = document.createElement("div"); d.className = "lbl"; d.innerHTML = "<b></b>" + n.toUpperCase(); $("labels").appendChild(d); LBL.push(d); }
+}
+function place(el, w, extraY = 0) { el.style.opacity = w.op; el.style.transform = `translateY(${w.y + extraY}px) scale(${w.s})`; }
+function textAt(t) {
+  // hook: words land, then the slap knocks them up and out, each by its distance from the coin
+  const hk = t - T.slap;
+  HW.forEach((el, i) => {
+    const w = wordRise(t, T.hookIn[i]);
+    if (hk > 0) { const kk = ease.in(clamp(hk / 0.32)); w.op *= 1 - kk; w.y -= 90 * kk * (1 + i * 0.15); }
+    place(el, w);
+  });
+  $("hook").style.display = t < T.slap + 0.4 ? "" : "none";
+  PW.forEach((el, i) => { const w = wordRise(t, T.payIn[i]); const o = ease.in(seg(t, 7.95, 8.3)); w.op *= 1 - o; w.y -= 40 * o; place(el, w); });
+  $("pay").style.display = t > 5.4 && t < 8.35 ? "" : "none";
+  SW.forEach((el, i) => { const w = wordRise(t, T.seeIn[i]); const o = ease.in(seg(t, 12.05, 12.35)); w.op *= 1 - o; w.y -= 40 * o; place(el, w); });
+  $("see").style.display = t > 9.9 && t < 12.4 ? "" : "none";
+  // lockup
+  const L = wordRise(t, T.lock, 60), L2 = wordRise(t, T.lock + 0.22, 40), U = wordRise(t, T.lock + 0.5, 24);
+  place($("name"), L); place($("tag"), L2); place($("url"), U);
+  $("lockup").style.display = $("url").style.display = t > T.lock - 0.05 ? "" : "none";
+  // material labels: pop on landing at the object's screen position; lift out as the heat comes
+  const items = [...T.drops.map((d, i) => ({ t0: d + 0.05, dy: i === 0 ? 70 : -70 })), { t0: 3.02, dy: 70 }];
+  const fr = Math.round(t * LABELS.fps) + 1, row = LABELS.labels[fr] || LABELS.labels[Math.min(Math.max(fr, 73), 129)] || null;
+  items.forEach((it, i) => {
+    const el = LBL[i]; const vis = t > it.t0 && t < T.heat[0] + 0.45; el.style.display = vis ? "" : "none"; if (!vis) return;
+    if (!row) { el.style.display = "none"; return; } const x = row[i][1], y = row[i][2];
+    const w = wordRise(t, it.t0, 18); const o = ease.in(seg(t, T.heat[0], T.heat[0] + 0.4)); w.op *= 1 - o;
+    el.style.opacity = w.op; el.style.transform = `translate(${x - el.offsetWidth / 2}px, ${y + it.dy + w.y - 14 - o * 24}px)`;
+  });
+}
+
+
+let LABELS = null;
+window.seek = (t) => { textAt(t); return true; };
+window.ready = async () => { LABELS = await (await fetch("labels.json")).json(); await document.fonts.load("italic 400 104px NR"); await document.fonts.load("800 132px MR"); await document.fonts.load("600 30px MR"); await document.fonts.ready; setupText(); textAt(0); return true; };
+window.READY = window.ready();
+</script></body></html>
