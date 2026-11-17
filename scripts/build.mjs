@@ -1177,7 +1177,8 @@ function renderMaterialGuide(locale = "en") {
 function renderMobileActions(locale = "en", content = "") {
   const spanishPage = locale === "es";
   const pageLink = content.match(/href="(\/contact\?intent=pickup(?:&(?:amp;)?material=[a-z_]+)?)"/)?.[1];
-  const href = spanishPage ? "#solicitud" : pageLink || "/contact?intent=pickup";
+  // "#get-paid" opens the contact page already scrolled to the form, so visitors never hunt for it.
+  const href = spanishPage ? "#solicitud" : `${pageLink || "/contact?intent=pickup"}#get-paid`;
   const label = spanishPage ? "Reciba Su Pago" : "Get Paid";
   return `<nav class="mobile-actions get-paid-dock" aria-label="${spanishPage ? "Acciones rápidas" : "Quick actions"}" data-visible="false" aria-hidden="true" inert><a class="get-paid-pill" href="${href}"><span class="get-paid-sheen" aria-hidden="true"></span><span class="get-paid-label">${label}</span><span class="get-paid-arrow" aria-hidden="true"><i></i><i></i><i></i><svg viewBox="0 0 20 20" width="18" height="18"><path d="M3 10h12m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a></nav>`;
 }
@@ -2519,7 +2520,7 @@ const contact = `
       <div class="contact-line"><span>Address</span><strong>${street}<br>${cityLine}</strong></div>
       <div class="contact-boundary"><h3>Before you ship or visit</h3><p>Call first. We will confirm the material, pickup option, and next step.</p></div>
     </aside>
-    <div><p class="eyebrow">Pickup and quote request</p><h2>Start with a few details.</h2>${renderReviewForm({ locale: "en" })}</div>
+    <div id="get-paid" class="contact-form-column"><p class="eyebrow">Pickup and quote request</p><h2>Start with a few details.</h2>${renderReviewForm({ locale: "en" })}</div>
   </div></section>`;
 mkdirSync(join(out, "contact"), { recursive: true });
 writeFileSync(join(out, "contact", "index.html"), document({

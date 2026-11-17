@@ -25,12 +25,13 @@ test("the Get Paid pill is one localized link that routes to the right form", ()
   const englishDock = mobileDock(home);
   const spanishDock = mobileDock(spanish);
   assert.equal((englishDock.match(/<a\b/g) || []).length, 1);
-  assert.match(englishDock, /<a class="get-paid-pill" href="\/contact\?intent=pickup">[\s\S]*Get Paid/);
+  assert.match(englishDock, /<a class="get-paid-pill" href="\/contact\?intent=pickup#get-paid">[\s\S]*Get Paid/, "the pill lands on the form itself");
   assert.doesNotMatch(englishDock, /tel:|>Call</);
   assert.equal((spanishDock.match(/<a\b/g) || []).length, 1);
   assert.match(spanishDock, /<a class="get-paid-pill" href="#solicitud">[\s\S]*Reciba Su Pago/);
   const coins = readFileSync(join(dist, "sell-silver-coins-houston", "index.html"), "utf8");
-  assert.match(mobileDock(coins), /href="\/contact\?intent=pickup&material=silver_coins"/, "material pages open the form with their material chosen");
+  assert.match(mobileDock(coins), /href="\/contact\?intent=pickup&material=silver_coins#get-paid"/, "material pages open the form with their material chosen");
+  assert.match(contact, /<div id="get-paid" class="contact-form-column">/, "the contact page carries the form anchor");
 });
 
 test("the pill is centered, hidden on the first screen, safe-area aware, and suppressed by navigation, forms and the footer", () => {
