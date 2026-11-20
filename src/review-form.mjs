@@ -71,7 +71,7 @@ const COPY = {
     emailChoice: "Email",
     submit: "Send request",
     errorHeading: "Please review the following:",
-    note: "This request is not a final quote or pickup promise. Free pickup and fast payment depend on the material, location, account type, and schedule. Do not send patient records, passwords, financial data, or identity documents. When you submit, the form page, first landing page, referring page, and supported campaign or ad identifiers are sent with your request. See our",
+    note: "This is a request, not a final quote. Your offer is based on the material and today's market. Do not send patient records, passwords, financial data, or identity documents. When you submit, the form page, first landing page, referring page, and supported campaign or ad identifiers are sent with your request. See our",
     privacy: "privacy notice"
   },
   es: {
@@ -98,7 +98,7 @@ const COPY = {
     emailChoice: "Correo electrónico",
     submit: "Enviar solicitud",
     errorHeading: "Revise los campos indicados:",
-    note: "Esta solicitud no es una cotización final ni una promesa de recogida. La recogida gratuita y el pago rápido dependen del material, la ubicación, el tipo de cuenta y el horario. No envíe historiales de pacientes, contraseñas, datos financieros ni documentos de identidad. Al enviar, la página del formulario, la primera página de llegada, la página de referencia y los identificadores compatibles de campaña o anuncio se envían con su solicitud. Consulte nuestro",
+    note: "Esta es una solicitud, no una cotización final. Su oferta se basa en el material y el mercado del día. No envíe historiales de pacientes, contraseñas, datos financieros ni documentos de identidad. Al enviar, la página del formulario, la primera página de llegada, la página de referencia y los identificadores compatibles de campaña o anuncio se envían con su solicitud. Consulte nuestro",
     privacy: "aviso de privacidad (en ingles)"
   }
 };
