@@ -17,19 +17,19 @@ const taxonomy = [
     ["Sterling and flatware", "/silver-flatware-buyer-houston"],
     ["Silver-plated materials", "/silver-plated-materials-buyer-houston"]
   ]],
-  ["Industrial and Laboratory", [
+  ["Industrial And Laboratory", [
     ["Industrial silver", "/industrial-silver-scrap"],
     ["Electronics silver recovery", "/electronics-silver-recovery"],
     ["Silver flake", "/silver-flake-buyer-houston"],
     ["Silver solder", "/silver-solder-buyer-houston"],
     ["Laboratory silver", "/laboratory-silver-buyer-houston"]
   ]],
-  ["Imaging and Healthcare", [
+  ["Imaging And Healthcare", [
     ["Industrial NDT film", "/industrial-x-ray-silver-recycling"],
     ["Medical X-ray film", "/medical-x-ray-recycling"],
     ["Dental scrap", "/dental-scrap-buyer-houston"]
   ]],
-  ["Guides and Trade", [
+  ["Guides And Trade", [
     ["X-ray recycling services", "/x-ray-recycling-services-houston"],
     ["Jewelry-store silver recycling", "/jewelry-store-silver-recycling-houston"]
   ]]
@@ -158,7 +158,7 @@ test("the disclosure groups exactly 17 unique destinations with ordinary list se
 });
 
 test("accepted materials renders the 17-item purchase index with one full-width first card", () => {
-  assert.match(accepted, /<h1>We purchase\.<\/h1>/);
+  assert.match(accepted, /<h1>Everything We Buy<\/h1>/);
   const cards = anchorRecords(accepted, "taxonomy-card");
   assert.equal(cards.length, 17);
   assert.deepEqual(cards.map(({ href }) => href), expectedPaths);
@@ -177,7 +177,7 @@ test("the sitemap contains every public route once", () => {
 });
 
 test("homepage material labels use the approved purchase taxonomy", () => {
-  assert.match(home, />Sterling and Flatware<\/h3>/);
+  assert.match(home, />Sterling And Flatware<\/h3>/);
   assert.match(home, />Industrial NDT Film<\/h3>/);
   assert.doesNotMatch(home, />Sterling and hollowware<\/h3>/);
 });
@@ -186,8 +186,8 @@ test("the industrial film page explains NDT consistently and expands the term on
   assert.match(industrial, /<title>Industrial NDT Film Silver Recycling in Houston \| AG Refining<\/title>/);
   assert.match(industrial, /<meta name="description" content="[^"]*industrial NDT film[^"]*">/);
   assert.match(industrial, /<p class="eyebrow">Industrial NDT Film<\/p>/);
-  assert.match(industrial, /<h1>Recover silver from industrial NDT film\.<\/h1>/);
-  assert.match(industrial, /AG Refining works with Houston companies that have qualifying industrial NDT film/);
+  assert.match(industrial, /<h1>Recover Silver From Industrial NDT Film<\/h1>/);
+  assert.match(industrial, /AG Refining works with Houston companies that have industrial NDT film/);
   assert.ok((customerFacingText(industrial).match(/Industrial NDT film/gi) || []).length >= 5);
   assert.equal((customerFacingText(industrial).match(/Industrial Non-Destructive Testing film/g) || []).length, 1);
 });
@@ -207,11 +207,11 @@ test("all customer-facing output removes industrial X-ray wording while preservi
 test("medical and general X-ray terminology remains accurate", () => {
   assert.match(medical, /<title>Medical X-Ray Film Recycling in Houston \| AG Refining<\/title>/);
   assert.match(medical, /<p class="eyebrow">Medical X-Ray Film<\/p>/);
-  assert.match(customerFacingText(medical), /silver-bearing X-ray film/);
+  assert.match(customerFacingText(medical), /silver X-ray film/);
   assert.match(xrayHub, /<title>X-Ray Recycling Services Houston \| X-Ray Film Recycling \| AG Refining<\/title>/);
-  assert.match(xrayHub, /<h1>Secure X-ray film recycling in Houston\.<\/h1>/);
+  assert.match(xrayHub, /<h1>Secure X-Ray Film Recycling In Houston<\/h1>/);
 });
 
-test("How It Works opens with the exact six-step promise", () => {
-  assert.match(howItWorks, /<h1>Six simple steps from silver to cash\.<\/h1>/);
+test("How It Works opens with the plain heading", () => {
+  assert.match(howItWorks, /<h1>How Selling To Us Works<\/h1>/);
 });

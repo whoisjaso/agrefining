@@ -107,7 +107,7 @@ test("URL-encoded invalid native submission returns escaped HTML recovery", { co
   assert.doesNotMatch(response.body, /<script>alert\(1\)<\/script>/);
 });
 
-test("native delivery-unavailable response preserves phone and email recovery", { concurrency: false }, async () => {
+test("native delivery-unavailable response asks the visitor to call, never to email it themselves", { concurrency: false }, async () => {
   let fetchCalls = 0;
   const response = await withDelivery({
     apiKey: undefined,
@@ -128,9 +128,8 @@ test("native delivery-unavailable response preserves phone and email recovery", 
   assert.equal(response.headers["content-type"], "text/html; charset=utf-8");
   assert.match(response.body, /data-lead-result="delivery-failure"/);
   assert.match(response.body, /href="tel:\+12818982719"/);
-  assert.match(response.body, /href="mailto:dennis@agrefining\.com\?subject=/);
-  assert.match(response.body, /xray_film/);
-  assert.match(response.body, /Houston%2C%20TX/);
+  assert.doesNotMatch(response.body, /mailto:/);
+  assert.match(response.body, /Please call \(281\) 898-2719/);
 });
 
 test("native success uses a private 303 receipt and GET does not redeliver", { concurrency: false }, async () => {
@@ -171,7 +170,7 @@ test("native success uses a private 303 receipt and GET does not redeliver", { c
   assert.equal(receipt.headers["content-type"], "text/html; charset=utf-8");
   assert.match(receipt.body, /data-lead-result="success"/);
   assert.match(receipt.body, /<meta name="robots" content="noindex,nofollow">/);
-  assert.match(receipt.body, /request (?:was )?received/i);
+  assert.match(receipt.body, /Got It\. We&#039;ll Call You Soon/);
   assert.match(receipt.body, /href="\/contact"/);
   assert.match(receipt.body, /href="tel:\+12818982719"/);
 });
@@ -200,9 +199,10 @@ test("Spanish native validation and delivery failure stay Spanish", { concurrenc
   }));
   assert.equal(unavailable.statusCode, 503);
   assert.match(unavailable.body, /<html lang="es">/);
-  assert.match(unavailable.body, /Enviar estos datos por correo/);
+  assert.match(unavailable.body, /Llame al \(281\) 898-2719/);
+  assert.doesNotMatch(unavailable.body, /mailto:/);
   assert.match(unavailable.body, /href="\/espanol#solicitud"/);
-  assert.doesNotMatch(unavailable.body, /Online delivery is being set up/);
+  assert.doesNotMatch(unavailable.body, /Something went wrong on our end/);
 });
 
 test("enhanced JSON remains backward-compatible", { concurrency: false }, async () => {
@@ -223,14 +223,15 @@ test("enhanced JSON remains backward-compatible", { concurrency: false }, async 
   const unavailable = await withDelivery({ apiKey: undefined }, () => invoke({ headers: jsonHeaders, body: validLead }));
   assert.equal(unavailable.statusCode, 503);
   assert.equal(typeof unavailable.payload.message, "string");
-  assert.equal(unavailable.payload.fallback_email, "dennis@agrefining.com");
+  assert.equal(unavailable.payload.fallback_email, undefined);
+  assert.equal(unavailable.payload.call_href, "tel:+12818982719");
 
   const failed = await withDelivery({
     apiKey: "synthetic-test-key",
     fetchImpl: async () => ({ ok: false })
   }, () => invoke({ headers: jsonHeaders, body: validLead }));
   assert.equal(failed.statusCode, 502);
-  assert.equal(failed.payload.fallback_email, "dennis@agrefining.com");
+  assert.equal(failed.payload.fallback_email, undefined);
 });
 
 test("content negotiation selects safe browser and JSON defaults", { concurrency: false }, async () => {
@@ -342,7 +343,7 @@ test("preferred pickup day and time reach the owner and the visitor", { concurre
     body: JSON.stringify({ ...validLead, submission_key: "test-schedule-001", pickup_date: future, pickup_window: "afternoon" })
   }));
   assert.equal(response.statusCode, 200);
-  assert.match(sent[0].text, /Preferred pickup: \w+day, \w+ \d+, in the afternoon/);
+  assert.match(sent[0].text, /Preferred time: \w+day, \w+ \d+, in the afternoon/);
   assert.match(sent[0].html, /href="tel:2815550144"/, "owner email has a one-tap call button");
   assert.match(sent[1].text, /You asked for: \w+day, \w+ \d+, in the afternoon\./);
   assert.match(sent[1].text, /contact you to confirm/, "confirmation never promises a booked time");
@@ -387,8 +388,96 @@ test("Spanish visitors get a Spanish confirmation", { concurrency: false }, asyn
 
 test("delivery health check reports configuration without exposing secrets", { concurrency: false }, async () => {
   const on = await withDelivery({ apiKey: "synthetic-test-key" }, () => invoke({ method: "GET", query: { status: "health" }, headers: { accept: "application/json" } }));
-  assert.deepEqual(on.payload, { delivery: true });
+  assert.deepEqual(on.payload, { delivery: true, recipients: 1 });
   assert.doesNotMatch(on.body, /synthetic/);
   const off = await withDelivery({ apiKey: undefined }, () => invoke({ method: "GET", query: { status: "health" }, headers: { accept: "text/html" } }));
-  assert.deepEqual(off.payload, { delivery: false });
+  assert.deepEqual(off.payload, { delivery: false, recipients: 1 });
+});
+
+async function withEnv(values, callback) {
+  const previous = Object.fromEntries(Object.keys(values).map((key) => [key, process.env[key]]));
+  Object.entries(values).forEach(([key, value]) => {
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  });
+  try {
+    return await callback();
+  } finally {
+    Object.entries(previous).forEach(([key, value]) => {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    });
+  }
+}
+
+test("recipients come from LEAD_TO and LEAD_CC, Dennis is CC'd by default, no address is duplicated", { concurrency: false }, async () => {
+  const sent = [];
+  await withEnv({ LEAD_TO: "dorothy@example.com", LEAD_CC: undefined, LEAD_FROM: "AG Refining Website <leads@example.com>" }, () => withDelivery({
+    apiKey: "synthetic-test-key",
+    fetchImpl: async (_url, init) => {
+      sent.push(JSON.parse(init.body));
+      return { ok: true };
+    }
+  }, () => invoke({
+    headers: { accept: "application/json", "content-type": "application/json" },
+    body: JSON.stringify({ ...validLead, submission_key: "test-route-001", selling_as: "business" })
+  })));
+  assert.deepEqual(sent[0].to, ["dorothy@example.com"]);
+  assert.deepEqual(sent[0].cc, ["dennis@agrefining.com"]);
+  assert.equal(sent[0].from, "AG Refining Website <leads@example.com>");
+  assert.equal(sent[0].reply_to, "maria@example.com");
+  assert.equal(sent[0].subject, "New Seller: Maria Gomez | X-ray film | Business | Houston, TX");
+  assert.equal(sent[1].reply_to, "dorothy@example.com", "visitor replies reach the first lead recipient");
+
+  const health = await withEnv({ LEAD_TO: "dorothy@example.com", LEAD_CC: undefined }, () => withDelivery({ apiKey: "k" }, () => invoke({ method: "GET", query: { status: "health" }, headers: { accept: "application/json" } })));
+  assert.deepEqual(health.payload, { delivery: true, recipients: 2 });
+  assert.doesNotMatch(health.body, /dorothy|dennis/);
+
+  const { leadRecipients } = await import("../api/leads.js");
+  await withEnv({ LEAD_TO: "a@example.com, b@example.com", LEAD_CC: "", LEAD_ROUTES: '{"business":["biz@example.com"],"es":["es@example.com"]}' }, async () => {
+    assert.deepEqual(leadRecipients({ selling_as: "business" }), { to: ["biz@example.com"], cc: [] });
+    assert.deepEqual(leadRecipients({ selling_as: "myself" }), { to: ["a@example.com", "b@example.com"], cc: [] });
+    assert.deepEqual(leadRecipients({ locale: "es" }), { to: ["es@example.com"], cc: [] });
+  });
+  await withEnv({ LEAD_TO: undefined, AG_LEAD_TO_EMAIL: undefined, LEAD_CC: undefined, LEAD_ROUTES: "not json" }, async () => {
+    assert.deepEqual(leadRecipients({}), { to: ["dennis@agrefining.com"], cc: [] });
+  });
+});
+
+test("a phone-only lead is accepted: email, area and notes are optional, and no confirmation is attempted", { concurrency: false }, async () => {
+  const sent = [];
+  const response = await withDelivery({
+    apiKey: "synthetic-test-key",
+    fetchImpl: async (_url, init) => {
+      sent.push(JSON.parse(init.body));
+      return { ok: true };
+    }
+  }, () => invoke({
+    headers: { accept: "application/json", "content-type": "application/json" },
+    body: JSON.stringify({ name: "Ray Long", phone: "713-555-0100", material: "silver_flatware", submission_key: "test-phone-only", locale: "en" })
+  }));
+  assert.equal(response.statusCode, 200);
+  assert.equal(sent.length, 1, "owner email only");
+  assert.equal(sent[0].reply_to, undefined);
+  assert.match(sent[0].text, /Email: Not provided/);
+  assert.match(sent[0].text, /Received: .+ CT/);
+});
+
+test("an undelivered lead is written to the server log in full", { concurrency: false }, async () => {
+  const logged = [];
+  const previous = console.error;
+  console.error = (line) => logged.push(String(line));
+  try {
+    await withDelivery({ apiKey: "synthetic-test-key", fetchImpl: async () => ({ ok: false }) }, () => invoke({
+      headers: { accept: "application/json", "content-type": "application/json" },
+      body: validLead
+    }));
+  } finally {
+    console.error = previous;
+  }
+  assert.equal(logged.length, 1);
+  assert.match(logged[0], /^LEAD_UNDELIVERED /);
+  const record = JSON.parse(logged[0].slice("LEAD_UNDELIVERED ".length));
+  assert.equal(record.lead.phone, "281-555-0144");
+  assert.equal(record.lead.company_url, undefined);
 });

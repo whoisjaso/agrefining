@@ -96,9 +96,9 @@ for (const path of htmlFiles) {
 
 const home = readFileSync(join(out, "index.html"), "utf8");
 const exactHomeChecks = [
-  "<title>Houston Silver Buyer | Sell Scrap Silver in Houston | AG Refining</title>",
-  '<meta name="description" content="Sell silver in Houston with AG Refining. Free pickup, on-site weighing, honest pricing, and payment terms confirmed with the offer.">',
-  "<h1>Your silver, valued precisely.</h1>"
+  "<title>Silver & Gold Buyer In Southeast Houston | AG Refining</title>",
+  '<meta name="description" content="Sell silver (and gold) in southeast Houston. We come to your home or business and give you a quote on the spot. Coins, flatware, jewelry, dental scrap and more.">',
+  "<h1>Sell Your Silver. We Come To You</h1>"
 ];
 for (const expected of exactHomeChecks) {
   if (!home.includes(expected)) failures.push(`Homepage is missing: ${expected}`);
@@ -141,23 +141,23 @@ else {
   if (/class="hero-kicker"/.test(hero)) failures.push("Homepage hero must not restore the retired kicker line");
   const heroAnchors = anchorsIn(hero);
   const primaryAction = heroAnchors.find((anchor) => anchor.href === "/contact?intent=pickup");
-  const fallbackAction = heroAnchors.find((anchor) => anchor.href === "/accepted-materials");
   if (!primaryAction) failures.push("Homepage hero must provide a primary pickup anchor to /contact?intent=pickup");
   else {
     if (!primaryAction.classes.includes("button") || !primaryAction.classes.includes("button-primary")) {
       failures.push("Homepage hero pickup anchor must use button button-primary classes");
     }
-    if (primaryAction.text !== "Schedule a Free Pickup") failures.push("Homepage hero pickup anchor must use the exact V2 label");
+    if (primaryAction.text !== "Get Paid") failures.push("Homepage hero pickup anchor must use the exact v2 label (Get Paid)");
   }
+  const fallbackAction = heroAnchors.find((anchor) => anchor.href === "/accepted-materials");
   if (!fallbackAction) failures.push("Homepage hero must provide a fallback material anchor to /accepted-materials");
   else {
     if (!fallbackAction.classes.includes("button") || !fallbackAction.classes.includes("button-secondary")) {
       failures.push("Homepage hero material anchor must use button button-secondary classes");
     }
-    if (fallbackAction.text !== "See what we buy") failures.push("Homepage hero material anchor must use the exact V2 label");
+    if (fallbackAction.text !== "See What We Buy") failures.push("Homepage hero material anchor must use the exact label");
   }
   if (!hero.includes('href="tel:+12818982719"')) failures.push("Homepage hero must keep the phone fallback");
-  const requiredProof = ["Houston-based", "Free qualifying pickup", "On-site weighing", "Confirmed payment terms"];
+  const requiredProof = ["Family-Owned", "We Come To You", "Quote On The Spot", "You Decide. No Pressure."];
   const proofRail = (hero.match(/<ul\b[\s\S]*?<\/ul>/g) || []).find((list) => requiredProof.every((proof) => list.includes(proof))) || "";
   if (!proofRail) failures.push("Homepage hero must keep the proof rail inside the hero");
   for (const proof of requiredProof) {
@@ -169,11 +169,11 @@ if (!home.includes('class="intake-panel"')) failures.push("Homepage is missing t
 const closingHero = heroSection?.end ?? -1;
 const intakeStart = home.indexOf('<form class="intake-panel"');
 if (closingHero >= 0 && intakeStart <= closingHero) failures.push("Homepage intake form must begin after the closing hero section");
-if (!/<label for="hero-material">(?:(?!<\/label>)[\s\S])*<select id="hero-material"(?:(?!<\/label>)[\s\S])*<\/select>\s*<\/label>/.test(home)) {
-  failures.push("Homepage material intake control must be nested inside its label");
-}
 if (!/<label for="hero-quantity">(?:(?!<\/label>)[\s\S])*<input id="hero-quantity"[^>]*>\s*<\/label>/.test(home)) {
   failures.push("Homepage quantity intake control must be nested inside its label");
+}
+if (!/<label for="hero-material">(?:(?!<\/label>)[\s\S])*<select id="hero-material"(?:(?!<\/label>)[\s\S])*<\/select>\s*<\/label>/.test(home)) {
+  failures.push("Homepage material intake control must be nested inside its label");
 }
 if (home.includes('class="hero-review-card"')) failures.push("Homepage still contains the floating glass intake card");
 if (/data-assay-stage|assay-canvas-host|assay-fallback/.test(home)) {
@@ -214,68 +214,68 @@ const seoPages = [
   {
     path: "industrial-x-ray-silver-recycling",
     title: "Industrial NDT Film Silver Recycling in Houston | AG Refining",
-    description: "Recycle qualifying industrial NDT film in Houston with AG Refining. Get clear guidance, free qualifying pickup, and on-site weighing.",
-    h1: "Recover silver from industrial NDT film."
+    description: "Recycle industrial NDT film in Houston with AG Refining. We come to you, weigh the film on-site and give you a quote on the spot.",
+    h1: "Recover Silver From Industrial NDT Film"
   },
   {
     path: "sell-silver-coins-houston",
     title: "Sell Silver Coins in Houston | Clear Evaluations | AG Refining",
     description: "Sell silver coins in Houston with clear evaluations based on coin type, silver content, weight, condition, and current market values.",
-    h1: "Sell your silver coins in Houston."
+    h1: "Sell Your Silver Coins In Houston"
   },
   {
     path: "silver-flake-buyer-houston",
     title: "Silver Flake Buyer in Houston, TX | AG Refining",
     description: "Sell silver flake in Houston with an evaluation based on confirmed silver content, purity, weight, condition, and current market values.",
-    h1: "Sell silver flake in Houston."
+    h1: "Sell Silver Flake In Houston"
   },
   {
     path: "laboratory-silver-buyer-houston",
     title: "Laboratory Silver Buyer in Houston, TX | AG Refining",
     description: "Sell laboratory silver in Houston with evaluations based on confirmed recoverable silver, material condition, and current market values.",
-    h1: "Sell laboratory silver in Houston."
+    h1: "Sell Laboratory Silver In Houston"
   },
   {
     path: "silver-solder-buyer-houston",
     title: "Silver Solder Buyer in Houston, TX | AG Refining",
     description: "Sell silver solder in Houston with evaluations based on alloy, silver content, weight, condition, and current market values.",
-    h1: "Sell silver solder in Houston."
+    h1: "Sell Silver Solder In Houston"
   },
   {
     path: "silver-plated-materials-buyer-houston",
     title: "Silver-Plated Materials Buyer in Houston, TX | AG Refining",
-    description: "Sell silver-plated materials in Houston. AG Refining offers fair pricing, expert evaluations, and fast payment for silver-plated scrap.",
-    h1: "Sell silver-plated materials in Houston."
+    description: "Sell silver-plated items in Houston. Some plated pieces are worth selling and some are not. AG Refining comes to you and tells you straight.",
+    h1: "Sell Silver-Plated Materials In Houston"
   },
   {
     path: "dental-scrap-buyer-houston",
     title: "Dental Scrap Buyer Houston | Sell Dental Scrap | AG Refining",
-    description: "Sell dental scrap in Houston with material review, free qualifying pickup, on-site service, and pricing based on confirmed precious-metal content.",
-    h1: "Sell your dental scrap with confidence."
+    description: "Sell dental gold and silver scrap in Houston. AG Refining comes to your office or lab, weighs it in front of you and gives you a quote on the spot.",
+    h1: "Sell Your Dental Scrap With Confidence"
   },
   {
     path: "silver-oxide-watch-battery-recycling-houston",
     title: "Silver Oxide Watch Battery Recycling Houston | AG Refining",
-    description: "Recycle silver oxide watch batteries in Houston with material review, qualifying pickup, and recovery based on confirmed content and condition.",
-    h1: "Recycle silver oxide watch batteries in Houston."
+    description: "Recycle silver oxide watch batteries in Houston. Tell us the type and amount, and we will tell you what they are worth. We come to you.",
+    h1: "Recycle Silver Oxide Watch Batteries In Houston"
   },
   {
     path: "houston-silver-buyer",
     title: "Houston Silver Buyer | Sell Scrap Silver in Houston | AG Refining",
-    description: "Sell silver in Houston with AG Refining. Free pickup, on-site weighing, honest pricing, and payment terms confirmed with the offer.",
-    h1: "Sell your silver with confidence."
+    description: "Houston silver buyer in southeast Houston, near Hobby Airport. We come to your home or business and give you a quote on the spot. Gold too.",
+    h1: "Houston Silver Buyer In Southeast Houston"
   },
   {
     path: "x-ray-recycling-services-houston",
     title: "X-Ray Recycling Services Houston | X-Ray Film Recycling | AG Refining",
-    description: "Houston X-ray recycling services for qualifying medical and industrial film, with handling planning, silver recovery review, and professional service.",
-    h1: "Secure X-ray film recycling in Houston."
+    description: "Houston X-ray film recycling for medical, dental and industrial film. We come to you, plan safe handling and give you a quote on the spot.",
+    h1: "Secure X-Ray Film Recycling In Houston"
   },
   {
     path: "scrap-silver-buyer-houston",
     title: "Scrap Silver Buyer Houston | Sell Scrap Silver | AG Refining",
-    description: "Sell scrap silver in Houston with AG Refining. Free qualifying pickup, on-site weighing, and offers based on confirmed material and current market values.",
-    h1: "Turn your scrap silver into cash."
+    description: "Sell scrap silver in southeast Houston. AG Refining comes to your home or business and gives you a quote on the spot, based on the material and today's market.",
+    h1: "Turn Your Scrap Silver Into Cash"
   }
 ];
 
@@ -329,7 +329,7 @@ if (acceptedCards[0]?.[2] !== "/silver-oxide-watch-battery-recycling-houston" ||
 if (new Set(acceptedCards.map((match) => match[2])).size !== acceptedCards.length) {
   failures.push("Accepted materials contains a duplicate taxonomy destination");
 }
-if (!acceptedMaterials.includes("<h1>We purchase.</h1>")) failures.push("Accepted materials must use the exact We purchase. heading");
+if (!acceptedMaterials.includes("<h1>Everything We Buy</h1>")) failures.push("Accepted materials must use the exact Everything We Buy heading");
 
 const serviceAreas = readFileSync(join(out, "service-areas", "index.html"), "utf8");
 const serviceAreaRoutes = [
