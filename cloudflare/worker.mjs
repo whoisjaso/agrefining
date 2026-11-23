@@ -3,25 +3,14 @@
 // MANIFEST maps every public path to its KV key and content type. The three Vercel functions in /api
 // run unchanged through a small req/res adapter. Behavior mirrors vercel.json (cleanUrls, no trailing
 // slash, redirects, headers) plus Vercel's apex -> www domain redirect.
-import { MANIFEST } from "./manifest.generated.mjs";
+import { MANIFEST, REDIRECTS } from "./manifest.generated.mjs";
 import leads from "../api/leads.js";
 import receipt from "../api/receipt.js";
 import spot from "../api/spot.js";
 
 const API = { "/api/leads": leads, "/api/receipt": receipt, "/api/spot": spot };
 
-const REDIRECTS = {
-  "/home": ["/", 308], "/about-us": ["/about", 308],
-  "/silver-coin-buyers-houston": ["/sell-silver-coins-houston", 308],
-  "/dental-scrap": ["/dental-scrap-buyer-houston", 308], "/dental-scrap-buyer": ["/dental-scrap-buyer-houston", 308],
-  "/silver-oxide-battery-recycling": ["/silver-oxide-watch-battery-recycling-houston", 308],
-  "/watch-battery-recycling": ["/silver-oxide-watch-battery-recycling-houston", 308],
-  "/silver-oxide-watch-batteries": ["/silver-oxide-watch-battery-recycling-houston", 308],
-  "/x-ray-recycling": ["/x-ray-recycling-services-houston", 308], "/x-ray-film-recycling": ["/x-ray-recycling-services-houston", 308],
-  "/silver-scrap-buyer-houston": ["/scrap-silver-buyer-houston", 308], "/sell-scrap-silver": ["/scrap-silver-buyer-houston", 308],
-  "/contact-us": ["/contact", 308], "/index": ["/sitemap", 308], "/site-map": ["/sitemap", 308], "/site-index": ["/sitemap", 308],
-  "/faqs": ["/faq", 308], "/frequently-asked-questions": ["/faq", 308], "/app": ["/desk", 307]
-};
+// REDIRECTS is generated from vercel.json by cloudflare/build.mjs so both hosts stay in sync.
 
 function baseHeaders(path) {
   const h = new Headers({

@@ -25,7 +25,12 @@ const files = walk(dist).map((p) => {
   return { path: "/" + relative(dist, p).split("\\").join("/"), k: createHash("sha256").update(raw).digest("hex").slice(0, 32), t: TYPES[ext] || "application/octet-stream", b64: raw.toString("base64"), size: raw.length };
 });
 const manifest = Object.fromEntries(files.map((f) => [f.path, { k: f.k, t: f.t }]));
-writeFileSync(join(root, "cloudflare/manifest.generated.mjs"), "export const MANIFEST = " + JSON.stringify(manifest) + ";\n");
+const vercel = JSON.parse(readFileSync(join(root, "vercel.json"), "utf8"));
+const redirects = Object.fromEntries((vercel.redirects || []).map((r) => {
+  if (/[:(*]/.test(r.source)) throw new Error("pattern redirect not supported: " + r.source);
+  return [r.source, [r.destination, r.statusCode || (r.permanent === false ? 307 : 308)]];
+}));
+writeFileSync(join(root, "cloudflare/manifest.generated.mjs"), "export const MANIFEST = " + JSON.stringify(manifest) + ";\nexport const REDIRECTS = " + JSON.stringify(redirects) + ";\n");
 
 rmSync(out, { recursive: true, force: true }); mkdirSync(out);
 execFileSync("npx", ["-y", "esbuild", "cloudflare/worker.mjs", "--bundle", "--format=esm", "--platform=neutral", "--external:node:*", "--main-fields=module,main", `--outfile=${join(out, "worker.js")}`], { cwd: root, stdio: "inherit" });
