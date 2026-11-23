@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderReviewForm } from "../src/review-form.mjs";
 import { guides, guidesPublished, pendingPages, dennisConfirmed } from "./content/guides.mjs";
+import { areaPages } from "./content/areas.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const out = join(root, "dist");
@@ -2459,6 +2460,10 @@ function serviceAreasPage() {
       <div><h2 id="service-coverage-title">Houston Metro coverage</h2><p>Free pickup may be available for qualifying commercial accounts. We confirm the material, location, and schedule first.</p></div>
       <ul data-service-coverage>${serviceCoverageLinks.map(([city, href]) => `<li><a href="${href}">${city}</a></li>`).join("")}</ul>
     </div></section>
+    <section class="section service-coverage" aria-labelledby="southeast-areas-title"><div class="shell service-coverage-grid">
+      <div><h2 id="southeast-areas-title">Near our Hobby Airport office</h2><p>Directions, landmarks, and local answers for the areas closest to 9125 Airport Blvd.</p></div>
+      <ul>${areaPages.map((page) => `<li><a href="/${page.path}">${page.heading}</a></li>`).join("")}</ul>
+    </div></section>
     <section class="conversion-band"><div class="shell"><h2>Tell us where the material is.</h2><p>We will confirm whether the lot and location qualify for pickup.</p><a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></div></section>`;
   const path = "service-areas";
   mkdirSync(join(out, path), { recursive: true });
@@ -2657,7 +2662,8 @@ function relatedLinks(paths) {
   return paths.map((path) => {
     const service = allServicePagesByPath.get(path);
     const guide = guides.find((g) => g.path === path);
-    const label = service ? service.title.split(" | ")[0] : guide ? guide.heading : path === "how-it-works" ? "How It Works" : path === "contact" ? "Contact" : path;
+    const area = areaPages.find((g) => g.path === path);
+    const label = service ? service.title.split(" | ")[0] : guide ? guide.heading : area ? area.heading : path === "how-it-works" ? "How It Works" : path === "contact" ? "Contact" : path;
     return `<li><a href="/${path}">${label}</a></li>`;
   }).join("");
 }
@@ -2709,6 +2715,25 @@ for (const page of builtPendingPages) {
     pageSchema: [faqSchema(page.faqs)]
   }));
 }
+for (const page of areaPages) {
+  const canonical = `${siteUrl}/${page.path}`;
+  mkdirSync(join(out, page.path), { recursive: true });
+  writeFileSync(join(out, page.path, "index.html"), document({
+    title: page.title,
+    description: page.description,
+    path: page.path,
+    content: renderLongform(page, [["Home", "/"], ["Service areas", "/service-areas"], [page.city, null]]),
+    pageSchema: [{
+      "@type": "Service",
+      "@id": `${canonical}#service`,
+      name: `Silver buying for ${page.city}`,
+      serviceType: "Silver buying",
+      provider: { "@id": organizationId },
+      areaServed: page.areaServed.map((name) => ({ "@type": "Place", name: `${name}, TX` }))
+    }, faqSchema(page.faqs)]
+  }));
+}
+const areaPaths = areaPages.map((p) => p.path);
 const guidePaths = ["guides", ...guides.map((g) => g.path), ...builtPendingPages.map((p) => p.path)];
 
 // Human-readable site index: one page that links every public route so
@@ -2717,7 +2742,7 @@ const siteIndexGroups = [
   ["Core pages", "Start here.", [["Home", "/"], ["Materials We Buy", "/accepted-materials"], ["Industries We Serve", "/industries"], ["Service Areas", "/service-areas"], ["How It Works", "/how-it-works"], ["Our Story", "/about"], ["FAQ", "/faq"], ["Contact and Pickup", "/contact"], ["Español", "/espanol"], ["Privacy", "/privacy"]]],
   ["Material pages", "Each page explains what qualifies and how pickup works.", materialPages.map((page) => [page.title.split(" | ")[0], `/${page.path}`])],
   ["Industry pages", "Silver service by the kind of business you run.", industryPages.map((page) => [page.heading, `/${page.path}`])],
-  ["Service area pages", "Pickup routes across the Houston Metro Area.", locationPages.map((page) => [`${page.city} silver buyer`, `/${page.path}`])],
+  ["Service area pages", "Pickup routes across the Houston Metro Area.", [...locationPages.map((page) => [`${page.city} silver buyer`, `/${page.path}`]), ...areaPages.map((page) => [`${page.city} silver buyer`, `/${page.path}`])]],
   ["Guides", "Sourced answers for sellers and businesses.", [["All Guides", "/guides"], ...guides.map((g) => [g.heading, `/${g.path}`]), ...builtPendingPages.map((p) => [p.heading, `/${p.path}`])]],
   ["Machine-readable resources", "For search engines and AI assistants.", [["XML sitemap", "/sitemap.xml"], ["robots.txt", "/robots.txt"], ["llms.txt", "/llms.txt"], ["llms-full.txt", "/llms-full.txt"]]]
 ];
@@ -2800,6 +2825,10 @@ const llmsIndex = [
   ...guides.map((g) => `- [${g.heading}](${siteUrl}/${g.path}): ${g.answer}`),
   ...builtPendingPages.map((p) => `- [${p.heading}](${siteUrl}/${p.path}): ${p.answer}`),
   "",
+  "## Southeast Houston areas",
+  "",
+  ...areaPages.map((p) => `- [${p.heading}](${siteUrl}/${p.path}): ${p.answer}`),
+  "",
   "## Company pages",
   "",
   `- [How it works](${siteUrl}/how-it-works): the six-step process from first call to payment`,
@@ -2865,7 +2894,7 @@ writeFileSync(join(out, "llms-full.txt"), llmsFull.join("\n"));
 writeFileSync(join(out, `${indexNowKey}.txt`), indexNowKey);
 
 const staticPaths = ["", "accepted-materials", "industries", "service-areas", "how-it-works", "about", "contact", "espanol", "privacy", "faq", "sitemap"];
-const sitemapPaths = [...staticPaths, ...allServicePages.map((page) => page.path), ...guidePaths];
+const sitemapPaths = [...staticPaths, ...allServicePages.map((page) => page.path), ...areaPaths, ...guidePaths];
 function sitemapEntry(path) {
   const loc = path ? `${siteUrl}/${path}` : `${siteUrl}/`;
   const page = allServicePagesByPath.get(path);
