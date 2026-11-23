@@ -96,7 +96,7 @@ for (const path of htmlFiles) {
 
 const home = readFileSync(join(out, "index.html"), "utf8");
 const exactHomeChecks = [
-  "<title>Houston Silver Buyer | Sell Scrap Silver in Houston | AG Refining</title>",
+  "<title>AG Refining | Houston Silver Buyer Near Hobby Airport</title>",
   '<meta name="description" content="Sell silver in Houston with AG Refining. Free pickup, on-site weighing, honest pricing, and payment terms confirmed with the offer.">',
   "<h1>Your silver, valued precisely.</h1>"
 ];
@@ -438,7 +438,7 @@ if (!privacyPage.includes('<nav aria-label="Privacy sections">')) {
 
 const sitemap = readFileSync(join(out, "sitemap.xml"), "utf8");
 const sitemapEntries = (sitemap.match(/<url>/g) || []).length;
-if (sitemapEntries !== 40) failures.push(`Expected 40 sitemap pages, found ${sitemapEntries}`);
+if (sitemapEntries !== 52) failures.push(`Expected 52 sitemap pages, found ${sitemapEntries}`);
 const sitemapLocations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
 if (new Set(sitemapLocations).size !== sitemapLocations.length) failures.push("Sitemap contains a duplicate URL");
 
