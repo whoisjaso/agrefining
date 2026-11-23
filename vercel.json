@@ -143,6 +143,81 @@
       "source": "/app",
       "destination": "/desk",
       "permanent": false
+    },
+    {
+      "source": "/aboutus",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/aboutus.html",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/advantage",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/advantage.html",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/factory",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/factory.html",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/pricing",
+      "destination": "/how-it-works",
+      "permanent": true
+    },
+    {
+      "source": "/pricing.html",
+      "destination": "/how-it-works",
+      "permanent": true
+    },
+    {
+      "source": "/product",
+      "destination": "/accepted-materials",
+      "permanent": true
+    },
+    {
+      "source": "/product.html",
+      "destination": "/accepted-materials",
+      "permanent": true
+    },
+    {
+      "source": "/orderfaxform",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/orderfaxform.html",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/scrap-silver",
+      "destination": "/scrap-silver-buyer-houston",
+      "permanent": true
+    },
+    {
+      "source": "/blog",
+      "destination": "/guides",
+      "permanent": true
+    },
+    {
+      "source": "/hours",
+      "destination": "/contact",
+      "permanent": true
     }
   ]
 }
