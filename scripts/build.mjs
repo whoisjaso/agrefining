@@ -2649,8 +2649,8 @@ function articleSchema(page, canonical) {
     "@id": `${canonical}#article`,
     headline: page.heading,
     description: page.description,
-    datePublished: guidesPublished,
-    dateModified: guidesPublished,
+    datePublished: page.published || guidesPublished,
+    dateModified: page.published || guidesPublished,
     inLanguage: "en-US",
     author: { "@id": organizationId },
     publisher: { "@id": organizationId },
@@ -2689,8 +2689,8 @@ for (const page of guides) {
     path: page.path,
     content: renderLongform(page, [["Home", "/"], ["Guides", "/guides"], [page.heading, null]]),
     pageSchema: [articleSchema(page, canonical), faqSchema(page.faqs)],
-    datePublished: guidesPublished,
-    dateModified: guidesPublished
+    datePublished: page.published || guidesPublished,
+    dateModified: page.published || guidesPublished
   }));
 }
 const guidesHub = `

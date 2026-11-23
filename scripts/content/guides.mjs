@@ -107,6 +107,70 @@ export const guides = [
       ["Texas Health and Safety Code Chapter 181", "https://statutes.capitol.texas.gov/Docs/HS/htm/HS.181.htm"]
     ],
     related: ["medical-x-ray-recycling", "x-ray-recycling-services-houston", "hospital-silver-recycling"]
+  },
+  {
+    path: "guides/which-us-coins-are-silver",
+    published: "2026-11-23",
+    title: "Which U.S. Coins Are Silver? A Quick Date Guide | AG Refining",
+    description: "A simple date guide to U.S. silver coins: 90% dimes, quarters, and halves, 40% Kennedy halves, and 35% wartime nickels, with sources.",
+    eyebrow: "Guide for sellers",
+    heading: "Which U.S. Coins Are Silver? A Quick Date Guide",
+    answer: "U.S. dimes, quarters, and half dollars dated 1964 and earlier are 90% silver. Kennedy half dollars dated 1965 through 1970 are 40% silver. Jefferson nickels from late 1942 through 1945 with a large mint mark above Monticello are 35% silver. Circulating dimes, quarters, and half dollars made after those dates contain no silver.",
+    sections: [
+      ["The Quick Date Chart", "<ul><li><strong>Dimes dated 1964 and earlier:</strong> 90% silver.</li><li><strong>Quarters dated 1964 and earlier:</strong> 90% silver.</li><li><strong>Half dollars dated 1964 and earlier:</strong> 90% silver.</li><li><strong>Kennedy half dollars dated 1965 through 1970:</strong> 40% silver.</li><li><strong>Jefferson nickels from late 1942 through 1945 with a large P, D, or S above Monticello:</strong> 35% silver.</li><li><strong>Dimes and quarters dated 1965 and later, and half dollars dated 1971 and later:</strong> no silver.</li></ul>"],
+      ["Why 1964 Is the Cutoff", "<p>The Coinage Act of 1965 replaced silver in dimes and quarters with a clad coin: copper-nickel faces bonded to a copper core. It kept some silver in the half dollar, with a cladding of 80% silver over a silver-copper core, for a coin that is 40% silver overall. Later law removed silver from circulating half dollars starting with the 1971 date.</p>"],
+      ["The Copper Edge Test", "<p>Look at the edge of a dime, quarter, or half dollar. A clad coin shows a copper-colored stripe around the rim. A 90% silver coin has a solid silver-gray edge. The date is still the best check, because 40% half dollars also look silver on the edge.</p>"],
+      ["Wartime Nickels", "<p>During World War II, Congress ordered nickel removed from the five-cent coin. From late 1942 through 1945, the Mint struck nickels from 56% copper, 35% silver, and 9% manganese. These coins carry a large P, D, or S mint mark above the dome of Monticello on the back. Some 1942 nickels were made the old way, so look for the large mint mark, not just the date.</p>"],
+      ["Melt Value Versus Collector Value", "<p>Most worn silver coins sell for their silver content. Rare dates, uncirculated coins, and coins in sealed grading holders can be worth more to collectors. Do not clean coins. Cleaning can lower collector value and does not add silver.</p>"],
+      ["Selling a Jar or a Roll", "<ul><li>Pull out coins by date using the chart above.</li><li>Keep 90%, 40%, and wartime nickels in separate bags.</li><li>Leave coins in any original rolls, folders, or holders.</li><li>Call before you visit and tell us roughly how many of each you have.</li></ul><p>AG Refining is at 9125 Airport Blvd., Suite B-1, Houston, TX 77061. Call (281) 898-2719.</p>"]
+    ],
+    faqs: [
+      ["Are 1965 quarters silver?", "No. Circulating dimes and quarters dated 1965 and later are copper-nickel clad and contain no silver."],
+      ["Are Kennedy half dollars silver?", "Kennedy halves dated 1964 are 90% silver, those dated 1965 through 1970 are 40% silver, and circulating halves dated 1971 and later contain no silver."],
+      ["Which nickels contain silver?", "Jefferson nickels struck from late 1942 through 1945 with a large P, D, or S mint mark above Monticello are 35% silver."],
+      ["Should I clean old coins before selling them?", "No. Cleaning can lower collector value and does not change the silver content."]
+    ],
+    sources: [
+      ["Coinage Act of 1965, Public Law 89-81 (79 Stat. 254)", "https://www.govinfo.gov/content/pkg/STATUTE-79/pdf/STATUTE-79-Pg254.pdf"],
+      ["31 U.S. Code 5112, Denominations, specifications, and design of coins", "https://www.law.cornell.edu/uscode/text/31/5112"],
+      ["The National WWII Museum, US Money in World War II", "https://www.nationalww2museum.org/war/articles/united-states-money-in-world-war-ii"],
+      ["APMEX, History of 90% silver coins", "https://learn.apmex.com/learning-guide/history/the-history-of-90-precent-silver-coins/"]
+    ],
+    related: ["sell-silver-coins-houston", "guides/how-silver-is-valued", "silver-buyer-hobby-airport"]
+  },
+  {
+    path: "guides/id-to-sell-silver-texas",
+    published: "2026-11-23",
+    title: "What ID Do You Need To Sell Silver in Texas? | AG Refining",
+    description: "What Texas law asks of silver buyers and sellers: the ID record, the seller list, the 10-day hold, and why coins and bars are treated differently.",
+    eyebrow: "Guide for sellers",
+    heading: "What ID Do You Need To Sell Silver in Texas?",
+    answer: "Bring a government-issued photo ID. When a Texas dealer buys crafted precious metal, such as sterling flatware or jewelry, state law requires the dealer to record the seller’s driver’s license or Texas ID number, name, address, and a description of the items, and to report the purchase to local police. Sellers under 18 need written consent from a parent or guardian.",
+    sections: [
+      ["What the Law Covers", "<p>Texas Occupations Code Chapter 1956 regulates dealers that buy crafted precious metal. That means jewelry, silverware, art objects, and similar household items made wholly or partly of precious metal. The law specifically leaves out coins, bars, commemorative medallions, dental and medical items, and metal recovered from industrial waste. Those items fall outside this chapter’s reporting rules.</p>"],
+      ["What the Dealer Must Record", "<ul><li>Your name and address.</li><li>A complete description of the items you are selling.</li><li>Your signed statement that the information is true and complete.</li><li>Your driver’s license number or Texas Department of Public Safety ID number, recorded when you show the card in person.</li><li>For the police report: the date, a description of the items, your name, physical description, and address, and the dealer’s name and address.</li></ul>"],
+      ["Where the Report Goes", "<p>The dealer sends a copy of the list to the local chief of police, or to the county sheriff outside a city with a police department, within 48 hours. The dealer keeps a copy for three years. Peace officers can inspect purchased items during business hours.</p>"],
+      ["Why Items Are Held Before Melting", "<p>A dealer may not melt, alter, or dispose of reported crafted precious metal before the 11th day after the report is filed, with a few exceptions. If an officer suspects an item is stolen, the officer can place it on hold for up to 60 days. This protects families whose heirlooms were stolen.</p>"],
+      ["Selling for a Family Member or an Estate", "<p>The seller is the person who signs the list and shows ID. If you are selling for a parent or as part of an estate, bring your own ID and tell us the situation when you call. Sellers under 18 must bring a written statement from a parent or legal guardian consenting to the sale.</p>"],
+      ["Registration and Taxes", "<p>Businesses that buy and sell crafted precious metal must register with the Texas Office of Consumer Credit Commissioner. Texas does not charge sales tax on gold, silver, or numismatic coins, or on gold and silver bullion.</p>"],
+      ["What To Bring to AG Refining", "<p>Bring your silver as it is and a government-issued photo ID. If you only have an out-of-state license or a passport, call (281) 898-2719 first. We are at 9125 Airport Blvd., Suite B-1, Houston, TX 77061, open Monday through Friday 9:00 AM to 5:00 PM and Saturday 9:00 AM to 12:00 PM. This guide is general information, not legal advice.</p>"]
+    ],
+    faqs: [
+      ["Do I need ID to sell silver in Texas?", "Yes, for crafted precious metal such as sterling flatware and jewelry. Texas law requires the dealer to record your driver’s license or Texas ID number. Bring a government-issued photo ID."],
+      ["Why does the buyer write down my description?", "Texas law requires the dealer’s police report to include the seller’s name, physical description, and address."],
+      ["Can a buyer melt my silver the same day?", "Generally no. Reported crafted precious metal may not be melted or disposed of before the 11th day after the report is filed, with limited exceptions."],
+      ["Can a teenager sell silver?", "A dealer may not buy crafted precious metal from someone under 18 without a written statement from a parent or legal guardian consenting to the sale."]
+    ],
+    sources: [
+      ["Texas Occupations Code 1956.051, Definitions", "https://statutes.capitol.texas.gov/Docs/OC/htm/OC.1956.htm#1956.051"],
+      ["Texas Occupations Code 1956.062, Report of purchase required", "https://statutes.capitol.texas.gov/Docs/OC/htm/OC.1956.htm#1956.062"],
+      ["Texas Occupations Code 1956.063, Form of report", "https://statutes.capitol.texas.gov/Docs/OC/htm/OC.1956.htm#1956.063"],
+      ["Texas Occupations Code 1956.064, Required retention", "https://statutes.capitol.texas.gov/Docs/OC/htm/OC.1956.htm#1956.064"],
+      ["Texas Occupations Code 1956.066, Purchase from minor", "https://statutes.capitol.texas.gov/Docs/OC/htm/OC.1956.htm#1956.066"],
+      ["Texas OCCC, Crafted Precious Metal Dealers", "https://occc.texas.gov/industry/cpmd/"],
+      ["Texas Tax Code 151.336, Certain coins and precious metals", "https://statutes.capitol.texas.gov/Docs/TX/htm/TX.151.htm#151.336"]
+    ],
+    related: ["sell-estate-silver-houston", "guides/sterling-vs-silver-plate", "contact"]
   }
 ];
 
