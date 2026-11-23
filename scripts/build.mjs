@@ -2,6 +2,7 @@ import { cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderReviewForm } from "../src/review-form.mjs";
+import { guides, guidesPublished, pendingPages, dennisConfirmed } from "./content/guides.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const out = join(root, "dist");
@@ -47,6 +48,17 @@ const email = "dennis@agrefining.com";
 const street = "9125 Airport Blvd., Suite B-1";
 const cityLine = "Houston, TX 77061";
 const primaryCta = "Schedule a Free Pickup";
+// Hours match the verified Google Business Profile (set Nov 2026).
+const openingHours = [
+  { days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], label: "Monday to Friday", opens: "09:00", closes: "17:00", display: "9:00 AM to 5:00 PM" },
+  { days: ["Saturday"], label: "Saturday", opens: "09:00", closes: "12:00", display: "9:00 AM to 12:00 PM" }
+];
+const hoursLine = "Monday to Friday 9:00 AM to 5:00 PM, Saturday 9:00 AM to 12:00 PM, closed Sunday";
+// Add each official profile URL here once it is claimed and matches the NAP
+// exactly (Google Maps CID link, Bing Places, Apple Maps, Yelp, Facebook, BBB).
+const sameAsProfiles = [];
+// Pending pages describe services Dennis has not confirmed in writing yet.
+const includePending = process.env.AG_INCLUDE_PENDING === "1";
 const spanishPrimaryCta = "Programar Una Recogida Gratis";
 const arrow = '<span class="icon-arrow" aria-hidden="true"></span>';
 const titleCaseMinorWords = {
@@ -825,7 +837,7 @@ const locationPages = [
 ].map(([path, city, area, imageBase, emblem, artifactDescription, artifactScale, imageFocus, imageAlt]) => ({
   path,
   city,
-  title: `Silver Buyer in ${city}, TX | Free Qualifying Pickup | AG Refining`,
+  title: `Silver Buyer in ${city}, TX | Free Pickup | AG Refining`,
   description: `Sell qualifying silver in ${city}. AG Refining offers free commercial pickup, on-site weighing, honest pricing, and fast payment.`,
   eyebrow: "Houston Metro service",
   heading: `${city} silver buyer for commercial accounts.`,
@@ -1246,6 +1258,9 @@ const organizationSchema = {
   },
   geo: { "@type": "GeoCoordinates", ...geoCoordinates },
   hasMap: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${street}, ${cityLine}`)}`,
+  openingHoursSpecification: openingHours.map(({ days, opens, closes }) => ({ "@type": "OpeningHoursSpecification", dayOfWeek: days, opens, closes })),
+  ...(sameAsProfiles.length ? { sameAs: sameAsProfiles } : {}),
+  currenciesAccepted: "USD",
   areaServed: [
     { "@type": "AdministrativeArea", name: "Greater Houston Metro Area" },
     ...serviceCities.map((name) => ({ "@type": "City", name, containedInPlace: { "@type": "State", name: "Texas" } }))
@@ -1744,7 +1759,7 @@ const home = `
   </section>`;
 
 writeFileSync(join(out, "index.html"), document({
-  title: "Houston Silver Buyer | Sell Scrap Silver in Houston | AG Refining",
+  title: "AG Refining | Houston Silver Buyer Near Hobby Airport",
   description: "Sell silver in Houston with AG Refining. Free pickup, on-site weighing, honest pricing, and payment terms confirmed with the offer.",
   content: home,
   moduleScripts: ["/cinematic-hero-video.js"],
@@ -2518,6 +2533,7 @@ const contact = `
       <a class="contact-line" href="tel:${phoneHref}"><span>Phone</span><strong>${phoneDisplay}</strong></a>
       <a class="contact-line" href="mailto:${email}"><span>Email</span><strong>${email}</strong></a>
       <div class="contact-line"><span>Address</span><strong>${street}<br>${cityLine}</strong></div>
+      <div class="contact-line"><span>Hours</span><strong>${openingHours.map((row) => `${row.label} ${row.display}`).join("<br>")}<br>Sunday closed</strong></div>
       <div class="contact-boundary"><h3>Before you ship or visit</h3><p>Call first. We will confirm the material, pickup option, and next step.</p></div>
     </aside>
     <div id="get-paid" class="contact-form-column"><p class="eyebrow">Pickup and quote request</p><h2>Start with a few details.</h2>${renderReviewForm({ locale: "en" })}</div>
@@ -2621,6 +2637,80 @@ writeFileSync(join(out, "faq", "index.html"), document({
   pageSchema: [faqSchema(allFaqItems)]
 }));
 
+// Guides (blog) and pending pages. Content lives in scripts/content/guides.mjs.
+function articleSchema(page, canonical) {
+  return {
+    "@type": "Article",
+    "@id": `${canonical}#article`,
+    headline: page.heading,
+    description: page.description,
+    datePublished: guidesPublished,
+    dateModified: guidesPublished,
+    inLanguage: "en-US",
+    author: { "@id": organizationId },
+    publisher: { "@id": organizationId },
+    mainEntityOfPage: canonical,
+    citation: page.sources.map(([name, url]) => ({ "@type": "CreativeWork", name, url }))
+  };
+}
+function relatedLinks(paths) {
+  return paths.map((path) => {
+    const service = allServicePagesByPath.get(path);
+    const guide = guides.find((g) => g.path === path);
+    const label = service ? service.title.split(" | ")[0] : guide ? guide.heading : path === "how-it-works" ? "How It Works" : path === "contact" ? "Contact" : path;
+    return `<li><a href="/${path}">${label}</a></li>`;
+  }).join("");
+}
+function renderLongform(page, crumbs) {
+  const confirmed = (page.confirmable || []).filter(([flag]) => dennisConfirmed[flag]).map(([, text]) => text);
+  return `
+  <section class="page-hero page-intro"><div class="shell">${breadcrumbs(crumbs)}<div class="page-intro-grid"><div><p class="eyebrow">${page.eyebrow}</p><h1>${page.heading}</h1></div><p class="answer-box">${page.answer}</p></div></div></section>
+  <section class="section"><div class="shell legal-grid"><nav aria-label="On this page">${page.sections.map(([h], i) => `<a href="#s${i + 1}">${h}</a>`).join("")}<a href="#questions">Common Questions</a><a href="#sources">Sources</a></nav><div>
+    ${confirmed.length ? `<section id="confirmed"><h2>How We Handle It</h2><ul>${confirmed.map((t) => `<li>${t}</li>`).join("")}</ul></section>` : ""}
+    ${page.sections.map(([h, body], i) => `<section id="s${i + 1}"><h2>${h}</h2>${body}</section>`).join("")}
+    <section id="questions"><h2>Common Questions</h2>${faqMarkup(page.faqs)}</section>
+    <section id="sources"><h2>Sources</h2><ul>${page.sources.map(([name, url]) => `<li><a href="${url}" rel="noopener">${name}</a></li>`).join("")}</ul><p>Last reviewed ${guidesPublished}. ${siteName}, ${street}, ${cityLine}. ${phoneDisplay}.</p></section>
+    <section><h2>Related Pages</h2><ul>${relatedLinks(page.related)}</ul></section>
+  </div></div></section>
+  <section class="conversion-band"><div class="shell"><p class="eyebrow">Questions about your silver?</p><h2>Call before you visit.</h2><p>${hoursLine}.</p><a class="button button-inverse" href="tel:${phoneHref}">Call ${phoneDisplay} ${arrow}</a></div></section>`;
+}
+for (const page of guides) {
+  const canonical = `${siteUrl}/${page.path}`;
+  mkdirSync(join(out, page.path), { recursive: true });
+  writeFileSync(join(out, page.path, "index.html"), document({
+    title: page.title,
+    description: page.description,
+    path: page.path,
+    content: renderLongform(page, [["Home", "/"], ["Guides", "/guides"], [page.heading, null]]),
+    pageSchema: [articleSchema(page, canonical), faqSchema(page.faqs)],
+    datePublished: guidesPublished,
+    dateModified: guidesPublished
+  }));
+}
+const guidesHub = `
+  <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["Guides", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Guides</p><h1>Plain Answers About Selling Silver.</h1></div><p>Short, sourced guides for families, collectors, and Houston businesses.</p></div></div></section>
+  <section class="section service-coverage"><div class="shell service-coverage-grid"><div><h2>All Guides</h2><p>Each guide lists its sources.</p></div><ul>${guides.map((g) => `<li><a href="/${g.path}">${g.heading}</a></li>`).join("")}</ul></div></section>`;
+mkdirSync(join(out, "guides"), { recursive: true });
+writeFileSync(join(out, "guides", "index.html"), document({
+  title: "Silver Selling Guides | AG Refining Houston",
+  description: "Sourced, plain-language guides on sterling marks, silver value, troy ounces, and X-ray film privacy from AG Refining in Houston.",
+  path: "guides",
+  content: guidesHub,
+  pageType: "CollectionPage"
+}));
+const builtPendingPages = pendingPages.filter((page) => !page.pending || includePending);
+for (const page of builtPendingPages) {
+  mkdirSync(join(out, page.path), { recursive: true });
+  writeFileSync(join(out, page.path, "index.html"), document({
+    title: page.title,
+    description: page.description,
+    path: page.path,
+    content: renderLongform(page, [["Home", "/"], [page.heading, null]]),
+    pageSchema: [faqSchema(page.faqs)]
+  }));
+}
+const guidePaths = ["guides", ...guides.map((g) => g.path), ...builtPendingPages.map((p) => p.path)];
+
 // Human-readable site index: one page that links every public route so
 // crawlers, answer engines, and people can reach any page in one hop.
 const siteIndexGroups = [
@@ -2628,6 +2718,7 @@ const siteIndexGroups = [
   ["Material pages", "Each page explains what qualifies and how pickup works.", materialPages.map((page) => [page.title.split(" | ")[0], `/${page.path}`])],
   ["Industry pages", "Silver service by the kind of business you run.", industryPages.map((page) => [page.heading, `/${page.path}`])],
   ["Service area pages", "Pickup routes across the Houston Metro Area.", locationPages.map((page) => [`${page.city} silver buyer`, `/${page.path}`])],
+  ["Guides", "Sourced answers for sellers and businesses.", [["All Guides", "/guides"], ...guides.map((g) => [g.heading, `/${g.path}`]), ...builtPendingPages.map((p) => [p.heading, `/${p.path}`])]],
   ["Machine-readable resources", "For search engines and AI assistants.", [["XML sitemap", "/sitemap.xml"], ["robots.txt", "/robots.txt"], ["llms.txt", "/llms.txt"], ["llms-full.txt", "/llms-full.txt"]]]
 ];
 const siteIndexContent = `
@@ -2678,6 +2769,8 @@ const llmsHeader = [
   `- Business: ${siteName}, family-owned, run by owner Dennis Stevens`,
   `- Address: ${street}, ${cityLine}, United States (call before shipping or visiting)`,
   `- Phone: ${phoneDisplay} (${phoneHref})`,
+  `- Hours: ${hoursLine}; please call before visiting`,
+  "- Nearby landmark: on Airport Blvd. near William P. Hobby Airport in southeast Houston",
   `- Email: ${email}`,
   `- Website: ${siteUrl}/`,
   "- Languages: English and Spanish",
@@ -2701,6 +2794,11 @@ const llmsIndex = [
   "## Service areas",
   "",
   ...locationPages.map((page) => `- [${page.city} silver buyer](${siteUrl}/${page.path}): ${plainText(page.intro)}`),
+  "",
+  "## Guides",
+  "",
+  ...guides.map((g) => `- [${g.heading}](${siteUrl}/${g.path}): ${g.answer}`),
+  ...builtPendingPages.map((p) => `- [${p.heading}](${siteUrl}/${p.path}): ${p.answer}`),
   "",
   "## Company pages",
   "",
@@ -2767,7 +2865,7 @@ writeFileSync(join(out, "llms-full.txt"), llmsFull.join("\n"));
 writeFileSync(join(out, `${indexNowKey}.txt`), indexNowKey);
 
 const staticPaths = ["", "accepted-materials", "industries", "service-areas", "how-it-works", "about", "contact", "espanol", "privacy", "faq", "sitemap"];
-const sitemapPaths = [...staticPaths, ...allServicePages.map((page) => page.path)];
+const sitemapPaths = [...staticPaths, ...allServicePages.map((page) => page.path), ...guidePaths];
 function sitemapEntry(path) {
   const loc = path ? `${siteUrl}/${path}` : `${siteUrl}/`;
   const page = allServicePagesByPath.get(path);
