@@ -899,7 +899,7 @@ const serviceCoverageLinks = [
 Object.assign(locationPages.find((page) => page.path === "houston-silver-buyer"), {
   layout: "houston-hub",
   title: "Houston Silver Buyer | Sell Scrap Silver in Houston | AG Refining",
-  description: "Sell silver in Houston with AG Refining. Free pickup, on-site weighing, honest pricing, and payment terms confirmed with the offer.",
+  description: "Houston silver buyer near Hobby Airport. Sell scrap silver, sterling, and silver coins with on-site weighing and free pickup for qualifying accounts.",
   eyebrow: "Houston silver buyer",
   heading: "Sell your silver with confidence.",
   intro: "AG Refining helps Houston businesses sell qualifying silver-bearing material. We offer clear evaluations, convenient pickup, on-site weighing, and prompt payment when the transaction qualifies.",
@@ -1725,9 +1725,9 @@ const home = `
 
   <section class="section location-section">
     <div class="shell location-grid">
-      <a class="location-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${street}, ${cityLine}`)}" target="_blank" rel="noopener" aria-label="Open in Google Maps: ${street}, ${cityLine}">
+      <a class="location-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${street}, ${cityLine}`)}" target="_blank" rel="noopener">
         <span class="location-map-kicker"><b>Ag / 47</b><span>Houston, Texas</span></span>
-        <span class="location-map-city" aria-hidden="true">HOU</span>
+        <span class="location-map-city" data-city="HOU" aria-hidden="true"></span>
         <span class="location-map-detail"><span>${street}<br>${cityLine}</span><strong>Open in Google Maps ${arrow}</strong></span>
       </a>
       <div class="location-copy">

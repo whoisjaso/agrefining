@@ -898,7 +898,7 @@ html[data-loader-state="ready"] .home-loader {
 
 .nav-links .language-note {
   color: currentColor;
-  opacity: 0.76;
+  opacity: 0.9;
 }
 
 .nav-links > a:not(.button)::after {
@@ -1901,6 +1901,10 @@ html[data-loader-state="ready"] .home-loader {
   font-weight: 760;
 }
 
+.location-map-city::before {
+  content: attr(data-city);
+}
+
 .location-map-city {
   align-self: center;
   color: rgba(250, 248, 242, 0.12);
@@ -2058,6 +2062,7 @@ html[data-loader-state="ready"] .home-loader {
 }
 
 .conversion-band .eyebrow {
+  color: #8aaccd;
   grid-column: 1 / -1;
 }
 
@@ -2681,9 +2686,16 @@ html[data-loader-state="ready"] .home-loader {
 .handling-inset,
 .coin-value-section,
 .houston-area-section {
+  --muted: #4d6074;
   background: #e6dfd3;
   border-block: 1px solid var(--line);
   padding-block: var(--section-tight);
+}
+
+.handling-inset .eyebrow,
+.coin-value-section .eyebrow,
+.houston-area-section .eyebrow {
+  color: #375d82;
 }
 
 .material-guardrail-grid,

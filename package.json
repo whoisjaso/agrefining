@@ -16,12 +16,14 @@
     "test:site-chrome": "node tests/site-chrome-browser.mjs",
     "test:service-areas": "node --test tests/service-area-artifacts-contract.test.mjs tests/service-area-image-contract.test.mjs",
     "test:materials-runtime": "node --test tests/materials-disclosure-runtime.test.mjs",
-    "verify": "npm run build && npm test && npm run test:assay && npm run check && node scripts/verify.mjs && npm run test:site-chrome && npm run test:desk",
+    "verify": "npm run build && npm test && npm run test:assay && npm run check && node scripts/verify.mjs && npm run test:site-chrome && npm run test:desk && npm run test:a11y",
     "submit:indexnow": "node scripts/indexnow.mjs",
-    "test:desk": "node tests/desk-browser.mjs"
+    "test:desk": "node tests/desk-browser.mjs",
+    "test:a11y": "node tests/a11y-browser.mjs"
   },
   "devDependencies": {
     "@sparticuz/chromium": "^149.0.0",
+    "axe-core": "^4.14.1",
     "jspdf": "^2.5.2",
     "playwright-core": "^1.61.1",
     "sharp": "^0.35.3",

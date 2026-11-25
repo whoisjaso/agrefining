@@ -265,7 +265,7 @@ const seoPages = [
   {
     path: "houston-silver-buyer",
     title: "Houston Silver Buyer | Sell Scrap Silver in Houston | AG Refining",
-    description: "Sell silver in Houston with AG Refining. Free pickup, on-site weighing, honest pricing, and payment terms confirmed with the offer.",
+    description: "Houston silver buyer near Hobby Airport. Sell scrap silver, sterling, and silver coins with on-site weighing and free pickup for qualifying accounts.",
     h1: "Sell your silver with confidence."
   },
   {
@@ -444,6 +444,45 @@ const sitemapEntries = (sitemap.match(/<url>/g) || []).length;
 if (sitemapEntries !== 54) failures.push(`Expected 54 sitemap pages, found ${sitemapEntries}`);
 const sitemapLocations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
 if (new Set(sitemapLocations).size !== sitemapLocations.length) failures.push("Sitemap contains a duplicate URL");
+
+// Every indexed page (including new guides and area pages) gets the same
+// baseline SEO and accessibility checks, driven by the sitemap so new routes
+// are covered without editing this list.
+const seenTitles = new Map();
+const seenDescriptions = new Map();
+for (const location of sitemapLocations) {
+  const route = new URL(location).pathname.replace(/^\/+/, "");
+  const file = route ? join(out, route, "index.html") : join(out, "index.html");
+  if (!existsSync(file)) {
+    failures.push(`Sitemap page ${location} has no built HTML file`);
+    continue;
+  }
+  const source = readFileSync(file, "utf8");
+  const label = route || "home";
+  const title = source.match(/<title>([^<]+)<\/title>/)?.[1]?.trim();
+  const description = source.match(/<meta name="description" content="([^"]+)">/)?.[1]?.trim();
+  if (!title) failures.push(`${label}: missing <title>`);
+  if (!description) failures.push(`${label}: missing meta description`);
+  if (title) {
+    if (seenTitles.has(title)) failures.push(`${label}: duplicate <title> shared with ${seenTitles.get(title)}`);
+    seenTitles.set(title, label);
+  }
+  if (description) {
+    if (seenDescriptions.has(description)) failures.push(`${label}: duplicate meta description shared with ${seenDescriptions.get(description)}`);
+    seenDescriptions.set(description, label);
+  }
+  if (!source.includes(`<link rel="canonical" href="${location}">`)) failures.push(`${label}: canonical does not match its sitemap URL`);
+  if (!/<html lang="(en|es)"/.test(source)) failures.push(`${label}: <html> is missing lang`);
+  if ((source.match(/<h1[\s>]/g) || []).length !== 1) failures.push(`${label}: must have exactly one <h1>`);
+  if (!/<main id="main"/.test(source)) failures.push(`${label}: missing <main id="main"> skip-link target`);
+  if (!source.includes("(281) 898-2719")) failures.push(`${label}: missing the exact phone number`);
+  for (const img of source.match(/<img\b[^>]*>/g) || []) {
+    if (!/\salt="/.test(img)) failures.push(`${label}: <img> without alt: ${img.slice(0, 80)}`);
+  }
+  for (const block of source.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+    try { JSON.parse(block[1]); } catch { failures.push(`${label}: JSON-LD does not parse`); }
+  }
+}
 
 for (const page of seoPages) {
   if (!sitemap.includes(`<loc>https://www.agrefining.com/${page.path}</loc>`)) {
