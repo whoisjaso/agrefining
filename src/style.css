@@ -3306,6 +3306,13 @@ html[data-loader-state="ready"] .home-loader {
     position: relative;
   }
 
+  /* The homepage hides the header until scroll (home-header-pending, set by an inline script),
+     so the no-JS fallback above must not put the open link list in flow there: it pushed the hero
+     down until site.js enhanced the nav, a 0.55 layout shift on phones. */
+  .home-header-pending .site-header:not([data-nav-enhanced="true"]) {
+    position: fixed;
+  }
+
   .site-header:not([data-nav-enhanced="true"]) .nav {
     align-items: flex-start;
     flex-wrap: wrap;
