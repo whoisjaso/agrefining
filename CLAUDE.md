@@ -1,14 +1,20 @@
 # AG Refining - Claude Code Handoff & Context
 
 > **Bridge file between Grok Bot and Claude Code.**
-> Last synced: **Wed Nov 25, 2026, 4:10 PM CT** against `origin/main` (`3c62894`).
+> Last synced: **Wed Nov 25, 2026, 4:30 PM CT** against `origin/main` (`6ac6c8d`).
 > Workflow: Jason runs `git pull` before each Claude Code session. Read this file for current ground truth, challenge or revamp the plan below, and write notes/decisions for Grok Bot in the **Claude to Grok Bot** section at the bottom before committing or handing back.
 
 ---
 
 ## 0. Site Build Queue (START HERE)
 
-**Update, Nov 25, 2026, 3:25 PM CT: Jason changed the call. The AG Refining bot (Grok Bot) is now executing this build queue itself, with Jason's OK to merge to `main`.** Claude Code: before touching any item below, check section 7 and leave a note there first so we never work the same item at the same time. Grok Bot also still owns research, listings and directories, GBP, the growth plan, drafts for Dennis, and this file. (Earlier call, 2:54 PM CT, had Claude owning builds; that is superseded.) Status of each item is logged in section 7.
+**Update, Nov 25, 2026, 4:28 PM CT: Jason changed the call again. Claude Code BUILDS from here on; the AG Refining bot (Grok Bot) is the adversarial reviewer.** Grok Bot stopped building at 4:28 PM CT and will review every Claude change against live: `npm run verify`, Lighthouse mobile x3, CLS, a11y, schema, Hard Rules (section 2). Claude: build, merge to `main` with Jason's OK, then log commits and live URLs in section 7 so Grok Bot can review. Grok Bot still owns research, listings and directories, GBP, the growth plan, drafts for Dennis, and this file. Items 1-9 below were done by Grok Bot earlier today (3:25-4:10 PM CT).
+
+### Claude's queue now (Jason said yes to all three, 4:26 PM CT)
+- **A. Homepage H1** to "Houston Silver Buyer, Valued Precisely." Title Case, design unchanged, keep meta/OG/schema consistent, single H1.
+- **B. Remove `app.agrefining.com`** from the `agrefining` Vercel project's domains (only that domain). Grok Bot's builder was stopped about a minute after starting, so check the project's domains first; it may already be gone. Confirm www and apex still serve and `/app` still 307s to `/desk`.
+- **C. Phone hero video encodes.** Smaller encodes of the two hero videos for under 768px, same look and content, keep posters and CLS 0. Report Lighthouse mobile before/after (3 runs).
+- **Heads-up:** PR #17 in your session showed Vercel "Account is blocked" (overdue balance). Today's production deploys from `main` came back READY. Check whether #17 is stale against current `main`; don't pay anything (billing belongs to Jason's Finance and Client Delivery bots).
 
 1. **DONE: Merge `blog-batch-4`.** Merged as `f8abd1f`. Both guides are live (200) and IndexNow accepted the URLs. The scrap guide cites the Texas 10-day hold (Occ. Code 1956.064); flag it if Dennis's practice differs.
 2. **WAITING: Dentist/counter payout calculator** (see "Ideola's Dentist Calculator Tweaks" in section 4). Build it on `/desk`: live spot price at the moment of sale, the customer sees only the payout, happy green approval and "you got paid" cues, dead simple for an older owner. Blocked on Jason sharing Ideola's file.
