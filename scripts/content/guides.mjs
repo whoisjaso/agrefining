@@ -285,6 +285,38 @@ export const guides = [
       ["Texas Occupations Code 1956.064, Required retention of crafted precious metal", "https://statutes.capitol.texas.gov/Docs/OC/htm/OC.1956.htm#1956.064"]
     ],
     related: ["scrap-silver-buyer-houston", "guides/how-silver-is-valued", "guides/inherited-sterling-flatware-tea-sets-houston", "contact"]
+  },
+  {
+    path: "guides/selling-silver-refiner-vs-pawn-shop-vs-online",
+    published: "2026-11-25",
+    title: "Selling Silver to a Refiner vs. a Pawn Shop vs. Online | AG Refining",
+    description: "How selling silver to a refiner or precious metal buyer compares with a pawn shop or an online mail-in buyer, and the questions to ask before you sell.",
+    eyebrow: "Guide for Sellers",
+    heading: "Selling Silver to a Refiner vs. a Pawn Shop vs. Online",
+    answer: "A refiner or precious metal buyer pays for the silver in your items, based on weight, purity, and the current silver market. A pawn shop can buy an item outright or make a pawn loan, and a pawn loan is not a sale: in Texas you can get the item back by repaying the loan and charges, and unredeemed items can be forfeited after a grace period of at least 30 days past the maturity date. Online and mail-in buyers can be convenient, but your silver leaves your hands before you see the final offer. The right choice depends on whether you want to sell or borrow, and whether your items are worth more than their silver.",
+    sections: [
+      ["How Each Option Works", "<ul><li><strong>Refiner or precious metal buyer:</strong> the buyer identifies the silver, weighs it, and makes an offer based on the recoverable silver and the current market. The items are usually melted and refined, so the offer is about metal content, not the item as a product.</li><li><strong>Pawn shop, outright sale:</strong> the shop buys the item and owns it. A pawn shop may resell the item as it is, so ask how the offer was set.</li><li><strong>Pawn shop, pawn loan:</strong> the shop holds your item as collateral for a short-term loan. You get cash now, and you get the item back only if you repay the loan and the pawn service charge.</li><li><strong>Online or mail-in buyer:</strong> you ship your silver, the buyer checks it, and then you get an offer or a payment. You do not see the weighing or testing in person.</li></ul>"],
+      ["When a Refiner or Precious Metal Buyer Makes Sense", "<p>A buyer that pays for metal content is a good fit for items whose value is mostly the silver itself:</p><ul><li>Sterling flatware, tea sets, and serving pieces marked 925 or Sterling</li><li>Broken or out-of-style silver jewelry and bench scrap</li><li>Pre-1965 U.S. dimes, quarters, and half dollars in circulated condition</li><li>Business material such as silver solder, contacts, lab silver, X-ray film, and silver oxide batteries</li></ul><p>Ask to watch the weighing, ask how purity was confirmed, and ask how non-silver parts such as knife blades, weighted bases, or stones are handled. See <a href=\"/guides/how-silver-buyers-price-scrap-houston\">how silver buyers price scrap</a> for the details.</p>"],
+      ["When a Pawn Shop Makes Sense", "<p>A pawn loan can make sense when you need short-term cash and want to keep the item. In Texas, the pawn ticket must show the amount financed, the finance charge, the total of payments, the annual percentage rate, and the maturity date, along with a statement that you are not required to redeem the item. The maturity date can be no more than one month after the loan, and the last day of grace is at least 30 days after the maturity date. If you do not redeem the item by then, the pawnbroker may take it into inventory.</p><p>If you do not want the item back, compare an outright pawn shop offer with an offer based on the silver content before you decide.</p>"],
+      ["When Selling Online or by Mail Makes Sense", "<p>Mail-in and online buyers can help when no local buyer handles your type of item. Before you ship anything, get these answers in writing:</p><ul><li>The buyer's physical business address and how long it has operated</li><li>Whether shipping is insured, and who pays for it</li><li>How long you have to accept or decline the offer, and what happens if you do not answer</li><li>Who pays return shipping if you say no</li><li>When and how you will be paid</li></ul><p>Take photos and note the weight of each item before you pack it.</p>"],
+      ["Items That May Be Worth More Than Their Silver", "<p>Some items are worth more to collectors than their silver content, such as rare or high-grade coins, signed antique silver, or pieces by well-known makers. Before selling those for metal value, consider asking a coin dealer, an antiques specialist, or an appraiser what you have. A metal buyer should tell you if an item looks like it deserves a second look.</p>"],
+      ["Questions To Ask Any Silver Buyer", "<ul><li>Can I watch you weigh the silver, and in what units?</li><li>How did you confirm the purity?</li><li>What weight was left out, and why?</li><li>Is the offer in writing, and how long is it good for?</li><li>When and how will I be paid?</li></ul><p>Bring a government-issued photo ID. Texas law requires dealers that buy crafted precious metal to record the seller's name, physical description, and address. Read more in our <a href=\"/guides/id-to-sell-silver-texas\">guide to ID for selling silver in Texas</a>.</p>"],
+      ["How AG Refining Works", "<p>AG Refining is a silver buyer at 9125 Airport Blvd., Suite B-1, Houston, TX 77061, near Hobby Airport. We review the silver, weigh it where you can see the scale, and explain the offer before you decide, with no pressure to sell. Hours are Monday through Friday 9:00 AM to 5:00 PM and Saturday 9:00 AM to 12:00 PM, closed Sunday. Call (281) 898-2719 before you visit. Hablamos español.</p>"]
+    ],
+    faqs: [
+      ["Is a pawn loan the same as selling my silver?", "No. A pawn loan uses your item as collateral. You can redeem it by repaying the loan and charges by the last day of grace. If you do not, the pawnbroker may keep the item."],
+      ["How long does a Texas pawn shop hold an item I do not redeem?", "Texas law requires the pawnbroker to hold pledged goods for at least 30 days after the maturity date on the pawn ticket. After that, the goods may be forfeited to the pawnbroker."],
+      ["Is it safe to mail silver to an online buyer?", "It can be, if you confirm the buyer's physical address, insured shipping, how long you have to decline an offer, and who pays return shipping. Get those terms in writing before you ship."],
+      ["Should I sell rare coins for their silver value?", "Not before you check. Some coins and antique pieces are worth more to collectors than their silver. Ask a coin dealer or appraiser first."]
+    ],
+    sources: [
+      ["Texas Finance Code 371.157, Pawn ticket", "https://statutes.capitol.texas.gov/Docs/FI/htm/FI.371.htm#371.157"],
+      ["Texas Finance Code 371.169, Unredeemed pledged goods; forfeiture", "https://statutes.capitol.texas.gov/Docs/FI/htm/FI.371.htm#371.169"],
+      ["7 Texas Administrative Code 85.405, Pawn transaction", "https://www.law.cornell.edu/regulations/texas/7-Tex-Admin-Code-SS-85-405"],
+      ["Texas Occupations Code 1956.063, Records of crafted precious metal purchases", "https://statutes.capitol.texas.gov/Docs/OC/htm/OC.1956.htm#1956.063"],
+      ["FTC Jewelry Guides, 16 CFR 23.5, Misrepresentation as to silver content", "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-23/section-23.5"]
+    ],
+    related: ["guides/how-silver-buyers-price-scrap-houston", "guides/how-silver-is-valued", "guides/id-to-sell-silver-texas", "contact"]
   }
 ];
 
