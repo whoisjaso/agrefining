@@ -94,6 +94,9 @@ Billing note: the monthly fee covers the website and hosting only. Physical item
   5. `/guides/id-to-sell-silver-texas`
   6. `/guides/selling-silver-bars-and-rounds-houston`
   7. `/guides/commercial-dental-industrial-silver-houston`
+- **2 staged guides on `blog-batch-4` (awaiting Jason OK to merge):**
+  8. `/guides/inherited-sterling-flatware-tea-sets-houston` (*Selling Inherited Sterling Flatware and Tea Sets in Houston: Weighted and Hollow Pieces*)
+  9. `/guides/how-silver-buyers-price-scrap-houston` (*How Silver Buyers Price Scrap in Houston: Daily Spot Prices, Purity, and Offers*)
 - **SE Houston area pages:** `/silver-buyer-hobby-airport`, `/silver-buyer-south-houston`, `/silver-buyer-clear-lake`, and `/sell-estate-silver-houston` are live. `/silver-buyer-pasadena` and `/silver-buyer-pearland` exist but still use generic template copy.
 
 ### Buy Desk (`/desk`, `/app` 307-redirects to `/desk`)
