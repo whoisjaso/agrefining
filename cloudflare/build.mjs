@@ -31,6 +31,11 @@ const redirects = Object.fromEntries((vercel.redirects || []).map((r) => {
   return [r.source, [r.destination, r.statusCode || (r.permanent === false ? 307 : 308)]];
 }));
 writeFileSync(join(root, "cloudflare/manifest.generated.mjs"), "export const MANIFEST = " + JSON.stringify(manifest) + ";\nexport const REDIRECTS = " + JSON.stringify(redirects) + ";\n");
+// `--manifest-only` stops here (used by cloudflare/parity-test.mjs); nothing is uploaded either way.
+if (process.argv.includes("--manifest-only")) {
+  console.log(JSON.stringify({ manifestOnly: true, files: files.length, redirects: Object.keys(redirects).length }));
+  process.exit(0);
+}
 
 rmSync(out, { recursive: true, force: true }); mkdirSync(out);
 execFileSync("npx", ["-y", "esbuild", "cloudflare/worker.mjs", "--bundle", "--format=esm", "--platform=neutral", "--external:node:*", "--main-fields=module,main", `--outfile=${join(out, "worker.js")}`], { cwd: root, stdio: "inherit" });

@@ -19,7 +19,8 @@
     "verify": "npm run build && npm test && npm run test:assay && npm run check && node scripts/verify.mjs && npm run test:site-chrome && npm run test:desk && npm run test:a11y",
     "submit:indexnow": "node scripts/indexnow.mjs",
     "test:desk": "node tests/desk-browser.mjs",
-    "test:a11y": "node tests/a11y-browser.mjs"
+    "test:a11y": "node tests/a11y-browser.mjs",
+    "test:cloudflare": "node cloudflare/build.mjs --manifest-only && node cloudflare/parity-test.mjs"
   },
   "devDependencies": {
     "@sparticuz/chromium": "^149.0.0",
