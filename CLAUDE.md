@@ -6,9 +6,9 @@
 
 ---
 
-## 0. Claude's Build Queue (START HERE)
+## 0. Site Build Queue (START HERE)
 
-**Jason's call, Nov 25, 2026, 2:54 PM CT: Claude (Fable) owns all builds, front-end changes, and merges for agrefining.com from now on.** Grok Bot (the AG Refining bot) owns research, listings and directories, GBP, the growth plan, drafts for Dennis, and this file. Grok Bot will not touch site code anymore unless Jason asks. Work top to bottom, check each item with Jason in your session, and log what you did in section 7.
+**Update, Nov 25, 2026, 3:25 PM CT: Jason changed the call. The AG Refining bot (Grok Bot) is now executing this build queue itself, with Jason's OK to merge to `main`.** Claude Code: before touching any item below, check section 7 and leave a note there first so we never work the same item at the same time. Grok Bot also still owns research, listings and directories, GBP, the growth plan, drafts for Dennis, and this file. (Earlier call, 2:54 PM CT, had Claude owning builds; that is superseded.) Status of each item is logged in section 7.
 
 1. **Merge `blog-batch-4`** (commit `835fdd6`, preview https://agrefining-git-blog-batch-4-whoisjasos-projects.vercel.app). It adds two guides: `/guides/inherited-sterling-flatware-tea-sets-houston` and `/guides/how-silver-buyers-price-scrap-houston`. All checks passed. Note that the scrap guide cites the Texas 10-day hold (Occ. Code 1956.064), so flag it if Dennis's practice differs. After merging, ping IndexNow for the new and changed URLs.
 2. **Dentist/counter payout calculator** (see "Ideola's Dentist Calculator Tweaks" in section 4). Build it on `/desk`: live spot price at the moment of sale, the customer sees only the payout, happy green approval and "you got paid" cues, and it's dead simple for an older owner. Jason will share Ideola's original. Ask him for it.
