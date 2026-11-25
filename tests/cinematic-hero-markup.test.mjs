@@ -97,6 +97,7 @@ test("the generated hero directly nests the permanent poster and exactly two ine
   assert.equal(media[0].inner.slice(0, poster.start).trim(), "", "the poster must be a direct first child of the media shell");
   assert.equal(media[0].inner.slice(poster.end, stack.start).trim(), "", "the video stack must directly follow the poster");
   assert.equal(media[0].inner.slice(stack.end).trim(), "", "the video stack must be the final direct child of the media shell");
+  assert.match(poster.html, /<source media="\(max-width: 767px\)" srcset="\/images\/ag-refining-molten-pour-poster-1280\.webp" width="1280" height="720">/, "phones must get the 1280px poster, not the 2560px desktop asset");
   assert.match(poster.html, /<img src="\/images\/ag-refining-molten-pour-poster\.webp" alt="" width="2560" height="1440" fetchpriority="high">/);
   assert.doesNotMatch(poster.html, /loading="lazy"/);
 
@@ -105,7 +106,7 @@ test("the generated hero directly nests the permanent poster and exactly two ine
   for (const [index, video] of videos.entries()) {
     const videoAttributes = attributes(video);
     assert.match(videoAttributes, new RegExp(`data-video-layer="${index}"`));
-    for (const required of ["autoplay", "muted", "playsinline", 'aria-hidden="true"', 'tabindex="-1"', 'preload="none"', 'poster="/images/ag-refining-molten-pour-poster.webp"']) {
+    for (const required of ["autoplay", "muted", "playsinline", 'aria-hidden="true"', 'tabindex="-1"', 'preload="none"', 'poster="/images/ag-refining-molten-pour-poster-1280.webp"']) {
       assert.match(videoAttributes, new RegExp(`\\b${required}`), `video ${index} must include ${required}`);
     }
     assert.doesNotMatch(videoAttributes, /\b(?:controls|loop)\b/, `video ${index} must stay inert`);

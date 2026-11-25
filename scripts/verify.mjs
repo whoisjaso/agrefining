@@ -115,6 +115,9 @@ else {
     if (!poster.includes('src="/images/ag-refining-molten-pour-poster.webp"') || !poster.includes('width="2560" height="1440"')) {
       failures.push("Homepage hero must use the eager, dimensioned molten-pour poster");
     }
+    if (!poster.includes('<source media="(max-width: 767px)" srcset="/images/ag-refining-molten-pour-poster-1280.webp"')) {
+      failures.push("Homepage hero must serve the phone-sized 1280px poster below 768px");
+    }
     if (!poster.includes('fetchpriority="high"') || poster.includes('loading="lazy"')) {
       failures.push("Homepage hero picture must remain eager first-paint media");
     }

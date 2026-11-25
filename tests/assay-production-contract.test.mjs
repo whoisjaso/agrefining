@@ -98,6 +98,7 @@ test("the deployable homepage hero uses a permanent cinematic poster and two def
   const stacks = hero.match(/<div class="cinematic-hero-video-stack"[\s\S]*?<\/div>/g) || [];
 
   assert.equal(posters.length, 1, "the hero must contain exactly one cinematic poster");
+  assert.match(posters[0], /<source media="\(max-width: 767px\)" srcset="\/images\/ag-refining-molten-pour-poster-1280\.webp" width="1280" height="720">/, "phones must get the 1280px poster, not the 2560px desktop asset");
   assert.match(posters[0], /<img src="\/images\/ag-refining-molten-pour-poster\.webp" alt="" width="2560" height="1440" fetchpriority="high">/);
   assert.equal(stacks.length, 1, "the hero must contain one cinematic video stack");
   const videos = stacks[0].match(/<video class="cinematic-hero-video"[\s\S]*?<\/video>/g) || [];

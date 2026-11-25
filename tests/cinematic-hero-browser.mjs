@@ -461,7 +461,7 @@ async function runNormalCycle(browser, baseUrl, viewport) {
   const activeSequence = [0];
 
   const resourceBeforeSwap = await page.evaluate(() => performance.getEntriesByType("resource").map(({ name, startTime, responseEnd, initiatorType }) => ({ name, startTime, responseEnd, initiatorType })));
-  const posterResource = resourceBeforeSwap.find(({ name }) => name.includes("/images/ag-refining-molten-pour-poster.webp"));
+  const posterResource = resourceBeforeSwap.find(({ name }) => name.includes("/images/ag-refining-molten-pour-poster"));
   const moduleResource = resourceBeforeSwap.find(({ name }) => name.includes("/cinematic-hero-video.js"));
   assert.ok(posterResource && moduleResource, `${viewport.name}: poster or cinematic module missing from first-paint resources`);
   assert.ok(posterResource.startTime <= moduleResource.startTime, `${viewport.name}: poster request did not begin before cinematic module request`);

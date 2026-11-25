@@ -1,5 +1,5 @@
 const CLIPS = [
-  { key: "molten-pour", poster: "/images/ag-refining-molten-pour-poster.webp" },
+  { key: "molten-pour", poster: "/images/ag-refining-molten-pour-poster-1280.webp" },
   { key: "silver-ingots", poster: "/images/ag-refining-silver-ingots-poster.webp" },
   { key: "precision-assay", poster: "/images/ag-refining-precision-assay-poster.webp" }
 ];

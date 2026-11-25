@@ -14,6 +14,7 @@ const clips = [
 ];
 const posters = [
   { name: "ag-refining-molten-pour-poster.webp", width: 2560, height: 1440, minBytes: 80 * 1024, maxBytes: 600 * 1024 },
+  { name: "ag-refining-molten-pour-poster-1280.webp", width: 1280, height: 720, minBytes: 10 * 1024, maxBytes: 96 * 1024 },
   { name: "ag-refining-silver-ingots-poster.webp", width: 1280, height: 720, minBytes: 10 * 1024, maxBytes: 96 * 1024 },
   { name: "ag-refining-precision-assay-poster.webp", width: 1280, height: 720, minBytes: 10 * 1024, maxBytes: 96 * 1024 }
 ];

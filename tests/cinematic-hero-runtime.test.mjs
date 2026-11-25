@@ -326,7 +326,7 @@ test("kills mutation: clip records are reordered, a third clip is eagerly assign
   ]);
   assert.equal(active.preload, "auto");
   assert.equal(prepared.preload, "metadata");
-  assert.equal(active.poster, "/images/ag-refining-molten-pour-poster.webp");
+  assert.equal(active.poster, "/images/ag-refining-molten-pour-poster-1280.webp");
   assert.equal(prepared.poster, "/images/ag-refining-silver-ingots-poster.webp");
   assert.deepEqual(active.assignments.map(({ format }) => format), ["webm", "mp4"]);
   assert.deepEqual(prepared.assignments.map(({ format }) => format), ["webm", "mp4"]);
