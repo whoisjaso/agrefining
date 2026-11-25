@@ -98,7 +98,7 @@ const home = readFileSync(join(out, "index.html"), "utf8");
 const exactHomeChecks = [
   "<title>AG Refining | Houston Silver Buyer Near Hobby Airport</title>",
   '<meta name="description" content="Sell silver in Houston with AG Refining. Free pickup, on-site weighing, honest pricing, and payment terms confirmed with the offer.">',
-  "<h1>Your silver, valued precisely.</h1>"
+  "<h1>Houston Silver Buyer, Valued Precisely.</h1>"
 ];
 for (const expected of exactHomeChecks) {
   if (!home.includes(expected)) failures.push(`Homepage is missing: ${expected}`);

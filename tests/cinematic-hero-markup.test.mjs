@@ -128,7 +128,7 @@ test("the generated hero keeps the stable overlay behind the streamlined commerc
   assert.ok(hero.indexOf('class="cinematic-hero-media"') < hero.indexOf('class="cinematic-hero-overlay"'));
   assert.ok(hero.indexOf('class="cinematic-hero-overlay"') < hero.indexOf('class="shell hero-commercial-grid"'));
   assert.equal((hero.match(/<h1(?:\s[^>]*)?>/g) || []).length, 1);
-  assert.match(hero, /<h1>Your silver, valued precisely\.<\/h1>/);
+  assert.match(hero, /<h1>Houston Silver Buyer, Valued Precisely\.<\/h1>/);
   assert.doesNotMatch(hero, /class="hero-kicker"/, "the hero kicker should be removed to keep the first screen quieter");
   assert.match(hero, /Free pickup for qualifying Houston accounts\. See the weight, review the offer, and choose what happens next\./);
   assert.match(hero, /href="\/contact\?intent=pickup">Schedule a Free Pickup<\/a>/);

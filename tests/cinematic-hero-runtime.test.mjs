@@ -167,7 +167,7 @@ class FakeRoot extends EventTarget {
     this.videos = [new FakeVideo(0), new FakeVideo(1)];
     this.poster = new FakePoster();
     this.heroContent = {
-      heading: "Your silver, valued precisely.",
+      heading: "Houston Silver Buyer, Valued Precisely.",
       actions: ["Schedule a free pickup", "See what we buy"]
     };
   }
@@ -249,9 +249,15 @@ async function settle() {
   await new Promise((resolve) => setImmediate(resolve));
 }
 
-function createHarness({ reducedMotion = false, saveData = false, roots } = {}) {
+function createHarness({ reducedMotion = false, saveData = false, roots, phone = false } = {}) {
   const root = roots?.[0] || new FakeRoot();
   const documentRef = new FakeDocument(roots || [root]);
+  documentRef.defaultView.matchMedia = (query) => ({
+    matches: phone && String(query).includes("max-width: 767px"),
+    media: query,
+    addEventListener() {},
+    removeEventListener() {}
+  });
   const timers = new TimerHarness();
   const options = {
     documentRef,
@@ -310,6 +316,29 @@ function hideAndBeginIncomingRecovery(harness, incoming, recoveryPlay) {
   harness.documentRef.hidden = false;
   harness.documentRef.dispatchEvent(new Event("visibilitychange"));
 }
+
+
+test("phones below 768px receive the smaller mobile hero encodes, desktop keeps the 1280px files", async () => {
+  const phone = createHarness({ phone: true });
+  await startPlaying(phone);
+  assert.deepEqual(phone.root.videos[0].sources.map((source) => source.src), [
+    "/videos/ag-refining-molten-pour-mobile.webm",
+    "/videos/ag-refining-molten-pour-mobile.mp4"
+  ]);
+  assert.deepEqual(phone.root.videos[1].sources.map((source) => source.src), [
+    "/videos/ag-refining-silver-ingots-mobile.webm",
+    "/videos/ag-refining-silver-ingots-mobile.mp4"
+  ]);
+  assert.equal(phone.root.videos[0].poster, "/images/ag-refining-molten-pour-poster-1280.webp");
+  assert.equal(phone.root.videos[1].poster, "/images/ag-refining-silver-ingots-poster.webp");
+
+  const desktop = createHarness();
+  await startPlaying(desktop);
+  assert.deepEqual(desktop.root.videos[0].sources.map((source) => source.src), [
+    "/videos/ag-refining-molten-pour.webm",
+    "/videos/ag-refining-molten-pour.mp4"
+  ]);
+});
 
 test("kills mutation: clip records are reordered, a third clip is eagerly assigned, or MP4 is assigned before WebM", async () => {
   const harness = createHarness();

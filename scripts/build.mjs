@@ -1251,7 +1251,7 @@ const organizationSchema = {
   alternateName: ["Ag Refining", "AG Refining Houston"],
   legalName: "AG Refining",
   description: businessDescription,
-  slogan: "Your silver, valued precisely.",
+  slogan: "Houston Silver Buyer, Valued Precisely.",
   url: `${siteUrl}/`,
   logo: { "@type": "ImageObject", url: `${siteUrl}/assets/ag-mark-path.svg` },
   image: [`${siteUrl}/assets/ag-silver-social.jpg`, `${siteUrl}/assets/ag-silver-hero-1600.webp`],
@@ -1553,7 +1553,7 @@ const home = `
     <div class="cinematic-hero-overlay" aria-hidden="true"></div>
     <div class="shell hero-commercial-grid">
       <div class="hero-copy">
-        <h1>Your silver, valued precisely.</h1>
+        <h1>Houston Silver Buyer, Valued Precisely.</h1>
         <p class="hero-lede">Free pickup for qualifying Houston accounts. See the weight, review the offer, and choose what happens next.</p>
         <div class="hero-actions">
           <a class="button button-primary" href="/contact?intent=pickup">${primaryCta}</a>

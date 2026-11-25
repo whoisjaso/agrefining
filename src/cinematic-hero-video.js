@@ -5,6 +5,17 @@ const CLIPS = [
 ];
 
 const ROOT_CONTROLLER_PROPERTY = "cinematicHeroVideoController";
+const PHONE_VIDEO_QUERY = "(max-width: 767px)";
+
+function usesPhoneHeroVideo(documentRef) {
+  return Boolean(documentRef?.defaultView?.matchMedia?.(PHONE_VIDEO_QUERY)?.matches);
+}
+
+function clipSourcePath(clip, format, phone) {
+  const suffix = phone ? "-mobile" : "";
+  return `/videos/ag-refining-${clip.key}${suffix}.${format}`;
+}
+
 const VISIBLE_CLASS = "is-visible";
 const POSTER_HIDDEN_CLASS = "is-hidden";
 
@@ -193,10 +204,11 @@ export class CinematicHeroVideo {
     layer.muted = true;
     layer.defaultMuted = true;
     layer.playsInline = true;
+    const phone = usesPhoneHeroVideo(this.documentRef);
     const webm = layer.querySelector('[data-video-format="webm"]');
     const mp4 = layer.querySelector('[data-video-format="mp4"]');
-    webm?.setAttribute("src", `/videos/ag-refining-${clip.key}.webm`);
-    mp4?.setAttribute("src", `/videos/ag-refining-${clip.key}.mp4`);
+    webm?.setAttribute("src", clipSourcePath(clip, "webm", phone));
+    mp4?.setAttribute("src", clipSourcePath(clip, "mp4", phone));
     layer.load();
     layer.pause();
   }

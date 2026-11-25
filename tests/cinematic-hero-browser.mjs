@@ -248,7 +248,7 @@ async function pageState(page) {
     const videos = Array.from(root?.querySelectorAll("video[data-video-layer]") ?? []);
     const overlay = document.querySelector(".cinematic-hero-overlay");
     const sourceRecords = videos.map((video) => Array.from(video.querySelectorAll("source"), (source) => source.getAttribute("src")));
-    const clipSources = [...new Set(sourceRecords.flat().filter(Boolean).map((src) => src.match(/ag-refining-([\w-]+)\.(?:webm|mp4)$/)?.[1]).filter(Boolean))];
+    const clipSources = [...new Set(sourceRecords.flat().filter(Boolean).map((src) => src.match(/ag-refining-([\w-]+?)(?:-mobile)?\.(?:webm|mp4)$/)?.[1]).filter(Boolean))];
     const rect = (selector) => {
       const element = document.querySelector(selector);
       if (!element) return null;
@@ -453,6 +453,12 @@ async function runNormalCycle(browser, baseUrl, viewport) {
   assert.ok(initial.controls.every((value) => value === false), `${viewport.name}: a video exposed controls`);
   assert.equal(initial.clipSources.length, 2, `${viewport.name}: initial source assignment did not contain exactly two clips`);
   assert.deepEqual(initial.clipSources.sort(), ["molten-pour", "silver-ingots"], `${viewport.name}: initial clips are not active plus next`);
+  const assignedSources = initial.sourceRecords.flat().filter(Boolean);
+  if (viewport.width < 768) {
+    assert.ok(assignedSources.every((src) => src.includes("-mobile.")), `${viewport.name}: phone viewports must use the mobile hero encodes`);
+  } else {
+    assert.ok(assignedSources.every((src) => !src.includes("-mobile.")), `${viewport.name}: 768px and up must keep the desktop hero encodes`);
+  }
   assert.equal(initial.overflow.scrollWidth, initial.overflow.clientWidth, `${viewport.name}: horizontal overflow`);
   const overlayBaseline = initial.overlay;
   const geometryBaseline = initial.rects;

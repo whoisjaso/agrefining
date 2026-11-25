@@ -73,7 +73,7 @@ test("the hero boundary includes nested sections before locating the following i
 test("the deployable homepage hero states the approved V2 value proposition", () => {
   const { hero } = homepageHero();
 
-  assert.match(hero, /<h1>Your silver, valued precisely\.<\/h1>/);
+  assert.match(hero, /<h1>Houston Silver Buyer, Valued Precisely\.<\/h1>/);
 });
 
 test("the deployable homepage hero presents both approved V2 actions", () => {

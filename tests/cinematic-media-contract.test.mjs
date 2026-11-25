@@ -68,6 +68,43 @@ test("cinematic source videos meet the production media contract", () => {
   }
 });
 
+
+test("phone cinematic source videos meet the production media contract", () => {
+  for (const [clip, minimumDuration, maximumDuration] of clips) {
+    for (const [extension, codec, maximumSize] of [
+      ["mp4", "h264", 1.2 * 1024 * 1024],
+      ["webm", "vp9", 1.1 * 1024 * 1024]
+    ]) {
+      const desktopPath = join(root, "videos", `${clip}.${extension}`);
+      const path = join(root, "videos", `${clip}-mobile.${extension}`);
+      assert.ok(existsSync(path), `Missing phone source media: ${path}`);
+      assert.ok(statSync(path).size > 80 * 1024, `${path} must be greater than 80 KiB`);
+      assert.ok(statSync(path).size <= maximumSize, `${path} exceeds its optimized phone file-size ceiling`);
+      assert.ok(statSync(path).size < statSync(desktopPath).size, `${path} must be smaller than the desktop encode`);
+
+      const probe = mediaProbe(path);
+      const videoStreams = probe.streams.filter((stream) => stream.codec_type === "video");
+      const audioStreams = probe.streams.filter((stream) => stream.codec_type === "audio");
+      const subtitleStreams = probe.streams.filter((stream) => stream.codec_type === "subtitle");
+      const dataStreams = probe.streams.filter((stream) => stream.codec_type === "data");
+      assert.equal(videoStreams.length, 1, `${path} must contain exactly one video stream`);
+      assert.equal(audioStreams.length, 0, `${path} must not contain audio streams`);
+      assert.equal(subtitleStreams.length, 0, `${path} must not contain subtitle streams`);
+      assert.equal(dataStreams.length, 0, `${path} must not contain data streams`);
+
+      const [video] = videoStreams;
+      assert.equal(video.codec_name, codec, `${path} must use ${codec}`);
+      assert.equal(video.pix_fmt, "yuv420p", `${path} must use yuv420p`);
+      assert.equal(video.width, 960, `${path} must be 960 pixels wide`);
+      assert.equal(video.height, 540, `${path} must be 540 pixels high`);
+      assert.equal(frameRate(video.r_frame_rate), 24, `${path} must be 24 fps`);
+
+      const duration = Number(probe.format.duration);
+      assert.ok(duration >= minimumDuration && duration <= maximumDuration, `${path} duration must be within ${minimumDuration}-${maximumDuration} seconds`);
+    }
+  }
+});
+
 test("cinematic posters meet the production media contract", async () => {
   for (const poster of posters) {
     const path = join(root, "images", poster.name);
