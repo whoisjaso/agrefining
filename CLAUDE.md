@@ -1,7 +1,7 @@
 # AG Refining - Claude Code Handoff & Context
 
 > **Bridge file between Grok Bot and Claude Code.**
-> Last synced: **Wed Nov 25, 2026 (America/Chicago / CT)** against `origin/main` (`402b6c2`).
+> Last synced: **Wed Nov 25, 2026, 4:10 PM CT** against `origin/main` (`3c62894`).
 > Workflow: Jason runs `git pull` before each Claude Code session. Read this file for current ground truth, challenge or revamp the plan below, and write notes/decisions for Grok Bot in the **Claude to Grok Bot** section at the bottom before committing or handing back.
 
 ---
@@ -10,15 +10,15 @@
 
 **Update, Nov 25, 2026, 3:25 PM CT: Jason changed the call. The AG Refining bot (Grok Bot) is now executing this build queue itself, with Jason's OK to merge to `main`.** Claude Code: before touching any item below, check section 7 and leave a note there first so we never work the same item at the same time. Grok Bot also still owns research, listings and directories, GBP, the growth plan, drafts for Dennis, and this file. (Earlier call, 2:54 PM CT, had Claude owning builds; that is superseded.) Status of each item is logged in section 7.
 
-1. **Merge `blog-batch-4`** (commit `835fdd6`, preview https://agrefining-git-blog-batch-4-whoisjasos-projects.vercel.app). It adds two guides: `/guides/inherited-sterling-flatware-tea-sets-houston` and `/guides/how-silver-buyers-price-scrap-houston`. All checks passed. Note that the scrap guide cites the Texas 10-day hold (Occ. Code 1956.064), so flag it if Dennis's practice differs. After merging, ping IndexNow for the new and changed URLs.
-2. **Dentist/counter payout calculator** (see "Ideola's Dentist Calculator Tweaks" in section 4). Build it on `/desk`: live spot price at the moment of sale, the customer sees only the payout, happy green approval and "you got paid" cues, and it's dead simple for an older owner. Jason will share Ideola's original. Ask him for it.
-3. **Mobile hero performance.** Serve a phone-sized hero instead of the 2560px asset (Home LCP 2.8s), and keep CLS at zero.
-4. **Accessibility.** Fix the eyebrow text contrast failure, and extend `scripts/verify.mjs` coverage to the new pages.
-5. **Localize the Pasadena and Pearland pages** with real routes, landmarks and local FAQs (see the Site Whiteboard).
-6. **Comparison page:** "Selling Silver to a Refiner vs. a Pawn Shop vs. Online". Keep it factual and don't name rivals.
-7. **Homepage H1.** Decide with Jason whether to add local intent. "Your silver, valued precisely." has no "Houston".
-8. **`app.agrefining.com`.** Resolve it or remove it from Vercel.
-9. **Cloudflare parity.** Get every `vercel.json` redirect and `/api/*` route working on Cloudflare before Dennis switches nameservers, because that's the way off the overdue Vercel bill.
+1. **DONE: Merge `blog-batch-4`.** Merged as `f8abd1f`. Both guides are live (200) and IndexNow accepted the URLs. The scrap guide cites the Texas 10-day hold (Occ. Code 1956.064); flag it if Dennis's practice differs.
+2. **WAITING: Dentist/counter payout calculator** (see "Ideola's Dentist Calculator Tweaks" in section 4). Build it on `/desk`: live spot price at the moment of sale, the customer sees only the payout, happy green approval and "you got paid" cues, dead simple for an older owner. Blocked on Jason sharing Ideola's file.
+3. **DONE: Mobile hero performance** (`2d16cfd`, plus `3c62894`). Phones (below 768px) get a 1280px poster (43 KB) instead of the 2560px one (186 KB), and the video layers use the 1280px poster (the film itself is 1280x720). `3c62894` fixes an intermittent 0.55 CLS on phones: the no-JS mobile nav fallback put the hidden homepage header in flow until `site.js` ran. Lighthouse mobile, Home: before 95 Perf / 96 A11y / LCP 2.8s / 2,789 KiB; after 99 Perf / 100 A11y / LCP 2.0s / 2,650 KiB / CLS 0 (three runs each). The two hero videos (about 2.3 MB) are now most of the page weight.
+4. **DONE: Accessibility** (`f52d4d1`). Fixed the conversion-band eyebrow contrast (2.6 to 6.2), small-text and eyebrow contrast on the tan `#e6dfd3` sections, the Spanish nav "en ingles" note, and the map card's label/name mismatch. `npm run verify` now also runs `npm run test:a11y` (axe-core, WCAG 2 A/AA, every sitemap page at phone and desktop width), and `scripts/verify.mjs` checks every sitemap page for title, meta description, unique titles/descriptions, canonical, lang, one H1, `<main id="main">`, the phone number, img alt, and valid JSON-LD. That caught a duplicate meta description on `/houston-silver-buyer`, now unique.
+5. **DONE: Pasadena and Pearland localized** (`0e8713b`). Real routes (Spencer Hwy and College Ave from Pasadena; Pearland Parkway or Main St/Telephone Rd to Monroe Rd from Pearland), OSRM drive distances, landmarks checked on official sites (Pasadena City Hall, San Jacinto College Central, Pearland City Hall, Pearland Town Center), and five local FAQs each. Content lives in `localServiceAreas` in `scripts/content/areas.mjs`.
+6. **DONE: Comparison guide** (`91b06b0`). `/guides/selling-silver-refiner-vs-pawn-shop-vs-online`, sourced to Texas Finance Code 371.157 and 371.169, 7 TAC 85.405, Occ. Code 1956.063, and the FTC Jewelry Guides. No rivals named, no prices. It's in the sitemap (now 55 URLs), `llms.txt`, and the guides hub.
+7. **RECOMMENDATION FOR JASON: Homepage H1.** Not changed. Recommend "Houston Silver Buyer, Valued Precisely." (Title Case, keeps the brand line, adds the city the H1 is missing). The title tag already says "Houston Silver Buyer Near Hobby Airport", so this is a small gain. Needs Jason's yes, since it's the hero headline Dennis sees first.
+8. **REPORT ONLY: `app.agrefining.com`.** Nothing removed. It's attached to Vercel project `agrefining` as a production domain (no redirect, no branch, verified), added Oct 11, 2026 3:21 PM CT by the `claude/app-subdomain` work to open the Buy Desk. Bluehost has no DNS record for it (NXDOMAIN), so it never resolves. The same day the Buy Desk moved to `www.agrefining.com/app` (a 307 to `/desk`), which works. Safe to remove from Vercel whenever Jason says so.
+9. **PREPPED: Cloudflare parity** on branch `cloudflare-parity` (`f6ca53a`, not merged, nothing deployed, no DNS changes). It adds `npm run test:cloudflare`, which runs the Worker locally against `dist/` and checks it against `vercel.json`: all 34 redirects, all 55 pages, the headers, apex to www, cleanUrls, the 404 page, video range requests, and `/api/leads` health. All green. The cutover checklist is in `cloudflare/README.md` on that branch. The big catch: `/review` (the counter card QR) is only built when `GOOGLE_REVIEW_URL` is set at build time, so the Cloudflare build must set it.
 10. **After the nameserver switch,** verify `agrefining.com` in Resend and move the lead sender from `agrefining@mail.olaceo.com` to an `@agrefining.com` address.
 11. **Ongoing:** two guides a month from the content calendar (one consumer, one B2B).
 
@@ -74,19 +74,19 @@ Billing note: the monthly fee covers the website and hosting only. Physical item
 - **Architecture:** Static HTML generator (`scripts/build.mjs`) + Vercel serverless functions (`api/leads.js`, `api/spot.js`, `api/receipt.js`), hosted on Vercel project `agrefining`, auto-deploying from `main`.
 - **Vercel overdue balance (OPEN RISK):** Live site is up today (all 52 sitemap URLs return HTTP 200), but there is an overdue $20 balance (bounced payment) that recently caused Vercel's "This deployment is temporarily paused" screen on Dennis's phone. Site can pause again without warning until resolved. Owned by Jason's Finance / Client Delivery bots.
 - **Cloudflare migration (PENDING DENNIS):** Cloudflare zone is created and waiting for Dennis to update nameservers at Bluehost (`marvin.ns.cloudflare.com` and `nelly.ns.cloudflare.com`). `cloudflare` branch and `.cf-deploy/` prep exist. Note: if moving off Vercel, `vercel.json` redirects and `/api/*` serverless routes (`leads`, `spot`, `receipt`) must also run on Cloudflare before cutting over. Never remove Vercel domains without Jason's OK.
-- **Open subdomain:** `app.agrefining.com` is attached to the Vercel project but does not resolve (needs Jason's decision).
+- **Open subdomain:** `app.agrefining.com` is attached to the Vercel project but has no DNS record at Bluehost, so it does not resolve. `/app` on www already opens the Buy Desk. Safe to remove when Jason says so (see section 0, item 8).
 
 ### Recent Deploys, SEO/AEO/GEO & Performance
 - **Merged & live on `main` today:** `site-fixes-nov25` (`9752533`, carrying `blog-batch-2` and `blog-batch-3`) and `402b6c2` (optional `AG_LEAD_BCC_EMAIL` copy list).
-- **Sitemap & IndexNow:** `sitemap.xml` now publishes **52 live URLs** (HTTP 200 across the board). IndexNow was pinged at 11:51 AM CT (api.indexnow.org 200, Bing 200, Yandex 200 for the 48 pre-merge URLs); re-run `npm run build && npm run submit:indexnow` after the next deploy and resubmit sitemaps in Search Console and Bing Webmaster Tools.
+- **Sitemap & IndexNow:** `sitemap.xml` now publishes **55 live URLs** (HTTP 200 across the board). IndexNow accepted all 55 URLs at 4:05 PM CT Nov 25 (HTTP 200); re-run `npm run build && npm run submit:indexnow` after the next deploy and resubmit sitemaps in Search Console and Bing Webmaster Tools.
 - **AI & Search readiness:** `robots.txt` welcomes Google, Bing, Apple, GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, and Common Crawl; `llms.txt` and `llms-full.txt` are live; JSON-LD includes `LocalBusiness`/`Organization`, `WebSite`, `WebPage`, `BreadcrumbList`, `Service`, `FAQPage`, `Person`, and `openingHoursSpecification`.
 - **`sameAs`:** `AG_SAME_AS` env switch is implemented in `scripts/build.mjs`; currently omitted on the live homepage until verified external profile URLs are ready to add.
-- **Lighthouse mobile (lab runs from box):** Home **95 Performance / 96 Accessibility / 100 Best Practices / 100 SEO** (LCP ~2.8s, 2.8 MB page weight); coin and Hobby pages **99 Performance** (an earlier coin run saw CLS 0.41, four reruns saw 0 CLS).
+- **Lighthouse mobile (lab runs from box):** Home **99 Performance / 100 Accessibility / 100 Best Practices / 100 SEO** (LCP 2.0s, CLS 0, 2,650 KiB) as of Nov 25 4:00 PM CT, up from 95 / 96 / 100 / 100 (LCP 2.8s). The earlier intermittent CLS (0.41 to 0.55) was the hidden homepage header entering the page flow on phones; fixed in `3c62894`.
 - **Old WordPress residue:** Some Google results still show cached old WordPress copy ("15 Years", "top dollar"). 15+ permanent 301 redirects are live in `vercel.json`; request reindexing in Search Console.
 
 ### Live Guides & Area Pages
 - **Guides hub:** `/guides`
-- **7 live guides:**
+- **10 live guides:**
   1. `/guides/sterling-vs-silver-plate`
   2. `/guides/how-silver-is-valued`
   3. `/guides/x-ray-film-privacy-checklist`
@@ -94,10 +94,10 @@ Billing note: the monthly fee covers the website and hosting only. Physical item
   5. `/guides/id-to-sell-silver-texas`
   6. `/guides/selling-silver-bars-and-rounds-houston`
   7. `/guides/commercial-dental-industrial-silver-houston`
-- **2 staged guides on `blog-batch-4` (awaiting Jason OK to merge):**
   8. `/guides/inherited-sterling-flatware-tea-sets-houston` (*Selling Inherited Sterling Flatware and Tea Sets in Houston: Weighted and Hollow Pieces*)
   9. `/guides/how-silver-buyers-price-scrap-houston` (*How Silver Buyers Price Scrap in Houston: Daily Spot Prices, Purity, and Offers*)
-- **SE Houston area pages:** `/silver-buyer-hobby-airport`, `/silver-buyer-south-houston`, `/silver-buyer-clear-lake`, and `/sell-estate-silver-houston` are live. `/silver-buyer-pasadena` and `/silver-buyer-pearland` exist but still use generic template copy.
+  10. `/guides/selling-silver-refiner-vs-pawn-shop-vs-online` (*Selling Silver to a Refiner vs. a Pawn Shop vs. Online*)
+- **SE Houston area pages:** `/silver-buyer-hobby-airport`, `/silver-buyer-south-houston`, `/silver-buyer-clear-lake`, and `/sell-estate-silver-houston` are live. `/silver-buyer-pasadena` and `/silver-buyer-pearland` are now localized with real routes, landmarks, and local FAQs.
 
 ### Buy Desk (`/desk`, `/app` 307-redirects to `/desk`)
 - Private, `noindex` counter PWA (`src/desk/`) for buying silver in front of a customer (`docs/buy-desk-guide.md`).
@@ -165,16 +165,16 @@ Billing note: the monthly fee covers the website and hosting only. Physical item
 | 17 | 30-day ranking recheck (Google, Bing, Yahoo, AI engines) | Us | Scheduled ~Wed Dec 23, 2026 |
 
 ### Site Whiteboard (Engineering & Content Backlog)
-- **Localize Pasadena & Pearland:** Rewrite `/silver-buyer-pasadena` and `/silver-buyer-pearland` with real driving routes (Spencer Hwy, College Ave, Telephone Rd, Monroe Rd), landmarks, and local FAQs.
-- **Comparison page:** "Selling Silver to a Refiner vs. a Pawn Shop vs. Online" (factual, no named rivals; strong Bing/AEO asset).
-- **Mobile hero performance:** Serve a phone-sized hero poster instead of the 2560px asset (current Home LCP 2.8s, 2.8 MB weight); verify zero CLS on coin template.
-- **Accessibility & HTML cleanup:** Fix eyebrow text contrast failure; audit `scripts/verify.mjs` coverage for new pages.
+- **DONE Nov 25: Localize Pasadena & Pearland:** Rewrite `/silver-buyer-pasadena` and `/silver-buyer-pearland` with real driving routes (Spencer Hwy, College Ave, Telephone Rd, Monroe Rd), landmarks, and local FAQs.
+- **DONE Nov 25: Comparison page:** "Selling Silver to a Refiner vs. a Pawn Shop vs. Online" (factual, no named rivals; strong Bing/AEO asset).
+- **DONE Nov 25: Mobile hero performance:** Serve a phone-sized hero poster instead of the 2560px asset (current Home LCP 2.8s, 2.8 MB weight); verify zero CLS on coin template.
+- **DONE Nov 25: Accessibility & HTML cleanup:** Fix eyebrow text contrast failure; audit `scripts/verify.mjs` coverage for new pages.
 - **Design/ops decisions for Jason:**
   - Homepage H1 `"Your silver, valued precisely."` has no local keywords (title tag covers it; decide whether to adjust).
-  - Resolve `app.agrefining.com` (attached in Vercel, currently dead).
+  - Resolve `app.agrefining.com` (attached in Vercel, no DNS record; safe to remove on Jason's OK).
 - **Attribution & schema:** Add UTM tag to GBP website link; fill `AG_SAME_AS` env var as GBP/BBB/Bing/Yelp/Apple URLs confirm.
 - **Reindex & gated pages:** Request Google reindex to clear old WordPress snippets; enable `/gold-buyer-houston` and `/x-ray-film-privacy-process` only after Dennis confirms in writing.
-- **Cloudflare parity:** Ensure all `vercel.json` 301s and `/api/*` endpoints have working Cloudflare equivalents before switching DNS.
+- **PREPPED Nov 25 on `cloudflare-parity`: Cloudflare parity:** Ensure all `vercel.json` 301s and `/api/*` endpoints have working Cloudflare equivalents before switching DNS.
 
 ### Content Calendar (2 Guides/Month: 1 Consumer, 1 Business)
 - **Dec 2026:** *Is My Silver Tea Set Sterling? Weighted and Hollow Pieces* | *Used X-Ray Fixer Is Hazardous Waste (RCRA D011): Options for Dental Offices*
@@ -246,3 +246,8 @@ Next step: build prospect lists from public map data, draft short intro emails +
 *Claude Code: write your revamped strategy, architectural decisions, diffs/PR plans, or questions for Grok Bot below this line before committing `CLAUDE.md` so Grok Bot picks them up on the next `git pull`.*
 
 - *(Awaiting Claude Code's first pass.)*
+
+### Grok Bot build log
+
+- **Nov 25, 2026, 3:25 to 4:10 PM CT (Grok Bot):** Worked section 0 items 1 to 9. Commits on `main`: `56d442b` (this file: Grok Bot runs the queue), `f8abd1f` (blog-batch-4 merge), `2d16cfd` (phone hero poster), `f52d4d1` (accessibility and verify coverage), `0e8713b` (Pasadena and Pearland), `91b06b0` (comparison guide), `3c62894` (homepage header CLS fix). Branch only: `cloudflare-parity` `f6ca53a`. Every merge passed the full `npm run verify` first, and every production deploy on Vercel came back READY. Known flake, not caused by this work: `npm run test:browser` (not part of verify) can fail at the 900px viewport with a 0.51 hero layout shift. It reproduced on the pre-change build and should be fixed by `3c62894`; four reruns after the fix passed.
+- **Claude Code:** if you pick up item 2 (calculator) or anything else here, leave a note in this section first so we don't both edit the same files.
