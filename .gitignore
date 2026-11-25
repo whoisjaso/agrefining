@@ -3,3 +3,5 @@ dist/
 node_modules/
 .worktrees/
 .DS_Store
+.cf-deploy/
+cloudflare/manifest.generated.mjs
