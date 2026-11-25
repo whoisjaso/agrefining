@@ -1,20 +1,20 @@
 # AG Refining - Claude Code Handoff & Context
 
 > **Bridge file between Grok Bot and Claude Code.**
-> Last synced: **Wed Nov 25, 2026, 4:30 PM CT** against `origin/main` (`6ac6c8d`).
+> Last synced: **Wed Nov 25, 2026, 4:54 PM CT** against `origin/main` (`0889e16`).
 > Workflow: Jason runs `git pull` before each Claude Code session. Read this file for current ground truth, challenge or revamp the plan below, and write notes/decisions for Grok Bot in the **Claude to Grok Bot** section at the bottom before committing or handing back.
 
 ---
 
 ## 0. Site Build Queue (START HERE)
 
-**Update, Nov 25, 2026, 4:28 PM CT: Jason changed the call again. Claude Code BUILDS from here on; the AG Refining bot (Grok Bot) is the adversarial reviewer.** Grok Bot stopped building at 4:28 PM CT and will review every Claude change against live: `npm run verify`, Lighthouse mobile x3, CLS, a11y, schema, Hard Rules (section 2). Claude: build, merge to `main` with Jason's OK, then log commits and live URLs in section 7 so Grok Bot can review. Grok Bot still owns research, listings and directories, GBP, the growth plan, drafts for Dennis, and this file. Items 1-9 below were done by Grok Bot earlier today (3:25-4:10 PM CT).
+**Update, Nov 25, 2026, 4:39 PM CT: Jason changed the call again.** "you do it" — the AG Refining bot (Grok Bot) BUILDS again on the box. Claude Code reviews and coordinates through section 7. Grok Bot still owns research, listings and directories, GBP, the growth plan, drafts for Dennis, and this file. Items 1-9 were done by Grok Bot earlier today (3:25-4:10 PM CT). A and C below shipped at 4:53 PM CT.
 
-### Claude's queue now (Jason said yes to all three, 4:26 PM CT)
-- **A. Homepage H1** to "Houston Silver Buyer, Valued Precisely." Title Case, design unchanged, keep meta/OG/schema consistent, single H1.
-- **B. Remove `app.agrefining.com`** from the `agrefining` Vercel project's domains (only that domain). Grok Bot's builder was stopped about a minute after starting, so check the project's domains first; it may already be gone. Confirm www and apex still serve and `/app` still 307s to `/desk`.
-- **C. Phone hero video encodes.** Smaller encodes of the two hero videos for under 768px, same look and content, keep posters and CLS 0. Report Lighthouse mobile before/after (3 runs).
-- **Heads-up:** PR #17 in your session showed Vercel "Account is blocked" (overdue balance). Today's production deploys from `main` came back READY. Check whether #17 is stale against current `main`; don't pay anything (billing belongs to Jason's Finance and Client Delivery bots).
+### Claude's queue now (Jason said yes to all three, 4:26 PM CT; Grok Bot executed at 4:39 PM CT)
+- **A. DONE: Homepage H1** (`0889e16`). Live H1 is "Houston Silver Buyer, Valued Precisely." One H1. Title, OG, and Twitter stay "AG Refining | Houston Silver Buyer Near Hobby Airport". LocalBusiness schema slogan was updated to the new line so it stays consistent with the H1. Design unchanged.
+- **B. CHECKED, NOT REMOVED: `app.agrefining.com`.** Still attached to Vercel project `agrefining` (`prj_rJyiwRLmv82XacSIod4zMx63QnzJ`) as a verified production domain with no redirect and no branch. The Vercel MCP connection can list it but has no tool to detach a project domain, and the box Vercel CLI is logged out. No login, no credentials, no DNS change, and no other domain was touched. Confirmed after the A/C deploy: `www` 200, apex 308 to `https://www.agrefining.com/`, `/app` 307 to `/desk` then 200.
+- **C. DONE: Phone hero video encodes** (`0889e16`). Phones below 768px now get 960x540 encodes of all three hero clips (the two that load first plus `precision-assay`, which loads after the first swap). Same content and look, existing posters kept, CLS 0 on three Lighthouse mobile runs. Desktop (768px and up) still uses the 1280x720 files. First-load WebMs went from 2,343 KB to 1,351 KB. Lighthouse mobile, Home, 3 runs: before 99 Perf / 100 A11y / LCP 2.0–2.1s / 2,650 KiB / CLS 0; after 99 Perf / 100 A11y / LCP 2.0–2.1s / 1,682 KiB / CLS 0. The after runs requested the `-mobile.webm` files, not the desktop ones.
+- **Heads-up, PR #17:** Report only; not closed or merged. Draft PR https://github.com/whoisjaso/agrefining/pull/17 (`claude/plain-words-pass`, commit `3a5c418`) is still open. Last updated Wed Nov 19, 2026, 10:28 PM CT. Its Vercel preview check is FAILURE ("Account is blocked"). It is stale as a merge candidate: `main` is 23 commits ahead of the merge-base, and the unique PR commit still diffs 11 files against current `main`. Some of its themes later landed in other work (Get Paid, consumer-inclusive copy, env lead routing), but it is not a no-op. Don't pay anything (billing belongs to Jason's Finance and Client Delivery bots).
 
 1. **DONE: Merge `blog-batch-4`.** Merged as `f8abd1f`. Both guides are live (200) and IndexNow accepted the URLs. The scrap guide cites the Texas 10-day hold (Occ. Code 1956.064); flag it if Dennis's practice differs.
 2. **WAITING: Dentist/counter payout calculator** (see "Ideola's Dentist Calculator Tweaks" in section 4). Build it on `/desk`: live spot price at the moment of sale, the customer sees only the payout, happy green approval and "you got paid" cues, dead simple for an older owner. Blocked on Jason sharing Ideola's file.
@@ -22,8 +22,8 @@
 4. **DONE: Accessibility** (`f52d4d1`). Fixed the conversion-band eyebrow contrast (2.6 to 6.2), small-text and eyebrow contrast on the tan `#e6dfd3` sections, the Spanish nav "en ingles" note, and the map card's label/name mismatch. `npm run verify` now also runs `npm run test:a11y` (axe-core, WCAG 2 A/AA, every sitemap page at phone and desktop width), and `scripts/verify.mjs` checks every sitemap page for title, meta description, unique titles/descriptions, canonical, lang, one H1, `<main id="main">`, the phone number, img alt, and valid JSON-LD. That caught a duplicate meta description on `/houston-silver-buyer`, now unique.
 5. **DONE: Pasadena and Pearland localized** (`0e8713b`). Real routes (Spencer Hwy and College Ave from Pasadena; Pearland Parkway or Main St/Telephone Rd to Monroe Rd from Pearland), OSRM drive distances, landmarks checked on official sites (Pasadena City Hall, San Jacinto College Central, Pearland City Hall, Pearland Town Center), and five local FAQs each. Content lives in `localServiceAreas` in `scripts/content/areas.mjs`.
 6. **DONE: Comparison guide** (`91b06b0`). `/guides/selling-silver-refiner-vs-pawn-shop-vs-online`, sourced to Texas Finance Code 371.157 and 371.169, 7 TAC 85.405, Occ. Code 1956.063, and the FTC Jewelry Guides. No rivals named, no prices. It's in the sitemap (now 55 URLs), `llms.txt`, and the guides hub.
-7. **RECOMMENDATION FOR JASON: Homepage H1.** Not changed. Recommend "Houston Silver Buyer, Valued Precisely." (Title Case, keeps the brand line, adds the city the H1 is missing). The title tag already says "Houston Silver Buyer Near Hobby Airport", so this is a small gain. Needs Jason's yes, since it's the hero headline Dennis sees first.
-8. **REPORT ONLY: `app.agrefining.com`.** Nothing removed. It's attached to Vercel project `agrefining` as a production domain (no redirect, no branch, verified), added Oct 11, 2026 3:21 PM CT by the `claude/app-subdomain` work to open the Buy Desk. Bluehost has no DNS record for it (NXDOMAIN), so it never resolves. The same day the Buy Desk moved to `www.agrefining.com/app` (a 307 to `/desk`), which works. Safe to remove from Vercel whenever Jason says so.
+7. **DONE: Homepage H1** (`0889e16`). Live headline is "Houston Silver Buyer, Valued Precisely." See section 0, item A.
+8. **CHECKED, NOT REMOVED: `app.agrefining.com`.** Still attached to the Vercel project. See section 0, item B. `www`, apex, and `/app` still work. Safe to detach from Vercel when a logged-in Vercel CLI or dashboard session is available; do not change DNS.
 9. **PREPPED: Cloudflare parity** on branch `cloudflare-parity` (`f6ca53a`, not merged, nothing deployed, no DNS changes). It adds `npm run test:cloudflare`, which runs the Worker locally against `dist/` and checks it against `vercel.json`: all 34 redirects, all 55 pages, the headers, apex to www, cleanUrls, the 404 page, video range requests, and `/api/leads` health. All green. The cutover checklist is in `cloudflare/README.md` on that branch. The big catch: `/review` (the counter card QR) is only built when `GOOGLE_REVIEW_URL` is set at build time, so the Cloudflare build must set it.
 10. **After the nameserver switch,** verify `agrefining.com` in Resend and move the lead sender from `agrefining@mail.olaceo.com` to an `@agrefining.com` address.
 11. **Ongoing:** two guides a month from the content calendar (one consumer, one B2B).
@@ -80,7 +80,7 @@ Billing note: the monthly fee covers the website and hosting only. Physical item
 - **Architecture:** Static HTML generator (`scripts/build.mjs`) + Vercel serverless functions (`api/leads.js`, `api/spot.js`, `api/receipt.js`), hosted on Vercel project `agrefining`, auto-deploying from `main`.
 - **Vercel overdue balance (OPEN RISK):** Live site is up today (all 52 sitemap URLs return HTTP 200), but there is an overdue $20 balance (bounced payment) that recently caused Vercel's "This deployment is temporarily paused" screen on Dennis's phone. Site can pause again without warning until resolved. Owned by Jason's Finance / Client Delivery bots.
 - **Cloudflare migration (PENDING DENNIS):** Cloudflare zone is created and waiting for Dennis to update nameservers at Bluehost (`marvin.ns.cloudflare.com` and `nelly.ns.cloudflare.com`). `cloudflare` branch and `.cf-deploy/` prep exist. Note: if moving off Vercel, `vercel.json` redirects and `/api/*` serverless routes (`leads`, `spot`, `receipt`) must also run on Cloudflare before cutting over. Never remove Vercel domains without Jason's OK.
-- **Open subdomain:** `app.agrefining.com` is attached to the Vercel project but has no DNS record at Bluehost, so it does not resolve. `/app` on www already opens the Buy Desk. Safe to remove when Jason says so (see section 0, item 8).
+- **Open subdomain:** `app.agrefining.com` is still attached to the Vercel project but has no DNS record at Bluehost, so it does not resolve. `/app` on www already opens the Buy Desk. Detach from Vercel when a logged-in CLI or dashboard session is available (see section 0, item B). Do not change DNS.
 
 ### Recent Deploys, SEO/AEO/GEO & Performance
 - **Merged & live on `main` today:** `site-fixes-nov25` (`9752533`, carrying `blog-batch-2` and `blog-batch-3`) and `402b6c2` (optional `AG_LEAD_BCC_EMAIL` copy list).
@@ -176,8 +176,8 @@ Billing note: the monthly fee covers the website and hosting only. Physical item
 - **DONE Nov 25: Mobile hero performance:** Serve a phone-sized hero poster instead of the 2560px asset (current Home LCP 2.8s, 2.8 MB weight); verify zero CLS on coin template.
 - **DONE Nov 25: Accessibility & HTML cleanup:** Fix eyebrow text contrast failure; audit `scripts/verify.mjs` coverage for new pages.
 - **Design/ops decisions for Jason:**
-  - Homepage H1 `"Your silver, valued precisely."` has no local keywords (title tag covers it; decide whether to adjust).
-  - Resolve `app.agrefining.com` (attached in Vercel, no DNS record; safe to remove on Jason's OK).
+  - Homepage H1 is now `"Houston Silver Buyer, Valued Precisely."` (`0889e16`).
+  - `app.agrefining.com` is still attached in Vercel (no DNS record; checked Nov 25, 4:54 PM CT, not removed). `/app` already opens the Buy Desk.
 - **Attribution & schema:** Add UTM tag to GBP website link; fill `AG_SAME_AS` env var as GBP/BBB/Bing/Yelp/Apple URLs confirm.
 - **Reindex & gated pages:** Request Google reindex to clear old WordPress snippets; enable `/gold-buyer-houston` and `/x-ray-film-privacy-process` only after Dennis confirms in writing.
 - **PREPPED Nov 25 on `cloudflare-parity`: Cloudflare parity:** Ensure all `vercel.json` 301s and `/api/*` endpoints have working Cloudflare equivalents before switching DNS.
@@ -256,4 +256,18 @@ Next step: build prospect lists from public map data, draft short intro emails +
 ### Grok Bot build log
 
 - **Nov 25, 2026, 3:25 to 4:10 PM CT (Grok Bot):** Worked section 0 items 1 to 9. Commits on `main`: `56d442b` (this file: Grok Bot runs the queue), `f8abd1f` (blog-batch-4 merge), `2d16cfd` (phone hero poster), `f52d4d1` (accessibility and verify coverage), `0e8713b` (Pasadena and Pearland), `91b06b0` (comparison guide), `3c62894` (homepage header CLS fix). Branch only: `cloudflare-parity` `f6ca53a`. Every merge passed the full `npm run verify` first, and every production deploy on Vercel came back READY. Known flake, not caused by this work: `npm run test:browser` (not part of verify) can fail at the 900px viewport with a 0.51 hero layout shift. It reproduced on the pre-change build and should be fixed by `3c62894`; four reruns after the fix passed.
+- **Nov 25, 2026, 4:39 to 4:54 PM CT (Grok Bot):** Jason reversed the 4:28 PM CT call ("you do it"). Grok Bot built queue A-C on the box. Commit `0889e16` on `main` ("Home: Title Case H1 and smaller phone hero video encodes"). `npm run verify` was green before the push (including a11y on 55 pages x 2 viewports). Extra, not in verify: `npm run test:media` and `npm run test:browser` (all 6 viewports) passed. Production deploy `dpl_GTeaVB6HXHfgjxMjcEBudoSWnqZA` came back READY. Live checks: https://www.agrefining.com/ 200 with one H1 "Houston Silver Buyer, Valued Precisely."; title/OG unchanged; schema slogan matches the H1; https://agrefining.com/ 308 to www; https://www.agrefining.com/app 307 to `/desk` (200). Phone videos are live under `/videos/*-mobile.webm` and `.mp4`.
+
+  Lighthouse mobile, Home, 3 runs each:
+
+  | | Perf | A11y | BP | SEO | LCP | Transfer | CLS |
+  |---|---:|---:|---:|---:|---:|---:|---:|
+  | Before 1 | 99 | 100 | 100 | 100 | 2.0s | 2,650 KiB | 0 |
+  | Before 2 | 99 | 100 | 100 | 100 | 2.1s | 2,650 KiB | 0 |
+  | Before 3 | 99 | 100 | 100 | 100 | 2.1s | 2,650 KiB | 0 |
+  | After 1 | 99 | 100 | 100 | 100 | 2.0s | 1,682 KiB | 0 |
+  | After 2 | 99 | 100 | 100 | 100 | 2.0s | 1,682 KiB | 0 |
+  | After 3 | 99 | 100 | 100 | 100 | 2.1s | 1,682 KiB | 0 |
+
+  Item B was not changed: `app.agrefining.com` is still on the project. Item 2 (calculator) is still waiting on Ideola's file. PR #17 is a stale open draft (see section 0 heads-up); not closed or merged.
 - **Claude Code:** if you pick up item 2 (calculator) or anything else here, leave a note in this section first so we don't both edit the same files.
