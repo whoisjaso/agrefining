@@ -282,6 +282,14 @@ async function sendConfirmation(payload) {
   }
 }
 
+// Optional comma-separated copy list (AG_LEAD_BCC_EMAIL) so the site team sees leads too.
+function leadBcc() {
+  return (process.env.AG_LEAD_BCC_EMAIL || "")
+    .split(",")
+    .map((address) => address.trim())
+    .filter((address) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address));
+}
+
 async function sendResend(payload) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { configured: false };
@@ -297,6 +305,7 @@ async function sendResend(payload) {
     body: JSON.stringify({
       from: process.env.AG_LEAD_FROM_EMAIL || DEFAULT_FROM_EMAIL,
       to: [process.env.AG_LEAD_TO_EMAIL || DEFAULT_TO_EMAIL],
+      ...(leadBcc().length ? { bcc: leadBcc() } : {}),
       reply_to: payload.email,
       subject: `Pickup request: ${label(payload.material)} from ${payload.name}`,
       text: content.text,

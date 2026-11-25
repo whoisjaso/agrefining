@@ -392,3 +392,27 @@ test("delivery health check reports configuration without exposing secrets", { c
   const off = await withDelivery({ apiKey: undefined }, () => invoke({ method: "GET", query: { status: "health" }, headers: { accept: "text/html" } }));
   assert.deepEqual(off.payload, { delivery: false });
 });
+
+test("AG_LEAD_BCC_EMAIL copies the owner lead email only", { concurrency: false }, async () => {
+  const calls = [];
+  const previous = process.env.AG_LEAD_BCC_EMAIL;
+  process.env.AG_LEAD_BCC_EMAIL = "team@example.com, not-an-email";
+  try {
+    await withDelivery({
+      apiKey: "synthetic-test-key",
+      fetchImpl: async (...args) => {
+        calls.push(args);
+        return { ok: true };
+      }
+    }, () => invoke({
+      headers: { accept: "text/html", "content-type": "application/x-www-form-urlencoded" },
+      body: encoded(validLead)
+    }));
+  } finally {
+    if (previous === undefined) delete process.env.AG_LEAD_BCC_EMAIL;
+    else process.env.AG_LEAD_BCC_EMAIL = previous;
+  }
+  const [ownerEmail, confirmation] = calls.map(([, init]) => JSON.parse(init.body));
+  assert.deepEqual(ownerEmail.bcc, ["team@example.com"]);
+  assert.equal(confirmation.bcc, undefined);
+});
