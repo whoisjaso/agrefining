@@ -91,6 +91,7 @@
 ### `/review` Redirect & Counter QR Card - LIVE TODAY
 - `GOOGLE_REVIEW_URL` is set in Vercel; `https://www.agrefining.com/review` (`noindex`) returns HTTP 200 and redirects straight to AG Refining's Google review form.
 - Print-ready 4x6 counter QR card (`ag-refining-review-card-4x6.pdf` and `.png`) is generated at `/workspace/agrefining-media/qr-card/`. Physical printing goes through Jason's billing bots.
+- **Final design approved by Jason (Nov 25, 2026, 2:40 PM CT) - keep as is:** navy card, v2-C Ag ring logo, "AG REFINING", "Thanks For Selling With Us.", cream panel with "Leave Us A Quick Google Review.", five yellow stars (#f5b301) under that line, QR (scans to https://agrefining.com/review), "Point your phone camera here. It takes a minute.", address + phone in the footer with breathing room above it. The printed URL line was removed on purpose. Source: `card.html` + `qr-review.svg` in the same folder.
 
 ### Listings & Citations Tracker Summary
 | Platform | Status (Nov 25, 2026) | Waiting On / Notes |
