@@ -6,6 +6,24 @@
 
 ---
 
+## 0. Claude's Build Queue (START HERE)
+
+**Jason's call, Nov 25, 2026, 2:54 PM CT: Claude (Fable) owns all builds, front-end changes, and merges for agrefining.com from now on.** Grok Bot (the AG Refining bot) owns research, listings and directories, GBP, the growth plan, drafts for Dennis, and this file. Grok Bot will not touch site code anymore unless Jason asks. Work top to bottom, check each item with Jason in your session, and log what you did in section 7.
+
+1. **Merge `blog-batch-4`** (commit `835fdd6`, preview https://agrefining-git-blog-batch-4-whoisjasos-projects.vercel.app). It adds two guides: `/guides/inherited-sterling-flatware-tea-sets-houston` and `/guides/how-silver-buyers-price-scrap-houston`. All checks passed. Note that the scrap guide cites the Texas 10-day hold (Occ. Code 1956.064), so flag it if Dennis's practice differs. After merging, ping IndexNow for the new and changed URLs.
+2. **Dentist/counter payout calculator** (see "Ideola's Dentist Calculator Tweaks" in section 4). Build it on `/desk`: live spot price at the moment of sale, the customer sees only the payout, happy green approval and "you got paid" cues, and it's dead simple for an older owner. Jason will share Ideola's original. Ask him for it.
+3. **Mobile hero performance.** Serve a phone-sized hero instead of the 2560px asset (Home LCP 2.8s), and keep CLS at zero.
+4. **Accessibility.** Fix the eyebrow text contrast failure, and extend `scripts/verify.mjs` coverage to the new pages.
+5. **Localize the Pasadena and Pearland pages** with real routes, landmarks and local FAQs (see the Site Whiteboard).
+6. **Comparison page:** "Selling Silver to a Refiner vs. a Pawn Shop vs. Online". Keep it factual and don't name rivals.
+7. **Homepage H1.** Decide with Jason whether to add local intent. "Your silver, valued precisely." has no "Houston".
+8. **`app.agrefining.com`.** Resolve it or remove it from Vercel.
+9. **Cloudflare parity.** Get every `vercel.json` redirect and `/api/*` route working on Cloudflare before Dennis switches nameservers, because that's the way off the overdue Vercel bill.
+10. **After the nameserver switch,** verify `agrefining.com` in Resend and move the lead sender from `agrefining@mail.olaceo.com` to an `@agrefining.com` address.
+11. **Ongoing:** two guides a month from the content calendar (one consumer, one B2B).
+
+Billing note: the monthly fee covers the website and hosting only. Physical items, like printing the counter card, are Dennis's cost.
+
 ## 1. Business Facts
 
 - **Business:** AG Refining (family-owned; founded by John Stevens, operated by his son Dennis Stevens)
@@ -125,7 +143,7 @@
 |---|---|---|---|
 | Fix | Fix lead form email delivery (Resend keys + BCC) | Jason / Grok Bot | **Done Nov 25** (`delivery:true`); move sender to `@agrefining.com` after NS cutover |
 | Fix | Clear Vercel overdue balance ($20 bounced) | Jason / Finance bots | Open pause risk |
-| 1 | Reviews engine (`/review`, QR card, post-sale text, 48h replies) | Us / Dennis | `/review` live + card ready; printing via billing bots; Dennis starts asking |
+| 1 | Reviews engine (`/review`, QR card, post-sale text, 48h replies) | Us / Dennis | `/review` live + final card approved; Dennis prints it himself; Dennis starts asking |
 | 2 | Merge `site-fixes-nov25` + IndexNow + sitemap resubmit | Jason / Us | **Merged Nov 25**; resubmit sitemaps + re-ping IndexNow for 52 URLs |
 | 3 | Real shop photos + 20-30s walk-in video (storefront, Suite B-1, counter, scale, testing, Dennis, clean lots) | Dennis / Us | Waiting on Dennis's phone shots |
 | 4 | Claim Bing Places (feeds Bing, Yahoo, Copilot, DuckDuckGo, Yahoo Scout) | Jason / Us | Identify owning login |
