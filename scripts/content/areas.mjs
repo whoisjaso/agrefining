@@ -84,3 +84,53 @@ export const areaPages = [
     related: ["sell-estate-silver-houston", "silver-buyer-pearland", "guides/how-silver-is-valued"]
   }
 ];
+
+// Local facts for the Pasadena and Pearland service pages (rendered by servicePage in build.mjs).
+// Drive distances and times are OpenStreetMap (OSRM) route estimates without traffic, checked 2026-11-25.
+// Landmark addresses were checked on official sites: City of Pasadena (1149 Ellsworth Drive),
+// San Jacinto College (8060 Spencer Hwy.), and City of Pearland (3519 Liberty Drive).
+const localNote = "<p>Distances are map estimates without traffic. Rush hour takes longer.</p>";
+export const localServiceAreas = {
+  "silver-buyer-pasadena": {
+    title: "Silver Buyer for Pasadena and Deer Park, TX | AG Refining",
+    description: "AG Refining is about 6 miles from Pasadena City Hall via Spencer Highway and College Avenue. Sterling, silver coins, flatware, and business silver.",
+    eyebrow: "Pasadena and Deer Park",
+    heading: "Silver Buyer for Pasadena and Deer Park",
+    intro: "AG Refining is about 6 miles from Pasadena City Hall, on Airport Blvd. near Hobby Airport. We review sterling, silver coins, flatware, and business silver from Pasadena and Deer Park. Call (281) 898-2719 before you visit.",
+    answerHeading: "A short drive west on Spencer Highway.",
+    answerText: "Most of Pasadena is a straight drive west on Spencer Highway to College Avenue, which becomes Airport Blvd. once you cross the Gulf Freeway (I-45). Families and businesses are both welcome. Call first so we can confirm what you have.",
+    localSections: [
+      ["How To Get Here From Pasadena", `<p>Head west on Spencer Highway into South Houston, then follow College Avenue west across the Gulf Freeway (I-45). Past the freeway, College Avenue becomes Airport Blvd. Our office is about half a mile past the freeway, before Monroe Road.</p><ul><li><strong>Strawberry Park, on Strawberry Road:</strong> about 4.7 miles, about 9 minutes</li><li><strong>Pasadena City Hall, 1149 Ellsworth Drive:</strong> about 6 miles, about 11 minutes, using Shaver Street to Spencer Highway</li><li><strong>San Jacinto College Central Campus, 8060 Spencer Hwy.:</strong> about 9.7 miles, about 18 minutes, straight down Spencer Highway</li></ul>${localNote}`],
+      ["What Pasadena Families Bring Us", "<ul><li>Sterling flatware, tea sets, and serving pieces marked 925 or Sterling</li><li>Silver dimes, quarters, and half dollars dated 1964 or earlier</li><li>Silver bars and rounds</li><li>Inherited estate silver that has not been sorted yet. We sort it with you</li></ul>"],
+      ["Pasadena and Deer Park Businesses", "<p>Labs, dental offices, clinics, and industrial shops in Pasadena and Deer Park can call about X-ray and NDT film, silver solder, contacts, lab silver, or silver oxide batteries. Pickup may be available for qualifying lots. We confirm the material and schedule first.</p>"]
+    ],
+    faqs: [
+      ["How far is AG Refining from Pasadena?", "About 6 miles from Pasadena City Hall, roughly 11 minutes without traffic, using Spencer Highway, College Avenue, and Airport Blvd."],
+      ["Do you buy silver from Pasadena residents or only businesses?", "Both. We review sterling, silver coins, flatware, and bars from individuals and families, and we work with businesses. Bring a government-issued photo ID."],
+      ["Do you pick up in Pasadena or Deer Park?", "Pickup may be available for qualifying business lots. Call (281) 898-2719 with the material type and amount."],
+      ["Do I need an appointment?", "Please call (281) 898-2719 before you come so we can confirm what you have and that someone is ready to review it."],
+      ["Do you speak Spanish?", "Yes. Hablamos español."]
+    ]
+  },
+  "silver-buyer-pearland": {
+    title: "Silver Buyer for Pearland, TX | Near Hobby Airport | AG Refining",
+    description: "From Pearland, AG Refining is about 8 to 9 miles north via Pearland Parkway or Telephone Road and Monroe Road. Sterling, silver coins, and business silver.",
+    eyebrow: "Pearland and South Houston",
+    heading: "Silver Buyer for Pearland",
+    intro: "AG Refining is about 8 to 9 miles north of central Pearland, on Airport Blvd. near Hobby Airport. We review sterling, silver coins, flatware, and business silver from Pearland families and businesses. Call (281) 898-2719 before you visit.",
+    answerHeading: "Monroe Road brings you to our door.",
+    answerText: "From most of Pearland, the drive ends on Monroe Road north to Airport Blvd. Turn east on Airport Blvd. and our office is between Monroe Road and the Gulf Freeway (I-45). Call first so we can confirm what you have.",
+    localSections: [
+      ["How To Get Here From Pearland", `<p><strong>From Pearland City Hall and east Pearland:</strong> take Pearland Parkway north, continue north on Monroe Road to Airport Blvd., and turn east.</p><p><strong>From Old Town Pearland:</strong> take Main Street (State Highway 35) north. It becomes Telephone Road. Turn east on Almeda-Genoa Road, then north on Monroe Road to Airport Blvd., and turn east.</p><ul><li><strong>Main Street and Broadway, Old Town Pearland:</strong> about 8 miles, about 14 minutes</li><li><strong>Pearland City Hall, 3519 Liberty Drive:</strong> about 8.7 miles, about 17 minutes</li><li><strong>Pearland Town Center, on Broadway at State Highway 288:</strong> about 15 miles, about 24 minutes, using State Highway 288 and Beltway 8 to Monroe Road</li></ul>${localNote}`],
+      ["What Pearland Families Bring Us", "<ul><li>Sterling flatware and serving pieces from family estates</li><li>Silver coins and coin collections, including pre-1965 dimes, quarters, and half dollars</li><li>Silver bars and rounds</li><li>Mixed drawers of sterling and silver plate. We sort them with you</li></ul>"],
+      ["Pearland Businesses", "<p>Dental offices, clinics, labs, and repair shops in Pearland can call about X-ray film, dental scrap, silver solder, or silver oxide watch batteries. Pickup may be available for qualifying lots. We confirm the material and schedule first.</p>"]
+    ],
+    faqs: [
+      ["How far is AG Refining from Pearland?", "About 8 to 9 miles from central Pearland, roughly 15 to 20 minutes without traffic, using Pearland Parkway or Telephone Road, then Monroe Road to Airport Blvd."],
+      ["Do you buy silver from Pearland residents or only businesses?", "Both. We review sterling, silver coins, flatware, and bars from individuals and families, and we work with businesses. Bring a government-issued photo ID."],
+      ["Do you pick up in Pearland?", "Pickup may be available for qualifying business lots. Call (281) 898-2719 with the material type and amount."],
+      ["Do I need an appointment?", "Please call (281) 898-2719 before you come so we can confirm what you have and that someone is ready to review it."],
+      ["Do you speak Spanish?", "Yes. Hablamos español."]
+    ]
+  }
+};

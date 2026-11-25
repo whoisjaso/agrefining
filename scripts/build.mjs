@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderReviewForm } from "../src/review-form.mjs";
 import { guides, guidesPublished, pendingPages, dennisConfirmed } from "./content/guides.mjs";
-import { areaPages } from "./content/areas.mjs";
+import { areaPages, localServiceAreas } from "./content/areas.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const out = join(root, "dist");
@@ -895,6 +895,8 @@ const serviceCoverageLinks = [
   ["Galveston", "/silver-buyer-pearland"],
   ["Stafford", "/silver-buyer-sugar-land"]
 ];
+
+for (const [path, local] of Object.entries(localServiceAreas)) Object.assign(locationPages.find((page) => page.path === path), local);
 
 Object.assign(locationPages.find((page) => page.path === "houston-silver-buyer"), {
   layout: "houston-hub",
@@ -1816,6 +1818,12 @@ function servicePage(page) {
         <div><h2>${page.answerHeading}</h2><p>${page.answerText}</p></div>
       </div>
     </section>
+    ${page.localSections ? `<section class="section detail-section local-section">
+      <div class="shell detail-grid">
+        <aside class="detail-rail"><p class="eyebrow">Local directions</p><h2>Getting Here From ${page.city}.</h2><a class="text-link" href="tel:${phoneHref}">Call ${phoneDisplay} ${arrow}</a></aside>
+        <div class="detail-copy">${page.localSections.map(([heading, body]) => `<article data-reveal><h3>${heading}</h3>${body}</article>`).join("")}</div>
+      </div>
+    </section>` : ""}
     <section class="section detail-section">
       <div class="shell detail-grid">
         <aside class="detail-rail"><p class="eyebrow">Simple next steps</p><h2>Know what happens next.</h2><a class="text-link" href="/how-it-works">See the full process ${arrow}</a></aside>
