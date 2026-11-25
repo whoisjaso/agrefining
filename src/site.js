@@ -61,7 +61,7 @@ function syncNavState({ open = false, restoreFocus = false, resetMaterials = tru
   toggle.setAttribute("aria-expanded", String(menuOpen));
   toggle.setAttribute("aria-label", menuOpen
     ? (spanish ? "Cerrar navegación" : "Close navigation")
-    : (spanish ? "Abrir navegación" : "Open navigation"));
+    : (spanish ? "Menú: abrir navegación" : "Menu: open navigation"));
   if (toggleLabel) toggleLabel.textContent = menuOpen
     ? (spanish ? "Cerrar" : "Close")
     : (spanish ? "Menú" : "Menu");

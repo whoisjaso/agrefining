@@ -37,12 +37,12 @@ cpSync(join(root, "src", "assay-scene.js"), join(out, "assay-scene.js"));
 const siteUrl = "https://www.agrefining.com";
 const siteName = "AG Refining";
 const firstPublished = "2026-07-30";
-const lastUpdated = process.env.AG_CONTENT_DATE || "2026-09-06";
+const lastUpdated = process.env.AG_CONTENT_DATE || "2026-11-25";
 const geoCoordinates = { latitude: 29.6522061, longitude: -95.2579947 };
 const indexNowKey = "c8325a3fa9a6acb1e94923fd669bb439";
 const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION || "";
 const bingSiteVerification = process.env.BING_SITE_VERIFICATION || "";
-const businessDescription = "AG Refining is a family-owned silver buyer in Houston, Texas. We purchase qualifying scrap silver, silver oxide watch batteries, X-ray film, dental scrap, silver coins, sterling, and industrial silver-bearing material from commercial, industrial, medical, educational, and business accounts across the Houston Metro Area, with free qualifying pickup and on-site weighing.";
+const businessDescription = "AG Refining is a family-owned silver buyer in Houston, Texas. We purchase qualifying scrap silver, silver oxide watch batteries, X-ray film, dental scrap, silver coins, sterling, and industrial silver-bearing material from individuals, families, and estates, and from commercial, industrial, medical, educational, and business accounts across the Houston Metro Area, with free qualifying pickup and on-site weighing.";
 const phoneDisplay = "(281) 898-2719";
 const phoneHref = "+12818982719";
 const email = "dennis@agrefining.com";
@@ -57,7 +57,13 @@ const openingHours = [
 const hoursLine = "Monday to Friday 9:00 AM to 5:00 PM, Saturday 9:00 AM to 12:00 PM, closed Sunday";
 // Add each official profile URL here once it is claimed and matches the NAP
 // exactly (Google Maps CID link, Bing Places, Apple Maps, Yelp, Facebook, BBB).
-const sameAsProfiles = [];
+// AG_SAME_AS (comma-separated URLs, set in Vercel) adds profiles without a code change.
+const sameAsProfiles = [
+  ...(process.env.AG_SAME_AS || "").split(",").map((url) => url.trim()).filter((url) => /^https:\/\//.test(url))
+];
+// Google's "ask for reviews" link from the Business Profile. When set, the build
+// publishes /review (noindex, not in the sitemap) for counter QR cards and texts.
+const googleReviewUrl = (process.env.GOOGLE_REVIEW_URL || "").trim();
 // Pending pages describe services Dennis has not confirmed in writing yet.
 const includePending = process.env.AG_INCLUDE_PENDING === "1";
 const spanishPrimaryCta = "Programar Una Recogida Gratis";
@@ -900,7 +906,7 @@ Object.assign(locationPages.find((page) => page.path === "houston-silver-buyer")
   answerHeading: "We come to qualifying Houston businesses.",
   answerText: "Tell us what you have, how much there is, and where it is. We will review the material and confirm the pickup, weighing, offer, and payment process before anything moves.",
   faqs: [
-    ["What types of customers does AG Refining serve?", "We work with commercial, industrial, medical, educational, manufacturing, recycling, and other approved customers across the Houston Metro Area."],
+    ["What types of customers does AG Refining serve?", "We buy silver from individuals, families, and estates, and we work with commercial, industrial, medical, educational, manufacturing, and recycling customers across the Houston Metro Area."],
     ["Do you offer free pickup?", "Yes, for qualifying commercial and industrial accounts after the material, quantity, location, and schedule are confirmed."],
     ["Do you weigh materials on-site?", "On-site weighing is available for qualifying pickups so you can see the weight before accepting an offer."],
     ["When do I get paid?", "Payment timing is confirmed with the offer and depends on the approved material and transaction."],
@@ -989,7 +995,7 @@ function renderNav(locale = "en", homepage = false) {
         <img src="/assets/ag-mark-path.svg" alt="" width="48" height="48">
         <span class="brand-word"><strong>AG</strong> Refining</span>
       </a>
-      <button class="nav-toggle" type="button" data-nav-toggle hidden aria-expanded="false" aria-controls="primary-links" aria-label="${spanish ? "Abrir navegación" : "Open navigation"}"><span class="nav-toggle-label" data-nav-toggle-label>${spanish ? "Menú" : "Menu"}</span><span class="nav-toggle-glyph" aria-hidden="true"><i></i><i></i></span></button>
+      <button class="nav-toggle" type="button" data-nav-toggle hidden aria-expanded="false" aria-controls="primary-links" aria-label="${spanish ? "Menú: abrir navegación" : "Menu: open navigation"}"><span class="nav-toggle-label" data-nav-toggle-label>${spanish ? "Menú" : "Menu"}</span><span class="nav-toggle-glyph" aria-hidden="true"><i></i><i></i></span></button>
       <div class="nav-links" id="primary-links" data-nav>${links}
       </div>
     </nav>
@@ -1515,7 +1521,8 @@ const featuredMaterials = [
 ];
 
 const homeFaqs = [
-  ["What types of customers does AG Refining serve?", "We work with commercial, industrial, medical, educational, manufacturing, and recycling businesses throughout the Houston Metro Area."],
+  ["Where can I sell silver in Houston near Hobby Airport?", `AG Refining buys silver at ${street}, ${cityLine}, near William P. Hobby Airport. Hours are ${hoursLine}. Please call ${phoneDisplay} before visiting.`],
+  ["What types of customers does AG Refining serve?", "We buy silver from individuals, families, and estates, and we work with commercial, industrial, medical, educational, manufacturing, and recycling businesses throughout the Houston Metro Area."],
   ["Do you offer free pickup?", "Yes. We provide free pickup throughout the Houston Metro Area for qualifying commercial and industrial accounts."],
   ["Do you weigh materials on-site?", "Yes. We perform on-site weighing for qualifying pickups so you can see the weight before payment."],
   ["When do I get paid?", "Payment timing is confirmed with the offer and depends on the approved material and transaction."],
@@ -1717,7 +1724,7 @@ const home = `
 
   <section class="section location-section">
     <div class="shell location-grid">
-      <a class="location-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${street}, ${cityLine}`)}" target="_blank" rel="noopener" aria-label="Open ${street}, ${cityLine} in Google Maps">
+      <a class="location-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${street}, ${cityLine}`)}" target="_blank" rel="noopener" aria-label="Open in Google Maps: ${street}, ${cityLine}">
         <span class="location-map-kicker"><b>Ag / 47</b><span>Houston, Texas</span></span>
         <span class="location-map-city" aria-hidden="true">HOU</span>
         <span class="location-map-detail"><span>${street}<br>${cityLine}</span><strong>Open in Google Maps ${arrow}</strong></span>
@@ -2909,6 +2916,11 @@ function sitemapEntry(path) {
   return `<url><loc>${loc}</loc><lastmod>${lastUpdated}</lastmod><changefreq>${changefreq}</changefreq><priority>${priority}</priority>${alternates}${image}</url>`;
 }
 writeFileSync(join(out, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${sitemapPaths.map(sitemapEntry).join("")}</urlset>`);
+
+if (/^https:\/\//.test(googleReviewUrl)) {
+  const safeReviewUrl = xmlEscape(googleReviewUrl);
+  writeFileSync(join(out, "review.html"), `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Review AG Refining on Google</title><meta http-equiv="refresh" content="0;url=${safeReviewUrl}"><link rel="canonical" href="${siteUrl}/"></head><body style="font-family:system-ui,sans-serif;max-width:32rem;margin:3rem auto;padding:0 1rem;line-height:1.5"><h1>Thank You for Choosing AG Refining</h1><p>If you have a minute, an honest review on Google helps other Houston families find us.</p><p><a href="${safeReviewUrl}">Leave a Google review</a></p><script>location.replace(${JSON.stringify(googleReviewUrl)});</script></body></html>`);
+}
 
 writeFileSync(join(out, "404.html"), document({
   title: "Page Not Found | AG Refining",
