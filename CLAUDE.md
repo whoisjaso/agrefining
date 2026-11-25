@@ -34,7 +34,7 @@
 6. **HIPAA wording ban:** **Never write "HIPAA compliant" or "HIPAA certified."** HHS does not recognize private HIPAA certifications. (`/x-ray-film-privacy-process` stays off by default behind `dennisConfirmed` flags until Dennis confirms his BAA, chain-of-custody, staff training, and destruction process.)
 7. **Media honesty:** **No stock or AI footage presented as the real shop.** Never upload AI-generated or stock images/video to Google Business Profile, Apple Business Connect, or Yelp. GBP uses brand graphics only until Dennis sends real phone photos.
 8. **NuCor boundary:** Do not touch the NuCor listings.
-9. **Billing boundary:** Paid items (Vercel overdue balance, South Belt-Ellington Chamber membership, counter QR card printing) go through Jason's Finance and Client Delivery bots.
+9. **Billing boundary:** Paid items (Vercel overdue balance, South Belt-Ellington Chamber membership, counter QR card printing) are NOT covered: the monthly fee is website + hosting only. Dennis prints the card himself from the PDF.
 10. **Dennis UX:** Dennis is older, non-technical, and a phone person. Keep his steps dead simple (phone calls, FaceTime, one-tap links).
 11. **Copy & UI contract (`PRODUCT.md`, `DESIGN.md`, `scripts/check.mjs`):**
     - Plain, direct, unhurried copy. Qualify claims ("for qualifying commercial and industrial accounts", "when scheduling permits", etc.).
@@ -90,7 +90,7 @@
 
 ### `/review` Redirect & Counter QR Card - LIVE TODAY
 - `GOOGLE_REVIEW_URL` is set in Vercel; `https://www.agrefining.com/review` (`noindex`) returns HTTP 200 and redirects straight to AG Refining's Google review form.
-- Print-ready 4x6 counter QR card (`ag-refining-review-card-4x6.pdf` and `.png`) is generated at `/workspace/agrefining-media/qr-card/`. Physical printing goes through Jason's billing bots.
+- Print-ready 4x6 counter QR card (`ag-refining-review-card-4x6.pdf` and `.png`) is generated at `/workspace/agrefining-media/qr-card/`. Dennis prints it himself (monthly fee covers website + hosting only).
 - **Final design approved by Jason (Nov 25, 2026, 2:40 PM CT) - keep as is:** navy card, v2-C Ag ring logo, "AG REFINING", "Thanks For Selling With Us.", cream panel with "Leave Us A Quick Google Review.", five yellow stars (#f5b301) under that line, QR (scans to https://agrefining.com/review), "Point your phone camera here. It takes a minute.", address + phone in the footer with breathing room above it. The printed URL line was removed on purpose. Source: `card.html` + `qr-review.svg` in the same folder.
 
 ### Listings & Citations Tracker Summary
