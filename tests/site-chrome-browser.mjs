@@ -195,10 +195,20 @@ async function verifyMobileChrome(browser, baseUrl) {
       dockInert: document.querySelector(".mobile-actions").inert
     };
   });
-  assert.ok(navState.panel.left > 0, "the mobile panel must not be a full-width sheet");
-  assert.ok(navState.panel.width <= 352, `the mobile panel must stay compact, received ${navState.panel.width}px`);
-  assert.ok(navState.panel.top < 96, `the mobile panel must anchor near the top-right toggle, received ${navState.panel.top}px`);
-  assert.ok(navState.panel.bottom < 844, "the mobile panel must not rise from or occupy the viewport bottom");
+  assert.deepEqual(
+    [navState.panel.left, navState.panel.top, navState.panel.width, navState.panel.bottom],
+    [0, 0, 390, 844],
+    "the open menu must cover the whole screen"
+  );
+  assert.equal(await page.locator("[data-site-header] .brand").evaluate((brand) => getComputedStyle(brand).visibility), "hidden", "no logo inside the open menu");
+  assert.equal(await page.evaluate(() => getComputedStyle(document.body).overflow), "hidden", "the page must not scroll behind the menu");
+  await page.waitForTimeout(1300);
+  const menuTargets = await page.evaluate(() => [...document.querySelectorAll("[data-nav] > a, [data-nav] .materials-link, [data-nav-toggle]")].map((item) => {
+    const rect = item.getBoundingClientRect();
+    return { height: rect.height, opacity: Number(getComputedStyle(item.closest("[data-nav] > *") || item).opacity) };
+  }));
+  assert.ok(menuTargets.every((item) => item.height >= 44), "every menu item and the Close control must be at least 44px tall");
+  assert.ok(menuTargets.every((item) => item.opacity === 1), "every menu item must finish its fade-in");
   assert.equal(navState.scrim.background, "rgba(0, 0, 0, 0)");
   assert.equal(navState.scrim.backdropFilter, "none");
   assert.equal(navState.scrim.filter, "none");

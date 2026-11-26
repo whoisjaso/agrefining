@@ -58,19 +58,21 @@ test("the hero fills the initial viewport without reserving header height", () =
   assert.doesNotMatch(css, /(?:\.atelier-hero|\.hero-commercial-grid)\s*\{[^}]*calc\(100svh\s*-\s*var\(--header-height\)\)/s);
 });
 
-test("enhanced mobile navigation is a compact top-right panel rather than a bottom sheet", () => {
-  const panel = [...css.matchAll(/^\s*\.site-header\[data-nav-enhanced="true"\]\s+\.nav-links\s*\{([^}]*)\}/gm)]
-    .map((match) => match[1])
-    .find((rule) => /top:\s*calc\(100%/.test(rule)) || "";
-  assert.match(panel, /top:\s*calc\(100%\s*-\s*0\.35rem\)/);
-  assert.match(panel, /right:\s*var\(--gutter\)/);
-  assert.match(panel, /bottom:\s*auto/);
-  assert.match(panel, /left:\s*auto/);
-  assert.match(panel, /width:\s*min\(22rem,\s*calc\(100vw\s*-\s*\(2 \* var\(--gutter\)\)\)\)/);
-  assert.match(panel, /transform-origin:\s*top right/);
-  assert.doesNotMatch(panel, /width:\s*100(?:vw|%)/);
-  assert.doesNotMatch(panel, /max-height:\s*(?:100|[89][0-9])vh/);
-  assert.doesNotMatch(panel, /translateY\(105%\)/);
+test("enhanced mobile navigation is a full-screen overlay that fades in with staggered items", () => {
+  const rules = [...css.matchAll(/^\s*\.site-header\[data-nav-enhanced="true"\]\s+\.nav-links\s*\{([^}]*)\}/gm)].map((match) => match[1]);
+  const panel = rules.find((rule) => /position:\s*fixed/.test(rule)) || "";
+  assert.match(panel, /top:\s*0/);
+  assert.match(panel, /left:\s*0/);
+  assert.match(panel, /width:\s*100vw/);
+  assert.match(panel, /height:\s*100dvh/);
+  assert.match(panel, /opacity:\s*0/);
+  assert.match(panel, /transition:\s*opacity 300ms ease-out/);
+  assert.match(panel, /overscroll-behavior:\s*contain/);
+  assert.match(css, /\.nav-open \.site-header\[data-nav-enhanced="true"\] \.nav-links > \* \{[^}]*transition-delay:\s*calc\(140ms \+ \(var\(--nav-step, 0\) \* 60ms\)\)/);
+  assert.match(css, /\.nav-open \.site-header \.brand \{\s*visibility:\s*hidden;/, "no logo inside the open menu");
+  assert.match(css, /body\.nav-open \{\s*overflow:\s*hidden;/, "the page must not scroll behind the menu");
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.site-header\[data-nav-enhanced="true"\] \.nav-links,[^}]*transition:\s*none;/);
+  assert.match(home, /<a class="nav-call" href="tel:\+12818982719">Call \(281\) 898-2719<\/a>/);
 });
 
 test("the mobile navigation scrim stays transparent and unfiltered", () => {

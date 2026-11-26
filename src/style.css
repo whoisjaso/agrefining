@@ -924,6 +924,10 @@ html[data-loader-state="ready"] .home-loader {
 }
 
 .nav-toggle,
+.nav-call {
+  display: none;
+}
+
 .nav-scrim {
   display: none;
 }
@@ -3457,43 +3461,92 @@ html[data-loader-state="ready"] .home-loader {
     transform: translateY(-0.2rem) rotate(-45deg);
   }
 
+  /* Full-screen menu. The overlay fades in over the whole screen, then the links and actions
+     rise in one by one. Closing fades everything out together. No logo inside the menu. */
   .site-header[data-nav-enhanced="true"] .nav-links {
-    background: var(--paper);
-    border: 1px solid var(--line-strong);
+    --navy: #f6f3ec;
+    --ink: #f6f3ec;
+    --ink-soft: #f6f3ec;
+    --muted: rgba(246, 243, 236, 0.74);
+    --mineral-blue: rgba(246, 243, 236, 0.7);
+    --paper: #0b0b0b;
+    --line: rgba(250, 248, 242, 0.14);
+    --line-strong: rgba(250, 248, 242, 0.32);
+    --focus: #ffffff;
+    align-content: start;
+    background: #0b0b0b;
+    border: 0;
     bottom: auto;
-    box-shadow: var(--shadow-float);
+    box-shadow: none;
+    color: #f6f3ec;
     display: grid;
     gap: 0;
-    left: auto;
-    max-height: calc(100svh - 6rem - var(--safe-bottom));
+    height: 100vh;
+    height: 100dvh;
+    left: 0;
+    max-height: none;
+    opacity: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: 0.75rem 1rem 1rem;
+    padding: calc(6.25rem + var(--safe-top)) var(--gutter) calc(2rem + var(--safe-bottom));
     pointer-events: none;
-    position: absolute;
-    right: var(--gutter);
-    top: calc(100% - 0.35rem);
-    transform: translateY(-0.75rem) scale(0.98);
-    transform-origin: top right;
-    transition: opacity var(--fast) ease, transform var(--medium) var(--ease), visibility 0s linear var(--medium);
+    position: fixed;
+    right: auto;
+    top: 0;
+    transform: none;
+    transition: opacity 300ms ease-out, visibility 0s linear 300ms;
     visibility: hidden;
-    width: min(22rem, calc(100vw - (2 * var(--gutter))));
+    width: 100vw;
     z-index: 101;
   }
 
   .nav-open .site-header[data-nav-enhanced="true"] .nav-links {
     opacity: 1;
     pointer-events: auto;
-    transform: translateY(0) scale(1);
-    transition-delay: 0s;
+    transition: opacity 360ms ease-out, visibility 0s linear 0s;
     visibility: visible;
   }
 
-  .nav-links > a:not(.button) {
+  .site-header[data-nav-enhanced="true"] .nav-links > * {
+    opacity: 0;
+    transform: translateY(0.85rem);
+    transition: opacity 200ms ease-out, transform 200ms ease-out;
+  }
+
+  .nav-open .site-header[data-nav-enhanced="true"] .nav-links > * {
+    opacity: 1;
+    transform: none;
+    transition: opacity 420ms ease-out, transform 520ms var(--ease);
+    transition-delay: calc(140ms + (var(--nav-step, 0) * 60ms));
+  }
+
+  .nav-links > :nth-child(2) { --nav-step: 1; }
+  .nav-links > :nth-child(3) { --nav-step: 2; }
+  .nav-links > :nth-child(4) { --nav-step: 3; }
+  .nav-links > :nth-child(5) { --nav-step: 4; }
+  .nav-links > :nth-child(6) { --nav-step: 5; }
+  .nav-links > :nth-child(7) { --nav-step: 6; }
+  .nav-links > :nth-child(8) { --nav-step: 7; }
+
+  .nav-links > a:not(.button):not(.nav-call),
+  .nav-links .materials-link {
     border-top: 1px solid var(--line);
-    font-size: 1rem;
-    min-height: 3.7rem;
+    color: #f6f3ec;
+    font-size: clamp(1.45rem, 6.2vw, 1.9rem);
+    font-weight: 380;
+    letter-spacing: -0.015em;
+    min-height: 4.2rem;
     padding: 1rem 0;
+  }
+
+  .nav-links > a:first-child:not(.button):not(.nav-call),
+  .nav-links > :first-child .materials-link,
+  .nav-links > :first-child .materials-disclosure-toggle {
+    border-top: 0;
+  }
+
+  .nav-links .materials-panel a {
+    text-transform: capitalize;
   }
 
   .nav-links > a:not(.button)::after {
@@ -3501,7 +3554,47 @@ html[data-loader-state="ready"] .home-loader {
   }
 
   .nav-review {
-    margin-top: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    min-height: 3.6rem;
+    width: 100%;
+  }
+
+  .nav-links > .nav-call {
+    align-items: center;
+    color: #f6f3ec;
+    display: flex;
+    font-size: 1.05rem;
+    font-weight: 650;
+    justify-content: center;
+    margin-top: 0.6rem;
+    min-height: 3.25rem;
+  }
+
+  /* While the menu is open the header is only the Close control. */
+  .nav-open .site-header .brand {
+    visibility: hidden;
+  }
+
+  .nav-open .site-header[data-nav-enhanced="true"] .nav-toggle {
+    background: transparent;
+    border-color: transparent;
+    color: #fff;
+    padding-right: 0;
+  }
+
+  .nav-open .site-header[data-nav-enhanced="true"] .nav-toggle-glyph i {
+    background: #fff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-header[data-nav-enhanced="true"] .nav-links,
+    .nav-open .site-header[data-nav-enhanced="true"] .nav-links,
+    .site-header[data-nav-enhanced="true"] .nav-links > *,
+    .nav-open .site-header[data-nav-enhanced="true"] .nav-links > * {
+      transform: none;
+      transition: none;
+    }
   }
 
   .site-header[data-nav-enhanced="true"] .nav-scrim {

@@ -972,14 +972,16 @@ function renderNav(locale = "en", homepage = false) {
         <a href="/service-areas" hreflang="en">Áreas de servicio ${languageNote}</a>
         <a href="/how-it-works" hreflang="en">Cómo funciona ${languageNote}</a>
         <a href="/about" hreflang="en">Nuestra historia ${languageNote}</a>
-        <a class="button button-primary nav-review" href="#solicitud">${spanishPrimaryCta} ${arrow}</a>`
+        <a class="button button-primary nav-review" href="#solicitud">${spanishPrimaryCta} ${arrow}</a>
+        <a class="nav-call" href="tel:${phoneHref}">Llame al ${phoneDisplay}</a>`
     : `
         ${renderMaterialsDisclosure()}
         <a href="/industries">Industries</a>
         <a href="/service-areas">Service Areas</a>
         <a href="/how-it-works">How It Works</a>
         <a href="/about">Our Story</a>
-        <a class="button button-primary nav-review" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>`;
+        <a class="button button-primary nav-review" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
+        <a class="nav-call" href="tel:${phoneHref}">Call ${phoneDisplay}</a>`;
   return `
   <header class="site-header" data-site-header>
     <div class="utility-bar">
