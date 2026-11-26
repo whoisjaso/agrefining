@@ -3719,6 +3719,28 @@ html[data-loader-state="ready"] .home-loader {
     color: var(--paper);
   }
 
+  /* Over the film the header is only a floating MENU control: no logo, no box. The logo and the
+     boxed button come back with the solid bar, and whenever the menu is open. */
+  html:not(.home-header-solid) body.home-page:not(.nav-open) .site-header .brand {
+    visibility: hidden;
+  }
+
+  html:not(.home-header-solid) body.home-page:not(.nav-open) .site-header[data-nav-enhanced="true"] .nav-toggle {
+    background: transparent;
+    border-color: transparent;
+    color: #fff;
+    min-height: 44px;
+    min-width: 44px;
+    padding-right: 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 12px rgba(0, 0, 0, 0.5);
+  }
+
+  html:not(.home-header-solid) body.home-page:not(.nav-open) .site-header[data-nav-enhanced="true"] .nav-toggle-glyph i {
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+    height: 1.5px;
+  }
+
   html.home-header-solid .site-header,
   html.home-header-solid .site-header[data-stuck="true"],
   .nav-open .site-header {
