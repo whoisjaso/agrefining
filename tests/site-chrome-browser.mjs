@@ -153,6 +153,28 @@ async function verifyMobileChrome(browser, baseUrl) {
 
   await page.evaluate(() => window.scrollTo(0, 120));
   await page.locator("[data-nav-toggle]").waitFor({ state: "visible" });
+  // Over the film the phone header is only a floating MENU control: no logo and no box.
+  const floatingHeader = await page.evaluate(() => {
+    const toggle = document.querySelector("[data-nav-toggle]");
+    const toggleStyle = getComputedStyle(toggle);
+    const rect = toggle.getBoundingClientRect();
+    return {
+      brand: getComputedStyle(document.querySelector("[data-site-header] .brand")).visibility,
+      background: toggleStyle.backgroundColor,
+      color: toggleStyle.color,
+      width: rect.width,
+      height: rect.height
+    };
+  });
+  assert.equal(floatingHeader.brand, "hidden", "the logo must not sit over the phone hero film");
+  assert.equal(floatingHeader.background, "rgba(0, 0, 0, 0)", "the MENU control must have no box over the film");
+  assert.equal(floatingHeader.color, "rgb(255, 255, 255)", "the MENU label must be white over the film");
+  assert.ok(floatingHeader.width >= 44 && floatingHeader.height >= 44, "the MENU tap target must stay at least 44px");
+
+  // The logo returns with the solid bar after the hero.
+  await page.evaluate((y) => window.scrollTo(0, y), heroHeight + 80);
+  await page.waitForFunction(() => document.documentElement.classList.contains("home-header-solid"));
+  assert.equal(await page.locator("[data-site-header] .brand").evaluate((brand) => getComputedStyle(brand).visibility), "visible");
   assert.equal(await page.locator("[data-site-header] .brand").getAttribute("href"), "#top");
   await page.locator("[data-site-header] .brand").click();
   assert.ok(await page.evaluate(() => window.scrollY > 0), "homepage brand must animate rather than jump immediately");
