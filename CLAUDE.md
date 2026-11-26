@@ -252,7 +252,7 @@ To restore only the old hero media, leaving other work alone:
 
 `git checkout hero-v1 -- images/ag-refining-molten-pour-poster.webp images/ag-refining-molten-pour-poster-1280.webp images/ag-refining-silver-ingots-poster.webp images/ag-refining-precision-assay-poster.webp videos/ag-refining-molten-pour.mp4 videos/ag-refining-molten-pour.webm videos/ag-refining-molten-pour-mobile.mp4 videos/ag-refining-molten-pour-mobile.webm videos/ag-refining-silver-ingots.mp4 videos/ag-refining-silver-ingots.webm videos/ag-refining-silver-ingots-mobile.mp4 videos/ag-refining-silver-ingots-mobile.webm videos/ag-refining-precision-assay.mp4 videos/ag-refining-precision-assay.webm videos/ag-refining-precision-assay-mobile.mp4 videos/ag-refining-precision-assay-mobile.webm`
 
-Or copy those paths from `/workspace/agrefining-media/hero-v1-backup/`. Then run `npm run test:media` and `npm run verify`, commit, and deploy only after Jason says yes. Do not reset `main` to the tag if later commits should be kept.
+Or copy those paths from `/workspace/agrefining-media/hero-v1-backup/`. Then run `npm run test:media` and `npm run verify`, commit, and deploy only after Jason says yes. Do not reset `main` to the tag if later commits should be kept. **Shipped:** Jason approved going live at 3:05 AM CT on Nov 26, 2026. `hero-v2` (through `af52269`) was fast-forwarded to `main` and is live on www.agrefining.com. The `hero-v1` tag and backup folder still hold the previous clips.
 
 ---
 
@@ -263,6 +263,8 @@ Or copy those paths from `/workspace/agrefining-media/hero-v1-backup/`. Then run
 - *(Awaiting Claude Code's first pass.)*
 
 ### Grok Bot build log
+
+- **Nov 26, 2026, 3:10 to 3:16 AM CT (Grok Bot):** Jason approved pushing the new hero clips live (3:05 AM CT). Fast-forwarded `main` from `05ddbb6` to `af52269` (includes `b78e3c6` and the hero-v1 restore note). `npm run test:media` (4/4) and full `npm run verify` were green, including a11y on 55 pages x 2 viewports. Pushed `main`. Production deploy `dpl_8v86M7sawbk2ubZ6YF6QWo3GrcFe` came back READY (commit `af52269c3e0fc96f6e0663f89771c930f141f99e`, aliases include www.agrefining.com). Live check of all 16 hero files on https://www.agrefining.com/: every desktop and mobile video (mp4 and webm) and all four posters returned HTTP 200, and byte size plus SHA-256 matched the new encodes and differed from the `hero-v1` backup. Homepage https://www.agrefining.com/ returned 200 and still references the molten-pour posters. Old clips remain at tag `hero-v1` and `/workspace/agrefining-media/hero-v1-backup/`.
 
 - **Nov 26, 2026, 3:09 AM CT (Grok Bot):** Backed up the live hero files from `origin/main` `05ddbb6` to `/workspace/agrefining-media/hero-v1-backup/` and pushed annotated tag `hero-v1` to origin. Restore steps are in section 6 question 6. Production was not changed.
 - **Nov 26, 2026, about 2:32 to 2:50 AM CT (Grok Bot):** Hero-v2 is on branch `hero-v2` only, not on `main` and not deployed to production. Claude chat generated the 10 Seedance 2.5 clips (ResiBrands / unlimited; Cursor tools cannot spend that allowance). Grok Bot downloaded them, reviewed frames, encoded the three finalists (3A, 1A, 2B) to the current 1280x720 and 960x540 mp4/webm pipeline plus posters, and asked Claude to review in section 6 question 6. Raws and contact sheets stay in `/workspace/agrefining-media/hero-v2/`. Replaced one pre-existing em dash in this file so `npm run check` can pass (that character is banned by the repo lint).
