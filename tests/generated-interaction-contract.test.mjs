@@ -394,3 +394,37 @@ test("coarse pointers receive radio-label targets at least 44px in both dimensio
     assert.ok(readPixelMinimum(declarations, "min-width") >= 44, "radio-label min-width must be at least 44px");
   }
 });
+
+test("every pickup call to action lands on the pickup form", () => {
+  for (const [name, html] of htmlDocuments) {
+    const stray = html.match(/href="\/contact\?intent=pickup[^"#]*"/);
+    assert.equal(stray, null, `${name}: ${stray?.[0]} must carry #get-paid`);
+  }
+  const contactPage = readFileSync(join(dist, "contact", "index.html"), "utf8");
+  assert.match(contactPage, /<div id="get-paid" class="contact-form-column">/);
+});
+
+test("the pickup form asks only for name, phone, material, optional email and an optional note", () => {
+  const contactPage = readFileSync(join(dist, "contact", "index.html"), "utf8");
+  const form = contactPage.match(/<form id="review-form"[\s\S]*?<\/form>/)?.[0] || "";
+  const visible = [...form.matchAll(/<(?:input|select|textarea)\b[^>]*\bname="([^"]+)"[^>]*>/g)]
+    .filter((match) => !/type="hidden"/.test(match[0]) && match[1] !== "company_url")
+    .map((match) => match[1]);
+  assert.deepEqual(visible, ["name", "phone", "material", "email", "details"]);
+  assert.match(form, /name="name"[^>]*required/);
+  assert.match(form, /name="phone"[^>]*required/);
+  assert.match(form, /<select id="material" name="material" required/);
+  assert.doesNotMatch(form.match(/<input id="email"[^>]*>/)[0], /required/);
+  assert.doesNotMatch(form.match(/<textarea id="details"[^>]*>/)[0], /required|minlength/);
+});
+
+test("the map band is one static image with a directions link and no map service", () => {
+  const homePage = readFileSync(join(dist, "index.html"), "utf8");
+  const band = homePage.match(/<section class="location-section map-band"[\s\S]*?<\/section>/)?.[0] || "";
+  assert.match(band, /<img src="\/images\/ag-refining-map-hobby-airport\.webp" alt="" width="2560" height="1100" loading="lazy"/);
+  assert.match(band, /href="https:\/\/www\.google\.com\/maps\/dir\/\?api=1&(?:amp;)?destination=[^"]+" target="_blank" rel="noopener" data-directions/);
+  assert.match(band, /data-destination="9125 Airport Blvd\., Suite B-1, Houston, TX 77061"/);
+  assert.match(band, />Get Directions/);
+  assert.doesNotMatch(band, /<iframe|<script|maps\.googleapis|api_key|key=/);
+  assert.match(band, /OpenStreetMap contributors/);
+});

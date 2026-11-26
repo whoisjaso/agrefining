@@ -49,6 +49,7 @@ export function pickupWindowLabel(value, locale = "en") {
 const COPY = {
   en: {
     required: "Required",
+    optional: "Optional",
     name: "Name",
     business: "Business",
     phone: "Phone",
@@ -63,8 +64,8 @@ const COPY = {
     pickupDate: "Preferred pickup day",
     pickupWindow: "Preferred time",
     scheduleNote: "We will call or email to confirm the exact time.",
-    details: "What should we know?",
-    detailsPlaceholder: "Describe the material, condition, source, and anything that may affect pickup.",
+    details: "Note",
+    detailsPlaceholder: "Anything we should know",
     preferred: "Preferred contact",
     companyWebsite: "Company website",
     phoneChoice: "Phone",
@@ -76,6 +77,7 @@ const COPY = {
   },
   es: {
     required: "Obligatorio",
+    optional: "Opcional",
     name: "Nombre",
     business: "Empresa",
     phone: "Teléfono",
@@ -90,8 +92,8 @@ const COPY = {
     pickupDate: "Día preferido de recogida",
     pickupWindow: "Horario preferido",
     scheduleNote: "Le llamaremos o escribiremos para confirmar la hora exacta.",
-    details: "¿Qué debemos saber?",
-    detailsPlaceholder: "Describa el material, su condición, procedencia y cualquier detalle que pueda afectar la recogida.",
+    details: "Nota",
+    detailsPlaceholder: "Algo que debamos saber",
     preferred: "Medio de contacto preferido",
     companyWebsite: "Sitio web de la empresa",
     phoneChoice: "Teléfono",
@@ -203,21 +205,14 @@ export function renderReviewForm({
     <input type="hidden" name="intent" value="${escapeHtml(intent)}">
     <input type="hidden" name="form_started" value="${escapeHtml(clean.form_started || "")}">
     <input type="hidden" name="submission_key" value="${escapeHtml(clean.submission_key || "")}">
-    <div class="field"><label for="name">${copy.name} <span>${copy.required}</span></label><input id="name" name="name" type="text" autocomplete="name" value="${escapeHtml(clean.name || "")}" required${nameState.attrs}>${nameState.error}</div>
-    <div class="field"><label for="business">${copy.business}</label><input id="business" name="business" type="text" autocomplete="organization" value="${escapeHtml(clean.business || "")}"></div>
-    <div class="field"><label for="phone">${copy.phone} <span>${copy.required}</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" value="${escapeHtml(clean.phone || "")}" required${phoneState.attrs}>${phoneState.error}</div>
-    <div class="field"><label for="email">${copy.email} <span>${copy.required}</span></label><input id="email" name="email" type="email" autocomplete="email" value="${escapeHtml(clean.email || "")}" required${emailState.attrs}>${emailState.error}</div>
-    <div class="field"><label for="material">${copy.material} <span>${copy.required}</span></label><select id="material" name="material" required${materialState.attrs}>
+    <input type="hidden" name="quantity" value="${escapeHtml(clean.quantity || "")}">
+    <div class="field field-wide"><label for="name">${copy.name} <span>${copy.required}</span></label><input id="name" name="name" type="text" autocomplete="name" value="${escapeHtml(clean.name || "")}" required${nameState.attrs}>${nameState.error}</div>
+    <div class="field field-wide"><label for="phone">${copy.phone} <span>${copy.required}</span></label><input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" value="${escapeHtml(clean.phone || "")}" required${phoneState.attrs}>${phoneState.error}</div>
+    <div class="field field-wide"><label for="material">${copy.material} <span>${copy.required}</span></label><select id="material" name="material" required${materialState.attrs}>
       <option value=""${selected(material, "")}>${copy.selectOne}</option>${materialOptions}
     </select>${materialState.error}</div>
-    <div class="field"><label for="quantity">${copy.quantity}</label><input id="quantity" name="quantity" type="text" maxlength="120" value="${escapeHtml(clean.quantity || "")}" placeholder="${copy.quantityPlaceholder}"></div>
-    <div class="field"><label for="location">${copy.location} <span>${copy.required}</span></label><input id="location" name="location" type="text" maxlength="180" value="${escapeHtml(clean.location || "")}" placeholder="${copy.locationPlaceholder}" required${locationState.attrs}>${locationState.error}</div>
-    <div class="field"><label for="frequency">${copy.frequency}</label><select id="frequency" name="frequency">${frequencyOptions}</select></div>
-    <div class="field"><label for="pickup_date">${copy.pickupDate}</label><input id="pickup_date" name="pickup_date" type="date" value="${escapeHtml(pickupDate)}" aria-describedby="schedule-note" data-pickup-date></div>
-    <div class="field"><label for="pickup_window">${copy.pickupWindow}</label><select id="pickup_window" name="pickup_window" aria-describedby="schedule-note">${windowOptions}</select></div>
-    <p id="schedule-note" class="form-note field-wide schedule-note">${copy.scheduleNote}</p>
-    <div class="field field-wide"><label for="details">${copy.details} <span>${copy.required}</span></label><textarea id="details" name="details" required minlength="20" placeholder="${copy.detailsPlaceholder}"${detailsState.attrs}>${escapeHtml(clean.details || "")}</textarea>${detailsState.error}</div>
-    <fieldset class="field field-wide preferred-contact"><legend>${copy.preferred}</legend><label><input type="radio" name="preferred_contact" value="phone"${checked(preferred, "phone")}> ${copy.phoneChoice}</label><label><input type="radio" name="preferred_contact" value="email"${checked(preferred, "email")}> ${copy.emailChoice}</label></fieldset>
+    <div class="field field-wide"><label for="email">${copy.email} <span>${copy.optional}</span></label><input id="email" name="email" type="email" autocomplete="email" value="${escapeHtml(clean.email || "")}"${emailState.attrs}>${emailState.error}</div>
+    <div class="field field-wide"><label for="details">${copy.details} <span>${copy.optional}</span></label><textarea id="details" name="details" rows="3" maxlength="1000" placeholder="${copy.detailsPlaceholder}"${detailsState.attrs}>${escapeHtml(clean.details || "")}</textarea>${detailsState.error}</div>
     <div class="honeypot" aria-hidden="true"><label for="company_url">${copy.companyWebsite}</label><input id="company_url" name="company_url" type="text" tabindex="-1" autocomplete="off"></div>
     <p class="form-note field-wide">${copy.note} <a href="/privacy"${privacyAttributes}>${copy.privacy}</a>.</p>
     <div class="form-actions field-wide"><button class="button button-primary" type="submit" data-submit-button>${copy.submit} <span class="icon-arrow" aria-hidden="true"></span></button><p class="form-status" data-form-status aria-live="polite"></p></div>

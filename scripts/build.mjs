@@ -1431,7 +1431,7 @@ function document({
   ].filter(Boolean).join("\n    ");
   const homepage = bodyClass.split(/\s+/).includes("home-page");
   const themeColor = homepage ? "#000000" : "#f1ede4";
-  return normalizeTitleCaseMarkup(`<!DOCTYPE html>
+  return withFormAnchor(normalizeTitleCaseMarkup(`<!DOCTYPE html>
 <html lang="${lang}"${homepage ? ' class="home-document"' : ""}>
   <head>
     <meta charset="utf-8">
@@ -1485,7 +1485,43 @@ function document({
     <script type="module" src="/materials-disclosure.js?v=20260810-materials"></script>
     ${moduleScripts.map((src) => `<script type="module" src="${src}"></script>`).join("\n    ")}
   </body>
-</html>`, locale);
+</html>`, locale), locale);
+}
+
+// Every pickup call to action lands on the form itself: "/contact?intent=pickup..." gains "#get-paid"
+// (English) and the Spanish page keeps "#solicitud". site.js smooth-scrolls when already on that page.
+function withFormAnchor(html, locale = "en") {
+  if (locale === "es") return html;
+  return html
+    .replace(/href="(\/contact\?intent=pickup[^"#]*)"/g, 'href="$1#get-paid"')
+    .replace('<form class="intake-panel" action="/contact" method="get"', '<form class="intake-panel" action="/contact#get-paid" method="get"');
+}
+
+// Full-bleed map band. One static, muted street map image kept in the repo (no map service, no key),
+// a CSS pin, the address, and a Get Directions action. site.js points the links at the visitor's own
+// maps app: Apple Maps on iPhone, iPad and Mac, a geo: link on Android, Google Maps elsewhere.
+function renderMapBand() {
+  const destination = `${street}, ${cityLine}`;
+  const directions = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${siteName}, ${destination}`)}`;
+  return `<section class="location-section map-band" aria-labelledby="map-band-title">
+    <a class="map-band-map" href="${directions}" target="_blank" rel="noopener" data-directions data-destination="${destination}" data-place="${siteName}" aria-label="Get directions to ${siteName}, ${destination}">
+      <picture>
+        <source media="(max-width: 700px)" srcset="/images/ag-refining-map-hobby-airport-mobile.webp" width="1100" height="1100">
+        <img src="/images/ag-refining-map-hobby-airport.webp" alt="" width="2560" height="1100" loading="lazy" decoding="async">
+      </picture>
+      <span class="map-band-pin" aria-hidden="true"></span>
+    </a>
+    <div class="map-band-card">
+      <p class="eyebrow">Visit</p>
+      <h2 id="map-band-title">Near Hobby Airport</h2>
+      <address>${street}<br>${cityLine}</address>
+      <p class="map-band-hours">${hoursLine}</p>
+      <a class="button button-primary" href="${directions}" target="_blank" rel="noopener" data-directions data-destination="${destination}" data-place="${siteName}">Get Directions ${arrow}</a>
+      <a class="phone-link map-band-call" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
+      <p class="location-note">Please call before visiting.</p>
+    </div>
+    <p class="map-band-credit">Map data <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a></p>
+  </section>`;
 }
 
 function breadcrumbs(items) {
@@ -1719,30 +1755,7 @@ const home = `
     </div>
   </section>
 
-  <section class="section location-section">
-    <div class="shell location-grid">
-      <a class="location-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${street}, ${cityLine}`)}" target="_blank" rel="noopener">
-        <span class="location-map-kicker"><b>Ag / 47</b><span>Houston, Texas</span></span>
-        <span class="location-map-city" data-city="HOU" aria-hidden="true"></span>
-        <span class="location-map-detail"><span>${street}<br>${cityLine}</span><strong>Open in Google Maps ${arrow}</strong></span>
-      </a>
-      <div class="location-copy">
-        <p class="eyebrow">Contact and Location</p>
-        <h2>Call Before Shipping or Visiting.</h2>
-        <p>We will confirm the material, pickup option, and next step before anything moves.</p>
-        <dl>
-          <div><dt>Address</dt><dd>${street}<br>${cityLine}</dd></div>
-          <div><dt>Phone</dt><dd><a href="tel:${phoneHref}">${phoneDisplay}</a></dd></div>
-          <div><dt>Email</dt><dd><a href="mailto:${email}">${email}</a></dd></div>
-        </dl>
-        <div class="location-actions">
-          <a class="button button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
-          <a class="phone-link" href="tel:${phoneHref}">Call AG Refining</a>
-        </div>
-        <p class="location-note">Please call before visiting. Pickup and service timing depend on the material and schedule.</p>
-      </div>
-    </div>
-  </section>
+  ${renderMapBand()}
 
   <section class="section faq-section">
     <div class="shell faq-grid">

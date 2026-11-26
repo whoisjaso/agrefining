@@ -416,3 +416,23 @@ test("AG_LEAD_BCC_EMAIL copies the owner lead email only", { concurrency: false 
   assert.deepEqual(ownerEmail.bcc, ["team@example.com"]);
   assert.equal(confirmation.bcc, undefined);
 });
+
+test("the short form delivers with only a name, phone and material", { concurrency: false }, async () => {
+  const sent = [];
+  const response = await withDelivery({
+    apiKey: "synthetic-test-key",
+    fetchImpl: async (_url, init) => {
+      sent.push(JSON.parse(init.body));
+      return { ok: true };
+    }
+  }, () => invoke({
+    headers: { accept: "application/json", "content-type": "application/json" },
+    body: JSON.stringify({ ...validLead, submission_key: "test-short-form-001", email: "", location: "", details: "", business: "", quantity: "" })
+  }));
+  assert.equal(response.statusCode, 200);
+  assert.equal(sent.length, 1, "the owner gets the lead; no courtesy email goes out without an address");
+  assert.equal("reply_to" in sent[0], false, "no reply-to header when the visitor gave no email");
+  assert.match(sent[0].text, /Email: Not provided/);
+  assert.match(sent[0].text, /Note: Not provided/);
+  assert.match(sent[0].html, /href="tel:/, "the owner email keeps its one-tap call button");
+});

@@ -71,7 +71,7 @@ const footerGroups = [
     ["Our Story", "/about"],
     ["How It Works", "/how-it-works"],
     ["Contact AG Refining", "/contact"],
-    ["Schedule a Free Pickup", "/contact?intent=pickup"],
+    ["Schedule a Free Pickup", "/contact?intent=pickup#get-paid"],
     ["(281) 898-2719", "tel:+12818982719"],
     ["dennis@agrefining.com", "mailto:dennis@agrefining.com"],
     ["FAQ", "/faq"],

@@ -703,7 +703,7 @@ async function runInteractions(browser, baseUrl, viewport) {
   const primaryTabs = await tabUntil(probePage, ".atelier-hero .button-primary");
   const primaryHref = await probePage.locator(".atelier-hero .button-primary").getAttribute("href");
   assert.equal(await probePage.locator(".atelier-hero a").count(), 1, `${viewport.name}: the hero must carry exactly one action`);
-  assert.equal(primaryHref, "/contact?intent=pickup", `${viewport.name}: primary CTA href changed`);
+  assert.equal(primaryHref, "/contact?intent=pickup#get-paid", `${viewport.name}: primary CTA href changed`);
   await probeContext.close();
 
   const navigationContext = await browser.newContext(contextOptions(viewport));

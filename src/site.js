@@ -321,12 +321,6 @@ function validateReviewForm(form) {
     }
   });
 
-  const details = form.elements.namedItem("details");
-  if (details && details.value.trim().length > 0 && details.value.trim().length < 20 && !issues.some((issue) => issue.field === details)) {
-    details.setAttribute("aria-invalid", "true");
-    issues.push({ field: details, message: formUi.shortDetails });
-  }
-
   return issues;
 }
 
@@ -508,3 +502,42 @@ if (reviewForm) {
   reviewForm.noValidate = true;
   reviewForm.dataset.enhanced = "true";
 }
+
+// Get Directions opens the visitor's own maps app: Apple Maps on iPhone, iPad and Mac, a geo: link on
+// Android, and Google Maps (the link already in the page) everywhere else.
+function directionsHref(link) {
+  const destination = link.dataset.destination || "";
+  const place = link.dataset.place || "";
+  if (!destination) return "";
+  const agent = navigator.userAgent || "";
+  const apple = /iPhone|iPad|iPod|Macintosh/.test(agent);
+  if (apple) return `https://maps.apple.com/?daddr=${encodeURIComponent(destination)}&q=${encodeURIComponent(place || destination)}`;
+  if (/Android/.test(agent)) return `geo:0,0?q=${encodeURIComponent(`${place ? `${place}, ` : ""}${destination}`)}`;
+  return "";
+}
+
+document.querySelectorAll("[data-directions]").forEach((link) => {
+  const href = directionsHref(link);
+  if (!href) return;
+  link.href = href;
+  if (href.startsWith("geo:")) link.removeAttribute("target");
+});
+
+// A pickup call to action on the page that already holds the form scrolls to it instead of reloading.
+document.addEventListener("click", (event) => {
+  const link = event.target.closest?.("a[href*='#']");
+  if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  let url;
+  try { url = new URL(link.href, window.location.href); } catch { return; }
+  const samePath = url.origin === window.location.origin && url.pathname.replace(/\/$/, "") === window.location.pathname.replace(/\/$/, "");
+  if (!samePath || url.hash.length < 2) return;
+  const target = document.getElementById(decodeURIComponent(url.hash.slice(1)));
+  if (!target || !target.querySelector("[data-review-form]")) return;
+  event.preventDefault();
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  target.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+  window.history.replaceState(null, "", url.hash);
+  const material = url.searchParams.get("material");
+  const field = target.querySelector("select[name='material']");
+  if (material && field && Array.from(field.options).some((option) => option.value === material)) field.value = material;
+});

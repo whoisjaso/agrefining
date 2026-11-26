@@ -132,7 +132,7 @@ test("the generated hero keeps the stable overlay behind the streamlined commerc
   assert.doesNotMatch(hero, /class="hero-kicker"/, "the hero kicker should be removed to keep the first screen quieter");
   // Minimal hero: one headline, one short line, one button. Nothing else competes with the film.
   assert.match(hero, /<p class="hero-lede">See the weight\. You decide\.<\/p>/);
-  assert.match(hero, /href="\/contact\?intent=pickup">Schedule a Free Pickup<\/a>/);
+  assert.match(hero, /href="\/contact\?intent=pickup#get-paid">Schedule a Free Pickup<\/a>/);
   assert.equal((hero.match(/<a\b/g) || []).length, 1, "the hero must carry exactly one action");
   assert.doesNotMatch(hero, /href="tel:/, "the call link lives in the menu and lower on the page, not in the hero");
   assert.doesNotMatch(hero, /hero-proof-rail/, "the proof points live in the band below the hero");

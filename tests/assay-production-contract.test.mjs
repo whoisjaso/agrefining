@@ -79,9 +79,9 @@ test("the deployable homepage hero states the approved V2 value proposition", ()
 test("the deployable homepage hero presents its single approved action", () => {
   const { hero } = homepageHero();
   const anchors = heroAnchors(hero);
-  const primary = anchors.find((anchor) => anchor.href === "/contact?intent=pickup");
+  const primary = anchors.find((anchor) => anchor.href === "/contact?intent=pickup#get-paid");
 
-  assert.ok(primary, "the primary pickup CTA must be an anchor to /contact?intent=pickup");
+  assert.ok(primary, "the primary pickup CTA must be an anchor that lands on the pickup form");
   assert.ok(primary.classes.includes("button"), "the primary pickup CTA must use the shared button class");
   assert.ok(primary.classes.includes("button-primary"), "the primary pickup CTA must use the primary button class");
   assert.equal(primary.text, "Schedule a Free Pickup");

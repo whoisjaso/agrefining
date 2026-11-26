@@ -283,7 +283,6 @@ blockquote {
 .section-title-row h2,
 .faq-grid h2,
 .answer-home h2,
-.location-copy h2,
 .service-area-layout h2 {
   margin-bottom: 0;
 }
@@ -1813,144 +1812,131 @@ html[data-loader-state="ready"] .home-loader {
   background: var(--canvas);
 }
 
-.location-grid {
+/* Map band: one static map image, edge to edge, with a small cream card. */
+.map-band {
   display: grid;
-  gap: clamp(2.5rem, 7vw, 7rem);
-  grid-template-columns: minmax(0, 1.1fr) minmax(20rem, 0.85fr);
-}
-
-.location-map {
-  background: var(--navy);
-  border: 1px solid var(--line);
-  color: var(--paper);
-  display: grid;
-  grid-template-rows: auto 1fr auto;
   isolation: isolate;
-  min-height: 34rem;
   overflow: hidden;
-  padding: clamp(1.5rem, 4vw, 3rem);
   position: relative;
-  transition: background var(--medium) var(--ease);
 }
 
-.location-map::before {
-  border: 1px solid var(--line-inverse);
+.map-band-map {
+  display: block;
+  grid-area: 1 / 1;
+  min-height: clamp(30rem, 46vw, 40rem);
+  position: relative;
+}
+
+.map-band-map picture,
+.map-band-map img {
+  display: block;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  object-position: 50% 50%;
+  position: absolute;
+  width: 100%;
+}
+
+.map-band-pin {
+  background: var(--navy);
+  border: 3px solid var(--paper);
   border-radius: 50%;
-  content: "";
-  height: clamp(12rem, 27vw, 23rem);
+  box-shadow: 0 0 0 0.6rem rgba(16, 42, 67, 0.14), 0 0.5rem 1.4rem rgba(16, 42, 67, 0.3);
+  height: 1.25rem;
   left: 50%;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: clamp(12rem, 27vw, 23rem);
-  z-index: -1;
+  width: 1.25rem;
 }
 
-.location-map::after {
-  background: var(--mineral-blue);
-  border: 0.35rem solid rgba(250, 248, 242, 0.16);
-  border-radius: 50%;
-  content: "";
-  height: 1.15rem;
-  left: 50%;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 1.15rem;
-}
-
-.location-map:hover {
-  background: color-mix(in srgb, var(--navy) 92%, var(--focus));
-}
-
-.location-map-kicker,
-.location-map-detail {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
+.map-band-card {
+  align-self: center;
+  background: var(--paper);
+  box-shadow: var(--shadow-float);
+  grid-area: 1 / 1;
+  justify-self: start;
+  margin-left: max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter)));
+  max-width: 23rem;
+  padding: clamp(1.75rem, 3vw, 2.6rem);
   position: relative;
   z-index: 1;
 }
 
-.location-map-kicker {
-  font-size: 0.69rem;
-  font-weight: 720;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+.map-band-card h2 {
+  font-size: clamp(1.7rem, 2.4vw, 2.2rem);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 1.1rem;
 }
 
-.location-map-kicker b {
-  color: var(--focus-soft);
-  font-weight: 760;
+.map-band-card address {
+  color: var(--ink);
+  font-style: normal;
+  line-height: 1.55;
 }
 
-.location-map-city::before {
-  content: attr(data-city);
+.map-band-hours {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 0.6rem 0 1.6rem;
 }
 
-.location-map-city {
-  align-self: center;
-  color: rgba(250, 248, 242, 0.12);
-  font-size: clamp(6.5rem, 14vw, 11rem);
-  font-weight: 240;
-  letter-spacing: -0.08em;
-  line-height: 0.8;
-  position: relative;
-  z-index: -1;
+.map-band-card .button {
+  width: 100%;
 }
 
-.location-map-detail {
-  border-top: 1px solid var(--line-inverse);
-  gap: 2rem;
-  padding-top: 1.25rem;
-}
-
-.location-map-detail > span {
-  font-size: 0.78rem;
-  line-height: 1.5;
-}
-
-.location-map-detail strong {
-  align-items: center;
+.map-band-call {
   display: inline-flex;
-  font-size: 0.73rem;
-  font-weight: 720;
-  gap: 0.65rem;
-  text-align: right;
+  margin-top: 1.1rem;
+  min-height: 44px;
 }
 
-.location-copy {
-  align-self: center;
-}
-
-.location-copy > p:not(.eyebrow):not(.location-note) {
-  color: var(--muted);
-}
-
-.location-copy dl {
-  border-top: 1px solid var(--line-strong);
-  margin: 2rem 0;
-}
-
-.location-copy dl > div {
-  border-bottom: 1px solid var(--line);
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: 5rem 1fr;
-  padding-block: 0.85rem;
-}
-
-.location-copy dt {
-  color: var(--muted);
-  font-size: 0.69rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.location-copy dd {
-  font-size: 0.86rem;
+.map-band-credit {
+  background: rgba(250, 248, 242, 0.86);
+  bottom: 0;
+  color: var(--ink-soft);
+  font-size: 0.62rem;
   margin: 0;
+  padding: 0.2rem 0.5rem;
+  position: absolute;
+  right: 0;
+  z-index: 1;
+}
+
+.map-band-credit a {
+  color: inherit;
+}
+
+@media (max-width: 900px) {
+  /* The form comes first on phones; the contact details follow it. */
+  .contact-grid > .contact-form-column {
+    order: -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .map-band {
+    display: block;
+  }
+
+  .map-band-map {
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+  }
+
+  .map-band-card {
+    box-shadow: none;
+    margin: 0;
+    max-width: none;
+    padding: 2.25rem var(--gutter) 2.75rem;
+  }
+
+  .map-band-credit {
+    bottom: auto;
+    top: calc(100vw - 1.4rem);
+  }
 }
 
 .location-note {
@@ -2932,9 +2918,10 @@ html[data-loader-state="ready"] .home-loader {
 
 .review-form {
   display: grid;
-  gap: 1.1rem;
+  gap: 1.75rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: 2.2rem;
+  margin-top: 2.6rem;
+  max-width: 34rem;
 }
 
 .field {
@@ -2977,7 +2964,7 @@ html[data-loader-state="ready"] .home-loader {
 }
 
 .field textarea {
-  min-height: 10rem;
+  min-height: 6.5rem;
   resize: vertical;
 }
 
@@ -3645,7 +3632,6 @@ html[data-loader-state="ready"] .home-loader {
   .answer-home-grid,
   .service-area-layout,
   .legacy-editorial,
-  .location-grid,
   .faq-grid,
   .service-hero-grid,
   .page-intro-grid,
@@ -3728,12 +3714,27 @@ html[data-loader-state="ready"] .home-loader {
     width: 2.25rem;
   }
 
-  .atelier-hero,
+  /* The copy block is laid out in the visible area (svh/dvh). The hero itself runs to the large
+     viewport, so the black film also covers the strip under Safari's toolbar and the bottom safe
+     area. No cream shows until the visitor scrolls. */
   .hero-commercial-grid {
     height: 100svh;
     height: 100dvh;
     min-height: 100svh;
     min-height: 100dvh;
+  }
+
+  .atelier-hero {
+    height: auto;
+    min-height: -webkit-fill-available;
+    min-height: 100svh;
+    min-height: 100dvh;
+  }
+
+  @supports (height: 100lvh) {
+    .atelier-hero {
+      min-height: calc(100lvh + env(safe-area-inset-bottom, 0px));
+    }
   }
 
   .atelier-hero {
@@ -3813,6 +3814,19 @@ html[data-loader-state="ready"] .home-loader {
     background: #faf8f2;
     border-bottom: 1px solid var(--line);
     box-shadow: 0 8px 30px rgba(16, 42, 67, 0.07);
+  }
+
+  /* Solid cream bar on phones: wordmark only and a plain MENU control, no tile and no box. */
+  body:not(.nav-open) .site-header .brand img {
+    display: none;
+  }
+
+  body:not(.nav-open) .site-header[data-nav-enhanced="true"] .nav-toggle {
+    background: transparent;
+    border-color: transparent;
+    min-height: 44px;
+    min-width: 44px;
+    padding-right: 0;
   }
 
   html.home-header-solid .site-header .brand-word,
@@ -3985,20 +3999,6 @@ html[data-loader-state="ready"] .home-loader {
 
   .taxonomy-card > div > p:not(.eyebrow) {
     display: none;
-  }
-
-  .location-map {
-    min-height: 23rem;
-  }
-
-  .location-map-detail {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.8rem;
-  }
-
-  .location-map-detail strong {
-    text-align: left;
   }
 
   .material-types-list,

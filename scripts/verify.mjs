@@ -143,8 +143,8 @@ else {
   if (/\/assets\/ag-refining-hero-v2-[^"']+\.webp/.test(hero)) failures.push("Homepage hero still references retired V2 artwork");
   if (/class="hero-kicker"/.test(hero)) failures.push("Homepage hero must not restore the retired kicker line");
   const heroAnchors = anchorsIn(hero);
-  const primaryAction = heroAnchors.find((anchor) => anchor.href === "/contact?intent=pickup");
-  if (!primaryAction) failures.push("Homepage hero must provide a primary pickup anchor to /contact?intent=pickup");
+  const primaryAction = heroAnchors.find((anchor) => anchor.href === "/contact?intent=pickup#get-paid");
+  if (!primaryAction) failures.push("Homepage hero must provide a primary pickup anchor that lands on the form (/contact?intent=pickup#get-paid)");
   else {
     if (!primaryAction.classes.includes("button") || !primaryAction.classes.includes("button-primary")) {
       failures.push("Homepage hero pickup anchor must use button button-primary classes");

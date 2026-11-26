@@ -131,11 +131,10 @@ function validate(payload) {
   const fields = {};
   const copy = RESPONSE_COPY[payload.locale].fields;
   if (payload.name.length < 2) fields.name = copy.name;
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) fields.email = copy.email;
+  // Email is optional on the short form; when given it must be valid.
+  if (payload.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) fields.email = copy.email;
   if (payload.phone.replace(/\D/g, "").length < 7) fields.phone = copy.phone;
   if (!MATERIALS.has(payload.material)) fields.material = copy.material;
-  if (payload.location.length < 2) fields.location = copy.location;
-  if (payload.details.length < 20) fields.details = copy.details;
   return fields;
 }
 
@@ -171,15 +170,15 @@ function emailContent(payload) {
     ["Name", payload.name],
     ["Business", payload.business || "Not provided"],
     ["Phone", payload.phone],
-    ["Email", payload.email],
+    ["Email", payload.email || "Not provided"],
     ["Request", label(payload.intent)],
     ["Material", label(payload.material)],
     ["Amount", payload.quantity || "Not provided"],
-    ["Pickup location", payload.location],
+    ["Pickup location", payload.location || "Not provided"],
     ["Frequency", label(payload.frequency)],
     ["Preferred pickup", pickupSummary(payload) || "Flexible"],
     ["Preferred contact", label(payload.preferred_contact)],
-    ["Details", payload.details]
+    ["Note", payload.details || "Not provided"]
   ];
   const attribution = Object.entries(payload.attribution);
   const plainRows = rows.map(([name, value]) => `${name}: ${value}`).join("\n");
@@ -258,6 +257,8 @@ export function confirmationContent(payload) {
 
 // Courtesy confirmation to the visitor. Never blocks or fails the lead itself.
 async function sendConfirmation(payload) {
+  // No address, no courtesy email. The owner still gets the lead.
+  if (!payload.email) return;
   try {
     const content = confirmationContent(payload);
     const owner = process.env.AG_LEAD_TO_EMAIL || DEFAULT_TO_EMAIL;
@@ -306,7 +307,7 @@ async function sendResend(payload) {
       from: process.env.AG_LEAD_FROM_EMAIL || DEFAULT_FROM_EMAIL,
       to: [process.env.AG_LEAD_TO_EMAIL || DEFAULT_TO_EMAIL],
       ...(leadBcc().length ? { bcc: leadBcc() } : {}),
-      reply_to: payload.email,
+      ...(payload.email ? { reply_to: payload.email } : {}),
       subject: `Pickup request: ${label(payload.material)} from ${payload.name}`,
       text: content.text,
       html: content.html
