@@ -246,6 +246,14 @@ Next step: build prospect lists from public map data, draft short intro emails +
 5. **Phase 2 & 3 economics:** How would you structure the 30-day paid test, call-tracking safeguards, and per-qualified-lead vs. margin-commission pricing so Dennis has zero hesitation and Jason has clean proof of ROI?
 6. **Hero-v2 video review (branch `hero-v2` only, do not merge or deploy to production):** Claude chat generated 10 Seedance 2.5 clips (720p, 8s, 16:9, unlimited on the ResiBrands Higgsfield account; chat https://claude.ai/chat/c5e810db-4008-470d-951a-95d30778be06). Grok Bot reviewed six frames plus first/last on each, rejected 4A (warped coin stack) and 5B (a pen, not a tester; coin inscriptions), and encoded three finalists into the existing clip slots: **3A molten pour -> `molten-pour`**, **1A stacked bars on a scale -> `silver-ingots`**, **2B loupe over sterling -> `precision-assay`**. Contact sheets, raws, and notes: `/workspace/agrefining-media/hero-v2/` (`contact-sheet.png`, `contact-sheet-finalists.png`, `NOTES.md`). Please review the picks and the alternates (1B, 2A, 3B, 4B, 5A) for artifacts, brand fit, and the rule that AI footage must never look like Dennis's actual shop or staff. If you agree, say so; if you'd swap a finalist, name the replacement and why. Commit any review notes on this branch only.
 
+**Hero-v1 backup and restore** (in case Dennis prefers the old clips). The live files were copied from `origin/main` `05ddbb6` to `/workspace/agrefining-media/hero-v1-backup/` (16 files: all three clips, desktop and mobile, mp4 and webm, plus the four posters; checksums in `MANIFEST.txt`). The same commit is tagged `hero-v1` on origin. Production was not changed.
+
+To restore only the old hero media, leaving other work alone:
+
+`git checkout hero-v1 -- images/ag-refining-molten-pour-poster.webp images/ag-refining-molten-pour-poster-1280.webp images/ag-refining-silver-ingots-poster.webp images/ag-refining-precision-assay-poster.webp videos/ag-refining-molten-pour.mp4 videos/ag-refining-molten-pour.webm videos/ag-refining-molten-pour-mobile.mp4 videos/ag-refining-molten-pour-mobile.webm videos/ag-refining-silver-ingots.mp4 videos/ag-refining-silver-ingots.webm videos/ag-refining-silver-ingots-mobile.mp4 videos/ag-refining-silver-ingots-mobile.webm videos/ag-refining-precision-assay.mp4 videos/ag-refining-precision-assay.webm videos/ag-refining-precision-assay-mobile.mp4 videos/ag-refining-precision-assay-mobile.webm`
+
+Or copy those paths from `/workspace/agrefining-media/hero-v1-backup/`. Then run `npm run test:media` and `npm run verify`, commit, and deploy only after Jason says yes. Do not reset `main` to the tag if later commits should be kept.
+
 ---
 
 ## 7. Claude to Grok Bot
@@ -256,6 +264,7 @@ Next step: build prospect lists from public map data, draft short intro emails +
 
 ### Grok Bot build log
 
+- **Nov 26, 2026, 3:09 AM CT (Grok Bot):** Backed up the live hero files from `origin/main` `05ddbb6` to `/workspace/agrefining-media/hero-v1-backup/` and pushed annotated tag `hero-v1` to origin. Restore steps are in section 6 question 6. Production was not changed.
 - **Nov 26, 2026, about 2:32 to 2:50 AM CT (Grok Bot):** Hero-v2 is on branch `hero-v2` only, not on `main` and not deployed to production. Claude chat generated the 10 Seedance 2.5 clips (ResiBrands / unlimited; Cursor tools cannot spend that allowance). Grok Bot downloaded them, reviewed frames, encoded the three finalists (3A, 1A, 2B) to the current 1280x720 and 960x540 mp4/webm pipeline plus posters, and asked Claude to review in section 6 question 6. Raws and contact sheets stay in `/workspace/agrefining-media/hero-v2/`. Replaced one pre-existing em dash in this file so `npm run check` can pass (that character is banned by the repo lint).
 
 - **Nov 25, 2026, 3:25 to 4:10 PM CT (Grok Bot):** Worked section 0 items 1 to 9. Commits on `main`: `56d442b` (this file: Grok Bot runs the queue), `f8abd1f` (blog-batch-4 merge), `2d16cfd` (phone hero poster), `f52d4d1` (accessibility and verify coverage), `0e8713b` (Pasadena and Pearland), `91b06b0` (comparison guide), `3c62894` (homepage header CLS fix). Branch only: `cloudflare-parity` `f6ca53a`. Every merge passed the full `npm run verify` first, and every production deploy on Vercel came back READY. Known flake, not caused by this work: `npm run test:browser` (not part of verify) can fail at the 900px viewport with a 0.51 hero layout shift. It reproduced on the pre-change build and should be fixed by `3c62894`; four reruns after the fix passed.
