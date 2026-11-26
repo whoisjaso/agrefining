@@ -109,7 +109,9 @@ test("homepage keeps a cream-dominant editorial rhythm with blue carried through
   assert.match(home, /<meta name="theme-color" content="#000000">/);
   assert.match(home, /<html lang="en" class="home-document">/);
   assert.doesNotMatch(contact, /class="home-document"/);
-  assert.match(css, /\.home-document,\s*\.home-page\s*\{[^}]*background:\s*#102a43/s);
+  // Black, never navy: iPhone Safari tints the status bar area from the page background.
+  assert.match(css, /\.home-document,\s*\.home-page\s*\{[^}]*background:\s*#000/s);
+  assert.match(css, /\.home-loader\s*\{[^}]*background:\s*#000/s);
   assert.match(css, /\.home-page\s+\.site-header,\s*\.home-page\s+\.site-header\[data-stuck="true"\]\s*\{[^}]*background:\s*#faf8f2/s);
   for (const selector of [
     ".home-page .assay-process",
@@ -144,8 +146,8 @@ test("reduced motion keeps the homepage header visible without returning it to l
 test("the cinematic layers remain unfiltered behind a materially lighter overlay", () => {
   const cinematicRules = [...css.matchAll(/(?:\.cinematic-hero-(?:media|poster|video|overlay)[^{]*)\{([^}]*)\}/g)].map((match) => match[1]).join("\n");
   assert.doesNotMatch(cinematicRules, /(?:backdrop-)?filter\s*:/);
-  assert.match(css, /\.cinematic-hero-overlay\s*\{[\s\S]*?rgba\(3, 22, 36, 0\.58\) 0%[\s\S]*?rgba\(3, 22, 36, 0\.48\) 26%[\s\S]*?rgba\(3, 22, 36, 0\.32\) 44%/);
-  assert.doesNotMatch(css, /\.cinematic-hero-overlay\s*\{[\s\S]*?rgba\(3, 22, 36, 0\.98\)/);
+  assert.match(css, /\.cinematic-hero-overlay\s*\{[\s\S]*?rgba\(0, 0, 0, 0\.62\) 0%[\s\S]*?rgba\(0, 0, 0, 0\.5\) 26%[\s\S]*?rgba\(0, 0, 0, 0\.32\) 44%/);
+  assert.doesNotMatch(css, /rgba\(3, 22, 36/);
 });
 
 test("the production-only hidden header behavior is now part of the repository build", () => {

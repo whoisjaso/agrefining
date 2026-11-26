@@ -144,7 +144,6 @@ else {
   if (/class="hero-kicker"/.test(hero)) failures.push("Homepage hero must not restore the retired kicker line");
   const heroAnchors = anchorsIn(hero);
   const primaryAction = heroAnchors.find((anchor) => anchor.href === "/contact?intent=pickup");
-  const fallbackAction = heroAnchors.find((anchor) => anchor.href === "/accepted-materials");
   if (!primaryAction) failures.push("Homepage hero must provide a primary pickup anchor to /contact?intent=pickup");
   else {
     if (!primaryAction.classes.includes("button") || !primaryAction.classes.includes("button-primary")) {
@@ -152,19 +151,11 @@ else {
     }
     if (primaryAction.text !== "Schedule a Free Pickup") failures.push("Homepage hero pickup anchor must use the exact V2 label");
   }
-  if (!fallbackAction) failures.push("Homepage hero must provide a fallback material anchor to /accepted-materials");
-  else {
-    if (!fallbackAction.classes.includes("button") || !fallbackAction.classes.includes("button-secondary")) {
-      failures.push("Homepage hero material anchor must use button button-secondary classes");
-    }
-    if (fallbackAction.text !== "See what we buy") failures.push("Homepage hero material anchor must use the exact V2 label");
-  }
-  if (!hero.includes('href="tel:+12818982719"')) failures.push("Homepage hero must keep the phone fallback");
+  if (heroAnchors.length !== 1) failures.push("Homepage hero must carry exactly one action");
   const requiredProof = ["Houston-based", "Free qualifying pickup", "On-site weighing", "Confirmed payment terms"];
-  const proofRail = (hero.match(/<ul\b[\s\S]*?<\/ul>/g) || []).find((list) => requiredProof.every((proof) => list.includes(proof))) || "";
-  if (!proofRail) failures.push("Homepage hero must keep the proof rail inside the hero");
+  const trustLedger = home.match(/<div class="trust-ledger">[\s\S]*?<\/div>\s*<\/div>/)?.[0] || "";
   for (const proof of requiredProof) {
-    if (!proofRail.includes(proof)) failures.push(`Homepage hero proof rail is missing ${proof}`);
+    if (!trustLedger.includes(proof)) failures.push(`Homepage trust band below the hero is missing ${proof}`);
   }
 }
 if (!home.includes("ag-silver-hero-1600.webp")) failures.push("Homepage must retain the lower industrial proof image");

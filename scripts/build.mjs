@@ -1556,10 +1556,9 @@ const home = `
     <div class="shell hero-commercial-grid">
       <div class="hero-copy">
         <h1>Houston Silver Buyer, Valued Precisely.</h1>
-        <p class="hero-lede">See the weight. Review the offer. You decide.</p>
+        <p class="hero-lede">See the weight. You decide.</p>
         <div class="hero-actions">
           <a class="button button-primary" href="/contact?intent=pickup">${primaryCta}</a>
-          <a class="phone-link phone-link-inverse hero-call" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
         </div>
       </div>
     </div>

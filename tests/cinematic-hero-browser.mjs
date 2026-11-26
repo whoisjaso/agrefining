@@ -292,10 +292,7 @@ async function pageState(page) {
       rects: {
         hero: rect(".atelier-hero"),
         h1: rect(".atelier-hero h1"),
-        ctaPrimary: rect(".atelier-hero .button-primary"),
-        ctaSecondary: rect(".atelier-hero .button-secondary"),
-        phone: rect(".atelier-hero .hero-call"),
-        proof: rect(".atelier-hero .hero-proof-rail")
+        ctaPrimary: rect(".atelier-hero .button-primary")
       },
       overflow: {
         scrollWidth: document.documentElement.scrollWidth,
@@ -696,19 +693,17 @@ async function runInteractions(browser, baseUrl, viewport) {
   const probePage = await probeContext.newPage();
   await probePage.goto(`${baseUrl}/`, { waitUntil: "load" });
   await probePage.waitForFunction(() => document.querySelector("[data-cinematic-hero-media]")?.cinematicHeroVideoController?.transitionPhase === "static", null, { timeout: 8000 });
-  const selectors = [".atelier-hero .button-primary", ".atelier-hero .button-secondary", ".atelier-hero .hero-call"];
+  // Minimal hero: one action only.
+  const selectors = [".atelier-hero .button-primary"];
   const hitTargets = {};
   for (const selector of selectors) {
     const state = await topmostState(probePage, selector);
     hitTargets[selector] = state;
   }
   const primaryTabs = await tabUntil(probePage, ".atelier-hero .button-primary");
-  const secondaryTabs = await tabUntil(probePage, ".atelier-hero .button-secondary");
-  const phoneTabs = await tabUntil(probePage, ".atelier-hero .hero-call");
   const primaryHref = await probePage.locator(".atelier-hero .button-primary").getAttribute("href");
-  const secondaryHref = await probePage.locator(".atelier-hero .button-secondary").getAttribute("href");
+  assert.equal(await probePage.locator(".atelier-hero a").count(), 1, `${viewport.name}: the hero must carry exactly one action`);
   assert.equal(primaryHref, "/contact?intent=pickup", `${viewport.name}: primary CTA href changed`);
-  assert.equal(secondaryHref, "/accepted-materials", `${viewport.name}: secondary CTA href changed`);
   await probeContext.close();
 
   const navigationContext = await browser.newContext(contextOptions(viewport));
@@ -718,10 +713,6 @@ async function runInteractions(browser, baseUrl, viewport) {
   assert.match(contactUrl.pathname, /^\/contact\/?$/, `${viewport.name}: primary CTA did not resolve to the contact route`);
   assert.equal(contactUrl.searchParams.get("intent"), "pickup", `${viewport.name}: primary CTA did not preserve the pickup intent`);
   await contactPage.close();
-  const materialsPage = await navigationContext.newPage();
-  await materialsPage.goto(new URL(secondaryHref, baseUrl).toString(), { waitUntil: "load" });
-  assert.match(new URL(materialsPage.url()).pathname, /^\/accepted-materials\/?$/, `${viewport.name}: secondary CTA did not resolve to accepted materials`);
-  await materialsPage.close();
   await navigationContext.close();
 
   const context = await createInteractionContext(browser, viewport);
@@ -827,13 +818,13 @@ async function runInteractions(browser, baseUrl, viewport) {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   for (const [selector, state] of Object.entries(hitTargets)) {
     assert.equal(state.topmost, true, `${viewport.name}: ${selector} is not topmost: ${JSON.stringify(state)}`);
-    const minimumHeight = selector.includes("hero-call") && viewport.width > 900 ? 24 : 44;
+    const minimumHeight = 44;
     assert.ok(state.rect.height >= minimumHeight, `${viewport.name}: ${selector} is shorter than ${minimumHeight}px`);
   }
   assert.equal(overflow, 0, `${viewport.name}: interactions page has horizontal overflow`);
   assert.deepEqual(diagnostics, { label: `${viewport.name}-interactions`, consoleErrors: [], pageErrors: [], failedLocalRequests: [], localHttpErrors: [] });
   await context.close();
-  return { hitTargets, keyboardTabs: { primary: primaryTabs, secondary: secondaryTabs, phone: phoneTabs }, materials, overflow };
+  return { hitTargets, keyboardTabs: { primary: primaryTabs }, materials, overflow };
 }
 
 function stageDefinitions(baseUrl, viewport) {

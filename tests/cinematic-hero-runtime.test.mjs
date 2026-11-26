@@ -168,7 +168,7 @@ class FakeRoot extends EventTarget {
     this.poster = new FakePoster();
     this.heroContent = {
       heading: "Houston Silver Buyer, Valued Precisely.",
-      actions: ["Schedule a free pickup", "See what we buy"]
+      actions: ["Schedule a free pickup"]
     };
   }
 

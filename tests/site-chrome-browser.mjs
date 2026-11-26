@@ -111,8 +111,8 @@ async function verifyMobileChrome(browser, baseUrl) {
     header: getComputedStyle(document.querySelector("[data-site-header]")).backgroundColor
   }));
   assert.deepEqual(homepageColors, {
-    root: "rgb(16, 42, 67)",
-    body: "rgb(16, 42, 67)",
+    root: "rgb(0, 0, 0)",
+    body: "rgb(0, 0, 0)",
     header: "rgba(0, 0, 0, 0)"
   });
 

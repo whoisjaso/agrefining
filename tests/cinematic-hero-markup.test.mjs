@@ -130,14 +130,13 @@ test("the generated hero keeps the stable overlay behind the streamlined commerc
   assert.equal((hero.match(/<h1(?:\s[^>]*)?>/g) || []).length, 1);
   assert.match(hero, /<h1>Houston Silver Buyer, Valued Precisely\.<\/h1>/);
   assert.doesNotMatch(hero, /class="hero-kicker"/, "the hero kicker should be removed to keep the first screen quieter");
-  assert.match(hero, /Free pickup for qualifying Houston accounts\. See the weight, review the offer, and choose what happens next\./);
+  // Minimal hero: one headline, one short line, one button. Nothing else competes with the film.
+  assert.match(hero, /<p class="hero-lede">See the weight\. You decide\.<\/p>/);
   assert.match(hero, /href="\/contact\?intent=pickup">Schedule a Free Pickup<\/a>/);
-  assert.match(hero, /href="\/accepted-materials">See what we buy<\/a>/);
-  assert.match(hero, /href="tel:\+12818982719">Call \(281\) 898-2719<\/a>/);
-  const proofRail = outerElement(hero, "hero-proof-rail");
-  assert.ok(proofRail, "the proof rail must remain inside the hero");
-  const proofItems = [...proofRail.inner.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((match) => match[1].trim());
-  assert.deepEqual(proofItems, ["Houston-based", "Free qualifying pickup", "On-site weighing", "Confirmed payment terms"]);
+  assert.equal((hero.match(/<a\b/g) || []).length, 1, "the hero must carry exactly one action");
+  assert.doesNotMatch(hero, /href="tel:/, "the call link lives in the menu and lower on the page, not in the hero");
+  assert.doesNotMatch(hero, /hero-proof-rail/, "the proof points live in the band below the hero");
+  assert.match(home.slice(heroEnd), /class="trust-ledger"[\s\S]*?Houston-based[\s\S]*?Free qualifying pickup[\s\S]*?On-site weighing[\s\S]*?Confirmed payment terms/, "the four proof points must stay on the page below the hero");
   assert.ok(home.indexOf('<form class="intake-panel"') > heroEnd, "the material intake form must begin after the closing hero");
 });
 
@@ -157,8 +156,9 @@ test("the built stylesheet isolates layered hero media with stationary overlay a
   assert.match(videoRule, /inset:\s*0/);
   assert.match(videoRule, /position:\s*absolute/);
   assert.match(videoRule, /transition:\s*opacity 800ms cubic-bezier\(0\.4, 0, 0\.2, 1\)/, "a 300ms cinematic fade would be too abrupt");
-  assert.match(overlayRule, /linear-gradient\(90deg, rgba\(3, 22, 36, 0\.58\) 0%, rgba\(3, 22, 36, 0\.48\) 26%, rgba\(3, 22, 36, 0\.32\) 44%, rgba\(3, 22, 36, 0\.14\) 66%, rgba\(3, 22, 36, 0\.04\) 100%\)/, "the lighter stationary gradient belongs on the overlay");
-  assert.match(overlayRule, /linear-gradient\(180deg, rgba\(3, 22, 36, 0\.12\) 0%, transparent 30%, rgba\(3, 22, 36, 0\.16\) 100%\)/);
+  assert.match(overlayRule, /linear-gradient\(90deg, rgba\(0, 0, 0, 0\.62\) 0%, rgba\(0, 0, 0, 0\.5\) 26%, rgba\(0, 0, 0, 0\.32\) 44%, rgba\(0, 0, 0, 0\.12\) 66%, rgba\(0, 0, 0, 0\.04\) 100%\)/, "the stationary gradient belongs on the overlay and is black, never navy");
+  assert.match(overlayRule, /linear-gradient\(180deg, rgba\(0, 0, 0, 0\.16\) 0%, transparent 30%, rgba\(0, 0, 0, 0\.2\) 100%\)/);
+  assert.doesNotMatch(overlayRule, /rgba\(3, 22, 36|#102a43|#071827/, "no navy tint over the film");
   assert.doesNotMatch(overlayRule, /transition:/, "the stationary overlay must not animate");
   assert.doesNotMatch(coverRule, /filter:|backdrop-filter:/, "hero media must not use CSS filters");
   assert.doesNotMatch(videoRule, /filter:|backdrop-filter:/, "hero videos must not use CSS filters");
@@ -188,8 +188,7 @@ test("the first poster crossfades with the active video instead of exposing the 
   assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.cinematic-hero-video,\s*\.cinematic-hero-poster\s*\{\s*transition:\s*none;/);
 });
 
-test("tablet and mobile phone targets retain the 44px coarse-pointer craft floor", () => {
+test("the single hero action keeps a comfortable tap target", () => {
   const stylesheet = readFileSync(join(dist, "style.css"), "utf8");
-  const mobileNavigation = stylesheet.match(/@media \(max-width: 900px\)\s*\{\s*:root\s*\{[\s\S]*?--header-height:\s*5rem;([\s\S]*?)@media \(max-width: 700px\)/)?.[1] || "";
-  assert.match(mobileNavigation, /\.hero-call\s*\{[^}]*min-height:\s*44px;/);
+  assert.match(stylesheet, /\.atelier-hero \.hero-actions \.button\s*\{[^}]*min-height:\s*3\.5rem;/);
 });

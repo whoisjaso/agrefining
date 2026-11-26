@@ -76,20 +76,16 @@ test("the deployable homepage hero states the approved V2 value proposition", ()
   assert.match(hero, /<h1>Houston Silver Buyer, Valued Precisely\.<\/h1>/);
 });
 
-test("the deployable homepage hero presents both approved V2 actions", () => {
+test("the deployable homepage hero presents its single approved action", () => {
   const { hero } = homepageHero();
   const anchors = heroAnchors(hero);
   const primary = anchors.find((anchor) => anchor.href === "/contact?intent=pickup");
-  const fallback = anchors.find((anchor) => anchor.href === "/accepted-materials");
 
   assert.ok(primary, "the primary pickup CTA must be an anchor to /contact?intent=pickup");
   assert.ok(primary.classes.includes("button"), "the primary pickup CTA must use the shared button class");
   assert.ok(primary.classes.includes("button-primary"), "the primary pickup CTA must use the primary button class");
   assert.equal(primary.text, "Schedule a Free Pickup");
-  assert.ok(fallback, "the fallback material CTA must be an anchor to /accepted-materials");
-  assert.ok(fallback.classes.includes("button"), "the fallback material CTA must use the shared button class");
-  assert.ok(fallback.classes.includes("button-secondary"), "the fallback material CTA must use the secondary button class");
-  assert.equal(fallback.text, "See what we buy");
+  assert.equal(anchors.length, 1, "the minimal hero carries exactly one action");
 });
 
 test("the deployable homepage hero uses a permanent cinematic poster and two deferred video layers", () => {
@@ -112,14 +108,14 @@ test("the deployable homepage hero uses a permanent cinematic poster and two def
   assert.doesNotMatch(hero, /\/assets\/ag-refining-hero-v2-[^"']+\.webp/);
 });
 
-test("the deployable homepage keeps its supported proof rail inside the hero", () => {
+test("the deployable homepage keeps its supported proof points in the band below the hero", () => {
   const { hero } = homepageHero();
   const requiredProof = ["Houston-based", "Free qualifying pickup", "On-site weighing", "Confirmed payment terms"];
-  const rail = (hero.match(/<ul\b[\s\S]*?<\/ul>/g) || []).find((list) => requiredProof.every((proof) => list.includes(proof)));
+  const ledger = readFileSync(join(dist, "index.html"), "utf8").match(/<div class="trust-ledger">[\s\S]*?<\/div>\s*<\/div>/)?.[0] || "";
 
-  assert.ok(rail, "the proof rail must remain inside the hero");
+  assert.doesNotMatch(hero, /hero-proof-rail/, "the hero stays minimal");
   for (const proof of requiredProof) {
-    assert.match(rail, new RegExp(`>\\s*${proof}\\s*<`));
+    assert.match(ledger, new RegExp(`>\\s*${proof}\\s*<`));
   }
 });
 
