@@ -17,7 +17,7 @@
   const update = () => {
     frame = 0;
     root.classList.toggle("home-header-revealed", window.scrollY >= threshold);
-    const leftHero = hero ? hero.getBoundingClientRect().bottom <= 48 : window.scrollY >= threshold;
+    const leftHero = hero ? hero.getBoundingClientRect().bottom <= 88 : window.scrollY >= threshold;
     root.classList.toggle("home-header-solid", leftHero);
   };
   const requestUpdate = () => {

@@ -166,9 +166,7 @@ if (closingHero >= 0 && intakeStart <= closingHero) failures.push("Homepage inta
 if (!/<label for="hero-material">(?:(?!<\/label>)[\s\S])*<select id="hero-material"(?:(?!<\/label>)[\s\S])*<\/select>\s*<\/label>/.test(home)) {
   failures.push("Homepage material intake control must be nested inside its label");
 }
-if (!/<label for="hero-quantity">(?:(?!<\/label>)[\s\S])*<input id="hero-quantity"[^>]*>\s*<\/label>/.test(home)) {
-  failures.push("Homepage quantity intake control must be nested inside its label");
-}
+if (/id="hero-quantity"/.test(home)) failures.push("Homepage intake asks one question only: the amount is asked in the step flow");
 if (home.includes('class="hero-review-card"')) failures.push("Homepage still contains the floating glass intake card");
 if (/data-assay-stage|assay-canvas-host|assay-fallback/.test(home)) {
   failures.push("Homepage still contains retired assay-stage markup");
@@ -209,67 +207,67 @@ const seoPages = [
     path: "industrial-x-ray-silver-recycling",
     title: "Industrial NDT Film Silver Recycling in Houston | AG Refining",
     description: "Recycle qualifying industrial NDT film in Houston with AG Refining. Get clear guidance, free qualifying pickup, and on-site weighing.",
-    h1: "Recover silver from industrial NDT film."
+    h1: "Recover Silver from Industrial NDT Film."
   },
   {
     path: "sell-silver-coins-houston",
     title: "Sell Silver Coins in Houston | Clear Evaluations | AG Refining",
     description: "Sell silver coins in Houston with clear evaluations based on coin type, silver content, weight, condition, and current market values.",
-    h1: "Sell your silver coins in Houston."
+    h1: "Sell Your Silver Coins in Houston."
   },
   {
     path: "silver-flake-buyer-houston",
     title: "Silver Flake Buyer in Houston, TX | AG Refining",
     description: "Sell silver flake in Houston with an evaluation based on confirmed silver content, purity, weight, condition, and current market values.",
-    h1: "Sell silver flake in Houston."
+    h1: "Sell Silver Flake in Houston."
   },
   {
     path: "laboratory-silver-buyer-houston",
     title: "Laboratory Silver Buyer in Houston, TX | AG Refining",
     description: "Sell laboratory silver in Houston with evaluations based on confirmed recoverable silver, material condition, and current market values.",
-    h1: "Sell laboratory silver in Houston."
+    h1: "Sell Laboratory Silver in Houston."
   },
   {
     path: "silver-solder-buyer-houston",
     title: "Silver Solder Buyer in Houston, TX | AG Refining",
     description: "Sell silver solder in Houston with evaluations based on alloy, silver content, weight, condition, and current market values.",
-    h1: "Sell silver solder in Houston."
+    h1: "Sell Silver Solder in Houston."
   },
   {
     path: "silver-plated-materials-buyer-houston",
     title: "Silver-Plated Materials Buyer in Houston, TX | AG Refining",
     description: "Sell silver-plated materials in Houston. AG Refining offers fair pricing, expert evaluations, and fast payment for silver-plated scrap.",
-    h1: "Sell silver-plated materials in Houston."
+    h1: "Sell Silver-Plated Materials in Houston."
   },
   {
     path: "dental-scrap-buyer-houston",
     title: "Dental Scrap Buyer Houston | Sell Dental Scrap | AG Refining",
     description: "Sell dental scrap in Houston with material review, free qualifying pickup, on-site service, and pricing based on confirmed precious-metal content.",
-    h1: "Sell your dental scrap with confidence."
+    h1: "Sell Your Dental Scrap with Confidence."
   },
   {
     path: "silver-oxide-watch-battery-recycling-houston",
     title: "Silver Oxide Watch Battery Recycling Houston | AG Refining",
     description: "Recycle silver oxide watch batteries in Houston with material review, qualifying pickup, and recovery based on confirmed content and condition.",
-    h1: "Recycle silver oxide watch batteries in Houston."
+    h1: "Recycle Silver Oxide Watch Batteries in Houston."
   },
   {
     path: "houston-silver-buyer",
     title: "Houston Silver Buyer | Sell Scrap Silver in Houston | AG Refining",
     description: "Houston silver buyer near Hobby Airport. Sell scrap silver, sterling, and silver coins with on-site weighing and free pickup for qualifying accounts.",
-    h1: "Sell your silver with confidence."
+    h1: "Sell Your Silver with Confidence."
   },
   {
     path: "x-ray-recycling-services-houston",
     title: "X-Ray Recycling Services Houston | X-Ray Film Recycling | AG Refining",
     description: "Houston X-ray recycling services for qualifying medical and industrial film, with handling planning, silver recovery review, and professional service.",
-    h1: "Secure X-ray film recycling in Houston."
+    h1: "Secure X-Ray Film Recycling in Houston."
   },
   {
     path: "scrap-silver-buyer-houston",
     title: "Scrap Silver Buyer Houston | Sell Scrap Silver | AG Refining",
     description: "Sell scrap silver in Houston with AG Refining. Free qualifying pickup, on-site weighing, and offers based on confirmed material and current market values.",
-    h1: "Turn your scrap silver into cash."
+    h1: "Turn Your Scrap Silver Into Cash."
   }
 ];
 
@@ -323,7 +321,7 @@ if (acceptedCards[0]?.[2] !== "/silver-oxide-watch-battery-recycling-houston" ||
 if (new Set(acceptedCards.map((match) => match[2])).size !== acceptedCards.length) {
   failures.push("Accepted materials contains a duplicate taxonomy destination");
 }
-if (!acceptedMaterials.includes("<h1>We purchase.</h1>")) failures.push("Accepted materials must use the exact We purchase. heading");
+if (!acceptedMaterials.includes("<h1>We Purchase.</h1>")) failures.push("Accepted materials must use the exact We purchase. heading");
 
 const serviceAreas = readFileSync(join(out, "service-areas", "index.html"), "utf8");
 const serviceAreaRoutes = [

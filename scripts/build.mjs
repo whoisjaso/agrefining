@@ -132,6 +132,7 @@ function normalizeTitleCaseMarkup(markup, locale = "en") {
 
   let normalized = markup;
   normalized = apply(/(<p class="(?:eyebrow|answer-index|hero-kicker|hero-review-label|legacy-caption)">)([\s\S]*?)(<\/p>)/g, normalized);
+  normalized = apply(/(<h1\b[^>]*>)([\s\S]*?)(<\/h1>)/g, normalized);
   normalized = apply(/(<h2\b[^>]*>)([\s\S]*?)(<\/h2>)/g, normalized);
   normalized = apply(/(<h3\b[^>]*>)([\s\S]*?)(<\/h3>)/g, normalized);
   normalized = apply(/(<details class="material-guide">[\s\S]*?<summary>[\s\S]*?<span>)([\s\S]*?)(<\/span><\/summary>)/g, normalized);
@@ -1618,11 +1619,7 @@ const home = `
             <option value="unknown">Not sure</option>
           </select>
         </label>
-        <label for="hero-quantity">Approximate amount <span>Optional</span>
-          <input id="hero-quantity" name="quantity" type="text" maxlength="120" placeholder="Weight, boxes, drums, or pallets">
-        </label>
         <button class="button button-primary" type="submit">${primaryCta} ${arrow}</button>
-        <small>Free pickup depends on the material, location, account type, and schedule.</small>
       </form>
     </div>
   </section>
@@ -2564,7 +2561,7 @@ const contact = `
       <div class="contact-line"><span>Hours</span><strong>${openingHours.map((row) => `${row.label} ${row.display}`).join("<br>")}<br>Sunday closed</strong></div>
       <div class="contact-boundary"><h3>Before you ship or visit</h3><p>Call first. We will confirm the material, pickup option, and next step.</p></div>
     </aside>
-    <div id="get-paid" class="contact-form-column"><p class="eyebrow">Pickup and quote request</p><h2>Start with a few details.</h2>${renderReviewForm({ locale: "en" })}</div>
+    <div id="get-paid" class="contact-form-column"><p class="eyebrow">Four quick questions</p><h2>Start with a few details.</h2>${renderReviewForm({ locale: "en" })}</div>
   </div></section>`;
 mkdirSync(join(out, "contact"), { recursive: true });
 writeFileSync(join(out, "contact", "index.html"), document({
@@ -2591,7 +2588,7 @@ const spanish = `
       <div class="contact-line"><span>Dirección</span><strong>${street}<br>${cityLine}</strong></div>
       <div class="contact-boundary"><h3>Antes de enviar material o visitarnos</h3><p>Llame primero. Confirmaremos el material, la opción de recogida y el siguiente paso.</p></div>
     </aside>
-    <div><p class="eyebrow">Solicitud de recogida y cotización</p><h2>Comience con algunos datos.</h2>${renderReviewForm({ locale: "es" })}</div>
+    <div class="contact-form-column"><p class="eyebrow">Cuatro preguntas rápidas</p><h2>Comience con algunos datos.</h2>${renderReviewForm({ locale: "es" })}</div>
   </div></section>`;
 mkdirSync(join(out, "espanol"), { recursive: true });
 writeFileSync(join(out, "espanol", "index.html"), document({

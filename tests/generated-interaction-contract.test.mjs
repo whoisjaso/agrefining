@@ -404,18 +404,35 @@ test("every pickup call to action lands on the pickup form", () => {
   assert.match(contactPage, /<div id="get-paid" class="contact-form-column">/);
 });
 
-test("the pickup form asks only for name, phone, material, optional email and an optional note", () => {
+test("the pickup form is a four-question flow that still works as a plain form", () => {
   const contactPage = readFileSync(join(dist, "contact", "index.html"), "utf8");
   const form = contactPage.match(/<form id="review-form"[\s\S]*?<\/form>/)?.[0] || "";
-  const visible = [...form.matchAll(/<(?:input|select|textarea)\b[^>]*\bname="([^"]+)"[^>]*>/g)]
-    .filter((match) => !/type="hidden"/.test(match[0]) && match[1] !== "company_url")
-    .map((match) => match[1]);
-  assert.deepEqual(visible, ["name", "phone", "material", "email", "details"]);
-  assert.match(form, /name="name"[^>]*required/);
-  assert.match(form, /name="phone"[^>]*required/);
-  assert.match(form, /<select id="material" name="material" required/);
-  assert.doesNotMatch(form.match(/<input id="email"[^>]*>/)[0], /required/);
-  assert.doesNotMatch(form.match(/<textarea id="details"[^>]*>/)[0], /required|minlength/);
+  const steps = [...form.matchAll(/<fieldset class="flow-step field-wide" data-flow-step="([a-z]+)">\s*<legend tabindex="-1">([^<]+)<\/legend>/g)].map((match) => [match[1], match[2]]);
+  assert.deepEqual(steps, [
+    ["material", "What Are You Bringing?"],
+    ["quantity", "About How Much?"],
+    ["location", "Pickup Or Drop-Off?"],
+    ["contact", "Where Should Dennis Call You?"]
+  ]);
+  const tiles = (name) => [...form.matchAll(new RegExp(`<input id="[^"]+" type="radio" name="${name}" value="([^"]+)"`, "g"))].map((match) => match[1]);
+  assert.deepEqual(tiles("material"), ["scrap_silver", "silver_coins", "dental_material", "industrial_silver", "unknown"], "tiles post the endpoint's own material values");
+  assert.deepEqual(tiles("quantity"), ["A few pieces", "A box or bag", "Business volume"]);
+  assert.deepEqual(tiles("location"), ["Pickup", "Drop-off"]);
+  assert.doesNotMatch(form, />\s*Gold\s*</, "no gold tile until the owner confirms gold in writing");
+  const typed = [...form.matchAll(/<input id="(name|phone|email)"[^>]*>/g)].map((match) => match[0]);
+  assert.equal(typed.length, 3);
+  assert.match(typed[0], /required/);
+  assert.match(typed[1], /required/);
+  assert.doesNotMatch(typed[2], /required/);
+  assert.doesNotMatch(form, /<textarea|name="business"|name="pickup_date"|name="frequency"/);
+  assert.doesNotMatch(form, />Required</, "nothing is labelled Required");
+  assert.match(form, /No obligation\. Dennis calls you back\./);
+  assert.doesNotMatch(form, /same day/i, "no response-time promise");
+  assert.match(form, /data-submit-button>Get My Offer Call/);
+  // Progress and step controls stay hidden until the script takes over, so the plain form is complete.
+  assert.match(form, /data-flow-progress[^>]*aria-valuenow="20"[^>]*hidden/);
+  assert.match(form, /data-flow-nav hidden/);
+  assert.match(form, /action="\/api\/leads" method="post"/);
 });
 
 test("the map band is one static image with a directions link and no map service", () => {

@@ -2990,7 +2990,7 @@ html[data-loader-state="ready"] .home-loader {
 }
 
 .field [aria-invalid="true"] {
-  border-color: var(--danger);
+  border-color: var(--navy);
 }
 
 .preferred-contact {
@@ -3028,6 +3028,207 @@ html[data-loader-state="ready"] .home-loader {
   position: absolute;
 }
 
+/* Step-by-step pickup flow. Without JavaScript the same markup reads as a plain stacked form. */
+.flow-step {
+  border: 0;
+  display: grid;
+  gap: 1.5rem;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.flow-step + .flow-step {
+  margin-top: 1.5rem;
+}
+
+.flow-step[hidden],
+.flow-nav[hidden],
+.flow-next[hidden],
+.flow-back[hidden] {
+  display: none;
+}
+
+.flow-step legend {
+  color: var(--navy);
+  float: left;
+  font-size: clamp(1.55rem, 4.6vw, 2.1rem);
+  font-weight: var(--display-weight);
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  outline: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.flow-tiles {
+  clear: both;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.flow-tiles > :last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.flow-tile {
+  cursor: pointer;
+  display: block;
+  position: relative;
+}
+
+.flow-tile input {
+  appearance: none;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  position: absolute;
+}
+
+.flow-tile span {
+  align-items: center;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  color: var(--navy);
+  display: flex;
+  font-size: 1rem;
+  font-weight: 620;
+  justify-content: center;
+  min-height: 4.75rem;
+  padding: 1rem;
+  text-align: center;
+  transition:
+    background var(--fast) ease,
+    border-color var(--fast) ease,
+    color var(--fast) ease;
+}
+
+.flow-tile:hover span {
+  border-color: var(--navy);
+}
+
+.flow-tile input:checked + span {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: var(--paper);
+}
+
+.flow-tile input:focus-visible + span {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.flow-progress {
+  background: var(--line);
+  height: 2px;
+  overflow: hidden;
+}
+
+.flow-progress span {
+  background: var(--navy);
+  display: block;
+  height: 100%;
+  transition: width 420ms var(--ease);
+}
+
+.flow-affirm {
+  color: var(--mineral-blue);
+  font-size: 0.86rem;
+  font-weight: 620;
+  margin: 0;
+  min-height: 1.3rem;
+}
+
+.flow-reassure {
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.flow-nav {
+  align-items: center;
+  display: flex;
+  gap: 1.25rem;
+  justify-content: space-between;
+}
+
+.flow-back {
+  background: none;
+  border: 0;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 620;
+  min-height: 44px;
+  padding: 0 0.25rem 0 0;
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+
+.flow-next {
+  margin-left: auto;
+}
+
+.review-form[data-flow="ready"] .flow-step + .flow-step {
+  margin-top: 0;
+}
+
+.review-form[data-flow="ready"] .flow-step.is-entering {
+  animation: flow-step-in 360ms var(--ease) both;
+}
+
+.review-form[data-flow="ready"] .form-actions .button {
+  width: 100%;
+}
+
+@keyframes flow-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.flow-done {
+  display: grid;
+  gap: 1.4rem;
+  grid-column: 1 / -1;
+  outline: 0;
+}
+
+.flow-done h3 {
+  font-size: clamp(1.55rem, 4.6vw, 2.1rem);
+  font-weight: var(--display-weight);
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  margin: 0;
+}
+
+.flow-done ol {
+  color: var(--ink);
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .review-form[data-flow="ready"] .flow-step.is-entering {
+    animation: none;
+  }
+
+  .flow-progress span {
+    transition: none;
+  }
+}
+
 .form-note {
   color: var(--muted);
   font-size: 0.7rem;
@@ -3052,17 +3253,19 @@ html[data-loader-state="ready"] .home-loader {
 }
 
 .form-status[data-state="error"] {
-  color: var(--danger);
+  color: var(--ink);
+  font-weight: 620;
 }
 
 .form-status[data-state="success"] {
   color: var(--success);
 }
 
+/* Calm prompts, never an alarm: no red anywhere in the form. */
 .form-errors {
-  background: #f4e7e2;
-  border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent);
-  color: var(--danger);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  color: var(--ink);
   padding: 1rem 1.2rem;
 }
 
@@ -3081,7 +3284,7 @@ html[data-loader-state="ready"] .home-loader {
 }
 
 .field-error {
-  color: var(--danger);
+  color: var(--ink-soft);
   font-size: 0.76rem;
   margin: 0;
 }

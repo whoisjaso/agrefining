@@ -158,7 +158,7 @@ test("the disclosure groups exactly 17 unique destinations with ordinary list se
 });
 
 test("accepted materials renders the 17-item purchase index with one full-width first card", () => {
-  assert.match(accepted, /<h1>We purchase\.<\/h1>/);
+  assert.match(accepted, /<h1>We Purchase\.<\/h1>/);
   const cards = anchorRecords(accepted, "taxonomy-card");
   assert.equal(cards.length, 17);
   assert.deepEqual(cards.map(({ href }) => href), expectedPaths);
@@ -186,7 +186,7 @@ test("the industrial film page explains NDT consistently and expands the term on
   assert.match(industrial, /<title>Industrial NDT Film Silver Recycling in Houston \| AG Refining<\/title>/);
   assert.match(industrial, /<meta name="description" content="[^"]*industrial NDT film[^"]*">/);
   assert.match(industrial, /<p class="eyebrow">Industrial NDT Film<\/p>/);
-  assert.match(industrial, /<h1>Recover silver from industrial NDT film\.<\/h1>/);
+  assert.match(industrial, /<h1>Recover Silver from Industrial NDT Film\.<\/h1>/);
   assert.match(industrial, /AG Refining works with Houston companies that have qualifying industrial NDT film/);
   assert.ok((customerFacingText(industrial).match(/Industrial NDT film/gi) || []).length >= 5);
   assert.equal((customerFacingText(industrial).match(/Industrial Non-Destructive Testing film/g) || []).length, 1);
@@ -209,9 +209,9 @@ test("medical and general X-ray terminology remains accurate", () => {
   assert.match(medical, /<p class="eyebrow">Medical X-Ray Film<\/p>/);
   assert.match(customerFacingText(medical), /silver-bearing X-ray film/);
   assert.match(xrayHub, /<title>X-Ray Recycling Services Houston \| X-Ray Film Recycling \| AG Refining<\/title>/);
-  assert.match(xrayHub, /<h1>Secure X-ray film recycling in Houston\.<\/h1>/);
+  assert.match(xrayHub, /<h1>Secure X-Ray Film Recycling in Houston\.<\/h1>/);
 });
 
 test("How It Works opens with the exact six-step promise", () => {
-  assert.match(howItWorks, /<h1>Six simple steps from silver to cash\.<\/h1>/);
+  assert.match(howItWorks, /<h1>Six Simple Steps from Silver to Cash\.<\/h1>/);
 });

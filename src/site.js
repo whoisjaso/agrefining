@@ -200,8 +200,9 @@ const reviewForm = document.querySelector("[data-review-form]");
 const formLocale = reviewForm?.dataset.locale === "es" || spanish ? "es" : "en";
 const formUi = {
   en: {
-    errorHeading: "Please review the following:",
-    required: (label) => `${label} is required.`,
+    errorHeading: "One more thing:",
+    required: (label) => `Please add your ${label.toLowerCase()}.`,
+    choose: (question) => `Please pick one: ${question}`,
     invalidEmail: "Enter a valid email.",
     invalidField: (label) => `Enter a valid ${label.toLowerCase()}.`,
     shortDetails: "Add a little more detail so the material can be reviewed.",
@@ -210,14 +211,31 @@ const formUi = {
     success: "Your request was received. AG Refining will review the details and follow up using your preferred contact method.",
     emailDetails: "Email these details",
     networkError: "The request could not be sent. Please call (281) 898-2719 or try again.",
-    submit: "Send request",
+    submit: "Get My Offer Call",
+    affirm: {
+      silver: "Nice. Silver is our specialty.",
+      coins: "Good. We buy coins and bullion.",
+      dental: "Good. We handle dental and X-ray material.",
+      industrial: "Good. We work with shops and plants.",
+      unsure: "No problem. We will sort it out together.",
+      "amount-1": "Perfect. Small lots are welcome.",
+      "amount-2": "Perfect. We handle that size.",
+      "amount-3": "Perfect. We handle business volume.",
+      pickup: "Good. We will confirm pickup on the call.",
+      dropoff: "Good. Dennis will set a time with you."
+    },
+    doneHeading: "Thank You. Your Request Is In.",
+    doneSteps: ["Dennis calls the number you gave.", "You tell him what you have.", "He confirms a pickup or a time to come by."],
+    doneCall: "Call (281) 898-2719",
+    doneNote: "No obligation.",
     subject: (intent) => `AG Refining ${intent === "quote" ? "quote" : "pickup"} request`,
     labels: ["Name", "Business", "Phone", "Email", "Material", "Amount", "Location", "Frequency", "Preferred pickup"],
     notProvided: "Not provided"
   },
   es: {
-    errorHeading: "Revise lo siguiente:",
-    required: (label) => `${label} es obligatorio.`,
+    errorHeading: "Falta un detalle:",
+    required: (label) => `Por favor agregue: ${label.toLowerCase()}.`,
+    choose: (question) => `Elija una opción: ${question}`,
     invalidEmail: "Escriba un correo electrónico válido.",
     invalidField: (label) => `Escriba un ${label.toLowerCase()} válido.`,
     shortDetails: "Añada un poco más de información para revisar el material.",
@@ -226,12 +244,36 @@ const formUi = {
     success: "Recibimos su solicitud. AG Refining revisará los detalles y se comunicará por el medio que prefirió.",
     emailDetails: "Enviar estos datos por correo",
     networkError: "No se pudo enviar la solicitud. Llame al (281) 898-2719 o inténtelo de nuevo.",
-    submit: "Enviar solicitud",
+    submit: "Reciba Mi Llamada",
+    affirm: {
+      silver: "Muy bien. La plata es nuestra especialidad.",
+      coins: "Bien. Compramos monedas y lingotes.",
+      dental: "Bien. Manejamos material dental y de rayos X.",
+      industrial: "Bien. Trabajamos con talleres y plantas.",
+      unsure: "No hay problema. Lo vemos juntos.",
+      "amount-1": "Perfecto. Los lotes pequeños son bienvenidos.",
+      "amount-2": "Perfecto. Manejamos ese tamaño.",
+      "amount-3": "Perfecto. Manejamos volumen de negocio.",
+      pickup: "Bien. Confirmamos la recogida en la llamada.",
+      dropoff: "Bien. Dennis acordará una hora con usted."
+    },
+    doneHeading: "Gracias. Recibimos Su Solicitud.",
+    doneSteps: ["Dennis llama al número que nos dio.", "Usted le cuenta qué tiene.", "Él confirma una recogida o una hora para venir."],
+    doneCall: "Llame al (281) 898-2719",
+    doneNote: "Sin compromiso.",
     subject: () => "Solicitud de recogida de AG Refining",
     labels: ["Nombre", "Empresa", "Teléfono", "Correo electrónico", "Material", "Cantidad", "Ubicación", "Frecuencia", "Recogida preferida"],
     notProvided: "No indicado"
   }
 }[formLocale];
+
+const MATERIAL_GROUPS = [
+  ["silver", ["scrap_silver", "silver_flatware", "jewelry_scrap", "silver_plated"]],
+  ["coins", ["silver_coins", "silver_bars"]],
+  ["dental", ["dental_material", "xray_film"]],
+  ["industrial", ["industrial_silver", "silver_flake", "laboratory_silver", "silver_solder", "silver_oxide_batteries"]],
+  ["unsure", ["unknown"]]
+];
 
 function prefillReviewForm(form) {
   if (!form) return;
@@ -242,7 +284,18 @@ function prefillReviewForm(form) {
     const local = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
     pickupDate.min = local;
   }
-  ["intent", "material", "quantity", "frequency"].forEach((name) => {
+  const requestedMaterial = params.get("material")?.trim();
+  if (requestedMaterial) {
+    const tiles = Array.from(form.querySelectorAll("input[type='radio'][name='material']"));
+    const group = MATERIAL_GROUPS.find(([, values]) => values.includes(requestedMaterial));
+    const tileInput = group ? tiles.find((input) => input.dataset.tile === group[0]) : null;
+    if (tileInput) {
+      // Keep the exact material from the link (for example xray_film) on its tile.
+      tileInput.value = requestedMaterial;
+      tileInput.checked = true;
+    }
+  }
+  ["intent", "frequency"].forEach((name) => {
     const field = form.elements.namedItem(name);
     const requested = params.get(name)?.trim();
     if (!field || !requested) return;
@@ -305,9 +358,20 @@ function validateReviewForm(form) {
   const issues = [];
   const fields = Array.from(form.elements).filter((field) => field.name && !field.disabled && field.type !== "hidden");
 
+  const radioGroups = new Set();
   fields.forEach((field) => {
     field.removeAttribute("aria-invalid");
     if (field.name === "company_url") return;
+    if (field.type === "radio") {
+      // One calm prompt per tile question, worded from the question itself.
+      if (radioGroups.has(field.name)) return;
+      radioGroups.add(field.name);
+      if (!field.checkValidity()) {
+        const question = field.closest("fieldset")?.querySelector("legend")?.textContent?.trim() || field.name;
+        issues.push({ field, message: formUi.choose(question) });
+      }
+      return;
+    }
     if (!field.checkValidity()) {
       const message = field.validity.valueMissing
         ? formUi.required(fieldLabel(field))
@@ -356,6 +420,112 @@ function setFormStatus(form, message, state = "") {
   status.textContent = message;
   if (state) status.dataset.state = state;
   else delete status.dataset.state;
+}
+
+// Calm confirmation: what happens next and one tap-to-call button.
+function showFormDone(form) {
+  const panel = document.createElement("div");
+  panel.className = "flow-done";
+  panel.setAttribute("role", "status");
+  panel.tabIndex = -1;
+  const heading = document.createElement("h3");
+  heading.textContent = formUi.doneHeading;
+  const list = document.createElement("ol");
+  formUi.doneSteps.forEach((text) => {
+    const item = document.createElement("li");
+    item.textContent = text;
+    list.append(item);
+  });
+  const call = document.createElement("a");
+  call.className = "button button-primary";
+  call.href = "tel:+12818982719";
+  call.textContent = formUi.doneCall;
+  const note = document.createElement("p");
+  note.className = "flow-reassure";
+  note.textContent = formUi.doneNote;
+  panel.append(heading, list, call, note);
+  const bar = form.querySelector("[data-flow-bar]");
+  if (bar) bar.style.width = "100%";
+  form.querySelector("[data-flow-progress]")?.setAttribute("aria-valuenow", "100");
+  form.dataset.flowDone = "true";
+  form.querySelectorAll(".flow-step, [data-flow-nav], [data-flow-affirm]").forEach((element) => { element.hidden = true; });
+  form.append(panel);
+  panel.focus();
+}
+
+// Step-by-step flow: one question per screen. Without this script the form is a plain stacked form.
+function initializeFormFlow(form) {
+  const steps = Array.from(form.querySelectorAll("[data-flow-step]"));
+  const progress = form.querySelector("[data-flow-progress]");
+  const bar = form.querySelector("[data-flow-bar]");
+  const affirm = form.querySelector("[data-flow-affirm]");
+  const nav = form.querySelector("[data-flow-nav]");
+  const back = form.querySelector("[data-flow-back]");
+  const next = form.querySelector("[data-flow-next]");
+  if (steps.length < 2 || !progress || !bar || !nav || !back || !next) return;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let current = 0;
+
+  const answered = (step) => Boolean(step.querySelector("input[type='radio']:checked"));
+  const lastAffirmation = (index) => {
+    const picked = steps[index]?.querySelector("input[type='radio']:checked");
+    return picked ? formUi.affirm[picked.dataset.tile] || "" : "";
+  };
+
+  function show(index, { focus = true } = {}) {
+    current = Math.max(0, Math.min(steps.length - 1, index));
+    steps.forEach((step, stepIndex) => {
+      step.hidden = stepIndex !== current;
+      step.classList.toggle("is-entering", stepIndex === current && !reduced);
+    });
+    const percent = Math.round(((current + 1) / (steps.length + 1)) * 100);
+    bar.style.width = `${percent}%`;
+    progress.setAttribute("aria-valuenow", String(percent));
+    const message = current > 0 ? lastAffirmation(current - 1) : "";
+    affirm.textContent = message;
+    affirm.hidden = !message;
+    const lastStep = current === steps.length - 1;
+    nav.hidden = false;
+    back.hidden = current === 0;
+    next.hidden = lastStep || !answered(steps[current]);
+    if (focus) {
+      steps[current].querySelector("legend")?.focus({ preventScroll: true });
+      // Each new question starts at the same place on screen, just under the header.
+      const anchor = form.closest("[id]") || form;
+      if (anchor.getBoundingClientRect().top < 0 || anchor.getBoundingClientRect().top > window.innerHeight * 0.4) {
+        anchor.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+      }
+    }
+  }
+
+  form.dataset.flow = "ready";
+  progress.hidden = false;
+  // A material chosen on another page (a material link or the home selector) starts at the next step.
+  show(answered(steps[0]) && new URLSearchParams(window.location.search).get("material") ? 1 : 0, { focus: false });
+
+  steps.forEach((step, index) => {
+    step.addEventListener("change", (event) => {
+      if (!event.target.matches("input[type='radio']")) return;
+      next.hidden = index === steps.length - 1;
+    });
+    // A tap or click on a tile moves on by itself. Keyboard choices use Continue, so arrow keys never jump ahead.
+    step.addEventListener("click", (event) => {
+      const input = event.target.closest("input[type='radio']");
+      if (!input || event.detail === 0 || index === steps.length - 1) return;
+      window.setTimeout(() => show(index + 1), reduced ? 0 : 220);
+    });
+  });
+  next.addEventListener("click", () => show(current + 1));
+  back.addEventListener("click", () => show(current - 1));
+  form.addEventListener("invalid", (event) => {
+    const step = event.target.closest?.("[data-flow-step]");
+    const index = steps.indexOf(step);
+    if (index >= 0 && index !== current) show(index);
+  }, true);
+  form.flowShowField = (field) => {
+    const index = steps.indexOf(field?.closest?.("[data-flow-step]"));
+    if (index >= 0 && index !== current) show(index, { focus: false });
+  };
 }
 
 function formPayload(form) {
@@ -418,6 +588,7 @@ function showDeliveryFallback(form, message, recipient, payload) {
 
 if (reviewForm) {
   prefillReviewForm(reviewForm);
+  initializeFormFlow(reviewForm);
   const started = reviewForm.elements.namedItem("form_started");
   const submissionKey = reviewForm.elements.namedItem("submission_key");
   if (started) started.value = String(Date.now());
@@ -431,6 +602,7 @@ if (reviewForm) {
     event.preventDefault();
     const form = event.currentTarget;
     const issues = validateReviewForm(form);
+    if (issues.length) form.flowShowField?.(issues[0].field);
     showFormIssues(form, issues);
     if (issues.length) return;
 
@@ -487,7 +659,8 @@ if (reviewForm) {
       if (submissionKey) submissionKey.value = createSubmissionKey();
       window.turnstile?.reset?.();
       showFormIssues(form, []);
-      setFormStatus(form, formUi.success, "success");
+      setFormStatus(form, "");
+      showFormDone(form);
     } catch {
       setFormStatus(form, responseErrorMessage || formUi.networkError, "error");
     } finally {

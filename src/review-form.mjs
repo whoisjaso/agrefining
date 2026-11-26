@@ -28,6 +28,16 @@ const FREQUENCY_OPTIONS = [
   ["unknown", "Not sure", "No estoy seguro"]
 ];
 
+// The step flow shows five big tiles. Each tile stands for a group of the endpoint's material values;
+// a material chosen elsewhere (a material page link) keeps its exact value on the matching tile.
+export const MATERIAL_TILES = Object.freeze([
+  ["silver", "scrap_silver", ["scrap_silver", "silver_flatware", "jewelry_scrap", "silver_plated"]],
+  ["coins", "silver_coins", ["silver_coins", "silver_bars"]],
+  ["dental", "dental_material", ["dental_material", "xray_film"]],
+  ["industrial", "industrial_silver", ["industrial_silver", "silver_flake", "laboratory_silver", "silver_solder", "silver_oxide_batteries"]],
+  ["unsure", "unknown", ["unknown"]]
+]);
+
 export const REVIEW_FORM_ENUMS = Object.freeze({
   materials: Object.freeze(MATERIAL_OPTIONS.map(([value]) => value)),
   frequencies: Object.freeze(FREQUENCY_OPTIONS.map(([value]) => value)),
@@ -50,6 +60,17 @@ const COPY = {
   en: {
     required: "Required",
     optional: "Optional",
+    stepMaterial: "What Are You Bringing?",
+    stepAmount: "About How Much?",
+    stepPickup: "Pickup Or Drop-Off?",
+    stepContact: "Where Should Dennis Call You?",
+    tiles: { silver: "Silver", coins: "Coins / Bullion", dental: "Dental / X-Ray", industrial: "Industrial / Scrap", unsure: "Not Sure" },
+    amounts: ["A few pieces", "A box or bag", "Business volume"],
+    amountLabels: ["A Few Pieces", "A Box Or Bag", "Business Volume"],
+    pickupLabels: ["Pickup", "Drop-Off"],
+    reassure: "No obligation. Dennis calls you back.",
+    back: "Back",
+    next: "Continue",
     name: "Name",
     business: "Business",
     phone: "Phone",
@@ -70,7 +91,7 @@ const COPY = {
     companyWebsite: "Company website",
     phoneChoice: "Phone",
     emailChoice: "Email",
-    submit: "Send request",
+    submit: "Get My Offer Call",
     errorHeading: "Please review the following:",
     note: "This request is not a final quote or pickup promise. Free pickup and fast payment depend on the material, location, account type, and schedule. Do not send patient records, passwords, financial data, or identity documents. When you submit, the form page, first landing page, referring page, and supported campaign or ad identifiers are sent with your request. See our",
     privacy: "privacy notice"
@@ -78,6 +99,17 @@ const COPY = {
   es: {
     required: "Obligatorio",
     optional: "Opcional",
+    stepMaterial: "¿Qué Va A Traer?",
+    stepAmount: "¿Cuánto, Más O Menos?",
+    stepPickup: "¿Recogida O Entrega?",
+    stepContact: "¿A Dónde Le Llama Dennis?",
+    tiles: { silver: "Plata", coins: "Monedas / Lingotes", dental: "Dental / Rayos X", industrial: "Industrial / Chatarra", unsure: "No Estoy Seguro" },
+    amounts: ["A few pieces", "A box or bag", "Business volume"],
+    amountLabels: ["Unas Pocas Piezas", "Una Caja O Bolsa", "Volumen De Negocio"],
+    pickupLabels: ["Recogida", "Entrega"],
+    reassure: "Sin compromiso. Dennis le devuelve la llamada.",
+    back: "Atrás",
+    next: "Continuar",
     name: "Nombre",
     business: "Empresa",
     phone: "Teléfono",
@@ -98,7 +130,7 @@ const COPY = {
     companyWebsite: "Sitio web de la empresa",
     phoneChoice: "Teléfono",
     emailChoice: "Correo electrónico",
-    submit: "Enviar solicitud",
+    submit: "Reciba Mi Llamada",
     errorHeading: "Revise los campos indicados:",
     note: "Esta solicitud no es una cotización final ni una promesa de recogida. La recogida gratuita y el pago rápido dependen del material, la ubicación, el tipo de cuenta y el horario. No envíe historiales de pacientes, contraseñas, datos financieros ni documentos de identidad. Al enviar, la página del formulario, la primera página de llegada, la página de referencia y los identificadores compatibles de campaña o anuncio se envían con su solicitud. Consulte nuestro",
     privacy: "aviso de privacidad (en ingles)"
@@ -197,6 +229,13 @@ export function renderReviewForm({
   const frequencyOptions = FREQUENCY_OPTIONS
     .map(([value, english, spanish]) => `<option value="${value}"${selected(frequency, value)}>${language === "es" ? spanish : english}</option>`)
     .join("");
+  const tile = (name, value, label, isChecked, id, extra = "") => `<label class="flow-tile" for="${id}"><input id="${id}" type="radio" name="${name}" value="${escapeHtml(value)}"${isChecked ? " checked" : ""}${extra}><span>${label}</span></label>`;
+  const materialTiles = MATERIAL_TILES.map(([key, fallback, group], index) => {
+    const exact = group.includes(material) ? material : fallback;
+    return tile("material", exact, copy.tiles[key], group.includes(material), `material-${key}`, `${index === 0 ? " required" : ""} data-tile="${key}" data-default="${fallback}"${materialState.attrs && index === 0 ? materialState.attrs : ""}`);
+  }).join("");
+  const amountTiles = copy.amounts.map((value, index) => tile("quantity", value, copy.amountLabels[index], clean.quantity === value, `quantity-${index + 1}`, ` data-tile="amount-${index + 1}"`)).join("");
+  const pickupTiles = ["Pickup", "Drop-off"].map((value, index) => tile("location", value, copy.pickupLabels[index], clean.location === value, `location-${index + 1}`, ` data-tile="${index === 0 ? "pickup" : "dropoff"}"`)).join("");
   const privacyAttributes = language === "es" ? ' hreflang="en"' : "";
 
   return `<form id="review-form" class="review-form" data-review-form data-locale="${language}" action="${escapeHtml(action)}" method="post">
@@ -205,16 +244,31 @@ export function renderReviewForm({
     <input type="hidden" name="intent" value="${escapeHtml(intent)}">
     <input type="hidden" name="form_started" value="${escapeHtml(clean.form_started || "")}">
     <input type="hidden" name="submission_key" value="${escapeHtml(clean.submission_key || "")}">
-    <input type="hidden" name="quantity" value="${escapeHtml(clean.quantity || "")}">
-    <div class="field field-wide"><label for="name">${copy.name} <span>${copy.required}</span></label><input id="name" name="name" type="text" autocomplete="name" value="${escapeHtml(clean.name || "")}" required${nameState.attrs}>${nameState.error}</div>
-    <div class="field field-wide"><label for="phone">${copy.phone} <span>${copy.required}</span></label><input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" value="${escapeHtml(clean.phone || "")}" required${phoneState.attrs}>${phoneState.error}</div>
-    <div class="field field-wide"><label for="material">${copy.material} <span>${copy.required}</span></label><select id="material" name="material" required${materialState.attrs}>
-      <option value=""${selected(material, "")}>${copy.selectOne}</option>${materialOptions}
-    </select>${materialState.error}</div>
-    <div class="field field-wide"><label for="email">${copy.email} <span>${copy.optional}</span></label><input id="email" name="email" type="email" autocomplete="email" value="${escapeHtml(clean.email || "")}"${emailState.attrs}>${emailState.error}</div>
-    <div class="field field-wide"><label for="details">${copy.details} <span>${copy.optional}</span></label><textarea id="details" name="details" rows="3" maxlength="1000" placeholder="${copy.detailsPlaceholder}"${detailsState.attrs}>${escapeHtml(clean.details || "")}</textarea>${detailsState.error}</div>
-    <div class="honeypot" aria-hidden="true"><label for="company_url">${copy.companyWebsite}</label><input id="company_url" name="company_url" type="text" tabindex="-1" autocomplete="off"></div>
-    <p class="form-note field-wide">${copy.note} <a href="/privacy"${privacyAttributes}>${copy.privacy}</a>.</p>
-    <div class="form-actions field-wide"><button class="button button-primary" type="submit" data-submit-button>${copy.submit} <span class="icon-arrow" aria-hidden="true"></span></button><p class="form-status" data-form-status aria-live="polite"></p></div>
+    <div class="flow-progress field-wide" data-flow-progress role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20" aria-label="${language === "es" ? "Progreso" : "Progress"}" hidden><span data-flow-bar style="width:20%"></span></div>
+    <p class="flow-affirm field-wide" data-flow-affirm aria-live="polite" hidden></p>
+    <fieldset class="flow-step field-wide" data-flow-step="material">
+      <legend tabindex="-1">${copy.stepMaterial}</legend>
+      <div class="flow-tiles">${materialTiles}</div>
+      ${materialState.error}
+    </fieldset>
+    <fieldset class="flow-step field-wide" data-flow-step="quantity">
+      <legend tabindex="-1">${copy.stepAmount}</legend>
+      <div class="flow-tiles">${amountTiles}</div>
+    </fieldset>
+    <fieldset class="flow-step field-wide" data-flow-step="location">
+      <legend tabindex="-1">${copy.stepPickup}</legend>
+      <div class="flow-tiles flow-tiles-two">${pickupTiles}</div>
+    </fieldset>
+    <fieldset class="flow-step field-wide" data-flow-step="contact">
+      <legend tabindex="-1">${copy.stepContact}</legend>
+      <div class="field"><label for="name">${copy.name}</label><input id="name" name="name" type="text" autocomplete="name" value="${escapeHtml(clean.name || "")}" required${nameState.attrs}>${nameState.error}</div>
+      <div class="field"><label for="phone">${copy.phone}</label><input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" value="${escapeHtml(clean.phone || "")}" required${phoneState.attrs}>${phoneState.error}</div>
+      <p class="flow-reassure">${copy.reassure}</p>
+      <div class="field"><label for="email">${copy.email} <span>${copy.optional}</span></label><input id="email" name="email" type="email" autocomplete="email" value="${escapeHtml(clean.email || "")}"${emailState.attrs}>${emailState.error}</div>
+      <div class="honeypot" aria-hidden="true"><label for="company_url">${copy.companyWebsite}</label><input id="company_url" name="company_url" type="text" tabindex="-1" autocomplete="off"></div>
+      <div class="form-actions"><button class="button button-primary" type="submit" data-submit-button>${copy.submit} <span class="icon-arrow" aria-hidden="true"></span></button><p class="form-status" data-form-status aria-live="polite"></p></div>
+      <p class="form-note">${copy.note} <a href="/privacy"${privacyAttributes}>${copy.privacy}</a>.</p>
+    </fieldset>
+    <div class="flow-nav field-wide" data-flow-nav hidden><button class="flow-back" type="button" data-flow-back>${copy.back}</button><button class="button button-secondary flow-next" type="button" data-flow-next>${copy.next} <span class="icon-arrow" aria-hidden="true"></span></button></div>
   </form>`;
 }

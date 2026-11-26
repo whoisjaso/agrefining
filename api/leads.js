@@ -174,7 +174,7 @@ function emailContent(payload) {
     ["Request", label(payload.intent)],
     ["Material", label(payload.material)],
     ["Amount", payload.quantity || "Not provided"],
-    ["Pickup location", payload.location || "Not provided"],
+    ["Pickup or drop-off", payload.location || "Not provided"],
     ["Frequency", label(payload.frequency)],
     ["Preferred pickup", pickupSummary(payload) || "Flexible"],
     ["Preferred contact", label(payload.preferred_contact)],
@@ -204,7 +204,7 @@ const CONFIRMATION_COPY = {
     requested: "You asked for",
     summary: "Your request",
     material: "Material",
-    location: "Pickup location",
+    location: "Pickup or drop-off",
     next: "If anything changes, simply reply to this email or call us.",
     sign: "Dennis Stevens, AG Refining"
   },
@@ -215,7 +215,7 @@ const CONFIRMATION_COPY = {
     requested: "Usted pidió",
     summary: "Su solicitud",
     material: "Material",
-    location: "Lugar de recogida",
+    location: "Recogida o entrega",
     next: "Si algo cambia, responda a este correo o llámenos.",
     sign: "Dennis Stevens, AG Refining"
   }
