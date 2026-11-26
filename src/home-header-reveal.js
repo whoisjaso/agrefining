@@ -4,17 +4,21 @@
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)");
   const threshold = 96;
   let frame = 0;
+  const hero = document.querySelector(".atelier-hero");
 
   clearTimeout(window.__agHeaderFailOpen);
 
   if (!header || reducedMotion?.matches) {
     root.classList.remove("home-header-pending", "home-header-ready", "home-header-revealed");
+    root.classList.add("home-header-solid");
     return;
   }
 
   const update = () => {
     frame = 0;
     root.classList.toggle("home-header-revealed", window.scrollY >= threshold);
+    const leftHero = hero ? hero.getBoundingClientRect().bottom <= 48 : window.scrollY >= threshold;
+    root.classList.toggle("home-header-solid", leftHero);
   };
   const requestUpdate = () => {
     if (!frame) frame = window.requestAnimationFrame(update);

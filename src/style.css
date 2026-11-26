@@ -3662,7 +3662,14 @@ html[data-loader-state="ready"] .home-loader {
 
   .atelier-hero,
   .hero-commercial-grid {
-    min-height: max(44rem, 100svh);
+    height: 100svh;
+    height: 100dvh;
+    min-height: 100svh;
+    min-height: 100dvh;
+  }
+
+  .atelier-hero {
+    background: #000;
   }
 
   .cinematic-hero-poster img,
@@ -3670,27 +3677,63 @@ html[data-loader-state="ready"] .home-loader {
     object-position: 50% center;
   }
 
-  /* Phones play native 9:16 clips. The film fills the upper part of the hero so the subject sits
-     above the headline, then fades into the navy under the copy for readable text. */
+  /* Full-bleed 9:16 film, edge to edge from the top of the screen. No mask fade, no navy
+     letterboxing. A light black scrim at the very top keeps the overlaid header readable;
+     a stronger gradient sits only under the headline and actions. */
   .cinematic-hero-media {
-    bottom: auto;
-    height: 66svh;
-    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
-    mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
+    bottom: 0;
+    height: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 
   .cinematic-hero-overlay {
     background:
-      linear-gradient(180deg, rgba(3, 22, 36, 0.28) 0%, rgba(3, 22, 36, 0) 14%, rgba(3, 22, 36, 0.12) 28%, rgba(3, 22, 36, 0.58) 40%, rgba(3, 22, 36, 0.84) 54%, rgba(3, 22, 36, 0.94) 100%);
+      linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.06) 16%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0.12) 55%, rgba(0, 0, 0, 0.52) 76%, rgba(0, 0, 0, 0.7) 100%);
+  }
+
+  html:not(.home-header-solid) .home-page .site-header,
+  html:not(.home-header-solid) .home-page .site-header[data-stuck="true"],
+  html:not(.home-header-solid).home-header-pending .site-header,
+  html:not(.home-header-solid).home-header-pending.home-header-revealed .site-header {
+    background: transparent;
+    border-bottom-color: transparent;
+    box-shadow: none;
+    opacity: 1;
+    padding-top: var(--safe-top);
+    pointer-events: auto;
+    position: fixed;
+    transform: none;
+  }
+
+  html:not(.home-header-solid) .home-page .site-header .brand-word,
+  html:not(.home-header-solid) .home-page .site-header .brand-word strong {
+    color: var(--paper);
+  }
+
+  html.home-header-solid .site-header,
+  html.home-header-solid .site-header[data-stuck="true"],
+  .nav-open .site-header {
+    background: #faf8f2;
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 8px 30px rgba(16, 42, 67, 0.07);
+  }
+
+  html.home-header-solid .site-header .brand-word,
+  html.home-header-solid .site-header .brand-word strong,
+  .nav-open .site-header .brand-word,
+  .nav-open .site-header .brand-word strong {
+    color: var(--navy);
   }
 
   .hero-commercial-grid {
     display: grid;
+    padding-bottom: var(--safe-bottom);
   }
 
   .hero-copy {
     max-width: none;
-    padding: clamp(18rem, 44vh, 23rem) 0 2.25rem;
+    padding: 0 0 0.65rem;
   }
 
   .atelier-hero h1 {

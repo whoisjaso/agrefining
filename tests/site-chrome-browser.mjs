@@ -113,7 +113,7 @@ async function verifyMobileChrome(browser, baseUrl) {
   assert.deepEqual(homepageColors, {
     root: "rgb(16, 42, 67)",
     body: "rgb(16, 42, 67)",
-    header: "rgb(250, 248, 242)"
+    header: "rgba(0, 0, 0, 0)"
   });
 
   const sectionColors = await page.evaluate(() => Object.fromEntries([
@@ -141,6 +141,15 @@ async function verifyMobileChrome(browser, baseUrl) {
 
   const heroHeight = await page.locator(".atelier-hero").evaluate((hero) => hero.getBoundingClientRect().height);
   assert.ok(heroHeight >= 844, `mobile hero must fill the 844px viewport, received ${heroHeight}px`);
+
+  await page.evaluate((y) => window.scrollTo(0, y), heroHeight + 80);
+  await page.waitForFunction(() => {
+    const header = document.querySelector("[data-site-header]");
+    return document.documentElement.classList.contains("home-header-solid")
+      && getComputedStyle(header).backgroundColor === "rgb(250, 248, 242)";
+  });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForFunction(() => !document.documentElement.classList.contains("home-header-solid"));
 
   await page.evaluate(() => window.scrollTo(0, 120));
   await page.locator("[data-nav-toggle]").waitFor({ state: "visible" });

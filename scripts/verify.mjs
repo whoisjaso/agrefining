@@ -77,7 +77,7 @@ for (const path of htmlFiles) {
   if (h1s.length !== 1) failures.push(`${displayPath}: expected one h1`);
   if (/\b(?:undefined|NaN)\b/.test(source)) failures.push(`${displayPath}: contains unresolved output`);
   if (!source.includes('data-design="silver-atelier"')) failures.push(`${displayPath}: missing Silver Atelier document marker`);
-  const expectedThemeColor = displayPath === "index.html" ? "#102a43" : "#f1ede4";
+  const expectedThemeColor = displayPath === "index.html" ? "#000000" : "#f1ede4";
   if (!source.includes(`<meta name="theme-color" content="${expectedThemeColor}">`)) failures.push(`${displayPath}: missing expected browser chrome ${expectedThemeColor}`);
   if ((source.match(/class="site-header"/g) || []).length !== 1) failures.push(`${displayPath}: expected one shared header`);
   if ((source.match(/class="footer"/g) || []).length !== 1) failures.push(`${displayPath}: expected one shared footer`);

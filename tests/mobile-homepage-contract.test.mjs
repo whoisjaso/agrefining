@@ -104,7 +104,7 @@ test("the homepage loader is semantic, homepage-only, and fails open after 1.2 s
 });
 
 test("homepage keeps a cream-dominant editorial rhythm with blue carried through key bands", () => {
-  assert.match(home, /<meta name="theme-color" content="#102a43">/);
+  assert.match(home, /<meta name="theme-color" content="#000000">/);
   assert.match(home, /<html lang="en" class="home-document">/);
   assert.doesNotMatch(contact, /class="home-document"/);
   assert.match(css, /\.home-document,\s*\.home-page\s*\{[^}]*background:\s*#102a43/s);

@@ -1428,7 +1428,7 @@ function document({
     bingSiteVerification ? `<meta name="msvalidate.01" content="${bingSiteVerification}">` : ""
   ].filter(Boolean).join("\n    ");
   const homepage = bodyClass.split(/\s+/).includes("home-page");
-  const themeColor = homepage ? "#102a43" : "#f1ede4";
+  const themeColor = homepage ? "#000000" : "#f1ede4";
   return normalizeTitleCaseMarkup(`<!DOCTYPE html>
 <html lang="${lang}"${homepage ? ' class="home-document"' : ""}>
   <head>
@@ -1466,7 +1466,7 @@ function document({
     <link rel="preload" href="/assets/fonts/newsreader-latin-opsz.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/assets/fonts/manrope-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/style.css?v=20260804-hero-v2">
-    ${homepage ? '<script>document.documentElement.classList.add("home-header-pending");window.__agHeaderFailOpen=setTimeout(function(){document.documentElement.classList.remove("home-header-pending","home-header-ready","home-header-revealed")},1500);if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.dataset.loaderState="ready"}else{document.documentElement.dataset.loaderState="loading";window.__agLoaderFailOpen=setTimeout(function(){document.documentElement.dataset.loaderState="ready";var loader=document.querySelector("[data-home-loader]");if(loader){loader.dataset.loaderState="ready";loader.setAttribute("aria-hidden","true");loader.setAttribute("inert","");loader.inert=true}},1200)}</script>' : ""}
+    ${homepage ? '<script>document.documentElement.classList.add("home-header-pending");window.__agHeaderFailOpen=setTimeout(function(){document.documentElement.classList.remove("home-header-pending","home-header-ready","home-header-revealed");document.documentElement.classList.add("home-header-solid")},1500);if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.dataset.loaderState="ready"}else{document.documentElement.dataset.loaderState="loading";window.__agLoaderFailOpen=setTimeout(function(){document.documentElement.dataset.loaderState="ready";var loader=document.querySelector("[data-home-loader]");if(loader){loader.dataset.loaderState="ready";loader.setAttribute("aria-hidden","true");loader.setAttribute("inert","");loader.inert=true}},1200)}</script>' : ""}
     ${schemaTag({ "@context": "https://schema.org", "@graph": schema })}
   </head>
   <body data-design="silver-atelier"${homepage ? ' id="top"' : ""}${bodyClass ? ` class="${bodyClass}"` : ""}>
@@ -1478,7 +1478,7 @@ function document({
     ${renderFooter(locale)}
     ${materialGuide ? renderMaterialGuide(locale) : ""}
     <script src="/site.js?v=20260804-hero-v2" defer></script>
-    ${homepage ? '<script src="/home-header-reveal.js?v=20260813-header" defer></script>' : ""}
+    ${homepage ? '<script src="/home-header-reveal.js?v=20261126-header" defer></script>' : ""}
     ${homepage ? '<script type="module" src="/home-loader.js?v=20260813-loader"></script>' : ""}
     <script type="module" src="/materials-disclosure.js?v=20260810-materials"></script>
     ${moduleScripts.map((src) => `<script type="module" src="${src}"></script>`).join("\n    ")}
