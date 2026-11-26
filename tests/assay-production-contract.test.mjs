@@ -98,8 +98,8 @@ test("the deployable homepage hero uses a permanent cinematic poster and two def
   const stacks = hero.match(/<div class="cinematic-hero-video-stack"[\s\S]*?<\/div>/g) || [];
 
   assert.equal(posters.length, 1, "the hero must contain exactly one cinematic poster");
-  assert.match(posters[0], /<source media="\(max-width: 767px\)" srcset="\/images\/ag-refining-molten-pour-poster-1280\.webp" width="1280" height="720">/, "phones must get the 1280px poster, not the 2560px desktop asset");
-  assert.match(posters[0], /<img src="\/images\/ag-refining-molten-pour-poster\.webp" alt="" width="2560" height="1440" fetchpriority="high">/);
+  assert.match(posters[0], /<source media="\(max-width: 767px\), \(orientation: portrait\)" srcset="\/images\/ag-refining-process-01-pile-poster-mobile\.webp" width="540" height="960">/, "phones and portrait viewports must get the 540x960 portrait poster, not the desktop asset");
+  assert.match(posters[0], /<img src="\/images\/ag-refining-process-01-pile-poster\.webp" alt="" width="1920" height="1080" fetchpriority="high">/);
   assert.equal(stacks.length, 1, "the hero must contain one cinematic video stack");
   const videos = stacks[0].match(/<video class="cinematic-hero-video"[\s\S]*?<\/video>/g) || [];
   assert.equal(videos.length, 2, "the hero must contain exactly two video layers");
@@ -154,13 +154,13 @@ test("the shared site script does not boot the retired assay scene", () => {
 });
 
 test("the permanent hero poster decodes at its first-paint dimensions within budget", async () => {
-  const name = "ag-refining-molten-pour-poster.webp";
+  const name = "ag-refining-process-01-pile-poster.webp";
   const path = join(root, "images", name);
 
   assert.ok(existsSync(path), `${name} is missing`);
   const metadata = await sharp(path).metadata();
-  assert.equal(metadata.width, 2560, `${name} width`);
-  assert.equal(metadata.height, 1440, `${name} height`);
+  assert.equal(metadata.width, 1920, `${name} width`);
+  assert.equal(metadata.height, 1080, `${name} height`);
   assert.ok(statSync(path).size <= 300 * 1024, `${name} exceeds the 300 KiB first-paint budget`);
 });
 

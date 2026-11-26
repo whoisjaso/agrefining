@@ -1536,15 +1536,15 @@ const home = `
   <section class="atelier-hero">
     <div class="cinematic-hero-media" aria-hidden="true" data-cinematic-hero-media>
       <picture class="cinematic-hero-poster" data-cinematic-poster>
-        <source media="(max-width: 767px)" srcset="/images/ag-refining-molten-pour-poster-1280.webp" width="1280" height="720">
-        <img src="/images/ag-refining-molten-pour-poster.webp" alt="" width="2560" height="1440" fetchpriority="high">
+        <source media="(max-width: 767px), (orientation: portrait)" srcset="/images/ag-refining-process-01-pile-poster-mobile.webp" width="540" height="960">
+        <img src="/images/ag-refining-process-01-pile-poster.webp" alt="" width="1920" height="1080" fetchpriority="high">
       </picture>
       <div class="cinematic-hero-video-stack" data-cinematic-video-stack>
-        <video class="cinematic-hero-video" autoplay muted playsinline aria-hidden="true" tabindex="-1" preload="none" poster="/images/ag-refining-molten-pour-poster-1280.webp" data-video-layer="0">
+        <video class="cinematic-hero-video" autoplay muted playsinline aria-hidden="true" tabindex="-1" preload="none" data-video-layer="0">
           <source data-video-format="webm" type='video/webm; codecs="vp9"'>
           <source data-video-format="mp4" type='video/mp4; codecs="avc1.64001F"'>
         </video>
-        <video class="cinematic-hero-video" autoplay muted playsinline aria-hidden="true" tabindex="-1" preload="none" poster="/images/ag-refining-molten-pour-poster-1280.webp" data-video-layer="1">
+        <video class="cinematic-hero-video" autoplay muted playsinline aria-hidden="true" tabindex="-1" preload="none" data-video-layer="1">
           <source data-video-format="webm" type='video/webm; codecs="vp9"'>
           <source data-video-format="mp4" type='video/mp4; codecs="avc1.64001F"'>
         </video>

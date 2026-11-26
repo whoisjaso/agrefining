@@ -1,18 +1,45 @@
-const CLIPS = [
-  { key: "molten-pour", poster: "/images/ag-refining-molten-pour-poster-1280.webp" },
-  { key: "silver-ingots", poster: "/images/ag-refining-silver-ingots-poster.webp" },
-  { key: "precision-assay", poster: "/images/ag-refining-precision-assay-poster.webp" }
+// The hero tells the whole buying process, one shot per clip, in order. Desktop plays the 16:9
+// set; phones and any portrait viewport play the native 9:16 set (shots without a clean
+// portrait take are left out of the phone sequence, so the two lists differ on purpose).
+// Order here must match the process: sort, test, weigh, melt, pour, cool, finished bars.
+const DESKTOP_CLIP_KEYS = [
+  "process-01-pile",
+  "process-02-sort",
+  "process-03-acid-test",
+  "process-04-xrf",
+  "process-05-weigh",
+  "process-06-furnace",
+  "process-07-pour",
+  "process-08-cooling",
+  "process-09-bars"
+];
+const PHONE_CLIP_KEYS = [
+  "process-01-pile",
+  "process-02-sort",
+  "process-03-acid-test",
+  "process-04-xrf",
+  "process-05-weigh",
+  "process-07-pour",
+  "process-09-bars"
 ];
 
 const ROOT_CONTROLLER_PROPERTY = "cinematicHeroVideoController";
-const PHONE_VIDEO_QUERY = "(max-width: 767px)";
+const PHONE_VIDEO_QUERY = "(max-width: 767px), (orientation: portrait)";
 
 function usesPhoneHeroVideo(documentRef) {
   return Boolean(documentRef?.defaultView?.matchMedia?.(PHONE_VIDEO_QUERY)?.matches);
 }
 
-function clipSourcePath(clip, format, phone) {
-  const suffix = phone ? "-mobile" : "";
+function buildClips(phone) {
+  return (phone ? PHONE_CLIP_KEYS : DESKTOP_CLIP_KEYS).map((key) => ({
+    key,
+    phone,
+    poster: `/images/ag-refining-${key}-poster${phone ? "-mobile" : ""}.webp`
+  }));
+}
+
+function clipSourcePath(clip, format) {
+  const suffix = clip.phone ? "-mobile" : "";
   return `/videos/ag-refining-${clip.key}${suffix}.${format}`;
 }
 
@@ -38,6 +65,7 @@ export class CinematicHeroVideo {
     this.layers = Array.from(root?.querySelectorAll("video[data-video-layer]") ?? []).slice(0, 2);
     this.poster = root?.querySelector("[data-cinematic-poster]") ?? null;
 
+    this.clips = buildClips(usesPhoneHeroVideo(this.documentRef));
     this.activeIndex = 0;
     this.nextIndex = 1;
     this.activeLayerIndex = 0;
@@ -72,6 +100,7 @@ export class CinematicHeroVideo {
       return;
     }
 
+    this.clips = buildClips(usesPhoneHeroVideo(this.documentRef));
     this.showPoster();
     for (const layer of this.layers) this.setLayerVisible(layer, false);
     this.prepareLayer(0, 0, "auto");
@@ -192,7 +221,7 @@ export class CinematicHeroVideo {
 
   prepareLayer(layerIndex, clipIndex, preload) {
     const layer = this.layers[layerIndex];
-    const clip = CLIPS[clipIndex];
+    const clip = this.clips[clipIndex];
     if (!layer || !clip) return;
 
     layer.pause();
@@ -204,11 +233,10 @@ export class CinematicHeroVideo {
     layer.muted = true;
     layer.defaultMuted = true;
     layer.playsInline = true;
-    const phone = usesPhoneHeroVideo(this.documentRef);
     const webm = layer.querySelector('[data-video-format="webm"]');
     const mp4 = layer.querySelector('[data-video-format="mp4"]');
-    webm?.setAttribute("src", clipSourcePath(clip, "webm", phone));
-    mp4?.setAttribute("src", clipSourcePath(clip, "mp4", phone));
+    webm?.setAttribute("src", clipSourcePath(clip, "webm"));
+    mp4?.setAttribute("src", clipSourcePath(clip, "mp4"));
     layer.load();
     layer.pause();
   }
@@ -315,7 +343,7 @@ export class CinematicHeroVideo {
 
     this.activeIndex = this.nextIndex;
     this.activeLayerIndex = incomingLayerIndex;
-    this.nextIndex = (this.activeIndex + 1) % CLIPS.length;
+    this.nextIndex = (this.activeIndex + 1) % this.clips.length;
     this.incomingLayerIndex = null;
     this.transitioning = false;
     this.visibilityRecoveryPending = false;

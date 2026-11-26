@@ -7,16 +7,25 @@ import test from "node:test";
 import sharp from "sharp";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const clips = [
-  ["ag-refining-molten-pour", 6, 10],
-  ["ag-refining-silver-ingots", 6, 10],
-  ["ag-refining-precision-assay", 6, 10]
+// Desktop plays the 16:9 process set; phones and portrait viewports play the 9:16 set, which
+// leaves out the shots (furnace, cooling) that have no clean portrait take.
+const desktopClips = [
+  ["ag-refining-process-01-pile", 6, 10],
+  ["ag-refining-process-02-sort", 6, 10],
+  ["ag-refining-process-03-acid-test", 6, 10],
+  ["ag-refining-process-04-xrf", 6, 10],
+  ["ag-refining-process-05-weigh", 6, 10],
+  ["ag-refining-process-06-furnace", 6, 10],
+  ["ag-refining-process-07-pour", 6, 10],
+  ["ag-refining-process-08-cooling", 6, 10],
+  ["ag-refining-process-09-bars", 6, 10]
 ];
+const phoneClips = desktopClips.filter(([clip]) => !/-(?:06-furnace|08-cooling)$/.test(clip));
+const clips = desktopClips;
 const posters = [
-  { name: "ag-refining-molten-pour-poster.webp", width: 2560, height: 1440, minBytes: 80 * 1024, maxBytes: 600 * 1024 },
-  { name: "ag-refining-molten-pour-poster-1280.webp", width: 1280, height: 720, minBytes: 10 * 1024, maxBytes: 96 * 1024 },
-  { name: "ag-refining-silver-ingots-poster.webp", width: 1280, height: 720, minBytes: 10 * 1024, maxBytes: 96 * 1024 },
-  { name: "ag-refining-precision-assay-poster.webp", width: 1280, height: 720, minBytes: 10 * 1024, maxBytes: 96 * 1024 }
+  { name: "ag-refining-process-01-pile-poster.webp", width: 1920, height: 1080, minBytes: 20 * 1024, maxBytes: 300 * 1024 },
+  ...desktopClips.slice(1).map(([clip]) => ({ name: `${clip}-poster.webp`, width: 1280, height: 720, minBytes: 5 * 1024, maxBytes: 96 * 1024 })),
+  ...phoneClips.map(([clip]) => ({ name: `${clip}-poster-mobile.webp`, width: 540, height: 960, minBytes: 5 * 1024, maxBytes: 64 * 1024 }))
 ];
 
 function mediaProbe(path) {
@@ -70,10 +79,10 @@ test("cinematic source videos meet the production media contract", () => {
 
 
 test("phone cinematic source videos meet the production media contract", () => {
-  for (const [clip, minimumDuration, maximumDuration] of clips) {
+  for (const [clip, minimumDuration, maximumDuration] of phoneClips) {
     for (const [extension, codec, maximumSize] of [
-      ["mp4", "h264", 1.2 * 1024 * 1024],
-      ["webm", "vp9", 1.1 * 1024 * 1024]
+      ["mp4", "h264", 700 * 1024],
+      ["webm", "vp9", 520 * 1024]
     ]) {
       const desktopPath = join(root, "videos", `${clip}.${extension}`);
       const path = join(root, "videos", `${clip}-mobile.${extension}`);
@@ -95,8 +104,8 @@ test("phone cinematic source videos meet the production media contract", () => {
       const [video] = videoStreams;
       assert.equal(video.codec_name, codec, `${path} must use ${codec}`);
       assert.equal(video.pix_fmt, "yuv420p", `${path} must use yuv420p`);
-      assert.equal(video.width, 960, `${path} must be 960 pixels wide`);
-      assert.equal(video.height, 540, `${path} must be 540 pixels high`);
+      assert.equal(video.width, 540, `${path} must be 540 pixels wide`);
+      assert.equal(video.height, 960, `${path} must be 960 pixels high`);
       assert.equal(frameRate(video.r_frame_rate), 24, `${path} must be 24 fps`);
 
       const duration = Number(probe.format.duration);

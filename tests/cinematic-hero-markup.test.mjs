@@ -97,8 +97,8 @@ test("the generated hero directly nests the permanent poster and exactly two ine
   assert.equal(media[0].inner.slice(0, poster.start).trim(), "", "the poster must be a direct first child of the media shell");
   assert.equal(media[0].inner.slice(poster.end, stack.start).trim(), "", "the video stack must directly follow the poster");
   assert.equal(media[0].inner.slice(stack.end).trim(), "", "the video stack must be the final direct child of the media shell");
-  assert.match(poster.html, /<source media="\(max-width: 767px\)" srcset="\/images\/ag-refining-molten-pour-poster-1280\.webp" width="1280" height="720">/, "phones must get the 1280px poster, not the 2560px desktop asset");
-  assert.match(poster.html, /<img src="\/images\/ag-refining-molten-pour-poster\.webp" alt="" width="2560" height="1440" fetchpriority="high">/);
+  assert.match(poster.html, /<source media="\(max-width: 767px\), \(orientation: portrait\)" srcset="\/images\/ag-refining-process-01-pile-poster-mobile\.webp" width="540" height="960">/, "phones and portrait viewports must get the 540x960 portrait poster, not the desktop asset");
+  assert.match(poster.html, /<img src="\/images\/ag-refining-process-01-pile-poster\.webp" alt="" width="1920" height="1080" fetchpriority="high">/);
   assert.doesNotMatch(poster.html, /loading="lazy"/);
 
   const videos = outerElements(stack.inner, "cinematic-hero-video");
@@ -106,7 +106,7 @@ test("the generated hero directly nests the permanent poster and exactly two ine
   for (const [index, video] of videos.entries()) {
     const videoAttributes = attributes(video);
     assert.match(videoAttributes, new RegExp(`data-video-layer="${index}"`));
-    for (const required of ["autoplay", "muted", "playsinline", 'aria-hidden="true"', 'tabindex="-1"', 'preload="none"', 'poster="/images/ag-refining-molten-pour-poster-1280.webp"']) {
+    for (const required of ["autoplay", "muted", "playsinline", 'aria-hidden="true"', 'tabindex="-1"', 'preload="none"']) {
       assert.match(videoAttributes, new RegExp(`\\b${required}`), `video ${index} must include ${required}`);
     }
     assert.doesNotMatch(videoAttributes, /\b(?:controls|loop)\b/, `video ${index} must stay inert`);
@@ -168,7 +168,7 @@ test("the built stylesheet isolates layered hero media with stationary overlay a
   for (const declarations of cinematicDeclarations) assert.doesNotMatch(declarations, /z-index:\s*-/);
   assert.match(stylesheet, /\.cinematic-hero-poster img,\s*\.cinematic-hero-video[\s\S]*?object-position:\s*70% center/);
   assert.match(stylesheet, /@media \(max-width: 1100px\)[\s\S]*?\.cinematic-hero-poster img,\s*\.cinematic-hero-video[\s\S]*?object-position:\s*74% center/);
-  assert.match(stylesheet, /@media \(max-width: 700px\)[\s\S]*?\.cinematic-hero-poster img,\s*\.cinematic-hero-video[\s\S]*?object-position:\s*78% center/);
+  assert.match(stylesheet, /@media \(max-width: 700px\)[\s\S]*?\.cinematic-hero-poster img,\s*\.cinematic-hero-video[\s\S]*?object-position:\s*50% center/);
   // The film plays for everyone; reduced motion only drops the crossfade, it never hides the video.
   assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.cinematic-hero-video,\s*\.cinematic-hero-poster\s*\{\s*transition:\s*none;\s*\}/);
   assert.doesNotMatch(stylesheet, /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.cinematic-hero-video\s*\{[^}]*opacity:\s*0/);

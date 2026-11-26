@@ -36,7 +36,14 @@ const viewports = [
   { name: "narrow-mobile", width: 320, height: 800 }
 ];
 
-const clipKeys = ["molten-pour", "silver-ingots", "precision-assay"];
+const desktopClipKeys = [
+  "process-01-pile", "process-02-sort", "process-03-acid-test", "process-04-xrf", "process-05-weigh",
+  "process-06-furnace", "process-07-pour", "process-08-cooling", "process-09-bars"
+];
+// Phones and portrait viewports play the 9:16 set, which omits the furnace and cooling shots.
+const phoneClipKeys = desktopClipKeys.filter((key) => !/-(?:06-furnace|08-cooling)$/.test(key));
+const isPhoneViewport = (viewport) => viewport.width < 768 || viewport.height > viewport.width;
+const clipKeysFor = (viewport) => (isPhoneViewport(viewport) ? phoneClipKeys : desktopClipKeys);
 const mimeTypes = new Map([
   [".css", "text/css; charset=utf-8"],
   [".html", "text/html; charset=utf-8"],
@@ -125,8 +132,12 @@ function createStaticServer() {
 }
 
 function probeMedia() {
-  return clipKeys.flatMap((key) => ["webm", "mp4"].map((format) => {
-    const filePath = join(root, "videos", `ag-refining-${key}.${format}`);
+  const files = [
+    ...desktopClipKeys.map((key) => [key, ""]),
+    ...phoneClipKeys.map((key) => [key, "-mobile"])
+  ];
+  return files.flatMap(([key, suffix]) => ["webm", "mp4"].map((format) => {
+    const filePath = join(root, "videos", `ag-refining-${key}${suffix}.${format}`);
     const probe = JSON.parse(execFileSync("ffprobe", [
       "-v", "error",
       "-show_entries", "format=duration,size:stream=index,codec_name,codec_type,width,height,r_frame_rate,pix_fmt",
@@ -443,6 +454,7 @@ async function runNormalCycle(browser, baseUrl, viewport) {
   const context = await browser.newContext(contextOptions(viewport, { reducedMotion: "no-preference" }));
   await installEvidenceObservers(context);
   const page = await context.newPage();
+  const clipKeys = clipKeysFor(viewport);
   const diagnostics = attachDiagnostics(page, `${viewport.name}-normal`, baseUrl);
   await page.goto(`${baseUrl}/`, { waitUntil: "load" });
   await waitForIdleClip(page, 0);
@@ -452,12 +464,12 @@ async function runNormalCycle(browser, baseUrl, viewport) {
   assert.equal(initial.videoCount, 2, `${viewport.name}: expected exactly two video elements`);
   assert.ok(initial.controls.every((value) => value === false), `${viewport.name}: a video exposed controls`);
   assert.equal(initial.clipSources.length, 2, `${viewport.name}: initial source assignment did not contain exactly two clips`);
-  assert.deepEqual(initial.clipSources.sort(), ["molten-pour", "silver-ingots"], `${viewport.name}: initial clips are not active plus next`);
+  assert.deepEqual(initial.clipSources.sort(), [clipKeys[0], clipKeys[1]].sort(), `${viewport.name}: initial clips are not active plus next`);
   const assignedSources = initial.sourceRecords.flat().filter(Boolean);
-  if (viewport.width < 768) {
-    assert.ok(assignedSources.every((src) => src.includes("-mobile.")), `${viewport.name}: phone viewports must use the mobile hero encodes`);
+  if (isPhoneViewport(viewport)) {
+    assert.ok(assignedSources.every((src) => src.includes("-mobile.")), `${viewport.name}: phone and portrait viewports must use the mobile hero encodes`);
   } else {
-    assert.ok(assignedSources.every((src) => !src.includes("-mobile.")), `${viewport.name}: 768px and up must keep the desktop hero encodes`);
+    assert.ok(assignedSources.every((src) => !src.includes("-mobile.")), `${viewport.name}: landscape 768px and up must keep the desktop hero encodes`);
   }
   assert.equal(initial.overflow.scrollWidth, initial.overflow.clientWidth, `${viewport.name}: horizontal overflow`);
   const overlayBaseline = initial.overlay;
@@ -467,11 +479,11 @@ async function runNormalCycle(browser, baseUrl, viewport) {
   const activeSequence = [0];
 
   const resourceBeforeSwap = await page.evaluate(() => performance.getEntriesByType("resource").map(({ name, startTime, responseEnd, initiatorType }) => ({ name, startTime, responseEnd, initiatorType })));
-  const posterResource = resourceBeforeSwap.find(({ name }) => name.includes("/images/ag-refining-molten-pour-poster"));
+  const posterResource = resourceBeforeSwap.find(({ name }) => name.includes("/images/ag-refining-process-01-pile-poster"));
   const moduleResource = resourceBeforeSwap.find(({ name }) => name.includes("/cinematic-hero-video.js"));
   assert.ok(posterResource && moduleResource, `${viewport.name}: poster or cinematic module missing from first-paint resources`);
   assert.ok(posterResource.startTime <= moduleResource.startTime, `${viewport.name}: poster request did not begin before cinematic module request`);
-  assert.equal(resourceBeforeSwap.some(({ name }) => name.includes("precision-assay")), false, `${viewport.name}: third clip requested before first swap`);
+  assert.equal(resourceBeforeSwap.some(({ name }) => name.includes(clipKeys[2])), false, `${viewport.name}: third clip requested before first swap`);
 
   for (let fromIndex = 0; fromIndex < clipKeys.length; fromIndex += 1) {
     const toIndex = (fromIndex + 1) % clipKeys.length;
@@ -537,7 +549,7 @@ async function runNormalCycle(browser, baseUrl, viewport) {
     });
   }
 
-  assert.deepEqual(activeSequence, [0, 1, 2, 0], `${viewport.name}: playback skipped or duplicated a transition`);
+  assert.deepEqual(activeSequence, [...clipKeys.keys(), 0], `${viewport.name}: playback skipped or duplicated a transition`);
   const samples = await page.evaluate(() => window.__releaseMediaSamples);
   assert.ok(samples.length > 0, `${viewport.name}: no continuous media samples were recorded`);
   assert.equal(samples.some(({ posterOpacity, videoOpacity }) => posterOpacity + videoOpacity.reduce((sum, value) => sum + value, 0) <= 0.01), false, `${viewport.name}: sampled a frame with all media transparent`);
@@ -545,7 +557,7 @@ async function runNormalCycle(browser, baseUrl, viewport) {
   assert.equal(duplicatePlaybackSamples.length, 0, `${viewport.name}: duplicate playback occurred outside a transition: ${JSON.stringify(duplicatePlaybackSamples.slice(0, 8))}`);
 
   const resourceAfterCycle = await page.evaluate(() => performance.getEntriesByType("resource").map(({ name, startTime, responseEnd, initiatorType }) => ({ name, startTime, responseEnd, initiatorType })));
-  assert.ok(resourceAfterCycle.some(({ name }) => name.includes("precision-assay")), `${viewport.name}: third clip was never requested after first swap`);
+  assert.ok(resourceAfterCycle.some(({ name }) => name.includes(clipKeys[2])), `${viewport.name}: third clip was never requested after first swap`);
   const perf = await page.evaluate(() => window.__releaseEvidence);
   assert.equal(perf.heroLayoutShift, 0, `${viewport.name}: hero caused layout shift`);
   assert.deepEqual(perf.unhandledRejections, [], `${viewport.name}: normal cycle had unhandled rejections`);

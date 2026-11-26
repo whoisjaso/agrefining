@@ -112,11 +112,11 @@ else {
   if (posters.length !== 1) failures.push("Homepage hero must contain exactly one permanent cinematic poster");
   else {
     const [poster] = posters;
-    if (!poster.includes('src="/images/ag-refining-molten-pour-poster.webp"') || !poster.includes('width="2560" height="1440"')) {
-      failures.push("Homepage hero must use the eager, dimensioned molten-pour poster");
+    if (!poster.includes('src="/images/ag-refining-process-01-pile-poster.webp"') || !poster.includes('width="1920" height="1080"')) {
+      failures.push("Homepage hero must use the eager, dimensioned process-01 pile poster");
     }
-    if (!poster.includes('<source media="(max-width: 767px)" srcset="/images/ag-refining-molten-pour-poster-1280.webp"')) {
-      failures.push("Homepage hero must serve the phone-sized 1280px poster below 768px");
+    if (!poster.includes('<source media="(max-width: 767px), (orientation: portrait)" srcset="/images/ag-refining-process-01-pile-poster-mobile.webp"')) {
+      failures.push("Homepage hero must serve the portrait 540x960 poster on phones and portrait viewports");
     }
     if (!poster.includes('fetchpriority="high"') || poster.includes('loading="lazy"')) {
       failures.push("Homepage hero picture must remain eager first-paint media");

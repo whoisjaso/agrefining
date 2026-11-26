@@ -88,7 +88,7 @@ class FakeVideo extends EventTarget {
     this.playOutcomes = [];
     this.loadedSources = [];
     this.nativeAutoplayOnLoad = false;
-    this.poster = "/images/ag-refining-molten-pour-poster.webp";
+    this.poster = "/images/ag-refining-process-01-pile-poster.webp";
   }
 
   get preload() {
@@ -318,26 +318,29 @@ function hideAndBeginIncomingRecovery(harness, incoming, recoveryPlay) {
 }
 
 
-test("phones below 768px receive the smaller mobile hero encodes, desktop keeps the 1280px files", async () => {
+test("phones and portrait viewports get the native 9:16 mobile encodes, desktop keeps the 16:9 files", async () => {
   const phone = createHarness({ phone: true });
   await startPlaying(phone);
   assert.deepEqual(phone.root.videos[0].sources.map((source) => source.src), [
-    "/videos/ag-refining-molten-pour-mobile.webm",
-    "/videos/ag-refining-molten-pour-mobile.mp4"
+    "/videos/ag-refining-process-01-pile-mobile.webm",
+    "/videos/ag-refining-process-01-pile-mobile.mp4"
   ]);
   assert.deepEqual(phone.root.videos[1].sources.map((source) => source.src), [
-    "/videos/ag-refining-silver-ingots-mobile.webm",
-    "/videos/ag-refining-silver-ingots-mobile.mp4"
+    "/videos/ag-refining-process-02-sort-mobile.webm",
+    "/videos/ag-refining-process-02-sort-mobile.mp4"
   ]);
-  assert.equal(phone.root.videos[0].poster, "/images/ag-refining-molten-pour-poster-1280.webp");
-  assert.equal(phone.root.videos[1].poster, "/images/ag-refining-silver-ingots-poster.webp");
+  assert.equal(phone.root.videos[0].poster, "/images/ag-refining-process-01-pile-poster-mobile.webp");
+  assert.equal(phone.root.videos[1].poster, "/images/ag-refining-process-02-sort-poster-mobile.webp");
+  assert.equal(phone.controller.clips.length, 7, "the phone sequence omits shots with no clean portrait take");
+  assert.ok(phone.controller.clips.every((clip) => !["process-06-furnace", "process-08-cooling"].includes(clip.key)));
 
   const desktop = createHarness();
   await startPlaying(desktop);
   assert.deepEqual(desktop.root.videos[0].sources.map((source) => source.src), [
-    "/videos/ag-refining-molten-pour.webm",
-    "/videos/ag-refining-molten-pour.mp4"
+    "/videos/ag-refining-process-01-pile.webm",
+    "/videos/ag-refining-process-01-pile.mp4"
   ]);
+  assert.equal(desktop.controller.clips.length, 9);
 });
 
 test("kills mutation: clip records are reordered, a third clip is eagerly assigned, or MP4 is assigned before WebM", async () => {
@@ -346,20 +349,20 @@ test("kills mutation: clip records are reordered, a third clip is eagerly assign
   const [active, prepared] = harness.root.videos;
 
   assert.deepEqual(active.sources.map((source) => source.src), [
-    "/videos/ag-refining-molten-pour.webm",
-    "/videos/ag-refining-molten-pour.mp4"
+    "/videos/ag-refining-process-01-pile.webm",
+    "/videos/ag-refining-process-01-pile.mp4"
   ]);
   assert.deepEqual(prepared.sources.map((source) => source.src), [
-    "/videos/ag-refining-silver-ingots.webm",
-    "/videos/ag-refining-silver-ingots.mp4"
+    "/videos/ag-refining-process-02-sort.webm",
+    "/videos/ag-refining-process-02-sort.mp4"
   ]);
   assert.equal(active.preload, "auto");
   assert.equal(prepared.preload, "metadata");
-  assert.equal(active.poster, "/images/ag-refining-molten-pour-poster-1280.webp");
-  assert.equal(prepared.poster, "/images/ag-refining-silver-ingots-poster.webp");
+  assert.equal(active.poster, "/images/ag-refining-process-01-pile-poster.webp");
+  assert.equal(prepared.poster, "/images/ag-refining-process-02-sort-poster.webp");
   assert.deepEqual(active.assignments.map(({ format }) => format), ["webm", "mp4"]);
   assert.deepEqual(prepared.assignments.map(({ format }) => format), ["webm", "mp4"]);
-  assert.ok(harness.root.videos.every((video) => video.sources.every((source) => !source.src.includes("precision-assay"))));
+  assert.ok(harness.root.videos.every((video) => video.sources.every((source) => !source.src.includes("process-03"))));
   assert.deepEqual([harness.controller.activeIndex, harness.controller.nextIndex], [0, 1]);
 });
 
@@ -483,8 +486,8 @@ test("kills mutation: role swap/reset occurs before playback and the CSS opacity
   assert.equal(outgoing.currentTime, 0);
   assert.equal(outgoing.preload, "metadata");
   assert.deepEqual(outgoing.sources.map((source) => source.src), [
-    "/videos/ag-refining-precision-assay.webm",
-    "/videos/ag-refining-precision-assay.mp4"
+    "/videos/ag-refining-process-03-acid-test.webm",
+    "/videos/ag-refining-process-03-acid-test.mp4"
   ]);
 });
 
@@ -501,21 +504,23 @@ test("kills mutation: the 950ms transition fallback is omitted or swaps before t
   assert.equal(harness.root.videos[0].currentTime, 0);
 });
 
-test("kills mutation: next-index arithmetic fails to wrap from clip three to clip one", async () => {
+test("kills mutation: next-index arithmetic fails to wrap from the last process clip to the first", async () => {
   const harness = createHarness();
   await startPlaying(harness);
+  const count = harness.controller.clips.length;
+  assert.equal(count, 9);
 
-  await beginThresholdTransition(harness);
-  await finishTransition(harness);
-  assert.deepEqual([harness.controller.activeIndex, harness.controller.nextIndex], [1, 2]);
-  await beginThresholdTransition(harness);
-  await finishTransition(harness);
-  assert.deepEqual([harness.controller.activeIndex, harness.controller.nextIndex], [2, 0]);
-  const preparedMoltenLayer = harness.root.videos[1];
-  assert.equal(preparedMoltenLayer.preload, "metadata");
-  assert.deepEqual(preparedMoltenLayer.sources.map((source) => source.src), [
-    "/videos/ag-refining-molten-pour.webm",
-    "/videos/ag-refining-molten-pour.mp4"
+  for (let step = 1; step < count; step += 1) {
+    await beginThresholdTransition(harness);
+    await finishTransition(harness);
+    assert.deepEqual([harness.controller.activeIndex, harness.controller.nextIndex], [step, (step + 1) % count]);
+  }
+  // The last clip is active, so the layer just retired must already hold clip one for the wrap.
+  const preparedFirstLayer = harness.root.videos[harness.controller.activeLayerIndex === 0 ? 1 : 0];
+  assert.equal(preparedFirstLayer.preload, "metadata");
+  assert.deepEqual(preparedFirstLayer.sources.map((source) => source.src), [
+    "/videos/ag-refining-process-01-pile.webm",
+    "/videos/ag-refining-process-01-pile.mp4"
   ]);
   await beginThresholdTransition(harness);
   await finishTransition(harness);
