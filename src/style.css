@@ -3689,7 +3689,15 @@ html[data-loader-state="ready"] .home-loader {
 
   .cinematic-hero-overlay {
     background:
-      linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.06) 16%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0.12) 55%, rgba(0, 0, 0, 0.52) 76%, rgba(0, 0, 0, 0.7) 100%);
+      linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.06) 14%, rgba(0, 0, 0, 0) 24%, rgba(0, 0, 0, 0.34) 33%, rgba(0, 0, 0, 0.76) 42%, rgba(0, 0, 0, 0.9) 54%, rgba(0, 0, 0, 0.95) 100%);
+  }
+
+  /* The copy sits on a deep black gradient so it reads over every clip, busy ones included. */
+  .atelier-hero h1,
+  .atelier-hero .hero-lede,
+  .atelier-hero .hero-call,
+  .hero-proof-rail li {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75), 0 0 18px rgba(0, 0, 0, 0.55);
   }
 
   html:not(.home-header-solid) .home-page .site-header,
@@ -3733,16 +3741,19 @@ html[data-loader-state="ready"] .home-loader {
 
   .hero-copy {
     max-width: none;
-    padding: 0 0 0.65rem;
+    padding: 0 0 0.35rem;
   }
 
   .atelier-hero h1 {
-    font-size: clamp(2.9rem, 12vw, 4.2rem);
+    font-size: clamp(2.35rem, 10.3vw, 3.6rem);
+    margin-bottom: 0.85rem;
   }
 
   .atelier-hero .hero-lede {
+    color: #fff;
     font-size: 1rem;
     line-height: 1.5;
+    margin-bottom: 1.1rem;
     max-width: 31rem;
   }
 
@@ -4025,12 +4036,9 @@ html[data-loader-state="ready"] .home-loader {
 }
 
 @media (max-width: 420px) {
-  .hero-copy {
-    padding-top: clamp(16rem, 38vh, 19rem);
-  }
-
   .atelier-hero h1 {
-    font-size: clamp(2.6rem, 13.5vw, 3.45rem);
+    font-size: clamp(2.2rem, 10.6vw, 2.75rem);
+    max-width: none;
   }
 
   .atelier-hero .hero-actions {
