@@ -63,14 +63,20 @@ const COPY = {
     stepMaterial: "What Are You Bringing?",
     stepAmount: "About How Much?",
     stepPickup: "Pickup Or Drop-Off?",
-    stepContact: "Where Should Dennis Call You?",
+    stepFirst: "What Is Your First Name?",
+    stepLast: "And Your Last Name?",
+    stepPhone: "Where Should Dennis Call You?",
+    stepEmail: "Want A Confirmation By Email?",
+    firstName: "First name",
+    lastName: "Last name",
+    skipHint: "Optional. Leave it blank to skip.",
     tiles: { silver: "Silver", coins: "Coins / Bullion", dental: "Dental / X-Ray", industrial: "Industrial / Scrap", unsure: "Not Sure" },
     amounts: ["A few pieces", "A box or bag", "Business volume"],
     amountLabels: ["A Few Pieces", "A Box Or Bag", "Business Volume"],
     pickupLabels: ["Pickup", "Drop-Off"],
-    reassure: "No obligation. Dennis calls you back.",
+    reassure: "No obligation. Dennis calls you back. Your number is saved as you go.",
     back: "Back",
-    next: "Continue",
+    next: "Next",
     name: "Name",
     business: "Business",
     phone: "Phone",
@@ -102,14 +108,20 @@ const COPY = {
     stepMaterial: "¿Qué Va A Traer?",
     stepAmount: "¿Cuánto, Más O Menos?",
     stepPickup: "¿Recogida O Entrega?",
-    stepContact: "¿A Dónde Le Llama Dennis?",
+    stepFirst: "¿Cuál Es Su Nombre?",
+    stepLast: "¿Y Su Apellido?",
+    stepPhone: "¿A Dónde Le Llama Dennis?",
+    stepEmail: "¿Quiere Confirmación Por Correo?",
+    firstName: "Nombre",
+    lastName: "Apellido",
+    skipHint: "Opcional. Déjelo en blanco para omitirlo.",
     tiles: { silver: "Plata", coins: "Monedas / Lingotes", dental: "Dental / Rayos X", industrial: "Industrial / Chatarra", unsure: "No Estoy Seguro" },
     amounts: ["A few pieces", "A box or bag", "Business volume"],
     amountLabels: ["Unas Pocas Piezas", "Una Caja O Bolsa", "Volumen De Negocio"],
     pickupLabels: ["Recogida", "Entrega"],
-    reassure: "Sin compromiso. Dennis le devuelve la llamada.",
+    reassure: "Sin compromiso. Dennis le devuelve la llamada. Su número se guarda mientras avanza.",
     back: "Atrás",
-    next: "Continuar",
+    next: "Siguiente",
     name: "Nombre",
     business: "Empresa",
     phone: "Teléfono",
@@ -139,6 +151,8 @@ const COPY = {
 
 const KNOWN_VALUES = new Set([
   "name",
+  "first_name",
+  "last_name",
   "business",
   "phone",
   "email",
@@ -236,6 +250,9 @@ export function renderReviewForm({
   }).join("");
   const amountTiles = copy.amounts.map((value, index) => tile("quantity", value, copy.amountLabels[index], clean.quantity === value, `quantity-${index + 1}`, ` data-tile="amount-${index + 1}"`)).join("");
   const pickupTiles = ["Pickup", "Drop-off"].map((value, index) => tile("location", value, copy.pickupLabels[index], clean.location === value, `location-${index + 1}`, ` data-tile="${index === 0 ? "pickup" : "dropoff"}"`)).join("");
+  const nameParts = String(clean.name || "").trim().split(/\s+/).filter(Boolean);
+  const firstName = clean.first_name || nameParts[0] || "";
+  const lastName = clean.last_name || nameParts.slice(1).join(" ");
   const privacyAttributes = language === "es" ? ' hreflang="en"' : "";
 
   return `<form id="review-form" class="review-form" data-review-form data-locale="${language}" action="${escapeHtml(action)}" method="post">
@@ -244,8 +261,21 @@ export function renderReviewForm({
     <input type="hidden" name="intent" value="${escapeHtml(intent)}">
     <input type="hidden" name="form_started" value="${escapeHtml(clean.form_started || "")}">
     <input type="hidden" name="submission_key" value="${escapeHtml(clean.submission_key || "")}">
-    <div class="flow-progress field-wide" data-flow-progress role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20" aria-label="${language === "es" ? "Progreso" : "Progress"}" hidden><span data-flow-bar style="width:20%"></span></div>
+    <div class="flow-progress field-wide" data-flow-progress role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="12" aria-label="${language === "es" ? "Progreso" : "Progress"}" hidden><span data-flow-bar style="width:12%"></span></div>
     <p class="flow-affirm field-wide" data-flow-affirm aria-live="polite" hidden></p>
+    <fieldset class="flow-step field-wide" data-flow-step="first_name">
+      <legend tabindex="-1"><label for="first_name">${copy.stepFirst}</label></legend>
+      <div class="field"><input id="first_name" name="first_name" type="text" autocomplete="given-name" autocapitalize="words" aria-label="${copy.firstName}" value="${escapeHtml(firstName)}" required${nameState.attrs}>${nameState.error}</div>
+    </fieldset>
+    <fieldset class="flow-step field-wide" data-flow-step="last_name">
+      <legend tabindex="-1"><label for="last_name">${copy.stepLast}</label></legend>
+      <div class="field"><input id="last_name" name="last_name" type="text" autocomplete="family-name" autocapitalize="words" aria-label="${copy.lastName}" value="${escapeHtml(lastName)}" required></div>
+    </fieldset>
+    <fieldset class="flow-step field-wide" data-flow-step="phone">
+      <legend tabindex="-1"><label for="phone">${copy.stepPhone}</label></legend>
+      <div class="field"><input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" aria-label="${copy.phone}" value="${escapeHtml(clean.phone || "")}" required${phoneState.attrs}>${phoneState.error}</div>
+      <p class="flow-reassure">${copy.reassure}</p>
+    </fieldset>
     <fieldset class="flow-step field-wide" data-flow-step="material">
       <legend tabindex="-1">${copy.stepMaterial}</legend>
       <div class="flow-tiles">${materialTiles}</div>
@@ -259,12 +289,10 @@ export function renderReviewForm({
       <legend tabindex="-1">${copy.stepPickup}</legend>
       <div class="flow-tiles flow-tiles-two">${pickupTiles}</div>
     </fieldset>
-    <fieldset class="flow-step field-wide" data-flow-step="contact">
-      <legend tabindex="-1">${copy.stepContact}</legend>
-      <div class="field"><label for="name">${copy.name}</label><input id="name" name="name" type="text" autocomplete="name" value="${escapeHtml(clean.name || "")}" required${nameState.attrs}>${nameState.error}</div>
-      <div class="field"><label for="phone">${copy.phone}</label><input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" value="${escapeHtml(clean.phone || "")}" required${phoneState.attrs}>${phoneState.error}</div>
-      <p class="flow-reassure">${copy.reassure}</p>
-      <div class="field"><label for="email">${copy.email} <span>${copy.optional}</span></label><input id="email" name="email" type="email" autocomplete="email" value="${escapeHtml(clean.email || "")}"${emailState.attrs}>${emailState.error}</div>
+    <fieldset class="flow-step field-wide" data-flow-step="email">
+      <legend tabindex="-1"><label for="email">${copy.stepEmail}</label></legend>
+      <div class="field"><input id="email" name="email" type="email" autocomplete="email" aria-label="${copy.email}" value="${escapeHtml(clean.email || "")}"${emailState.attrs}>${emailState.error}</div>
+      <p class="flow-reassure">${copy.skipHint}</p>
       <div class="honeypot" aria-hidden="true"><label for="company_url">${copy.companyWebsite}</label><input id="company_url" name="company_url" type="text" tabindex="-1" autocomplete="off"></div>
       <div class="form-actions"><button class="button button-primary" type="submit" data-submit-button>${copy.submit} <span class="icon-arrow" aria-hidden="true"></span></button><p class="form-status" data-form-status aria-live="polite"></p></div>
       <p class="form-note">${copy.note} <a href="/privacy"${privacyAttributes}>${copy.privacy}</a>.</p>

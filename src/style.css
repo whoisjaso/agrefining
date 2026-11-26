@@ -3177,20 +3177,58 @@ html[data-loader-state="ready"] .home-loader {
 }
 
 .review-form[data-flow="ready"] .flow-step.is-entering {
-  animation: flow-step-in 360ms var(--ease) both;
+  animation: flow-step-in 300ms cubic-bezier(0.16, 0.84, 0.24, 1) both;
+}
+
+.review-form[data-flow="ready"] .flow-step.is-entering-back {
+  animation: flow-step-back 300ms cubic-bezier(0.16, 0.84, 0.24, 1) both;
 }
 
 .review-form[data-flow="ready"] .form-actions .button {
   width: 100%;
 }
 
+/* One field per screen: the question is the label, the input is large and calm. */
+.flow-step legend label {
+  color: inherit;
+  cursor: text;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.flow-step > .field input {
+  font-size: 1.25rem;
+  min-height: 4rem;
+}
+
+.flow-affirm[data-state="prompt"] {
+  color: var(--ink);
+}
+
+/* Fast slide with a touch of blur, so each screen arrives with some speed and settles. */
 @keyframes flow-step-in {
   from {
+    filter: blur(6px);
     opacity: 0;
-    transform: translateY(0.75rem);
+    transform: translateX(1.75rem);
   }
 
   to {
+    filter: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes flow-step-back {
+  from {
+    filter: blur(6px);
+    opacity: 0;
+    transform: translateX(-1.75rem);
+  }
+
+  to {
+    filter: none;
     opacity: 1;
     transform: none;
   }
@@ -3220,7 +3258,8 @@ html[data-loader-state="ready"] .home-loader {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .review-form[data-flow="ready"] .flow-step.is-entering {
+  .review-form[data-flow="ready"] .flow-step.is-entering,
+  .review-form[data-flow="ready"] .flow-step.is-entering-back {
     animation: none;
   }
 

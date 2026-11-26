@@ -167,6 +167,7 @@ function label(value) {
 
 function emailContent(payload) {
   const rows = [
+    ["Status", "Complete"],
     ["Name", payload.name],
     ["Business", payload.business || "Not provided"],
     ["Phone", payload.phone],
@@ -289,6 +290,78 @@ function leadBcc() {
     .split(",")
     .map((address) => address.trim())
     .filter((address) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address));
+}
+
+const LEAD_STAGES = new Set(["partial", "progress", "left", "complete"]);
+const STEP_LABELS = {
+  first_name: "First name",
+  last_name: "Last name",
+  phone: "Phone",
+  material: "What they are bringing",
+  quantity: "How much",
+  location: "Pickup or drop-off",
+  email: "Email"
+};
+
+// Vercel keeps function logs: search "LEAD_PROGRESS" to see how far each session got.
+function logLeadProgress(payload) {
+  console.log(`LEAD_PROGRESS ${JSON.stringify({
+    session: payload.submission_key,
+    status: payload.lead_status,
+    step: payload.lead_step,
+    name: payload.name,
+    phone: payload.phone,
+    material: payload.material,
+    quantity: payload.quantity,
+    location: payload.location
+  })}`);
+}
+
+export function partialContent(payload) {
+  const left = payload.lead_status === "left";
+  const reached = STEP_LABELS[payload.lead_step] || payload.lead_step || "Phone";
+  const rows = [
+    ["Status", left ? "Partial: left before finishing" : "Partial: still filling in the form"],
+    ["Stopped at", reached],
+    ["Name", payload.name],
+    ["Phone", payload.phone],
+    ["Bringing", MATERIALS.has(payload.material) ? label(payload.material) : "Not answered yet"],
+    ["Amount", payload.quantity || "Not answered yet"],
+    ["Pickup or drop-off", payload.location || "Not answered yet"],
+    ["Email", payload.email || "Not answered yet"]
+  ];
+  const note = "This person has not finished the form. If a full pickup request arrives from the same name and number, use that one.";
+  return {
+    subject: `${left ? "Partial lead update" : "Partial lead"}: ${payload.name}, ${payload.phone}`,
+    text: `${left ? "Partial lead update" : "Partial lead"}\n\n${rows.map(([name, value]) => `${name}: ${value}`).join("\n")}\n\n${note}`,
+    html: `<div style="font-family:Arial,sans-serif;color:#14232c;line-height:1.5"><h1 style="color:#061724">${left ? "Partial lead update" : "Partial lead"}</h1><p style="margin:0 0 18px"><a href="tel:${escapeHtml(payload.phone.replace(/[^\d+]/g, ""))}" style="display:inline-block;background:#102a43;color:#ffffff;padding:12px 18px;text-decoration:none;border-radius:4px">Call ${escapeHtml(payload.name)}</a></p><table>${rows.map(([name, value]) => `<tr><th align="left" style="padding:8px 12px 8px 0;vertical-align:top">${escapeHtml(name)}</th><td style="padding:8px 0">${escapeHtml(value)}</td></tr>`).join("")}</table><p style="color:#586b7e">${note}</p></div>`
+  };
+}
+
+// One "Partial lead" email when a valid phone first arrives, and at most one "Partial lead update"
+// if the visitor leaves later without finishing. Same sender, recipient and copy list as full leads.
+async function sendPartial(payload) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return { configured: false };
+  const content = partialContent(payload);
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+      "Idempotency-Key": `${payload.submission_key}-${payload.lead_status}`
+    },
+    body: JSON.stringify({
+      from: process.env.AG_LEAD_FROM_EMAIL || DEFAULT_FROM_EMAIL,
+      to: [process.env.AG_LEAD_TO_EMAIL || DEFAULT_TO_EMAIL],
+      ...(leadBcc().length ? { bcc: leadBcc() } : {}),
+      subject: content.subject,
+      text: content.text,
+      html: content.html
+    })
+  });
+  if (!response.ok) throw new Error("Partial lead delivery failed");
+  return { configured: true };
 }
 
 async function sendResend(payload) {
@@ -442,8 +515,14 @@ export default async function handler(req, res) {
   const frequency = text(body.frequency, 30);
   const preferredContact = text(body.preferred_contact, 20);
   const formStarted = Number(body.form_started || 0);
+  // The one-field flow posts first and last name separately; older clients post "name".
+  const firstName = text(body.first_name, 60);
+  const lastName = text(body.last_name, 60);
+  const stage = LEAD_STAGES.has(text(body.lead_status, 20)) ? text(body.lead_status, 20) : "complete";
   const payload = {
-    name: text(body.name, 120),
+    name: text(body.name, 120) || [firstName, lastName].filter(Boolean).join(" "),
+    lead_status: stage,
+    lead_step: text(body.lead_step, 40),
     business: text(body.business, 180),
     phone: text(body.phone, 80),
     email: text(body.email, 254).toLowerCase(),
@@ -466,6 +545,22 @@ export default async function handler(req, res) {
   const hasTimingSignal = Number.isFinite(formStarted) && formStarted > 0;
   const tooFast = hasTimingSignal && Date.now() - formStarted < 700;
   if (payload.company_url || tooFast) return receiptResponse(res, format, locale);
+
+  // Unfinished leads from the step flow. One person is one lead: the browser's session id
+  // (submission_key) is the idempotency key, so a repeat of the same stage never sends twice.
+  if (stage !== "complete") {
+    if (payload.name.length < 1 || payload.phone.replace(/\D/g, "").length < 7) {
+      return res.status(422).json({ ok: false });
+    }
+    logLeadProgress(payload);
+    if (stage === "progress") return res.status(200).json({ ok: true });
+    try {
+      await sendPartial(payload);
+    } catch {
+      // A missed partial notice never blocks the visitor; the function log above still has it.
+    }
+    return res.status(200).json({ ok: true });
+  }
 
   const fields = validate(payload);
   if (Object.keys(fields).length) {

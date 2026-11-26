@@ -404,35 +404,47 @@ test("every pickup call to action lands on the pickup form", () => {
   assert.match(contactPage, /<div id="get-paid" class="contact-form-column">/);
 });
 
-test("the pickup form is a four-question flow that still works as a plain form", () => {
+test("the pickup form is a one-field-per-screen flow that still works as a plain form", () => {
   const contactPage = readFileSync(join(dist, "contact", "index.html"), "utf8");
   const form = contactPage.match(/<form id="review-form"[\s\S]*?<\/form>/)?.[0] || "";
-  const steps = [...form.matchAll(/<fieldset class="flow-step field-wide" data-flow-step="([a-z]+)">\s*<legend tabindex="-1">([^<]+)<\/legend>/g)].map((match) => [match[1], match[2]]);
+  const steps = [...form.matchAll(/<fieldset class="flow-step field-wide" data-flow-step="([a-z_]+)">\s*<legend tabindex="-1">(?:<label for="[a-z_]+">)?([^<]+)</g)].map((match) => [match[1], match[2]]);
   assert.deepEqual(steps, [
+    ["first_name", "What Is Your First Name?"],
+    ["last_name", "And Your Last Name?"],
+    ["phone", "Where Should Dennis Call You?"],
     ["material", "What Are You Bringing?"],
     ["quantity", "About How Much?"],
     ["location", "Pickup Or Drop-Off?"],
-    ["contact", "Where Should Dennis Call You?"]
+    ["email", "Want A Confirmation By Email?"]
   ]);
   const tiles = (name) => [...form.matchAll(new RegExp(`<input id="[^"]+" type="radio" name="${name}" value="([^"]+)"`, "g"))].map((match) => match[1]);
   assert.deepEqual(tiles("material"), ["scrap_silver", "silver_coins", "dental_material", "industrial_silver", "unknown"], "tiles post the endpoint's own material values");
   assert.deepEqual(tiles("quantity"), ["A few pieces", "A box or bag", "Business volume"]);
   assert.deepEqual(tiles("location"), ["Pickup", "Drop-off"]);
   assert.doesNotMatch(form, />\s*Gold\s*</, "no gold tile until the owner confirms gold in writing");
-  const typed = [...form.matchAll(/<input id="(name|phone|email)"[^>]*>/g)].map((match) => match[0]);
-  assert.equal(typed.length, 3);
-  assert.match(typed[0], /required/);
-  assert.match(typed[1], /required/);
-  assert.doesNotMatch(typed[2], /required/);
+  const typed = [...form.matchAll(/<input id="(first_name|last_name|phone|email)"[^>]*>/g)].map((match) => match[0]);
+  assert.equal(typed.length, 4, "one typed field per screen");
+  assert.match(typed[0], /name="first_name"[^>]*autocomplete="given-name"[^>]*required/);
+  assert.match(typed[1], /name="last_name"[^>]*autocomplete="family-name"[^>]*required/);
+  assert.match(typed[2], /name="phone"[^>]*type="tel"[^>]*required/);
+  assert.doesNotMatch(typed[3], /required/);
   assert.doesNotMatch(form, /<textarea|name="business"|name="pickup_date"|name="frequency"/);
   assert.doesNotMatch(form, />Required</, "nothing is labelled Required");
-  assert.match(form, /No obligation\. Dennis calls you back\./);
+  assert.match(form, /No obligation\. Dennis calls you back\. Your number is saved as you go\./, "the visitor is told the number is saved before finishing");
   assert.doesNotMatch(form, /same day/i, "no response-time promise");
   assert.match(form, /data-submit-button>Get My Offer Call/);
   // Progress and step controls stay hidden until the script takes over, so the plain form is complete.
-  assert.match(form, /data-flow-progress[^>]*aria-valuenow="20"[^>]*hidden/);
+  assert.match(form, /data-flow-progress[^>]*aria-valuenow="12"[^>]*hidden/);
   assert.match(form, /data-flow-nav hidden/);
   assert.match(form, /action="\/api\/leads" method="post"/);
+
+  const privacyPage = readFileSync(join(dist, "privacy", "index.html"), "utf8");
+  assert.match(privacyPage, /sent to AG Refining as you go, even if you do not finish/, "the privacy page discloses unfinished leads");
+
+  const css = readFileSync(join(dist, "style.css"), "utf8");
+  assert.match(css, /@keyframes flow-step-in \{[\s\S]*?filter:\s*blur\(6px\);[\s\S]*?transform:\s*translateX\(1\.75rem\)/);
+  assert.match(css, /\.flow-step\.is-entering \{\s*animation:\s*flow-step-in 300ms/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.review-form\[data-flow="ready"\] \.flow-step\.is-entering,[\s\S]*?animation:\s*none;/);
 });
 
 test("the map band is one static image with a directions link and no map service", () => {

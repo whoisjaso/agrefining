@@ -212,7 +212,14 @@ const formUi = {
     emailDetails: "Email these details",
     networkError: "The request could not be sent. Please call (281) 898-2719 or try again.",
     submit: "Get My Offer Call",
+    flowBlank: "Please type your answer to continue.",
+    flowPhone: "Please add a phone number Dennis can call.",
+    flowPick: "Please pick one to continue.",
+    affirmFirst: (name) => (name ? `Nice to meet you, ${name}.` : ""),
     affirm: {
+      first_name: "",
+      last_name: "Thank you.",
+      phone: "Got it. Dennis can reach you now.",
       silver: "Nice. Silver is our specialty.",
       coins: "Good. We buy coins and bullion.",
       dental: "Good. We handle dental and X-ray material.",
@@ -245,7 +252,14 @@ const formUi = {
     emailDetails: "Enviar estos datos por correo",
     networkError: "No se pudo enviar la solicitud. Llame al (281) 898-2719 o inténtelo de nuevo.",
     submit: "Reciba Mi Llamada",
+    flowBlank: "Escriba su respuesta para continuar.",
+    flowPhone: "Agregue un teléfono al que Dennis pueda llamar.",
+    flowPick: "Elija una opción para continuar.",
+    affirmFirst: (name) => (name ? `Mucho gusto, ${name}.` : ""),
     affirm: {
+      first_name: "",
+      last_name: "Gracias.",
+      phone: "Listo. Dennis ya puede llamarle.",
       silver: "Muy bien. La plata es nuestra especialidad.",
       coins: "Bien. Compramos monedas y lingotes.",
       dental: "Bien. Manejamos material dental y de rayos X.",
@@ -448,12 +462,34 @@ function showFormDone(form) {
   if (bar) bar.style.width = "100%";
   form.querySelector("[data-flow-progress]")?.setAttribute("aria-valuenow", "100");
   form.dataset.flowDone = "true";
+  clearFlowStore();
   form.querySelectorAll(".flow-step, [data-flow-nav], [data-flow-affirm]").forEach((element) => { element.hidden = true; });
   form.append(panel);
   panel.focus();
 }
 
 // Step-by-step flow: one question per screen. Without this script the form is a plain stacked form.
+const FLOW_STORE = "ag-pickup-flow-v1";
+const FLOW_KEEP_MS = 14 * 24 * 60 * 60 * 1000;
+
+function readFlowStore() {
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(FLOW_STORE) || "null");
+    if (!saved || typeof saved !== "object" || saved.locale !== formLocale) return null;
+    if (!Number.isFinite(saved.savedAt) || Date.now() - saved.savedAt > FLOW_KEEP_MS) return null;
+    return saved;
+  } catch {
+    return null;
+  }
+}
+
+function clearFlowStore() {
+  try { window.localStorage.removeItem(FLOW_STORE); } catch { /* storage can be blocked; the form still works */ }
+}
+
+// One-field-per-screen flow. Without this script the form is a plain stacked form.
+// Answers are kept in this browser so a returning visitor resumes where they stopped. Once a valid
+// phone is in, an unfinished lead is posted so the shop can call people who stop part way.
 function initializeFormFlow(form) {
   const steps = Array.from(form.querySelectorAll("[data-flow-step]"));
   const progress = form.querySelector("[data-flow-progress]");
@@ -462,76 +498,211 @@ function initializeFormFlow(form) {
   const nav = form.querySelector("[data-flow-nav]");
   const back = form.querySelector("[data-flow-back]");
   const next = form.querySelector("[data-flow-next]");
+  const sessionField = form.elements.namedItem("submission_key");
   if (steps.length < 2 || !progress || !bar || !nav || !back || !next) return;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const names = steps.map((step) => step.dataset.flowStep);
+  const phoneIndex = names.indexOf("phone");
+  const last = steps.length - 1;
+  const textInput = (step) => step.querySelector("input[type='text'], input[type='tel'], input[type='email']");
   let current = 0;
+  let furthest = 0;
+  let partialSent = false;
+  let leftSent = false;
 
-  const answered = (step) => Boolean(step.querySelector("input[type='radio']:checked"));
-  const lastAffirmation = (index) => {
-    const picked = steps[index]?.querySelector("input[type='radio']:checked");
-    return picked ? formUi.affirm[picked.dataset.tile] || "" : "";
-  };
+  const digits = (value) => String(value || "").replace(/\D/g, "").length;
+  function stepProblem(index) {
+    const step = steps[index];
+    const input = textInput(step);
+    if (!input) return step.querySelector("input[type='radio']:checked") ? "" : formUi.flowPick;
+    const value = input.value.trim();
+    if (input.name === "phone") return digits(value) >= 7 ? "" : formUi.flowPhone;
+    if (input.name === "email") return !value || input.checkValidity() ? "" : formUi.invalidEmail;
+    return value ? "" : formUi.flowBlank;
+  }
 
-  function show(index, { focus = true } = {}) {
-    current = Math.max(0, Math.min(steps.length - 1, index));
+  function reward(index) {
+    const step = steps[index];
+    if (!step) return "";
+    const picked = step.querySelector("input[type='radio']:checked");
+    if (picked) return formUi.affirm[picked.dataset.tile] || "";
+    const input = textInput(step);
+    if (input?.name === "first_name") return formUi.affirmFirst(input.value.trim());
+    return formUi.affirm[input?.name] || "";
+  }
+
+  function save() {
+    try {
+      const values = {};
+      ["first_name", "last_name", "phone", "email"].forEach((name) => { values[name] = form.elements.namedItem(name)?.value || ""; });
+      ["material", "quantity", "location"].forEach((name) => { values[name] = form.querySelector(`input[name='${name}']:checked`)?.value || ""; });
+      window.localStorage.setItem(FLOW_STORE, JSON.stringify({
+        values, step: current, furthest, partialSent, leftSent,
+        session: sessionField?.value || "", locale: formLocale, savedAt: Date.now()
+      }));
+    } catch { /* storage can be blocked; the form still works */ }
+  }
+
+  function restore() {
+    const saved = readFlowStore();
+    if (!saved) return;
+    const values = saved.values || {};
+    ["first_name", "last_name", "phone", "email"].forEach((name) => {
+      const field = form.elements.namedItem(name);
+      if (field && typeof values[name] === "string" && !field.value) field.value = values[name].slice(0, 254);
+    });
+    if (!form.querySelector("input[name='material']:checked") && values.material) {
+      const group = MATERIAL_GROUPS.find(([, list]) => list.includes(values.material));
+      const tile = group && form.querySelector(`input[name='material'][data-tile='${group[0]}']`);
+      if (tile) { tile.value = values.material; tile.checked = true; }
+    }
+    ["quantity", "location"].forEach((name) => {
+      const match = Array.from(form.querySelectorAll(`input[name='${name}']`)).find((input) => input.value === values[name]);
+      if (match) match.checked = true;
+    });
+    if (sessionField && typeof saved.session === "string" && saved.session) sessionField.value = saved.session.slice(0, 100);
+    partialSent = Boolean(saved.partialSent);
+    leftSent = Boolean(saved.leftSent);
+    furthest = Math.max(0, Math.min(last, Number(saved.furthest) || 0));
+    current = Math.max(0, Math.min(last, Number(saved.step) || 0));
+    // Never resume past a screen that still needs an answer.
+    for (let index = 0; index < current; index += 1) {
+      if (stepProblem(index)) { current = index; break; }
+    }
+  }
+
+  function post(status, { beacon = false } = {}) {
+    const payload = { ...formPayload(form), lead_status: status, lead_step: names[furthest] };
+    const body = JSON.stringify(payload);
+    if (beacon && navigator.sendBeacon) {
+      navigator.sendBeacon(form.action, new Blob([body], { type: "application/json" }));
+      return;
+    }
+    fetch(form.action, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body,
+      credentials: "same-origin",
+      keepalive: true
+    }).catch(() => {});
+  }
+
+  function show(index, { focus = true, direction = "forward", message } = {}) {
+    current = Math.max(0, Math.min(last, index));
+    furthest = Math.max(furthest, current);
     steps.forEach((step, stepIndex) => {
       step.hidden = stepIndex !== current;
-      step.classList.toggle("is-entering", stepIndex === current && !reduced);
+      step.classList.remove("is-entering", "is-entering-back");
     });
+    if (!reduced && focus) {
+      // Restart the entrance animation on the new screen.
+      void steps[current].offsetWidth;
+      steps[current].classList.add(direction === "back" ? "is-entering-back" : "is-entering");
+    }
     const percent = Math.round(((current + 1) / (steps.length + 1)) * 100);
     bar.style.width = `${percent}%`;
     progress.setAttribute("aria-valuenow", String(percent));
-    const message = current > 0 ? lastAffirmation(current - 1) : "";
-    affirm.textContent = message;
-    affirm.hidden = !message;
-    const lastStep = current === steps.length - 1;
+    const line = message ?? (current > 0 ? reward(current - 1) : "");
+    affirm.textContent = line;
+    affirm.hidden = !line;
+    delete affirm.dataset.state;
     nav.hidden = false;
     back.hidden = current === 0;
-    next.hidden = lastStep || !answered(steps[current]);
+    next.hidden = current === last;
     if (focus) {
-      steps[current].querySelector("legend")?.focus({ preventScroll: true });
+      const input = textInput(steps[current]);
+      (input || steps[current].querySelector("legend"))?.focus({ preventScroll: true });
       // Each new question starts at the same place on screen, just under the header.
       const anchor = form.closest("[id]") || form;
-      if (anchor.getBoundingClientRect().top < 0 || anchor.getBoundingClientRect().top > window.innerHeight * 0.4) {
-        anchor.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
-      }
+      const top = anchor.getBoundingClientRect().top;
+      if (top < 0 || top > window.innerHeight * 0.4) anchor.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+    }
+    save();
+  }
+
+  function advance() {
+    const problem = stepProblem(current);
+    if (problem) {
+      affirm.textContent = problem;
+      affirm.hidden = false;
+      affirm.dataset.state = "prompt";
+      textInput(steps[current])?.focus({ preventScroll: true });
+      return;
+    }
+    if (current === last) return;
+    const leaving = current;
+    show(current + 1);
+    if (phoneIndex >= 0 && leaving >= phoneIndex) {
+      // First valid phone: one partial lead. After that, quiet progress updates for the same session.
+      post(partialSent ? "progress" : "partial");
+      partialSent = true;
+      save();
     }
   }
 
   form.dataset.flow = "ready";
   progress.hidden = false;
-  // A material chosen on another page (a material link or the home selector) starts at the next step.
-  show(answered(steps[0]) && new URLSearchParams(window.location.search).get("material") ? 1 : 0, { focus: false });
+  restore();
+  show(current, { focus: false });
+  if (window.location.hash === "#get-paid" || window.location.hash === "#solicitud") {
+    // After the browser has finished its own jump to the anchor, put the cursor in the question.
+    const focusFirst = () => window.setTimeout(() => textInput(steps[current])?.focus({ preventScroll: true }), 60);
+    if (document.readyState === "complete") focusFirst();
+    else window.addEventListener("load", focusFirst, { once: true });
+  }
 
   steps.forEach((step, index) => {
-    step.addEventListener("change", (event) => {
-      if (!event.target.matches("input[type='radio']")) return;
-      next.hidden = index === steps.length - 1;
-    });
-    // A tap or click on a tile moves on by itself. Keyboard choices use Continue, so arrow keys never jump ahead.
+    step.addEventListener("input", save);
+    step.addEventListener("change", save);
+    // A tap or click on a tile moves on by itself. Keyboard choices use Next, so arrow keys never jump ahead.
     step.addEventListener("click", (event) => {
       const input = event.target.closest("input[type='radio']");
-      if (!input || event.detail === 0 || index === steps.length - 1) return;
-      window.setTimeout(() => show(index + 1), reduced ? 0 : 220);
+      if (!input || event.detail === 0 || index === last || index !== current) return;
+      window.setTimeout(advance, reduced ? 0 : 160);
     });
   });
-  next.addEventListener("click", () => show(current + 1));
-  back.addEventListener("click", () => show(current - 1));
-  form.addEventListener("invalid", (event) => {
-    const step = event.target.closest?.("[data-flow-step]");
-    const index = steps.indexOf(step);
-    if (index >= 0 && index !== current) show(index);
+  next.addEventListener("click", advance);
+  // Enter in a text field moves on. Handled directly so it never depends on the browser's own
+  // submit rules for forms with several fields.
+  form.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" || event.isComposing || !event.target.matches?.("input[type='text'], input[type='tel'], input[type='email']")) return;
+    if (current === last && !stepProblem(current)) return;
+    event.preventDefault();
+    advance();
+  });
+  back.addEventListener("click", () => show(current - 1, { direction: "back" }));
+  // Enter moves to the next screen; only the last screen submits.
+  form.addEventListener("submit", (event) => {
+    if (form.dataset.flowDone === "true") return;
+    const problem = stepProblem(current);
+    if (current < last || problem) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      advance();
+    }
   }, true);
+  // Leaving the page part way: one last update so the shop knows how far this person got.
+  window.addEventListener("pagehide", () => {
+    // Only when there is something new to tell: an answer beyond the phone number.
+    const answeredMore = Boolean(form.querySelector("input[name='material']:checked"));
+    if (!partialSent || leftSent || form.dataset.flowDone === "true" || !answeredMore) return;
+    leftSent = true;
+    save();
+    post("left", { beacon: true });
+  });
   form.flowShowField = (field) => {
     const index = steps.indexOf(field?.closest?.("[data-flow-step]"));
-    if (index >= 0 && index !== current) show(index, { focus: false });
+    if (index >= 0 && index !== current) show(index, { focus: false, direction: "back" });
   };
 }
 
 function formPayload(form) {
   const data = new FormData(form);
   return {
-    name: String(data.get("name") || "").trim(),
+    name: String(data.get("name") || "").trim() || [data.get("first_name"), data.get("last_name")].map((part) => String(part || "").trim()).filter(Boolean).join(" "),
+    first_name: String(data.get("first_name") || "").trim(),
+    last_name: String(data.get("last_name") || "").trim(),
+    lead_status: "complete",
     business: String(data.get("business") || "").trim(),
     phone: String(data.get("phone") || "").trim(),
     email: String(data.get("email") || "").trim(),
@@ -588,11 +759,11 @@ function showDeliveryFallback(form, message, recipient, payload) {
 
 if (reviewForm) {
   prefillReviewForm(reviewForm);
-  initializeFormFlow(reviewForm);
   const started = reviewForm.elements.namedItem("form_started");
   const submissionKey = reviewForm.elements.namedItem("submission_key");
   if (started) started.value = String(Date.now());
   if (submissionKey) submissionKey.value = createSubmissionKey();
+  initializeFormFlow(reviewForm);
 
   reviewForm.addEventListener("input", (event) => {
     event.target.removeAttribute?.("aria-invalid");

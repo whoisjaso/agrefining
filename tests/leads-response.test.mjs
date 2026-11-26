@@ -436,3 +436,59 @@ test("the short form delivers with only a name, phone and material", { concurren
   assert.match(sent[0].text, /Note: Not provided/);
   assert.match(sent[0].html, /href="tel:/, "the owner email keeps its one-tap call button");
 });
+
+test("an unfinished lead sends one Partial email and never a courtesy email", { concurrency: false }, async () => {
+  const sent = [];
+  const keys = [];
+  const deliver = (body) => withDelivery({
+    apiKey: "synthetic-test-key",
+    fetchImpl: async (_url, init) => {
+      sent.push(JSON.parse(init.body));
+      keys.push(init.headers["Idempotency-Key"]);
+      return { ok: true };
+    }
+  }, () => invoke({ headers: { accept: "application/json", "content-type": "application/json" }, body: JSON.stringify(body) }));
+
+  const base = { locale: "en", first_name: "Maria", last_name: "Lopez", phone: "281 555 0144", submission_key: "session-abc", form_started: Date.now() - 5000 };
+  const partial = await deliver({ ...base, lead_status: "partial", lead_step: "material" });
+  assert.equal(partial.statusCode, 200);
+  assert.equal(sent.length, 1);
+  assert.equal(keys[0], "session-abc-partial", "one person is one lead: the session id dedupes the notice");
+  assert.equal(sent[0].subject, "Partial lead: Maria Lopez, 281 555 0144");
+  assert.match(sent[0].text, /Status: Partial: still filling in the form/);
+  assert.match(sent[0].text, /Stopped at: What they are bringing/);
+  assert.match(sent[0].html, /href="tel:2815550144"/);
+
+  const progress = await deliver({ ...base, lead_status: "progress", lead_step: "quantity", material: "silver_coins" });
+  assert.equal(progress.statusCode, 200);
+  assert.equal(sent.length, 1, "progress updates are logged, not emailed");
+
+  const left = await deliver({ ...base, lead_status: "left", lead_step: "location", material: "silver_coins", quantity: "A few pieces" });
+  assert.equal(left.statusCode, 200);
+  assert.equal(sent.length, 2);
+  assert.equal(keys[1], "session-abc-left");
+  assert.equal(sent[1].subject, "Partial lead update: Maria Lopez, 281 555 0144");
+  assert.match(sent[1].text, /Bringing: Silver Coins/);
+  assert.match(sent[1].text, /Amount: A few pieces/);
+
+  const complete = await deliver({ ...base, material: "silver_coins", quantity: "A few pieces", location: "Drop-off" });
+  assert.equal(complete.statusCode, 200);
+  assert.equal(sent.length, 3, "the finished lead sends the normal owner email");
+  assert.equal(keys[2], "session-abc");
+  assert.match(sent[2].subject, /^Pickup request: Silver Coins from Maria Lopez$/);
+  assert.match(sent[2].text, /Status: Complete/);
+  assert.match(sent[2].text, /Pickup or drop-off: Drop-off/);
+});
+
+test("an unfinished lead without a usable phone is refused and sends nothing", { concurrency: false }, async () => {
+  const sent = [];
+  const response = await withDelivery({
+    apiKey: "synthetic-test-key",
+    fetchImpl: async (_url, init) => { sent.push(JSON.parse(init.body)); return { ok: true }; }
+  }, () => invoke({
+    headers: { accept: "application/json", "content-type": "application/json" },
+    body: JSON.stringify({ locale: "en", first_name: "Maria", phone: "12", lead_status: "partial", submission_key: "session-bad", form_started: Date.now() - 5000 })
+  }));
+  assert.equal(response.statusCode, 422);
+  assert.equal(sent.length, 0);
+});
