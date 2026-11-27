@@ -471,6 +471,7 @@ function showFormDone(form) {
 // Step-by-step flow: one question per screen. Without this script the form is a plain stacked form.
 const FLOW_STORE = "ag-pickup-flow-v1";
 const FLOW_KEEP_MS = 14 * 24 * 60 * 60 * 1000;
+const FLOW_TRANSITION_MS = 500;
 
 function readFlowStore() {
   try {
@@ -509,6 +510,7 @@ function initializeFormFlow(form) {
   let furthest = 0;
   let partialSent = false;
   let leftSent = false;
+  let leaveTimer = 0;
 
   const digits = (value) => String(value || "").replace(/\D/g, "").length;
   function stepProblem(index) {
@@ -588,16 +590,30 @@ function initializeFormFlow(form) {
   }
 
   function show(index, { focus = true, direction = "forward", message } = {}) {
+    const previous = current;
     current = Math.max(0, Math.min(last, index));
     furthest = Math.max(furthest, current);
+    window.clearTimeout(leaveTimer);
+    const animate = !reduced && focus && previous !== current;
     steps.forEach((step, stepIndex) => {
-      step.hidden = stepIndex !== current;
-      step.classList.remove("is-entering", "is-entering-back");
+      step.classList.remove("is-entering", "is-entering-back", "is-leaving", "is-leaving-back");
+      step.removeAttribute("aria-hidden");
+      // The outgoing screen stays for the length of the transition, then goes.
+      step.hidden = stepIndex !== current && !(animate && stepIndex === previous);
     });
-    if (!reduced && focus) {
+    if (animate) {
+      const leaving = steps[previous];
+      const back = direction === "back";
+      leaving.setAttribute("aria-hidden", "true");
+      leaving.classList.add(back ? "is-leaving-back" : "is-leaving");
       // Restart the entrance animation on the new screen.
       void steps[current].offsetWidth;
-      steps[current].classList.add(direction === "back" ? "is-entering-back" : "is-entering");
+      steps[current].classList.add(back ? "is-entering-back" : "is-entering");
+      leaveTimer = window.setTimeout(() => {
+        leaving.hidden = true;
+        leaving.classList.remove("is-leaving", "is-leaving-back");
+        leaving.removeAttribute("aria-hidden");
+      }, FLOW_TRANSITION_MS);
     }
     const percent = Math.round(((current + 1) / (steps.length + 1)) * 100);
     bar.style.width = `${percent}%`;
@@ -642,6 +658,8 @@ function initializeFormFlow(form) {
 
   form.dataset.flow = "ready";
   progress.hidden = false;
+  // On phones the question takes the whole screen (see .flow-portal).
+  form.closest(".contact-form-column")?.classList.add("flow-portal");
   restore();
   show(current, { focus: false });
   if (window.location.hash === "#get-paid" || window.location.hash === "#solicitud") {

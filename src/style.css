@@ -3176,12 +3176,32 @@ html[data-loader-state="ready"] .home-loader {
   margin-top: 0;
 }
 
+/* Both screens share one cell, so the old one can slide out while the new one slides in. */
+.review-form[data-flow="ready"] .flow-stage {
+  display: grid;
+}
+
+.review-form[data-flow="ready"] .flow-stage > .flow-step {
+  grid-area: 1 / 1;
+  margin-top: 0;
+}
+
 .review-form[data-flow="ready"] .flow-step.is-entering {
-  animation: flow-step-in 300ms cubic-bezier(0.16, 0.84, 0.24, 1) both;
+  animation: flow-step-in 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .review-form[data-flow="ready"] .flow-step.is-entering-back {
-  animation: flow-step-back 300ms cubic-bezier(0.16, 0.84, 0.24, 1) both;
+  animation: flow-step-in-back 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.review-form[data-flow="ready"] .flow-step.is-leaving {
+  animation: flow-step-out 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  pointer-events: none;
+}
+
+.review-form[data-flow="ready"] .flow-step.is-leaving-back {
+  animation: flow-step-out-back 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  pointer-events: none;
 }
 
 .review-form[data-flow="ready"] .form-actions .button {
@@ -3205,12 +3225,12 @@ html[data-loader-state="ready"] .home-loader {
   color: var(--ink);
 }
 
-/* Fast slide with a touch of blur, so each screen arrives with some speed and settles. */
+/* The old screen slides away with a little blur and fade while the new one slides in. */
 @keyframes flow-step-in {
   from {
-    filter: blur(6px);
+    filter: blur(8px);
     opacity: 0;
-    transform: translateX(1.75rem);
+    transform: translateX(3rem);
   }
 
   to {
@@ -3220,17 +3240,100 @@ html[data-loader-state="ready"] .home-loader {
   }
 }
 
-@keyframes flow-step-back {
+@keyframes flow-step-in-back {
   from {
-    filter: blur(6px);
+    filter: blur(8px);
     opacity: 0;
-    transform: translateX(-1.75rem);
+    transform: translateX(-3rem);
   }
 
   to {
     filter: none;
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes flow-step-out {
+  from {
+    filter: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    filter: blur(8px);
+    opacity: 0;
+    transform: translateX(-3rem);
+  }
+}
+
+@keyframes flow-step-out-back {
+  from {
+    filter: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    filter: blur(8px);
+    opacity: 0;
+    transform: translateX(3rem);
+  }
+}
+
+/* The form stands alone: one centered column, with a quiet call link under it. */
+.contact-grid-solo {
+  grid-template-columns: minmax(0, 34rem);
+  justify-content: center;
+}
+
+.flow-call {
+  font-size: 0.86rem;
+  margin: 2rem 0 0;
+}
+
+.flow-call .phone-link {
+  align-items: center;
+  display: inline-flex;
+  min-height: 44px;
+}
+
+/* Phones: while the flow is active the question is the whole screen. */
+@media (max-width: 700px) {
+  .contact-form-column.flow-portal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100svh - var(--header-height) - 1.5rem);
+    padding-bottom: 1.5rem;
+  }
+
+  .contact-form-column.flow-portal > .eyebrow,
+  .contact-form-column.flow-portal > h2 {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+
+  .contact-form-column.flow-portal .review-form {
+    margin-top: 0;
+  }
+
+  .contact-form-column.flow-portal .flow-call {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+
+  /* Nothing follows the question on its screen: the section ends where the screen ends. */
+  .contact-section:has(.flow-portal) {
+    padding-bottom: 0;
   }
 }
 
@@ -3259,7 +3362,9 @@ html[data-loader-state="ready"] .home-loader {
 
 @media (prefers-reduced-motion: reduce) {
   .review-form[data-flow="ready"] .flow-step.is-entering,
-  .review-form[data-flow="ready"] .flow-step.is-entering-back {
+  .review-form[data-flow="ready"] .flow-step.is-entering-back,
+  .review-form[data-flow="ready"] .flow-step.is-leaving,
+  .review-form[data-flow="ready"] .flow-step.is-leaving-back {
     animation: none;
   }
 

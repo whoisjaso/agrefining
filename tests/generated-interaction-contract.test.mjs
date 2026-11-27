@@ -442,9 +442,22 @@ test("the pickup form is a one-field-per-screen flow that still works as a plain
   assert.match(privacyPage, /sent to AG Refining as you go, even if you do not finish/, "the privacy page discloses unfinished leads");
 
   const css = readFileSync(join(dist, "style.css"), "utf8");
-  assert.match(css, /@keyframes flow-step-in \{[\s\S]*?filter:\s*blur\(6px\);[\s\S]*?transform:\s*translateX\(1\.75rem\)/);
-  assert.match(css, /\.flow-step\.is-entering \{\s*animation:\s*flow-step-in 300ms/);
-  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.review-form\[data-flow="ready"\] \.flow-step\.is-entering,[\s\S]*?animation:\s*none;/);
+  // The old screen slides out while the new one slides in, about half a second, with a soft ease.
+  assert.match(css, /@keyframes flow-step-in \{[\s\S]*?filter:\s*blur\(8px\);[\s\S]*?transform:\s*translateX\(3rem\)/);
+  assert.match(css, /@keyframes flow-step-out \{[\s\S]*?to \{[\s\S]*?filter:\s*blur\(8px\);\s*opacity:\s*0;\s*transform:\s*translateX\(-3rem\)/);
+  assert.match(css, /\.flow-step\.is-entering \{\s*animation:\s*flow-step-in 500ms cubic-bezier\(0\.22, 1, 0\.36, 1\)/);
+  assert.match(css, /\.flow-step\.is-leaving \{\s*animation:\s*flow-step-out 500ms cubic-bezier\(0\.22, 1, 0\.36, 1\)/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.review-form\[data-flow="ready"\] \.flow-step\.is-entering,[\s\S]*?\.flow-step\.is-leaving-back \{\s*animation:\s*none;/);
+  assert.match(form, /<div class="flow-stage field-wide" data-flow-stage>/);
+
+  // The form stands alone: no contact block beside or under it, one quiet call link at most.
+  for (const page of [contactPage, readFileSync(join(dist, "espanol", "index.html"), "utf8")]) {
+    const section = page.match(/<section class="section contact-section"[\s\S]*?<\/section>/)?.[0] || "";
+    assert.doesNotMatch(section, /contact-aside|expectation-rail|Prefer to Talk|Prefiere Hablar/i);
+    assert.equal((section.match(/href="tel:/g) || []).length, 1);
+    assert.match(section, /<p class="flow-call">/);
+  }
+  assert.match(css, /\.contact-form-column\.flow-portal \{[^}]*min-height:\s*calc\(100svh - var\(--header-height\) - 1\.5rem\)/, "on phones the question fills the screen");
 });
 
 test("the map band is one static image with a directions link and no map service", () => {

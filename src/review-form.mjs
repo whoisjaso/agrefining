@@ -263,6 +263,7 @@ export function renderReviewForm({
     <input type="hidden" name="submission_key" value="${escapeHtml(clean.submission_key || "")}">
     <div class="flow-progress field-wide" data-flow-progress role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="12" aria-label="${language === "es" ? "Progreso" : "Progress"}" hidden><span data-flow-bar style="width:12%"></span></div>
     <p class="flow-affirm field-wide" data-flow-affirm aria-live="polite" hidden></p>
+    <div class="flow-stage field-wide" data-flow-stage>
     <fieldset class="flow-step field-wide" data-flow-step="first_name">
       <legend tabindex="-1"><label for="first_name">${copy.stepFirst}</label></legend>
       <div class="field"><input id="first_name" name="first_name" type="text" autocomplete="given-name" autocapitalize="words" aria-label="${copy.firstName}" value="${escapeHtml(firstName)}" required${nameState.attrs}>${nameState.error}</div>
@@ -297,6 +298,7 @@ export function renderReviewForm({
       <div class="form-actions"><button class="button button-primary" type="submit" data-submit-button>${copy.submit} <span class="icon-arrow" aria-hidden="true"></span></button><p class="form-status" data-form-status aria-live="polite"></p></div>
       <p class="form-note">${copy.note} <a href="/privacy"${privacyAttributes}>${copy.privacy}</a>.</p>
     </fieldset>
+    </div>
     <div class="flow-nav field-wide" data-flow-nav hidden><button class="flow-back" type="button" data-flow-back>${copy.back}</button><button class="button button-secondary flow-next" type="button" data-flow-next>${copy.next} <span class="icon-arrow" aria-hidden="true"></span></button></div>
   </form>`;
 }

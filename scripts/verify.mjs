@@ -293,7 +293,7 @@ const atelierFamilies = [
   ["accepted-materials", ["page-hero", "editorial-index", "conversion-band"]],
   ["how-it-works", ["page-hero", "assay-process", "conversion-band"]],
   ["about", ["page-hero", "provenance-story", "conversion-band"]],
-  ["contact", ["page-hero", "review-form", "expectation-rail"]],
+  ["contact", ["page-hero", "review-form", "map-band"]],
   ["espanol", ["page-hero", "conversion-band"]],
   ["privacy", ["page-hero", "legal-grid"]]
 ];

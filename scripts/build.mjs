@@ -2553,16 +2553,10 @@ writeFileSync(join(out, "about", "index.html"), document({
 
 const contact = `
   <section class="page-hero page-intro page-intro-contact"><div class="shell">${breadcrumbs([["Home", "/"], ["Contact", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Schedule pickup</p><h1>Tell us what silver you have.</h1></div><p>Share the material, amount, and location. We will confirm whether it qualifies and explain the next step.</p></div></div></section>
-  <section class="section contact-section"><div class="shell contact-grid">
-    <aside class="expectation-rail contact-aside"><p class="eyebrow">Contact AG Refining</p><h2>Prefer to talk first?</h2>
-      <a class="contact-line" href="tel:${phoneHref}"><span>Phone</span><strong>${phoneDisplay}</strong></a>
-      <a class="contact-line" href="mailto:${email}"><span>Email</span><strong>${email}</strong></a>
-      <div class="contact-line"><span>Address</span><strong>${street}<br>${cityLine}</strong></div>
-      <div class="contact-line"><span>Hours</span><strong>${openingHours.map((row) => `${row.label} ${row.display}`).join("<br>")}<br>Sunday closed</strong></div>
-      <div class="contact-boundary"><h3>Before you ship or visit</h3><p>Call first. We will confirm the material, pickup option, and next step.</p></div>
-    </aside>
-    <div id="get-paid" class="contact-form-column"><p class="eyebrow">A few quick questions</p><h2>Start with a few details.</h2>${renderReviewForm({ locale: "en" })}</div>
-  </div></section>`;
+  <section class="section contact-section"><div class="shell contact-grid contact-grid-solo">
+    <div id="get-paid" class="contact-form-column"><p class="eyebrow">A few quick questions</p><h2>Start with a few details.</h2>${renderReviewForm({ locale: "en" })}<p class="flow-call"><a class="phone-link" href="tel:${phoneHref}">Or call ${phoneDisplay}</a></p></div>
+  </div></section>
+  ${renderMapBand()}`;
 mkdirSync(join(out, "contact"), { recursive: true });
 writeFileSync(join(out, "contact", "index.html"), document({
   title: "Schedule Silver Pickup in Houston | Contact AG Refining",
@@ -2581,14 +2575,8 @@ const spanish = `
     <article><h2>Llame primero</h2><p>No envíe material ni visite sin confirmar el siguiente paso. Llame al ${phoneDisplay}.</p></article>
   </div></section>
   <section class="conversion-band"><div class="shell"><p class="eyebrow">Comience hoy</p><h2>Solicite una recogida.</h2><a class="button button-inverse" href="#solicitud">Enviar solicitud ${arrow}</a></div></section>
-  <section class="section contact-section" id="solicitud"><div class="shell contact-grid">
-    <aside class="expectation-rail contact-aside"><p class="eyebrow">Contacte a AG Refining</p><h2>¿Prefiere hablar primero?</h2>
-      <a class="contact-line" href="tel:${phoneHref}"><span>Teléfono</span><strong>${phoneDisplay}</strong></a>
-      <a class="contact-line" href="mailto:${email}"><span>Correo electrónico</span><strong>${email}</strong></a>
-      <div class="contact-line"><span>Dirección</span><strong>${street}<br>${cityLine}</strong></div>
-      <div class="contact-boundary"><h3>Antes de enviar material o visitarnos</h3><p>Llame primero. Confirmaremos el material, la opción de recogida y el siguiente paso.</p></div>
-    </aside>
-    <div class="contact-form-column"><p class="eyebrow">Unas preguntas rápidas</p><h2>Comience con algunos datos.</h2>${renderReviewForm({ locale: "es" })}</div>
+  <section class="section contact-section"><div class="shell contact-grid contact-grid-solo">
+    <div id="solicitud" class="contact-form-column"><p class="eyebrow">Unas preguntas rápidas</p><h2>Comience con algunos datos.</h2>${renderReviewForm({ locale: "es" })}<p class="flow-call"><a class="phone-link" href="tel:${phoneHref}">O llame al ${phoneDisplay}</a></p></div>
   </div></section>`;
 mkdirSync(join(out, "espanol"), { recursive: true });
 writeFileSync(join(out, "espanol", "index.html"), document({
