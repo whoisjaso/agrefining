@@ -1,0 +1,449 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>AG Refining: the silver inside</title>
+<style>
+@font-face { font-family: "NR"; src: url("newsreader-latin-opsz.woff2") format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "MR"; src: url("manrope-latin-wght.woff2") format("woff2"); font-weight: 200 800; }
+html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+#gl { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+.t { position: absolute; left: 0; width: 1080px; text-align: center; color: #f4f1ea; will-change: transform, opacity; white-space: nowrap; }
+.w { display: inline-block; will-change: transform, opacity; }
+.serif { font-family: "NR"; font-weight: 400; font-size: 104px; letter-spacing: -0.02em; line-height: 1; }
+.serif i { font-style: italic; }
+.cap { font-family: "MR"; font-weight: 600; font-size: 26px; letter-spacing: 0.32em; text-transform: uppercase; color: #d9d6cf; }
+.lbl { position: absolute; font-family: "MR"; font-weight: 600; font-size: 30px; letter-spacing: 0.3em; color: #e8e5de; white-space: nowrap; }
+.lbl b { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #8fb4d8; margin-right: 16px; vertical-align: 3px; }
+#name { font-family: "MR"; font-size: 132px; letter-spacing: -0.02em; line-height: 1; }
+#grain { position: absolute; inset: 0; pointer-events: none; }
+</style></head>
+<body>
+<canvas id="gl" width="1080" height="1920"></canvas>
+<canvas id="grain" width="1080" height="1920"></canvas>
+<div id="hook" class="t serif" style="top:250px"></div>
+<div id="pay" class="t serif" style="top:236px"></div>
+<div id="see" class="t serif" style="top:250px"></div>
+<div id="lockup" class="t" style="top:300px">
+  <div id="name"><span style="font-weight:800">AG</span><span style="font-weight:400"> Refining</span></div>
+  <div id="tag" class="serif" style="font-size:64px;margin-top:34px;color:#e6e2d9"><i>Houston's silver buyer</i></div>
+</div>
+<div id="url" class="t cap" style="top:1700px;font-size:30px">agrefining.com</div>
+<div id="labels"></div>
+<script type="module">
+import * as THREE from "./lib/three.module.js";
+import { MarchingCubes } from "./lib/MarchingCubes.js";
+import { Reflector } from "./lib/Reflector.js";
+import { RoundedBoxGeometry } from "./lib/RoundedBoxGeometry.js";
+import { mergeVertices } from "./lib/BufferGeometryUtils.js";
+
+// ═════════ timeline (seconds). One source for picture, labels and sound. ═════════
+const DUR = 15.0;
+const T = {
+  hookIn: [0.30, 0.52, 0.74, 1.02, 1.24],   // "What's" "your" "silver" "really" "worth?"
+  slap: 2.40,                                // the coin falls flat; rest until 3.05
+  drops: [3.18, 3.52, 3.70, 4.26],           // spoon, ring, bullion, scrap: a burst, not a metronome
+  heat: [4.80, 5.45], melt: [5.40, 7.15],    // glow rises, then everything flows into one
+  payIn: [5.55, 5.72, 5.89, 6.30, 6.47],     // "We" "pay" "for" / "the silver" "inside."
+  rise: [7.35, 8.55],                        // the drop lifts into a sphere; held dead still to the strike
+  strike: 9.30,                              // sphere struck into the bar (the loudest moment)
+  seeIn: [10.05, 10.28, 10.70, 10.92],       // "See" "the weight." / "Then" "decide."
+  sweep: 11.0,                               // one strip of light crosses the bar
+  lock: 12.55,                               // lockup
+  still: 13.55,                              // dead still to the end
+};
+
+// ═════════ math ═════════
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const sst = (k) => k * k * (3 - 2 * k);
+const ease = {
+  sineIO: (k) => 0.5 - 0.5 * Math.cos(Math.PI * k),
+  cubicIO: (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2),
+  quintIO: (k) => (k < 0.5 ? 16 * k ** 5 : 1 - Math.pow(-2 * k + 2, 5) / 2),
+  expoIO: (k) => (k <= 0 ? 0 : k >= 1 ? 1 : k < 0.5 ? Math.pow(2, 20 * k - 10) / 2 : (2 - Math.pow(2, -20 * k + 10)) / 2),
+  out: (k) => 1 - Math.pow(1 - k, 3),
+  outQ: (k) => 1 - Math.pow(1 - k, 5),
+  in: (k) => k * k * k,
+};
+// spring step response, closed form (pure in t)
+const spring = (tau, zeta = 0.55, omega = 15) => {
+  if (tau <= 0) return 0;
+  if (zeta >= 1) return 1 - Math.exp(-omega * tau) * (1 + omega * tau);
+  const wd = omega * Math.sqrt(1 - zeta * zeta);
+  return 1 - Math.exp(-zeta * omega * tau) * (Math.cos(wd * tau) + (zeta * omega / wd) * Math.sin(wd * tau));
+};
+// decaying deterministic shake, zero before the hit
+const shake = (t, th, amp, decay = 9, freq = 23, seed = 1) => {
+  const d = t - th; if (d < 0 || d > 1.2) return [0, 0];
+  const e = amp * Math.exp(-decay * d);
+  return [e * Math.sin(freq * d * 6.283 + seed), e * Math.sin(freq * 0.83 * d * 6.283 + seed * 2.1)];
+};
+// a word that lands: opacity leads a spring rise
+const wordRise = (t, t0, dist = 46) => {
+  const k = t - t0; if (k <= 0) return { op: 0, y: dist, s: 0.96 };
+  const s = spring(k, 0.62, 13);
+  return { op: clamp(k / 0.12), y: dist * (1 - s), s: 0.96 + 0.04 * s };
+};
+// mulberry32
+const rng = (seed) => () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+
+// ═════════ renderer, studio ═════════
+const canvas = document.getElementById("gl");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true, powerPreference: "high-performance" });
+renderer.setPixelRatio(1); renderer.setSize(1080, 1920, false);
+renderer.toneMapping = THREE.NeutralToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x000000);
+const camera = new THREE.PerspectiveCamera(34, 1080 / 1920, 0.1, 400);
+
+// the strip-light studio, baked to an environment every frame (the sweep moves)
+const env = new THREE.Scene(); env.background = new THREE.Color(0x000000);
+const softTex = (() => { const c = document.createElement("canvas"); c.width = 64; c.height = 256; const g = c.getContext("2d"); const gx = g.createLinearGradient(0, 0, 64, 0); gx.addColorStop(0, "#000"); gx.addColorStop(0.3, "#fff"); gx.addColorStop(0.7, "#fff"); gx.addColorStop(1, "#000"); g.fillStyle = gx; g.fillRect(0, 0, 64, 256); g.globalCompositeOperation = "multiply"; const gy = g.createLinearGradient(0, 0, 0, 256); gy.addColorStop(0, "#000"); gy.addColorStop(0.15, "#fff"); gy.addColorStop(0.85, "#fff"); gy.addColorStop(1, "#000"); g.fillStyle = gy; g.fillRect(0, 0, 64, 256); return new THREE.CanvasTexture(c); })();
+const dome = new THREE.Mesh(new THREE.SphereGeometry(90, 32, 16), new THREE.ShaderMaterial({ side: THREE.BackSide, vertexShader: "varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }", fragmentShader: "varying vec3 vP; void main(){ float h = vP.y; vec3 c = mix(vec3(0.015), vec3(0.34,0.345,0.35), smoothstep(-0.1, 0.85, h)); c += vec3(0.05,0.07,0.1) * smoothstep(0.2, -0.05, abs(h - 0.05)); gl_FragColor = vec4(c, 1.0); }" }));
+env.add(dome);
+const strip = (w, h, k, color = 0xffffff) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(k), map: softTex, side: THREE.DoubleSide })); env.add(m); return m; };
+const sL = strip(4, 26, 2.6), sR = strip(4, 26, 2.0), sTop = strip(22, 10, 1.0), sK = strip(9, 4, 1.6), sHz = strip(60, 1.6, 1.1), sAcc = strip(10, 10, 0.55, 0x6f9fd0), sSweep = strip(2.2, 34, 0);
+sL.position.set(-13, 6, -6); sL.lookAt(0, 2, 0);
+sR.position.set(13, 6, -4); sR.lookAt(0, 2, 0);
+sTop.position.set(0, 18, 2); sTop.lookAt(0, 0, 0);
+sK.position.set(-9, 12, 12); sK.lookAt(0, 0, 0);
+const sFront = strip(36, 7, 0.45); sFront.position.set(0, 3, 26); sFront.lookAt(0, 1, 0);
+const sBack = strip(34, 9, 1.5); sBack.position.set(0, 6, -22); sBack.lookAt(0, 0, 0);
+sHz.position.set(0, 2.5, -24); sHz.lookAt(0, 2.5, 0);
+sAcc.position.set(8, 3, 14); sAcc.lookAt(0, 1, 0);
+const pmrem = new THREE.PMREMGenerator(renderer);
+let envRT = null, envSig = '';
+function bakeEnv(sig) { if (sig === envSig && envRT) return; envSig = sig; if (envRT) envRT.dispose(); envRT = pmrem.fromScene(env, 0, 0.1, 200); scene.environment = envRT.texture; }
+
+// floor: a dark mirror that fades into the black (no horizon line)
+const mirror = new Reflector(new THREE.PlaneGeometry(120, 120), { textureWidth: 540, textureHeight: 960, color: 0x2a2d31, clipBias: 0.003 });
+mirror.rotation.x = -Math.PI / 2; scene.add(mirror);
+const fadeTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 512; const g = c.getContext("2d"); const gr = g.createRadialGradient(256, 256, 0, 256, 256, 256); gr.addColorStop(0, "rgba(0,0,0,0.48)"); gr.addColorStop(0.22, "rgba(0,0,0,0.6)"); gr.addColorStop(0.55, "rgba(0,0,0,0.93)"); gr.addColorStop(1, "rgba(0,0,0,1)"); g.fillStyle = gr; g.fillRect(0, 0, 512, 512); const t = new THREE.CanvasTexture(c); return t; })();
+const fade = new THREE.Mesh(new THREE.PlaneGeometry(90, 90), new THREE.MeshBasicMaterial({ map: fadeTex, transparent: true, depthWrite: false }));
+fade.rotation.x = -Math.PI / 2; fade.position.y = 0.004; scene.add(fade);
+// a soft grey sweep far behind, so silhouettes separate from the black
+const backTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 512; const g = c.getContext("2d"); const gr = g.createRadialGradient(256, 300, 0, 256, 300, 256); gr.addColorStop(0, "#202327"); gr.addColorStop(0.5, "#0c0d0f"); gr.addColorStop(1, "#000"); g.fillStyle = gr; g.fillRect(0, 0, 512, 512); return new THREE.CanvasTexture(c); })();
+backTex.colorSpace = THREE.SRGBColorSpace;
+const back = new THREE.Mesh(new THREE.PlaneGeometry(160, 120), new THREE.MeshBasicMaterial({ map: backTex, depthWrite: false, fog: false }));
+back.position.set(0, 10, -70); scene.add(back);
+
+// ═════════ materials ═════════
+const silver = () => new THREE.MeshPhysicalMaterial({ color: new THREE.Color(0.972, 0.966, 0.955), metalness: 1, roughness: 0.2, emissive: new THREE.Color(0, 0, 0) });
+const HEAT = new THREE.Color(1.0, 0.36, 0.09);
+
+// coin: a proof finish: mirror field, frosted relief; fictional design (no real coin)
+function coinTextures() {
+  const S = 1024, c = document.createElement("canvas"); c.width = c.height = S; const g = c.getContext("2d");
+  const r = document.createElement("canvas"); r.width = r.height = S; const h = r.getContext("2d");
+  g.fillStyle = "#000"; g.fillRect(0, 0, S, S);                                           // bump: black field
+  const cx = S / 2, R = S / 2;
+  const both = (fn) => { fn(g, "#fff"); fn(h, "#fff"); };
+  h.fillStyle = "#0d0d0d"; h.fillRect(0, 0, S, S);                                        // roughness: mirror field
+  both((x, col) => { x.strokeStyle = col; x.lineWidth = 30; x.beginPath(); x.arc(cx, cx, R - 22, 0, 7); x.stroke(); });
+  both((x, col) => { x.fillStyle = col; for (let i = 0; i < 120; i++) { const a = (i / 120) * 6.2832; x.beginPath(); x.arc(cx + Math.cos(a) * (R - 64), cx + Math.sin(a) * (R - 64), 6.5, 0, 7); x.fill(); } });
+  const ring = (x, col) => {
+    x.fillStyle = col; x.font = "600 54px MR"; x.textAlign = "center"; x.textBaseline = "middle";
+    const txt = "AG REFINING  ·  HOUSTON  ·  FINE SILVER  ·  ", n = txt.length;
+    for (let i = 0; i < n; i++) { const a = -Math.PI / 2 + (i / n) * 6.2832; x.save(); x.translate(cx + Math.cos(a) * (R - 128), cx + Math.sin(a) * (R - 128)); x.rotate(a + Math.PI / 2); x.fillText(txt[i], 0, 0); x.restore(); }
+  };
+  both(ring);
+  both((x, col) => { x.strokeStyle = col; x.lineWidth = 5; x.beginPath(); x.arc(cx, cx, R - 178, 0, 7); x.stroke(); });
+  // compass-rose star with the element number: silver's own mark
+  both((x, col) => {
+    x.fillStyle = col; x.save(); x.translate(cx, cx);
+    for (let i = 0; i < 8; i++) { const L = i % 2 ? 150 : 250, W = i % 2 ? 26 : 40; x.save(); x.rotate((i / 8) * 6.2832); x.beginPath(); x.moveTo(0, -L); x.lineTo(W, 0); x.lineTo(-W, 0); x.closePath(); x.fill(); x.restore(); }
+    x.restore();
+    x.fillStyle = "#000"; x.beginPath(); x.arc(cx, cx, 96, 0, 7); x.fill();
+    x.fillStyle = col; x.font = "700 104px NR"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("Ag", cx, cx + 4);
+  });
+  h.fillStyle = "#000"; // keep the relief frosted: brighten roughness where bump is white
+  const bd = g.getImageData(0, 0, S, S), rd = h.getImageData(0, 0, S, S);
+  for (let i = 0; i < bd.data.length; i += 4) { const v = bd.data[i] / 255; const rough = 0.05 + 0.33 * v; rd.data[i] = rd.data[i + 1] = rd.data[i + 2] = Math.round(rough * 255); }
+  h.putImageData(rd, 0, 0);
+  const bump = new THREE.CanvasTexture(c), rough = new THREE.CanvasTexture(r);
+  bump.anisotropy = rough.anisotropy = 8;
+  return { bump, rough };
+}
+function reedTexture() { const c = document.createElement("canvas"); c.width = 1024; c.height = 8; const g = c.getContext("2d"); for (let x = 0; x < 1024; x++) { const v = 0.5 + 0.5 * Math.sin((x / 1024) * 6.2832 * 160); g.fillStyle = `rgb(${v * 255},${v * 255},${v * 255})`; g.fillRect(x, 0, 1, 8); } const t = new THREE.CanvasTexture(c); return t; }
+
+// ═════════ the silver ═════════
+const R_COIN = 1.6, H_COIN = 0.22;
+let coin, coinMats, objs = [], mc, mcMat, bar, barMat, barBase;
+const BALL_SUB = 12, ISO = 80, MC_SCALE = 5.6, R_DROP = 1.3;   // MarchingCubes world half-size
+
+function build() {
+  const ct = coinTextures();
+  const face = new THREE.MeshPhysicalMaterial({ color: 0xf6f5f2, metalness: 1, roughness: 1, roughnessMap: ct.rough, bumpMap: ct.bump, bumpScale: 2.2 });
+  const rt = reedTexture();
+  const edge = new THREE.MeshPhysicalMaterial({ color: 0xf2f1ee, metalness: 1, roughness: 0.2, bumpMap: rt, bumpScale: 1.2 });
+  coinMats = [edge, face, face];
+  coin = new THREE.Mesh(new THREE.CylinderGeometry(R_COIN, R_COIN, H_COIN, 160, 1), coinMats);
+  scene.add(coin);
+
+  // spoon: handle (extruded outline) + bowl (shallow cap)
+  const spoon = new THREE.Group(); const sm = silver(); sm.roughness = 0.1;
+  const hs = new THREE.Shape(); hs.moveTo(0, -0.14); hs.bezierCurveTo(1.6, -0.12, 3.0, -0.2, 3.9, -0.42); hs.bezierCurveTo(4.5, -0.52, 4.75, -0.2, 4.75, 0); hs.bezierCurveTo(4.75, 0.2, 4.5, 0.52, 3.9, 0.42); hs.bezierCurveTo(3.0, 0.2, 1.6, 0.12, 0, 0.14); hs.closePath();
+  const hg = new THREE.ExtrudeGeometry(hs, { depth: 0.06, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 4, curveSegments: 40 });
+  hg.rotateX(-Math.PI / 2); const handle = new THREE.Mesh(hg, sm); handle.position.set(0.85, 0.1, 0); spoon.add(handle);
+  const bg = new THREE.SphereGeometry(1, 64, 24, 0, Math.PI * 2, Math.PI * 0.62, Math.PI * 0.38); bg.scale(1.25, 0.75, 0.9);
+  const bowl = new THREE.Mesh(bg, Object.assign(sm.clone(), { side: THREE.DoubleSide })); bowl.position.set(-0.45, 0.78, 0); spoon.add(bowl);
+  spoon.userData = { name: "Sterling", at: [-0.7, -4.2], rot: 0.4, balls: [[-0.5, 0.25, 0, 1.0], [1.4, 0.12, 0, 0.55], [2.8, 0.12, 0, 0.5], [4.3, 0.12, 0, 0.6]], drop: T.drops[0], ox: 0 };
+  // ring
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.0, 0.2, 40, 120), silver()); ring.rotation.x = Math.PI / 2;
+  const ringG = new THREE.Group(); ringG.add(ring); ring.position.y = 0.2;
+  ringG.userData = { name: "Jewelry", at: [1.55, 2.55], rot: 0, balls: [[0.8, 0.2, 0, 0.45], [-0.8, 0.2, 0, 0.45], [0, 0.2, 0.8, 0.45], [0, 0.2, -0.8, 0.45]], drop: T.drops[1] };
+  // bullion bar (small)
+  const bb = new THREE.Mesh(new RoundedBoxGeometry(2.8, 0.55, 1.45, 6, 0.14), silver()); bb.position.y = 0.275;
+  const bbG = new THREE.Group(); bbG.add(bb);
+  bbG.userData = { name: "Bullion", at: [-1.45, 3.35], rot: -0.3, balls: [[-0.8, 0.3, 0, 0.8], [0.8, 0.3, 0, 0.8]], drop: T.drops[2] };
+  // scrap: crumpled pieces
+  const scr = new THREE.Group(); const rr = rng(47);
+  for (let i = 0; i < 3; i++) {
+    const g = new THREE.IcosahedronGeometry(0.62 - i * 0.1, 4); const p = g.attributes.position;
+    for (let j = 0; j < p.count; j++) { const v = new THREE.Vector3().fromBufferAttribute(p, j); const n = 1 + 0.22 * Math.sin(v.x * 7 + i) * Math.sin(v.y * 6 - i) * Math.cos(v.z * 8); v.multiplyScalar(n); v.y *= 0.45; p.setXYZ(j, v.x, v.y, v.z); }
+    g.computeVertexNormals(); const m = new THREE.Mesh(g, Object.assign(silver(), { roughness: 0.22 }));
+    m.position.set([0, 0.75, -0.55][i], 0.25, [0, 0.45, 0.6][i]); m.rotation.y = rr() * 6; scr.add(m);
+  }
+  scr.userData = { name: "Scrap", at: [1.75, -1.75], rot: 0, balls: [[0, 0.25, 0, 0.6], [0.75, 0.25, 0.45, 0.45], [-0.55, 0.25, 0.6, 0.4]], drop: T.drops[3] };
+  objs = [spoon, ringG, bbG, scr];
+  for (const o of objs) { o.userData.s = 0.78; o.traverse((m) => { if (m.isMesh) m.userData.mat = m.material; }); scene.add(o); }
+
+  // the melt: one field of metaballs
+  mcMat = silver(); mcMat.roughness = 0.08;
+  mc = new MarchingCubes(84, mcMat, false, false, 60000); mc.scale.setScalar(MC_SCALE); mc.position.set(0, 0, 0); scene.add(mc);
+
+  // the bar: one mesh that starts as a sphere and is struck flat (spherified cube, welded)
+  let g = new THREE.BoxGeometry(2, 2, 2, 96, 96, 96); g.deleteAttribute("normal"); g.deleteAttribute("uv"); g = mergeVertices(g);
+  const p = g.attributes.position; barBase = new Float32Array(p.count * 3);
+  for (let i = 0; i < p.count; i++) { const v = new THREE.Vector3().fromBufferAttribute(p, i).normalize(); barBase.set([v.x, v.y, v.z], i * 3); }
+  g.setAttribute("uv", new THREE.BufferAttribute(new Float32Array(p.count * 2), 2));
+  barMat = new THREE.MeshPhysicalMaterial({ color: 0xf7f6f3, metalness: 1, roughness: 0.1, bumpMap: stampTexture(), bumpScale: 0 });
+  bar = new THREE.Mesh(g, barMat); scene.add(bar);
+}
+
+// the stamp on the bar: AG, the element number, the fineness
+function stampTexture() {
+  const W = 1024, H = 560, c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d");
+  g.fillStyle = "#fff"; g.fillRect(0, 0, W, H);
+  g.fillStyle = "#000"; g.strokeStyle = "#000";
+  g.lineWidth = 10; g.strokeRect(92, 64, W - 184, H - 128);
+  g.font = "800 230px MR"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("AG", W / 2, H / 2 - 18);
+  g.font = "700 46px MR"; g.fillText("FINE SILVER  999", W / 2, H / 2 + 150);
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 8; return t;
+}
+
+// sphere (k=0) → bar (k=1). Superellipsoid exponent and box dims are eased separately so the corners square up last.
+const BAR = [1.9, 0.52, 1.02];
+function shapeBar(k, rSphere, squash) {
+  const p = bar.geometry.attributes.position, uv = bar.geometry.attributes.uv;
+  const e = lerp(1, 0.13, ease.out(k)), dims = [lerp(rSphere, BAR[0], k), lerp(rSphere, BAR[1], k), lerp(rSphere, BAR[2], k)];
+  for (let i = 0; i < p.count; i++) {
+    const x = barBase[i * 3], y = barBase[i * 3 + 1], z = barBase[i * 3 + 2];
+    let qx = Math.sign(x) * Math.pow(Math.abs(x), e), qy = Math.sign(y) * Math.pow(Math.abs(y), e), qz = Math.sign(z) * Math.pow(Math.abs(z), e);
+    const n = k < 1e-4 ? 1 : Math.max(Math.abs(qx), Math.abs(qy), Math.abs(qz)) * (1 - k) + k * 1;   // keep the sphere a sphere at k=0
+    if (k < 1e-4) { qx = x; qy = y; qz = z; }
+    p.setXYZ(i, qx * dims[0] * squash[0], (qy * dims[1] + dims[1]) * squash[1], qz * dims[2] * squash[2]);
+    uv.setXY(i, 0.5 + 0.5 * qx, 0.5 - 0.5 * qz);
+  }
+  p.needsUpdate = true; uv.needsUpdate = true; bar.geometry.computeVertexNormals(); bar.geometry.computeBoundingSphere();
+}
+
+// ═════════ the coin's spin: an Euler disk settling (precession speeds up as the tilt falls) ═════════
+const SPIN = (() => { const N = 2400, dt = T.slap / N, ph = new Float32Array(N + 1); let a = 0; const b0 = 1.2, W0 = 6.283 * 1.15;
+  for (let i = 0; i <= N; i++) { ph[i] = a; const t = i * dt, beta = b0 * Math.pow(Math.max(1e-4, (T.slap - t) / T.slap), 1 / 3); a += W0 * Math.sqrt(b0 / Math.max(beta, 0.03)) * dt; }
+  return { ph, dt, b0 }; })();
+function coinPose(t) {
+  if (t < T.slap) {
+    const i = Math.min(SPIN.ph.length - 1, Math.floor(t / SPIN.dt)), phi = SPIN.ph[i];
+    const beta = SPIN.b0 * Math.pow(Math.max(0, (T.slap - t) / T.slap), 1 / 3);           // tilt from flat
+    const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(Math.cos(phi), 0, Math.sin(phi)), beta);
+    const spin = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -phi * 0.18);
+    q.multiply(spin);
+    return { q, y: R_COIN * Math.sin(beta) + (H_COIN / 2) * Math.cos(beta) };
+  }
+  const d = t - T.slap, hop = d < 0.22 ? 0.06 * Math.sin((d / 0.22) * Math.PI) * Math.exp(-d * 6) : 0;   // a tiny bounce on the slap
+  return { q: new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -SPIN.ph[SPIN.ph.length - 1] * 0.18), y: H_COIN / 2 + hop };
+}
+
+// ═════════ camera: keyed, chases each beat; a hand float that dies in the holds ═════════
+const KEYS = [   // eye [x,y,z], look [x,y,z]
+  { t: 0.0, eye: [0.7, 1.5, 12.5], at: [0, 1.0, 0] },
+  { t: 2.36, eye: [0.3, 9.0, 9.6], at: [0, 0.0, 0.4], c: ease.cubicIO },
+  { t: 3.05, eye: [0.3, 9.0, 9.6], at: [0, 0.0, 0.4] },
+  { t: 4.55, eye: [0.05, 29.0, -1.4], at: [0, 0, -3.1], c: ease.quintIO },
+  { t: 7.25, eye: [0.05, 20.0, -1.0], at: [0, 0, -2.3], c: ease.sineIO },
+  { t: 8.55, eye: [0.0, 3.1, 16.5], at: [0, 1.75, 0], c: ease.cubicIO },
+  { t: 9.24, eye: [0.0, 3.1, 16.5], at: [0, 1.75, 0] },
+  { t: 9.42, eye: [0.0, 3.9, 15.5], at: [0, 0.75, 0], c: ease.outQ },
+  { t: 9.95, eye: [0.0, 3.9, 15.5], at: [0, 0.75, 0] },
+  { t: 12.4, eye: [-9.6, 4.4, 10.6], at: [0, 0.45, 0], c: ease.sineIO },
+  { t: 13.55, eye: [-7.6, 11.0, 10.8], at: [0, 1.6, 0], c: ease.cubicIO },
+];
+function camAt(t) {
+  let i = 0; while (i < KEYS.length - 1 && t >= KEYS[i + 1].t) i++;
+  const A = KEYS[i], B = KEYS[Math.min(i + 1, KEYS.length - 1)];
+  const k = B === A ? 0 : (B.c || ease.sineIO)(seg(t, A.t, B.t));
+  const eye = A.eye.map((v, j) => lerp(v, B.eye[j], k)), at = A.at.map((v, j) => lerp(v, B.at[j], k));
+  // the hand: zero in the holds (2.36–3.05, 8.55–9.24, 9.42–9.95, ≥13.55)
+  const hold = (a, b) => 1 - sst(seg(t, a - 0.25, a)) * (1 - sst(seg(t, b, b + 0.25)));
+  const env = sst(seg(t, 0.1, 0.6)) * hold(2.36, 3.05) * hold(8.55, 9.24) * hold(9.42, 9.95) * (1 - sst(seg(t, 13.2, 13.55)));
+  const hx = 0.05 * env * (Math.sin(1.7 * t) + 0.6 * Math.sin(2.9 * t + 1)), hy = 0.04 * env * (Math.sin(1.3 * t + 2) + 0.5 * Math.sin(3.3 * t));
+  // landings shake the operator
+  let sx = 0, sy = 0;
+  for (const [th, amp] of [[T.slap, 0.05], [T.drops[0] + 0.0, 0.05], [T.drops[1], 0.03], [T.drops[2], 0.05], [T.drops[3], 0.035], [T.strike + 0.02, 0.11]]) { const s = shake(t, th, amp, 10, 19, th * 7); sx += s[0]; sy += s[1]; }
+  return { eye: [eye[0] + hx + sx, eye[1] + hy + sy, eye[2]], at };
+}
+
+// ═════════ falling silver: gravity, one bounce, settle ═════════
+const FALL = 0.42, H0 = 9;
+function dropPose(t, td) {
+  const tf = td - FALL; if (t < tf) return null;
+  if (t < td) { const k = (t - tf) / FALL; return { y: H0 * (1 - k * k), tilt: (1 - k) * 0.5, sq: 1 }; }
+  const d = t - td, b = 0.32 * Math.abs(Math.sin(Math.min(d, 0.36) / 0.36 * Math.PI)) * Math.exp(-d * 4) * (d < 0.36 ? 1 : 0);
+  const sq = 1 - 0.18 * Math.exp(-d * 18) * Math.cos(d * 40);
+  return { y: b, tilt: 0.05 * Math.exp(-d * 6) * Math.sin(d * 30), sq };
+}
+
+// ═════════ the field: where every ball sits at time t ═════════
+function ballsAt(t) {
+  const k = ease.cubicIO(seg(t, T.melt[0], T.melt[1]));              // melt progress
+  const out = [];
+                                                     // final drop radius (world)
+  for (const o of objs) {
+    const u = o.userData, c = Math.cos(u.rot), s = Math.sin(u.rot);
+    for (const [bx, by, bz, w] of u.balls) {
+      const S = u.s, wx = u.at[0] + (bx * c - bz * s) * S, wz = u.at[1] + (bx * s + bz * c) * S;
+      const g = ease.out(seg(t, T.melt[0] + 0.05, T.melt[0] + 0.8));          // grows as the object slumps
+      const j = ease.cubicIO(seg(t, T.melt[0] + 0.35, T.melt[1]));            // then travels to the centre
+      out.push({ x: lerp(wx, 0, j), y: lerp(0.2, R_DROP * 0.85, j), z: lerp(wz, 0, j), r: w * 0.55 * S * g * (1 - ease.in(j)) });
+    }
+  }
+  return { list: out, k };
+}
+
+// ═════════ text ═════════
+const $ = (id) => document.getElementById(id);
+const words = (el, list) => { el.innerHTML = ""; return list.map((w) => { if (w === "\n") { el.appendChild(document.createElement("br")); return null; } const s = document.createElement("span"); s.className = "w"; s.innerHTML = w; el.appendChild(s); el.appendChild(document.createTextNode(" ")); return s; }).filter(Boolean); };
+let HW, PW, SW;
+const LBL = [];
+function setupText() {
+  HW = words($("hook"), ["What's", "your", "<i>silver</i>", "\n", "really", "worth?"]);
+  PW = words($("pay"), ["We", "pay", "for", "\n", "the&nbsp;<i>silver</i>", "inside."]);
+  SW = words($("see"), ["See", "the&nbsp;weight.", "\n", "Then", "<i>decide.</i>"]);
+  for (const o of objs) { const d = document.createElement("div"); d.className = "lbl"; d.innerHTML = "<b></b>" + o.userData.name.toUpperCase(); $("labels").appendChild(d); LBL.push(d); }
+  const c = document.createElement("div"); c.className = "lbl"; c.innerHTML = "<b></b>COINS"; $("labels").appendChild(c); LBL.push(c);
+}
+function place(el, w, extraY = 0) { el.style.opacity = w.op; el.style.transform = `translateY(${w.y + extraY}px) scale(${w.s})`; }
+function textAt(t) {
+  // hook: words land, then the slap knocks them up and out, each by its distance from the coin
+  const hk = t - T.slap;
+  HW.forEach((el, i) => {
+    const w = wordRise(t, T.hookIn[i]);
+    if (hk > 0) { const kk = ease.in(clamp(hk / 0.32)); w.op *= 1 - kk; w.y -= 90 * kk * (1 + i * 0.15); }
+    place(el, w);
+  });
+  $("hook").style.display = t < T.slap + 0.4 ? "" : "none";
+  PW.forEach((el, i) => { const w = wordRise(t, T.payIn[i]); const o = ease.in(seg(t, 7.95, 8.3)); w.op *= 1 - o; w.y -= 40 * o; place(el, w); });
+  $("pay").style.display = t > 5.4 && t < 8.35 ? "" : "none";
+  SW.forEach((el, i) => { const w = wordRise(t, T.seeIn[i]); const o = ease.in(seg(t, 12.05, 12.35)); w.op *= 1 - o; w.y -= 40 * o; place(el, w); });
+  $("see").style.display = t > 9.9 && t < 12.4 ? "" : "none";
+  // lockup
+  const L = wordRise(t, T.lock, 60), L2 = wordRise(t, T.lock + 0.22, 40), U = wordRise(t, T.lock + 0.5, 24);
+  place($("name"), L); place($("tag"), L2); place($("url"), U);
+  $("lockup").style.display = $("url").style.display = t > T.lock - 0.05 ? "" : "none";
+  // material labels: pop on landing at the object's screen position; lift out as the heat comes
+  const items = [...objs.map((o, i) => ({ at: [o.userData.at[0], 0.3, o.userData.at[1]], t0: o.userData.drop + 0.05, dy: i === 0 ? 70 : -70 })), { at: [0, 0.3, 0], t0: 3.02, dy: 70 }];
+  items.forEach((it, i) => {
+    const el = LBL[i]; const vis = t > it.t0 && t < T.heat[0] + 0.45; el.style.display = vis ? "" : "none"; if (!vis) return;
+    const v = new THREE.Vector3(...it.at).project(camera); const x = (v.x * 0.5 + 0.5) * 1080, y = (-v.y * 0.5 + 0.5) * 1920;
+    const w = wordRise(t, it.t0, 18); const o = ease.in(seg(t, T.heat[0], T.heat[0] + 0.4)); w.op *= 1 - o;
+    el.style.opacity = w.op; el.style.transform = `translate(${x - el.offsetWidth / 2}px, ${y + it.dy + w.y - 14 - o * 24}px)`;
+  });
+}
+
+// grain: fixed noise in device pixels (kills gradient banding; still frames stay still)
+function grain() { const g = $("grain").getContext("2d"), im = g.createImageData(1080, 1920), r = rng(7); for (let i = 0; i < im.data.length; i += 4) { const v = r() < 0.5 ? 0 : 255; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = Math.floor(r() * 6); } g.putImageData(im, 0, 0); }
+
+// ═════════ seek ═════════
+const HEATK = (t) => sst(seg(t, T.heat[0], T.heat[1])) * (1 - sst(seg(t, 6.2, 6.9)));
+function seek(t) {
+  t = clamp(t, 0, DUR);
+  // camera
+  const C = camAt(t); camera.position.set(...C.eye); camera.lookAt(...C.at); camera.updateMatrixWorld();
+  // the sweep: a tall strip behind the camera; it crosses at T.sweep (and once in the hook)
+  const sw = (tc, w) => Math.exp(-Math.pow((t - tc) / w, 2));
+  const swK = Math.max(sw(1.15, 0.45), sw(T.sweep, 0.42), sw(8.9, 0.6) * 0.55);
+  const az = Math.atan2(C.eye[0] - C.at[0], C.eye[2] - C.at[2]);
+  const sweepA = az + (t < 4 ? lerp(-1.1, 1.1, seg(t, 0.6, 1.7)) : t < 9.9 ? lerp(-1.0, 1.0, seg(t, 8.3, 9.5)) : lerp(-1.2, 1.2, seg(t, T.sweep - 0.55, T.sweep + 0.55)));
+  sSweep.position.set(Math.sin(sweepA) * 16, 4, Math.cos(sweepA) * 16); sSweep.lookAt(0, 1, 0);
+  sSweep.material.color.setScalar(swK < 0.004 ? 0 : 6.0 * swK);
+  { const a = sw(T.strike + 0.15, 0.35); sAcc.material.color.set(0x6f9fd0).multiplyScalar(0.5 + 0.9 * (a < 0.004 ? 0 : a)); }
+  bakeEnv(swK < 0.004 ? 'off' + sAcc.material.color.r.toFixed(3) : [swK.toFixed(3), sweepA.toFixed(3), sAcc.material.color.r.toFixed(3)].join());
+
+  // coin
+  const cp = coinPose(t); coin.quaternion.copy(cp.q); coin.position.set(0, cp.y, 0);
+  const hk = HEATK(t);
+  // objects
+  objs.forEach((o) => {
+    const u = o.userData, p = dropPose(t, u.drop);
+    o.visible = !!p && t < T.melt[0] + 0.95;
+    if (!p) return;
+    const m = ease.in(seg(t, T.melt[0], T.melt[0] + 0.9));                      // slump
+    o.position.set(u.at[0], p.y * (1 - m), u.at[1]); o.rotation.set(p.tilt, u.rot, p.tilt * 0.6);
+    o.scale.set(u.s * (1 - 0.35 * m), u.s * p.sq * (1 - 0.92 * m), u.s * (1 - 0.35 * m));
+    o.traverse((x) => { if (x.isMesh) x.material.emissive.copy(HEAT).multiplyScalar(0.07 * hk); });
+  });
+  coin.visible = t < T.melt[0] + 0.95;
+  { const m = ease.in(seg(t, T.melt[0], T.melt[0] + 0.9)); coin.scale.set(1 - 0.3 * m, 1 - 0.9 * m, 1 - 0.3 * m); }
+  coinMats.forEach((mm) => mm.emissive.copy(HEAT).multiplyScalar(0.07 * hk));
+
+  // the melt field
+  const melting = t > T.melt[0] && t < T.strike;
+  mc.visible = melting;
+  if (melting) {
+    mc.reset();
+    const B = ballsAt(t), rise = ease.cubicIO(seg(t, T.rise[0], T.rise[1]));
+    const toS = (r) => Math.pow(r / (2 * MC_SCALE), 2) * (ISO + BALL_SUB);   // world radius → strength
+    if (t < T.rise[0] + 0.001) {
+      const jc = ease.cubicIO(seg(t, T.melt[0] + 0.35, T.melt[1]));
+      B.list.push({ x: 0, y: lerp(0.2, R_DROP * 0.85, jc), z: 0, r: lerp(0.55 * ease.out(seg(t, T.melt[0], T.melt[0] + 0.7)), R_DROP, jc) });   // the coin's silver gathers the rest
+      for (const b of B.list) if (b.r > 0.02) mc.addBall(0.5 + b.x / (2 * MC_SCALE), 0.5 + b.y / (2 * MC_SCALE), 0.5 + b.z / (2 * MC_SCALE), toS(b.r), BALL_SUB);
+    } else {
+      // after the merge: one ball, lifted into a perfect sphere at y=2.15
+      const r = R_DROP, y = lerp(r * 0.85, 1.9, rise);
+      mc.addBall(0.5, 0.5 + y / (2 * MC_SCALE), 0.5, toS(r), BALL_SUB);
+    }
+    mc.update();
+    mcMat.emissive.copy(HEAT).multiplyScalar(0.08 * hk);
+  }
+  // the bar: replaces the sphere at the strike (same radius, same place)
+  bar.visible = t >= T.strike - 0.12;
+  if (bar.visible) {
+    const d = t - (T.strike - 0.12);                     // 0.12 s slam down, accelerating
+    const fall = ease.in(clamp(d / 0.12));
+    const k = clamp((t - T.strike) / 0.10);              // struck flat in 0.10 s
+    const ring = t > T.strike ? Math.exp(-(t - T.strike) * 7) * Math.sin((t - T.strike) * 46) : 0;
+    const r = R_DROP;
+    shapeBar(ease.outQ(k), r, [1 + 0.05 * ring, 1 - 0.07 * ring, 1 + 0.05 * ring]);
+    bar.position.set(0, (1 - fall) * (1.9 - r), 0);
+    barMat.bumpScale = 1.6 * ease.out(seg(t, T.strike, T.strike + 0.18));
+    barMat.emissive.setRGB(0, 0, 0);
+    bar.rotation.y = 0;
+  }
+  if (melting && t >= T.strike - 0.12) mc.visible = false;
+
+  textAt(t);
+  renderer.render(scene, camera);
+  return true;
+}
+
+// ═════════ sound events, from the same constants ═════════
+window.EVENTS = () => ({
+  dur: DUR, slap: T.slap, drops: T.drops, heat: T.heat, melt: T.melt, rise: T.rise, strike: T.strike, sweep: T.sweep, lock: T.lock,
+  hook: T.hookIn, pay: T.payIn, see: T.seeIn, spin: Array.from({ length: 48 }, (_, i) => { const t = (i / 48) * T.slap; const ii = Math.floor(t / SPIN.dt); return [t, SPIN.ph[Math.min(ii + 1, SPIN.ph.length - 1)] - SPIN.ph[ii]]; }),
+});
+window.seek = seek;
+window.DUR = DUR;
+window.ready = async () => { await document.fonts.load("600 54px MR"); await document.fonts.load("800 230px MR"); await document.fonts.load("700 104px NR"); await document.fonts.load("italic 400 104px NR"); await document.fonts.ready; build(); setupText(); grain(); seek(0); return true; };
+window.READY = window.ready();
+</script>
+</body></html>

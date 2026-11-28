@@ -1,0 +1,67 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>AG Refining: Exhibit A / Exhibit B type layer</title>
+<style>
+@font-face { font-family: "NR"; src: url("newsreader-latin-opsz.woff2") format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "MR"; src: url("manrope-latin-wght.woff2") format("woff2"); font-weight: 200 800; }
+html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; }
+.chy { position: absolute; left: 72px; top: 236px; will-change: transform, opacity; }
+.tag { display: inline-block; background: #416b94; color: #f1ede4; font: 700 28px/1 "MR"; letter-spacing: 0.3em; padding: 15px 18px 14px 22px; }
+.line { display: block; width: fit-content; margin-top: 10px; background: rgba(16, 42, 67, 0.94); color: #f1ede4; font: 400 64px/1.12 "NR"; letter-spacing: -0.01em; padding: 18px 28px 20px 26px; white-space: nowrap; }
+.line b { font-weight: 600; }
+.caret { display: inline-block; width: 3px; height: 56px; background: #f1ede4; vertical-align: -6px; margin-left: 4px; }
+.t { position: absolute; left: 0; width: 1080px; text-align: center; color: #f4f1ea; text-shadow: 0 2px 34px rgba(0,0,0,0.6); will-change: transform, opacity; white-space: nowrap; }
+#name { font: 132px/1 "MR"; letter-spacing: -0.02em; }
+#tag2 { font: italic 400 64px/1 "NR"; color: #e6e2d9; margin-top: 30px; }
+#check { font: 400 66px/1 "NR"; }
+#url { font: 600 30px/1 "MR"; letter-spacing: 0.32em; text-transform: uppercase; color: #d9d6cf; }
+</style></head>
+<body>
+<div id="A" class="chy"><span class="tag">EXHIBIT A</span><span class="line" id="A1"></span><span class="line" id="A2"></span></div>
+<div id="B" class="chy"><span class="tag">EXHIBIT B</span><span class="line" id="B1"></span><span class="line" id="B2"></span></div>
+<div id="lock" class="t" style="top:400px"><div id="name"><span style="font-weight:800">AG</span><span style="font-weight:400"> Refining</span></div><div id="tag2">Houston's silver buyer</div></div>
+<div id="check" class="t" style="top:1520px">Check the back of yours.</div>
+<div id="url" class="t" style="top:1640px">agrefining.com</div>
+<script>
+// one timeline, shared with score3.py (keep in sync)
+const CPS = 34;
+const L = {
+  // synced to the anchor's read (af_heart): A1 voice 0.55, A2 voice 3.76 ("nine" 4.92), B1 voice 6.20, B2 "nine" 7.95, lockup 10.85 / 13.45
+  A: { in: 0.45, out: 2.95 }, A1: { t: 1.43, s: "A spoon from a kitchen drawer.", cps: 34 },
+  A2: { t: 3.76, s: "Stamped on the back: <b>925</b>", plain: "Stamped on the back: 925", out: 6.0, cps: 18.1 },
+  B: { in: 6.12, out: 9.4 }, B1: { t: 7.14, s: "A silver bar.", cps: 34 }, B2: { t: 7.69, s: "Stamped: <b>999</b>", plain: "Stamped: 999", cps: 34.6 },
+  lock: 10.8, tag: 11.62, check: 13.4, url: 13.8,
+};
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), seg = (t, a, b) => clamp((t - a) / (b - a));
+const spring = (tau, z = 0.62, w = 13) => { if (tau <= 0) return 0; const wd = w * Math.sqrt(1 - z * z); return 1 - Math.exp(-z * w * tau) * (Math.cos(wd * tau) + (z * w / wd) * Math.sin(wd * tau)); };
+const rise = (t, t0, d = 40) => { const k = t - t0; if (k <= 0) return { op: 0, y: d }; const s = spring(k); return { op: clamp(k / 0.12), y: d * (1 - s) }; };
+const $ = (id) => document.getElementById(id);
+// typed text that keeps inline markup: type the plain string, then swap in the marked-up one when complete
+function typed(el, item, t, until = 1e9) {
+  const plain = item.plain || item.s; const C = item.cps || CPS; const n = Math.floor((t - item.t) * C);
+  if (t < item.t || t >= until) { el.style.display = "none"; return; }
+  el.style.display = "";
+  const blink = Math.floor((t - item.t) * 2.2) % 2 === 0;
+  if (n >= plain.length) el.innerHTML = item.s + (t - item.t - plain.length / C < 0.5 && blink ? '<span class="caret"></span>' : "");
+  else el.innerHTML = plain.slice(0, Math.max(0, n)).replace(/ /g, "&nbsp;") + '<span class="caret"></span>';
+}
+function block(el, b, t) {
+  if (t < b.in || t >= b.out) { el.style.display = "none"; return; }
+  el.style.display = "";
+  const k = seg(t, b.in, b.in + 0.22), o = seg(t, b.out - 0.18, b.out);
+  const x = -60 * Math.pow(1 - k, 3) - 40 * o * o;
+  el.style.opacity = Math.min(k * 1.6, 1) * (1 - o); el.style.transform = `translateX(${x}px)`;
+}
+window.seek = (t) => {
+  block($("A"), { in: L.A.in, out: L.A2.out }, t);
+  // first statement clears for the turn of the spoon; the second arrives when the mark is in frame
+  typed($("A1"), L.A1, t, L.A.out); typed($("A2"), L.A2, t, L.A2.out);
+  $("A").querySelector(".tag").style.opacity = 1;
+  block($("B"), L.B, t); typed($("B1"), L.B1, t); typed($("B2"), L.B2, t);
+  const n = rise(t, L.lock, 60), g = rise(t, L.tag, 40), c = rise(t, L.check, 30), u = rise(t, L.url, 24);
+  for (const [id, w] of [["lock", n], ["check", c], ["url", u]]) { const el = $(id); el.style.display = t >= L.lock - 0.05 ? "" : "none"; el.style.opacity = w.op; el.style.transform = `translateY(${w.y}px)`; }
+  $("tag2").style.opacity = g.op; $("tag2").style.transform = `translateY(${g.y - n.y}px)`;
+  return true;
+};
+window.EVENTS = () => ({ cps: CPS, A1: [L.A1.t, L.A1.s.length], A2: [L.A2.t, L.A2.plain.length], B1: [L.B1.t, L.B1.s.length], B2: [L.B2.t, L.B2.plain.length] });
+window.READY = (async () => { await document.fonts.load("400 58px NR"); await document.fonts.load("italic 400 64px NR"); await document.fonts.load("800 132px MR"); await document.fonts.load("700 26px MR"); await document.fonts.ready; seek(0); return true; })();
+</script></body></html>

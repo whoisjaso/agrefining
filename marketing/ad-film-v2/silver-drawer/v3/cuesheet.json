@@ -1,0 +1,1795 @@
+{
+ "schema": "cuesheet/v1",
+ "title": "AG Refining \"Silver drawer\" v3 (organic short, Orpheus-3B voice, per-beat takes)",
+ "style": [
+  "liquid-motion",
+  "kinetic-captions"
+ ],
+ "brand": "agrefining",
+ "voice": true,
+ "lane": "posted",
+ "posted": true,
+ "fps": 60,
+ "duration": 37.941,
+ "cuts": [
+  5.6478,
+  10.3615,
+  12.5419,
+  22.0833,
+  25.0667,
+  33.5123
+ ],
+ "voice_words": [
+  [
+   0.0667,
+   0.3,
+   "Okay,"
+  ],
+  [
+   0.5333,
+   0.74,
+   "real"
+  ],
+  [
+   0.7833,
+   0.96,
+   "quick"
+  ],
+  [
+   1.0,
+   1.34,
+   "question."
+  ],
+  [
+   1.7833,
+   1.868,
+   "You"
+  ],
+  [
+   1.9,
+   2.008,
+   "got"
+  ],
+  [
+   2.0167,
+   2.148,
+   "a"
+  ],
+  [
+   2.15,
+   2.428,
+   "drawer"
+  ],
+  [
+   2.4333,
+   2.668,
+   "full"
+  ],
+  [
+   2.6667,
+   2.888,
+   "of"
+  ],
+  [
+   2.9,
+   3.168,
+   "old"
+  ],
+  [
+   3.2,
+   3.808,
+   "silverware"
+  ],
+  [
+   3.8,
+   4.288,
+   "that"
+  ],
+  [
+   4.2667,
+   4.548,
+   "nobody"
+  ],
+  [
+   4.5667,
+   4.908,
+   "even"
+  ],
+  [
+   4.9,
+   5.248,
+   "uses."
+  ],
+  [
+   6.0167,
+   7.058,
+   "Cause"
+  ],
+  [
+   7.0667,
+   7.598,
+   "man,"
+  ],
+  [
+   8.2833,
+   8.398,
+   "rents"
+  ],
+  [
+   8.4167,
+   8.598,
+   "do"
+  ],
+  [
+   8.6,
+   8.978,
+   "Friday,"
+  ],
+  [
+   9.4667,
+   9.638,
+   "light"
+  ],
+  [
+   9.6833,
+   9.858,
+   "bills"
+  ],
+  [
+   9.85,
+   10.178,
+   "do."
+  ],
+  [
+   10.4833,
+   10.656,
+   "And"
+  ],
+  [
+   10.65,
+   10.756,
+   "that"
+  ],
+  [
+   10.8,
+   11.056,
+   "damn"
+  ],
+  [
+   11.1,
+   11.516,
+   "drawer's"
+  ],
+  [
+   11.4667,
+   11.616,
+   "just"
+  ],
+  [
+   11.6167,
+   11.976,
+   "sittin'"
+  ],
+  [
+   12.0833,
+   12.136,
+   "there."
+  ],
+  [
+   12.7,
+   12.998,
+   "Flip"
+  ],
+  [
+   13.0333,
+   13.258,
+   "one"
+  ],
+  [
+   13.2333,
+   13.398,
+   "of"
+  ],
+  [
+   13.3667,
+   13.538,
+   "them"
+  ],
+  [
+   13.5333,
+   13.978,
+   "over."
+  ],
+  [
+   14.5,
+   14.677,
+   "Look"
+  ],
+  [
+   14.65,
+   14.957,
+   "real"
+  ],
+  [
+   15.0,
+   15.397,
+   "close,"
+  ],
+  [
+   15.85,
+   16.017,
+   "there's"
+  ],
+  [
+   16.0,
+   16.237,
+   "a"
+  ],
+  [
+   16.2333,
+   16.477,
+   "tiny"
+  ],
+  [
+   16.4833,
+   16.817,
+   "little"
+  ],
+  [
+   16.85,
+   17.217,
+   "stamp."
+  ],
+  [
+   17.6333,
+   18.501,
+   "925."
+  ],
+  [
+   19.05,
+   19.321,
+   "Or"
+  ],
+  [
+   19.3167,
+   19.621,
+   "it"
+  ],
+  [
+   19.6,
+   19.981,
+   "straight"
+  ],
+  [
+   20.0167,
+   20.261,
+   "up"
+  ],
+  [
+   20.2333,
+   20.621,
+   "says,"
+  ],
+  [
+   20.8833,
+   21.501,
+   "Sterling."
+  ],
+  [
+   22.2833,
+   22.523,
+   "That"
+  ],
+  [
+   22.5167,
+   22.863,
+   "ain't"
+  ],
+  [
+   22.8167,
+   23.203,
+   "plated."
+  ],
+  [
+   23.5,
+   23.823,
+   "That's"
+  ],
+  [
+   23.7833,
+   24.023,
+   "real"
+  ],
+  [
+   24.0167,
+   24.443,
+   "silver."
+  ],
+  [
+   25.2167,
+   25.497,
+   "So,"
+  ],
+  [
+   25.8833,
+   26.077,
+   "rents"
+  ],
+  [
+   26.1,
+   26.357,
+   "do."
+  ],
+  [
+   26.75,
+   26.849,
+   "And"
+  ],
+  [
+   26.85,
+   26.949,
+   "you"
+  ],
+  [
+   26.9833,
+   27.149,
+   "got"
+  ],
+  [
+   27.15,
+   27.409,
+   "real"
+  ],
+  [
+   27.4167,
+   27.929,
+   "silver,"
+  ],
+  [
+   28.4,
+   28.549,
+   "just"
+  ],
+  [
+   28.5333,
+   28.949,
+   "sit"
+  ],
+  [
+   28.95,
+   29.109,
+   "in"
+  ],
+  [
+   29.05,
+   29.249,
+   "that"
+  ],
+  [
+   29.25,
+   29.589,
+   "drawer."
+  ],
+  [
+   31.5667,
+   32.06,
+   "Yeah,"
+  ],
+  [
+   32.5333,
+   32.68,
+   "now"
+  ],
+  [
+   32.6833,
+   32.84,
+   "you"
+  ],
+  [
+   32.8333,
+   33.02,
+   "see"
+  ],
+  [
+   33.05,
+   33.16,
+   "it."
+  ],
+  [
+   33.6167,
+   33.701,
+   "A"
+  ],
+  [
+   33.7333,
+   33.901,
+   "G"
+  ],
+  [
+   33.9,
+   34.461,
+   "Refining,"
+  ],
+  [
+   34.7833,
+   35.081,
+   "Houston"
+  ],
+  [
+   35.0167,
+   35.501,
+   "Silver"
+  ],
+  [
+   35.5,
+   36.221,
+   "Buyer."
+  ]
+ ],
+ "voice_peak_dbfs": -2.0,
+ "text": [
+  {
+   "id": "hook_q",
+   "role": "hook",
+   "text": "Okay, real quick question.",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 800,
+   "size_px": 160,
+   "preset": "stamp",
+   "t_in": 0.0667,
+   "t_out": 1.7318,
+   "units": [
+    0.0667,
+    0.5333,
+    0.7833,
+    1.0
+   ],
+   "peaks": [
+    0.1,
+    0.5958,
+    0.8194,
+    1.0515
+   ],
+   "signature": "SIG-GEO",
+   "silent": false,
+   "silent_reason": ""
+  },
+  {
+   "id": "l1_lead",
+   "role": "leadin",
+   "text": "you got a drawer full of old",
+   "font": "TeX Gyre Termes",
+   "style": "normal",
+   "weight": 400,
+   "size_px": 62,
+   "preset": "wordsUp",
+   "t_in": 1.7833,
+   "t_out": 5.558,
+   "units": [
+    1.7833,
+    1.9,
+    2.0167,
+    2.15,
+    2.4333,
+    2.6667,
+    2.9
+   ],
+   "peaks": [
+    1.8767,
+    1.9778,
+    2.0759,
+    2.231,
+    2.5,
+    2.7704,
+    2.9923
+   ],
+   "signature": null,
+   "silent": true,
+   "silent_reason": "long lead-in (7 words): silence allowed for leadin; hero carries the signature"
+  },
+  {
+   "id": "l1_hero",
+   "role": "hero",
+   "text": "silverware?",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 800,
+   "size_px": 150,
+   "preset": "blurSettle",
+   "t_in": 3.2,
+   "t_out": 5.558,
+   "units": [
+    3.2
+   ],
+   "peaks": [
+    3.3406
+   ],
+   "signature": "SIG-GEO",
+   "silent": false,
+   "silent_reason": ""
+  },
+  {
+   "id": "l1_lead2",
+   "role": "leadin",
+   "text": "that nobody even uses.",
+   "font": "TeX Gyre Termes",
+   "style": "normal",
+   "weight": 400,
+   "size_px": 62,
+   "preset": "wordsUp",
+   "t_in": 3.8,
+   "t_out": 5.558,
+   "units": [
+    3.8,
+    4.2667,
+    4.5667,
+    4.9
+   ],
+   "peaks": [
+    3.9098,
+    4.3238,
+    4.6222,
+    4.9798
+   ],
+   "signature": null,
+   "silent": true,
+   "silent_reason": "lead-in under VO: silence allowed (font-sound-signatures.md soft_roles); the paired hero carries the signature"
+  },
+  {
+   "id": "l2_lead",
+   "role": "leadin",
+   "text": "\u2019cause, man\u2026 rent\u2019s due",
+   "font": "TeX Gyre Termes",
+   "style": "normal",
+   "weight": 400,
+   "size_px": 66,
+   "preset": "wordsUp",
+   "t_in": 6.0167,
+   "t_out": 10.3615,
+   "units": [
+    6.0167,
+    7.0667,
+    8.2833,
+    8.4167
+   ],
+   "peaks": [
+    6.7167,
+    7.2187,
+    8.4333,
+    8.4833
+   ],
+   "signature": null,
+   "silent": true,
+   "silent_reason": "lead-in under VO: silence allowed (font-sound-signatures.md soft_roles); the paired hero carries the signature"
+  },
+  {
+   "id": "l2_hero",
+   "role": "hero",
+   "text": "friday.",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 800,
+   "size_px": 230,
+   "preset": "blurSettle",
+   "t_in": 8.6,
+   "t_out": 10.3615,
+   "units": [
+    8.6
+   ],
+   "peaks": [
+    8.7383
+   ],
+   "signature": "SIG-GEO",
+   "silent": false,
+   "silent_reason": ""
+  },
+  {
+   "id": "l2_lead2",
+   "role": "leadin",
+   "text": "light bill\u2019s",
+   "font": "TeX Gyre Termes",
+   "style": "normal",
+   "weight": 400,
+   "size_px": 62,
+   "preset": "wordsUp",
+   "t_in": 9.4667,
+   "t_out": 10.3615,
+   "units": [
+    9.4667,
+    9.6833
+   ],
+   "peaks": [
+    9.575,
+    9.731
+   ],
+   "signature": null,
+   "silent": true,
+   "silent_reason": "second lead-in of the line; the emphasis swap carries it"
+  },
+  {
+   "id": "l2_emph",
+   "role": "emphasis",
+   "text": "due.",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 800,
+   "size_px": 62,
+   "preset": "cut",
+   "t_in": 9.85,
+   "t_out": 10.3615,
+   "units": [
+    9.85
+   ],
+   "peaks": [
+    9.85
+   ],
+   "signature": null,
+   "silent": true,
+   "silent_reason": "emphasis under VO: silence (role default)"
+  },
+  {
+   "id": "l3_lead",
+   "role": "leadin",
+   "text": "and that damn drawer\u2019s just",
+   "font": "TeX Gyre Termes",
+   "style": "normal",
+   "weight": 400,
+   "size_px": 62,
+   "preset": "wordsUp",
+   "t_in": 10.4833,
+   "t_out": 12.4707,
+   "units": [
+    10.4833,
+    10.65,
+    10.8,
+    11.1,
+    11.4667
+   ],
+   "peaks": [
+    10.5667,
+    10.7167,
+    10.875,
+    11.1506,
+    11.5667
+   ],
+   "signature": null,
+   "silent": true,
+   "silent_reason": "lead-in under VO: silence allowed (font-sound-signatures.md soft_roles); the paired hero carries the signature"
+  },
+  {
+   "id": "l3_hero",
+   "role": "hero",
+   "text": "sittin\u2019 there.",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 800,
+   "size_px": 150,
+   "preset": "blurSettle",
+   "t_in": 11.6167,
+   "t_out": 12.4707,
+   "units": [
+    11.6167
+   ],
+   "peaks": [
+    11.7917
+   ],
+   "signature": "SIG-GEO",
+   "silent": false,
+   "silent_reason": ""
+  },
+  {
+   "id": "l4_hero",
+   "role": "hero",
+   "text": "flip",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 800,
+   "size_px": 230,
+   "preset": "stamp",
+   "t_in": 12.7,
+   "t_out": 14.2693,
+   "units": [
+    12.7
+   ],
+   "peaks": [
+    12.7694
+   ],
+   "signature": "SIG-GEO",
+   "silent": false,
+   "silent_reason": ""
+  },
+  {
+   "id": "l4_lead",
+   "role": "leadin",
+   "text": "one of \u2019em over.",
+   "font": "TeX Gyre Termes",
+   "style": "normal",
+   "weight": 400,
+   "size_px": 66,
+   "preset": "wordsUp",
+   "t_in": 13.0333,
+   "t_out": 14.2693,
+   "units": [
+    13.0333,
+    13.2333,
+    13.3667,
+    13.5333
+   ],
+   "peaks": [
+    13.0949,
+    13.3095,
+    13.4333,
+    13.6212
+   ],
+   "signature": "SIG-SOFTSERIF",
+   "silent": false,
+   "silent_reason": ""
+  },
+  {
+   "id": "l5_lead",
+   "role": "leadin",
+   "text": "look real close. there\u2019s a tiny little",
+   "font": "TeX Gyre Termes",
+   "style": "normal",
+   "weight": 400,
+   "size_px": 62,
+   "preset": "wordsUp",
+   "t_in": 14.5,
+   "t_out": 17.5917,
+   "units": [
+    14.5,
+    14.65,
+    15.0,
+    15.85,
+    16.0,
+    16.2333,
+    16.4833
+   ],
+   "peaks": [
+    14.56,
+    14.7324,
+    15.0895,
+    15.91,
+    16.1556,
+    16.2958,
+    16.5881
+   ],
+   "signature": null,
+   "silent": true,
+   "silent_reason": "5-word lead-in under VO; the hero carries the signature"
+  },
+  {
+   "id": "l5_hero",
+   "role": "hero",
+   "text": "stamp.",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 800,
+   "size_px": 230,
+   "preset": "blurSettle",
+   "t_in": 16.85,
+   "t_out": 17.5917,
+   "units": [
+    16.85
+   ],
+   "peaks": [
+    16.975
+   ],
+   "signature": "SIG-GEO",
+   "silent": false,
+   "silent_reason": ""
+  },
+  {
+   "id": "l6_num",
+   "role": "number",
+   "text": "925",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 800,
+   "size_px": 200,
+   "preset": "stamp",
+   "t_in": 17.6333,
+   "t_out": 22.0833,
+   "units": [
+    17.6333
+   ],
+   "peaks": [
+    17.6989
+   ],
+   "signature": "SIG-GEO",
+   "silent": false,
+   "silent_reason": ""
+  },
+  {
+   "id": "l6_lead",
+   "role": "leadin",
+   "text": "or it straight up says",
+   "font": "TeX Gyre Termes",
+   "style": "normal",
+   "weight": 400,
+   "size_px": 62,
+   "preset": "wordsUp",
+   "t_in": 19.05,
+   "t_out": 22.0833,
+   "units": [
+    19.05,
+    19.3167,
+    19.6,
+    20.0167,
+    20.2333
+   ],
+   "peaks": [
+    19.43,
+    19.5433,
+    19.719,
+    20.125,
+    20.3633
+   ],
+   "signature": null,
+   "silent": true,
+   "silent_reason": "lead-in under VO: silence allowed (font-sound-signatures.md soft_roles); the paired hero carries the signature"
+  },
+  {
+   "id": "l6_hero",
+   "role": "hero",
+   "text": "sterling.",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 800,
+   "size_px": 190,
+   "preset": "blurSettle",
+   "t_in": 20.8833,
+   "t_out": 22.0833,
+   "units": [
+    20.8833
+   ],
+   "peaks": [
+    21.0976
+   ],
+   "signature": "SIG-GEO",
+   "silent": false,
+   "silent_reason": ""
+  },
+  {
+   "id": "l7_hero",
+   "role": "hero",
+   "text": "real silver.",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 800,
+   "size_px": 170,
+   "preset": "blurSettle",
+   "t_in": 23.7833,
+   "t_out": 25.0667,
+   "units": [
+    23.7833
+   ],
+   "peaks": [
+    23.9583
+   ],
+   "signature": "SIG-GEO",
+   "silent": false,
+   "silent_reason": ""
+  },
+  {
+   "id": "l7_lead",
+   "role": "leadin",
+   "text": "that ain\u2019t plated.",
+   "font": "TeX Gyre Termes",
+   "style": "normal",
+   "weight": 400,
+   "size_px": 66,
+   "preset": "wordsUp",
+   "t_in": 22.2833,
+   "t_out": 24.8792,
+   "units": [
+    22.2833,
+    22.5167,
+    22.8167
+   ],
+   "peaks": [
+    22.3682,
+    22.5873,
+    22.9021
+   ],
+   "signature": "SIG-SOFTSERIF",
+   "silent": false,
+   "silent_reason": ""
+  },
+  {
+   "id": "l7_lead2",
+   "role": "leadin",
+   "text": "that\u2019s",
+   "font": "TeX Gyre Termes",
+   "style": "normal",
+   "weight": 400,
+   "size_px": 66,
+   "preset": "wordsUp",
+   "t_in": 23.5,
+   "t_out": 24.8792,
+   "units": [
+    23.5
+   ],
+   "peaks": [
+    23.5708
+   ],
+   "signature": "SIG-SOFTSERIF",
+   "silent": false,
+   "silent_reason": ""
+  },
+  {
+   "id": "cap1",
+   "role": "caption",
+   "text": "so\u2026 rent\u2019s due.",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 700,
+   "size_px": 60,
+   "preset": "cut",
+   "t_in": 25.2167,
+   "t_out": 26.7329,
+   "units": [
+    25.2167,
+    25.8833,
+    26.1
+   ],
+   "peaks": [
+    25.2167,
+    25.8833,
+    26.1
+   ],
+   "signature": null,
+   "silent": true,
+   "silent_reason": "caption riding the voice: silent"
+  },
+  {
+   "id": "cap2",
+   "role": "caption",
+   "text": "and you got real silver,",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 700,
+   "size_px": 60,
+   "preset": "cut",
+   "t_in": 26.75,
+   "t_out": 28.3636,
+   "units": [
+    26.75,
+    26.85,
+    26.9833,
+    27.15,
+    27.4167
+   ],
+   "peaks": [
+    26.75,
+    26.85,
+    26.9833,
+    27.15,
+    27.4167
+   ],
+   "signature": null,
+   "silent": true,
+   "silent_reason": "caption riding the voice: silent"
+  },
+  {
+   "id": "cap3",
+   "role": "caption",
+   "text": "just sittin\u2019 in a drawer.",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 700,
+   "size_px": 60,
+   "preset": "cut",
+   "t_in": 28.4,
+   "t_out": 30.4388,
+   "units": [
+    28.4,
+    28.5333,
+    28.95,
+    29.05,
+    29.25
+   ],
+   "peaks": [
+    28.4,
+    28.5333,
+    28.95,
+    29.05,
+    29.25
+   ],
+   "signature": null,
+   "silent": true,
+   "silent_reason": "caption riding the voice: silent"
+  },
+  {
+   "id": "cap4",
+   "role": "caption",
+   "text": "yeah. now you see it.",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 700,
+   "size_px": 60,
+   "preset": "cut",
+   "t_in": 31.5667,
+   "t_out": 33.475,
+   "units": [
+    31.5667,
+    32.5333,
+    32.6833,
+    32.8333,
+    33.05
+   ],
+   "peaks": [
+    31.5667,
+    32.5333,
+    32.6833,
+    32.8333,
+    33.05
+   ],
+   "signature": null,
+   "silent": true,
+   "silent_reason": "caption riding the voice: silent"
+  },
+  {
+   "id": "end_lead",
+   "role": "leadin",
+   "text": "houston\u2019s silver buyer.",
+   "font": "TeX Gyre Termes",
+   "style": "normal",
+   "weight": 400,
+   "size_px": 66,
+   "preset": "wordsUp",
+   "t_in": 34.7833,
+   "t_out": 37.941,
+   "units": [
+    34.7833,
+    35.0167,
+    35.5
+   ],
+   "peaks": [
+    34.8167,
+    35.1654,
+    35.58
+   ],
+   "signature": "SIG-SOFTSERIF",
+   "silent": false,
+   "silent_reason": ""
+  },
+  {
+   "id": "cta",
+   "role": "cta",
+   "text": "agrefining.com",
+   "font": "Manrope",
+   "style": "normal",
+   "weight": 700,
+   "size_px": 44,
+   "preset": "pop",
+   "t_in": 36.16,
+   "t_out": 37.941,
+   "units": [
+    36.16
+   ],
+   "peaks": [
+    36.24
+   ],
+   "signature": "SIG-GEO",
+   "silent": false,
+   "silent_reason": ""
+  }
+ ],
+ "sfx": [
+  {
+   "t": 0.0,
+   "file": "synth/orig_whoosh_clean.wav",
+   "family": "whoosh",
+   "gain_db": -16.03,
+   "rel_vo_db": -16,
+   "pairs": "hook_q",
+   "hit_t": 0.1,
+   "anchor_s": 0.1,
+   "seg_peak_dbfs": -1.97,
+   "seg_s": [
+    0.1629,
+    0.6
+   ],
+   "text_id": "hook_q",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "whoosh_in"
+  },
+  {
+   "t": 0.095,
+   "file": "kenney/toggle_004.wav",
+   "family": "click",
+   "gain_db": -16.01,
+   "rel_vo_db": -18,
+   "pairs": "hook_q",
+   "hit_t": 0.1,
+   "anchor_s": 0.005,
+   "seg_peak_dbfs": -3.99,
+   "text_id": "hook_q",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "click"
+  },
+  {
+   "t": 0.5908,
+   "file": "kenney/toggle_004.wav",
+   "family": "click",
+   "gain_db": -16.01,
+   "rel_vo_db": -18,
+   "pairs": "hook_q",
+   "hit_t": 0.5958,
+   "anchor_s": 0.005,
+   "seg_peak_dbfs": -3.99,
+   "text_id": "hook_q",
+   "unit": 1,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "click"
+  },
+  {
+   "t": 0.8144,
+   "file": "kenney/toggle_004.wav",
+   "family": "click",
+   "gain_db": -16.01,
+   "rel_vo_db": -18,
+   "pairs": "hook_q",
+   "hit_t": 0.8194,
+   "anchor_s": 0.005,
+   "seg_peak_dbfs": -3.99,
+   "text_id": "hook_q",
+   "unit": 2,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "click"
+  },
+  {
+   "t": 1.0465,
+   "file": "kenney/toggle_004.wav",
+   "family": "click",
+   "gain_db": -16.01,
+   "rel_vo_db": -18,
+   "pairs": "hook_q",
+   "hit_t": 1.0515,
+   "anchor_s": 0.005,
+   "seg_peak_dbfs": -3.99,
+   "text_id": "hook_q",
+   "unit": 3,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "click"
+  },
+  {
+   "t": 3.0777,
+   "file": "synth/orig_whoosh_clean.wav",
+   "family": "whoosh",
+   "gain_db": -16.03,
+   "rel_vo_db": -16,
+   "pairs": "l1_hero",
+   "hit_t": 3.3406,
+   "anchor_s": 0.2629,
+   "seg_peak_dbfs": -1.97,
+   "text_id": "l1_hero",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "whoosh_in"
+  },
+  {
+   "t": 3.3356,
+   "file": "kenney/toggle_004.wav",
+   "family": "click",
+   "gain_db": -16.01,
+   "rel_vo_db": -18,
+   "pairs": "l1_hero",
+   "hit_t": 3.3406,
+   "anchor_s": 0.005,
+   "seg_peak_dbfs": -3.99,
+   "text_id": "l1_hero",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "click"
+  },
+  {
+   "t": 8.4754,
+   "file": "synth/orig_whoosh_clean.wav",
+   "family": "whoosh",
+   "gain_db": -16.03,
+   "rel_vo_db": -16,
+   "pairs": "l2_hero",
+   "hit_t": 8.7383,
+   "anchor_s": 0.2629,
+   "seg_peak_dbfs": -1.97,
+   "text_id": "l2_hero",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "whoosh_in"
+  },
+  {
+   "t": 8.7333,
+   "file": "kenney/toggle_004.wav",
+   "family": "click",
+   "gain_db": -16.01,
+   "rel_vo_db": -18,
+   "pairs": "l2_hero",
+   "hit_t": 8.7383,
+   "anchor_s": 0.005,
+   "seg_peak_dbfs": -3.99,
+   "text_id": "l2_hero",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "click"
+  },
+  {
+   "t": 11.5288,
+   "file": "synth/orig_whoosh_clean.wav",
+   "family": "whoosh",
+   "gain_db": -16.03,
+   "rel_vo_db": -16,
+   "pairs": "l3_hero",
+   "hit_t": 11.7917,
+   "anchor_s": 0.2629,
+   "seg_peak_dbfs": -1.97,
+   "text_id": "l3_hero",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "whoosh_in"
+  },
+  {
+   "t": 11.7867,
+   "file": "kenney/toggle_004.wav",
+   "family": "click",
+   "gain_db": -16.01,
+   "rel_vo_db": -18,
+   "pairs": "l3_hero",
+   "hit_t": 11.7917,
+   "anchor_s": 0.005,
+   "seg_peak_dbfs": -3.99,
+   "text_id": "l3_hero",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "click"
+  },
+  {
+   "t": 12.279,
+   "file": "synth/orig_whoosh_clean.wav",
+   "family": "whoosh",
+   "gain_db": -16.03,
+   "rel_vo_db": -16,
+   "pairs": "cut",
+   "hit_t": 12.5419,
+   "anchor_s": 0.2629,
+   "seg_peak_dbfs": -1.97,
+   "text_id": "l4_hero",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "whoosh_in"
+  },
+  {
+   "t": 12.7644,
+   "file": "kenney/toggle_004.wav",
+   "family": "click",
+   "gain_db": -16.01,
+   "rel_vo_db": -18,
+   "pairs": "l4_hero",
+   "hit_t": 12.7694,
+   "anchor_s": 0.005,
+   "seg_peak_dbfs": -3.99,
+   "text_id": "l4_hero",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "click"
+  },
+  {
+   "t": 12.9878,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -20.62,
+   "rel_vo_db": -20,
+   "pairs": "l4_lead",
+   "hit_t": 13.0949,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38,
+   "text_id": "l4_lead",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-SOFTSERIF",
+   "layer": "pluck"
+  },
+  {
+   "t": 13.2024,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -20.62,
+   "rel_vo_db": -20,
+   "pairs": "l4_lead",
+   "hit_t": 13.3095,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38,
+   "text_id": "l4_lead",
+   "unit": 1,
+   "anchor": "sig",
+   "signature": "SIG-SOFTSERIF",
+   "layer": "pluck"
+  },
+  {
+   "t": 13.3262,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -20.62,
+   "rel_vo_db": -20,
+   "pairs": "l4_lead",
+   "hit_t": 13.4333,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38,
+   "text_id": "l4_lead",
+   "unit": 2,
+   "anchor": "sig",
+   "signature": "SIG-SOFTSERIF",
+   "layer": "pluck"
+  },
+  {
+   "t": 13.5141,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -20.62,
+   "rel_vo_db": -20,
+   "pairs": "l4_lead",
+   "hit_t": 13.6212,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38,
+   "text_id": "l4_lead",
+   "unit": 3,
+   "anchor": "sig",
+   "signature": "SIG-SOFTSERIF",
+   "layer": "pluck"
+  },
+  {
+   "t": 16.7121,
+   "file": "synth/orig_whoosh_clean.wav",
+   "family": "whoosh",
+   "gain_db": -16.03,
+   "rel_vo_db": -16,
+   "pairs": "l5_hero",
+   "hit_t": 16.975,
+   "anchor_s": 0.2629,
+   "seg_peak_dbfs": -1.97,
+   "text_id": "l5_hero",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "whoosh_in"
+  },
+  {
+   "t": 16.97,
+   "file": "kenney/toggle_004.wav",
+   "family": "click",
+   "gain_db": -16.01,
+   "rel_vo_db": -18,
+   "pairs": "l5_hero",
+   "hit_t": 16.975,
+   "anchor_s": 0.005,
+   "seg_peak_dbfs": -3.99,
+   "text_id": "l5_hero",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "click"
+  },
+  {
+   "t": 17.436,
+   "file": "synth/orig_whoosh_clean.wav",
+   "family": "whoosh",
+   "gain_db": -16.03,
+   "rel_vo_db": -16,
+   "pairs": "l6_num",
+   "hit_t": 17.6989,
+   "anchor_s": 0.2629,
+   "seg_peak_dbfs": -1.97,
+   "text_id": "l6_num",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "whoosh_in"
+  },
+  {
+   "t": 17.6939,
+   "file": "kenney/toggle_004.wav",
+   "family": "click",
+   "gain_db": -16.01,
+   "rel_vo_db": -18,
+   "pairs": "l6_num",
+   "hit_t": 17.6989,
+   "anchor_s": 0.005,
+   "seg_peak_dbfs": -3.99,
+   "text_id": "l6_num",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "click"
+  },
+  {
+   "t": 20.8347,
+   "file": "synth/orig_whoosh_clean.wav",
+   "family": "whoosh",
+   "gain_db": -16.03,
+   "rel_vo_db": -16,
+   "pairs": "l6_hero",
+   "hit_t": 21.0976,
+   "anchor_s": 0.2629,
+   "seg_peak_dbfs": -1.97,
+   "text_id": "l6_hero",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "whoosh_in"
+  },
+  {
+   "t": 21.0926,
+   "file": "kenney/toggle_004.wav",
+   "family": "click",
+   "gain_db": -16.01,
+   "rel_vo_db": -18,
+   "pairs": "l6_hero",
+   "hit_t": 21.0976,
+   "anchor_s": 0.005,
+   "seg_peak_dbfs": -3.99,
+   "text_id": "l6_hero",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "click"
+  },
+  {
+   "t": 23.6954,
+   "file": "synth/orig_whoosh_clean.wav",
+   "family": "whoosh",
+   "gain_db": -16.03,
+   "rel_vo_db": -16,
+   "pairs": "l7_hero",
+   "hit_t": 23.9583,
+   "anchor_s": 0.2629,
+   "seg_peak_dbfs": -1.97,
+   "text_id": "l7_hero",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "whoosh_in"
+  },
+  {
+   "t": 23.9533,
+   "file": "kenney/toggle_004.wav",
+   "family": "click",
+   "gain_db": -16.01,
+   "rel_vo_db": -18,
+   "pairs": "l7_hero",
+   "hit_t": 23.9583,
+   "anchor_s": 0.005,
+   "seg_peak_dbfs": -3.99,
+   "text_id": "l7_hero",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-GEO",
+   "layer": "click"
+  },
+  {
+   "t": 22.2611,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -20.62,
+   "rel_vo_db": -20,
+   "pairs": "l7_lead",
+   "hit_t": 22.3682,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38,
+   "text_id": "l7_lead",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-SOFTSERIF",
+   "layer": "pluck"
+  },
+  {
+   "t": 22.4802,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -20.62,
+   "rel_vo_db": -20,
+   "pairs": "l7_lead",
+   "hit_t": 22.5873,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38,
+   "text_id": "l7_lead",
+   "unit": 1,
+   "anchor": "sig",
+   "signature": "SIG-SOFTSERIF",
+   "layer": "pluck"
+  },
+  {
+   "t": 22.795,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -20.62,
+   "rel_vo_db": -20,
+   "pairs": "l7_lead",
+   "hit_t": 22.9021,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38,
+   "text_id": "l7_lead",
+   "unit": 2,
+   "anchor": "sig",
+   "signature": "SIG-SOFTSERIF",
+   "layer": "pluck"
+  },
+  {
+   "t": 23.4637,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -20.62,
+   "rel_vo_db": -20,
+   "pairs": "l7_lead2",
+   "hit_t": 23.5708,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38,
+   "text_id": "l7_lead2",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-SOFTSERIF",
+   "layer": "pluck"
+  },
+  {
+   "t": 34.7096,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -20.62,
+   "rel_vo_db": -20,
+   "pairs": "end_lead",
+   "hit_t": 34.8167,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38,
+   "text_id": "end_lead",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": "SIG-SOFTSERIF",
+   "layer": "pluck"
+  },
+  {
+   "t": 35.0583,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -20.62,
+   "rel_vo_db": -20,
+   "pairs": "end_lead",
+   "hit_t": 35.1654,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38,
+   "text_id": "end_lead",
+   "unit": 1,
+   "anchor": "sig",
+   "signature": "SIG-SOFTSERIF",
+   "layer": "pluck"
+  },
+  {
+   "t": 35.4729,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -20.62,
+   "rel_vo_db": -20,
+   "pairs": "end_lead",
+   "hit_t": 35.58,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38,
+   "text_id": "end_lead",
+   "unit": 2,
+   "anchor": "sig",
+   "signature": "SIG-SOFTSERIF",
+   "layer": "pluck"
+  },
+  {
+   "t": 36.1329,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -16.62,
+   "rel_vo_db": -16,
+   "pairs": "cta",
+   "hit_t": 36.24,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38,
+   "text_id": "cta",
+   "unit": 0,
+   "anchor": "sig",
+   "signature": null,
+   "layer": "pop"
+  },
+  {
+   "t": 5.4106,
+   "file": "synth/orig_whoosh_whip.wav",
+   "family": "whoosh",
+   "gain_db": -15.01,
+   "rel_vo_db": -15,
+   "pairs": "cut",
+   "hit_t": 5.6478,
+   "anchor_s": 0.2372,
+   "seg_peak_dbfs": -1.99
+  },
+  {
+   "t": 5.6105,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -19.62,
+   "rel_vo_db": -19,
+   "pairs": "object",
+   "hit_t": 5.7176,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38
+  },
+  {
+   "t": 9.3576,
+   "file": "synth/orig_whoosh_soft.wav",
+   "family": "whoosh",
+   "gain_db": -18.17,
+   "rel_vo_db": -18,
+   "pairs": "object",
+   "hit_t": 9.575,
+   "anchor_s": 0.2174,
+   "seg_peak_dbfs": -1.83
+  },
+  {
+   "t": 12.3047,
+   "file": "synth/orig_whoosh_whip.wav",
+   "family": "whoosh",
+   "gain_db": -15.01,
+   "rel_vo_db": -15,
+   "pairs": "cut",
+   "hit_t": 12.5419,
+   "anchor_s": 0.2372,
+   "seg_peak_dbfs": -1.99
+  },
+  {
+   "t": 13.4917,
+   "file": "synth/orig_whoosh_soft.wav",
+   "family": "whoosh",
+   "gain_db": -16.17,
+   "rel_vo_db": -16,
+   "pairs": "object",
+   "hit_t": 13.7091,
+   "anchor_s": 0.2174,
+   "seg_peak_dbfs": -1.83
+  },
+  {
+   "t": 16.1989,
+   "file": "synth/orig_riser_14.wav",
+   "family": "riser",
+   "gain_db": -16.99,
+   "rel_vo_db": -17,
+   "pairs": "l6_num",
+   "hit_t": 17.5989,
+   "anchor_s": 1.4,
+   "seg_peak_dbfs": -2.01
+  },
+  {
+   "t": 16.7929,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -19.62,
+   "rel_vo_db": -19,
+   "pairs": "object",
+   "hit_t": 16.9,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38
+  },
+  {
+   "t": 21.2161,
+   "file": "synth/orig_shimmer_glint.wav",
+   "family": "shimmer",
+   "gain_db": -19.41,
+   "rel_vo_db": -19,
+   "pairs": "object",
+   "hit_t": 21.2405,
+   "anchor_s": 0.0244,
+   "seg_peak_dbfs": -1.59
+  },
+  {
+   "t": 24.3485,
+   "file": "synth/orig_shimmer_glint.wav",
+   "family": "shimmer",
+   "gain_db": -19.41,
+   "rel_vo_db": -19,
+   "pairs": "object",
+   "hit_t": 24.3729,
+   "anchor_s": 0.0244,
+   "seg_peak_dbfs": -1.59
+  },
+  {
+   "t": 23.132,
+   "file": "kenney/toggle_004.wav",
+   "family": "click",
+   "gain_db": -17.01,
+   "rel_vo_db": -19,
+   "pairs": "object",
+   "hit_t": 23.137,
+   "anchor_s": 0.005,
+   "seg_peak_dbfs": -3.99
+  },
+  {
+   "t": 25.4509,
+   "file": "synth/orig_whoosh_soft.wav",
+   "family": "whoosh",
+   "gain_db": -18.17,
+   "rel_vo_db": -18,
+   "pairs": "object",
+   "hit_t": 25.6683,
+   "anchor_s": 0.2174,
+   "seg_peak_dbfs": -1.83
+  },
+  {
+   "t": 26.9493,
+   "file": "synth/orig_whoosh_soft.wav",
+   "family": "whoosh",
+   "gain_db": -18.17,
+   "rel_vo_db": -18,
+   "pairs": "object",
+   "hit_t": 27.1667,
+   "anchor_s": 0.2174,
+   "seg_peak_dbfs": -1.83
+  },
+  {
+   "t": 31.5357,
+   "file": "kenney/impactPunch_heavy_001.wav",
+   "family": "impact",
+   "gain_db": -10.82,
+   "rel_vo_db": -10,
+   "pairs": "object",
+   "hit_t": 31.5667,
+   "anchor_s": 0.031,
+   "seg_peak_dbfs": -1.18
+  },
+  {
+   "t": 31.5608,
+   "file": "synth/orig_sub_boom.wav",
+   "family": "impact",
+   "gain_db": -11.36,
+   "rel_vo_db": -12,
+   "pairs": "object",
+   "hit_t": 31.5717,
+   "anchor_s": 0.0109,
+   "seg_peak_dbfs": -2.64
+  },
+  {
+   "t": 33.5825,
+   "file": "kenney/switch24.wav",
+   "family": "pop",
+   "gain_db": -19.62,
+   "rel_vo_db": -19,
+   "pairs": "object",
+   "hit_t": 33.6896,
+   "anchor_s": 0.1071,
+   "seg_peak_dbfs": -1.38
+  },
+  {
+   "t": 33.9882,
+   "file": "synth/orig_shimmer_glint.wav",
+   "family": "shimmer",
+   "gain_db": -21.41,
+   "rel_vo_db": -21,
+   "pairs": "object",
+   "hit_t": 34.0126,
+   "anchor_s": 0.0244,
+   "seg_peak_dbfs": -1.59
+  }
+ ],
+ "music": {
+  "mode": "none in master",
+  "in_app_suggestion": "storytelling lane (docs/music/song-library.md), e.g. SONG-TYSMUSIC-AS-TIME-FLIES (artist likely), voice 100% / music 10-15%",
+  "fallback": "any calm piano from the account picker, business-cleared"
+ }
+}

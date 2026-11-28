@@ -1,0 +1,17 @@
+{
+ "ref": "/tmp/claude-0/-home-user-agrefining/9fbaafbb-3210-5aca-8623-467a5c6680b5/scratchpad/silver/build/voice_only_master.wav",
+ "mix": "/tmp/claude-0/-home-user-agrefining/9fbaafbb-3210-5aca-8623-467a5c6680b5/scratchpad/silver/build/master_nomusic.wav",
+ "model": "small",
+ "runs": 3,
+ "word_match_pct": 98.8,
+ "word_match_min_pct": 98.8,
+ "per_run": [
+  98.8,
+  98.8,
+  98.8
+ ],
+ "hook_word_match_pct": 100.0,
+ "ref_text": "Okay real quick question. You got a drawer full of old silverware that nobody even uses. Cause man rents due Friday, light bills due, and that damn drawer's just sitting there. Flip one of M over. Look real close, there's a tiny little stamp. 925, or it straight up says Sterling. That ain't plated, that's real silver. So rents due, and you got real silver, just sitting in a drawer. Yeah, now you see it. A G refining, Houston's silver buyer.",
+ "mix_text": "Okay real quick question. You got a drawer full of old silverware that nobody even uses. Cause man rents due Friday. Light bills due. And that damn drawer's just sitting there. Flip one of them over. Look real close. There's a tiny little stamp. 925 or it straight up says Sterling. That ain't plated. That's real silver. So rents due. And you got real silver. Just sitting in a drawer. Yeah, now you see it. A G refining Houston's Silver Buyer.",
+ "pass": true
+}

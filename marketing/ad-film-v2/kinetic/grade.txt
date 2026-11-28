@@ -1,0 +1,1 @@
+split[a][b];[b]gblur=sigma=40,curves=all='0/0 0.55/0.1 1/1'[g];[a][g]blend=all_mode=screen:all_opacity=0.18,eq=contrast=1.04:saturation=1.05,colorbalance=rs=0.015:bs=-0.01:rh=0.01:bh=-0.015,vignette=angle=0.28,noise=c0s=5:c0f=t+u
