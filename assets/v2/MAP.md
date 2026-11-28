@@ -1,16 +1,16 @@
-# Media v2 — Higgsfield top picks (not wired yet)
+# Media v2 - Higgsfield top picks (not wired yet)
 
 Prepared for Claude Code to wire in. Jason asked to use the top picks for all slots. These files are not referenced by the site, so they do not change what visitors see until someone points the markup at them.
 
 They live in `assets/v2/` so `scripts/build.mjs` will copy them into `dist` on deploy. There is no top-level `media/` folder in this repo; `assets/`, `images/`, and `videos/` are the public media directories.
 
-Sources are the reviewed top picks in `/workspace/agrefining-media/higgsfield-batch-1/manifest.md`. Stills were encoded with Sharp to WebP (quality about 72–76, matching `scripts/optimize-asset.mjs`). Email and Open Graph files are JPEG because those surfaces cannot rely on WebP. Loops are H.264 MP4 (`+faststart`, no audio, CRF 26) plus VP9 WebM, with poster frames.
+Sources are the reviewed top picks in `/workspace/agrefining-media/higgsfield-batch-1/manifest.md`. Stills were encoded with Sharp to WebP (quality about 72-76, matching `scripts/optimize-asset.mjs`). Email and Open Graph files are JPEG because those surfaces cannot rely on WebP. Loops are H.264 MP4 (`+faststart`, no audio, CRF 26) plus VP9 WebM, with poster frames.
 
 99 files, 6.4 MB.
 
 ## Mapping
 
-Paths are from the site root. “Replaces” is the live asset a later wiring pass should swap out. “—” means there is no current asset for that slot.
+Paths are from the site root. "Replaces" is the live asset a later wiring pass should swap out. "-" means there is no current asset for that slot.
 
 ### Home hero
 
@@ -18,16 +18,16 @@ The live home hero is the cinematic process film, not the still `ag-silver-hero-
 
 | v2 file | Page | Slot | Replaces |
 |---|---|---|---|
-| `hero-home-1600.webp` (1600×900) | `/` | Desktop hero still, 16:9 | `assets/ag-silver-hero-1600.webp` |
-| `hero-home-2400.webp` (2400×1350) | `/` | Desktop hero still, 16:9 at 1.5× | — (new size; same slot as the 1600) |
-| `hero-home-21x9-1600.webp` (1600×686) | `/` | Optional wide desktop hero, 21:9 | — (no 21:9 asset on the site today) |
-| `hero-home-21x9-2400.webp` (2400×1029) | `/` | Optional wide desktop hero, 21:9 at 1.5× | — |
-| `hero-home-mobile.webp` (1080×1920, 9:16) | `/` | Mobile portrait hero still | `assets/ag-silver-hero-mobile.webp` (that file is 900×506 landscape, not portrait) and/or `images/ag-refining-process-01-pile-poster-mobile.webp` (540×960) |
-| `hero-home-mobile-4x5.webp` (1080×1350) | `/` | Alternate mobile tall still | — (alternate crop of the same spoon) |
-| `loop-flatware.mp4`, `loop-flatware.webm` | `/` | Desktop hero loop, 1280×720, 6.04s | Does **not** replace the nine-clip process film. Candidate first clip or a simpler single-loop hero in place of `/videos/ag-refining-process-01-pile.mp4` and `.webm` |
-| `loop-flatware-poster.webp` (1920×1080) | `/` | Desktop hero poster | `images/ag-refining-process-01-pile-poster.webp` if the flatware loop is used |
-| `loop-flatware-mobile.mp4`, `loop-flatware-mobile.webm` | `/` | Mobile hero loop, 720×1280, 6.04s | Candidate in place of `/videos/ag-refining-process-01-pile-mobile.mp4` and `.webm` |
-| `loop-flatware-poster-mobile.webp` (540×960) | `/` | Mobile hero poster | `images/ag-refining-process-01-pile-poster-mobile.webp` if the flatware loop is used |
+| `hero-home-1600.webp` (1600x900) | `/` | Desktop hero still, 16:9 | `assets/ag-silver-hero-1600.webp` |
+| `hero-home-2400.webp` (2400x1350) | `/` | Desktop hero still, 16:9 at 1.5x | - (new size; same slot as the 1600) |
+| `hero-home-21x9-1600.webp` (1600x686) | `/` | Optional wide desktop hero, 21:9 | - (no 21:9 asset on the site today) |
+| `hero-home-21x9-2400.webp` (2400x1029) | `/` | Optional wide desktop hero, 21:9 at 1.5x | - |
+| `hero-home-mobile.webp` (1080x1920, 9:16) | `/` | Mobile portrait hero still | `assets/ag-silver-hero-mobile.webp` (that file is 900x506 landscape, not portrait) and/or `images/ag-refining-process-01-pile-poster-mobile.webp` (540x960) |
+| `hero-home-mobile-4x5.webp` (1080x1350) | `/` | Alternate mobile tall still | - (alternate crop of the same spoon) |
+| `loop-flatware.mp4`, `loop-flatware.webm` | `/` | Desktop hero loop, 1280x720, 6.04s | Does **not** replace the nine-clip process film. Candidate first clip or a simpler single-loop hero in place of `/videos/ag-refining-process-01-pile.mp4` and `.webm` |
+| `loop-flatware-poster.webp` (1920x1080) | `/` | Desktop hero poster | `images/ag-refining-process-01-pile-poster.webp` if the flatware loop is used |
+| `loop-flatware-mobile.mp4`, `loop-flatware-mobile.webm` | `/` | Mobile hero loop, 720x1280, 6.04s | Candidate in place of `/videos/ag-refining-process-01-pile-mobile.mp4` and `.webm` |
+| `loop-flatware-poster-mobile.webp` (540x960) | `/` | Mobile hero poster | `images/ag-refining-process-01-pile-poster-mobile.webp` if the flatware loop is used |
 
 ### Inner-page heroes
 
@@ -35,14 +35,14 @@ The live home hero is the cinematic process film, not the still `ag-silver-hero-
 
 | v2 file | Page | Slot | Replaces |
 |---|---|---|---|
-| `hero-about-1600.webp`, `hero-about-2400.webp`, `hero-about-mobile.webp` | `/about` | Page hero, 16:9 + mobile 9:16 | — (no page hero image today; OG falls back to `ag-silver-social.webp`) |
-| `hero-how-it-works-1600.webp`, `hero-how-it-works-2400.webp`, `hero-how-it-works-mobile.webp` | `/how-it-works` | Page hero | — (same) |
-| `hero-contact-1600.webp`, `hero-contact-2400.webp`, `hero-contact-mobile.webp` | `/contact` | Page hero | — (same) |
-| `hero-espanol-1600.webp`, `hero-espanol-2400.webp`, `hero-espanol-mobile.webp` | `/espanol` | Page hero | — (same) |
+| `hero-about-1600.webp`, `hero-about-2400.webp`, `hero-about-mobile.webp` | `/about` | Page hero, 16:9 + mobile 9:16 | - (no page hero image today; OG falls back to `ag-silver-social.webp`) |
+| `hero-how-it-works-1600.webp`, `hero-how-it-works-2400.webp`, `hero-how-it-works-mobile.webp` | `/how-it-works` | Page hero | - (same) |
+| `hero-contact-1600.webp`, `hero-contact-2400.webp`, `hero-contact-mobile.webp` | `/contact` | Page hero | - (same) |
+| `hero-espanol-1600.webp`, `hero-espanol-2400.webp`, `hero-espanol-mobile.webp` | `/espanol` | Page hero | - (same) |
 
 ### Material cards
 
-Each subject has `-1280.webp` (1280×960) and `-800.webp` (800×600), which matches `renderMaterialPicture()` and `scripts/optimize-asset.mjs`. Live basenames come from `materialImageManifest` in `scripts/build.mjs` (that manifest wins over older hardcoded `image:` fields).
+Each subject has `-1280.webp` (1280x960) and `-800.webp` (800x600), which matches `renderMaterialPicture()` and `scripts/optimize-asset.mjs`. Live basenames come from `materialImageManifest` in `scripts/build.mjs` (that manifest wins over older hardcoded `image:` fields).
 
 | v2 basename | Pages | Slot | Replaces | Also a candidate for |
 |---|---|---|---|---|
@@ -76,9 +76,9 @@ Same 1280 / 800 sizes as the live area cards.
 | `service-area-sugar-land-1280/800.webp` | `/service-areas`, `/silver-buyer-sugar-land` | Sugar Land card | `assets/service-area-sugar-land-1280.webp` and `-800.webp` |
 | `service-area-the-woodlands-1280/800.webp` | `/service-areas`, `/silver-buyer-the-woodlands` | The Woodlands card | `assets/service-area-the-woodlands-1280.webp` and `-800.webp` |
 | `service-area-conroe-1280/800.webp` | `/service-areas`, `/silver-buyer-conroe` | Conroe card | `assets/service-area-conroe-1280.webp` and `-800.webp` |
-| `service-area-hobby-airport-1280/800.webp` | future `/silver-buyer-hobby-airport` | Hobby Airport card | — (this city is not on `main` yet; no live card) |
-| `service-area-south-houston-1280/800.webp` | future `/silver-buyer-south-houston` | South Houston card | — (not on `main` yet) |
-| `service-area-clear-lake-1280/800.webp` | future `/silver-buyer-clear-lake` | Clear Lake card | — (not on `main` yet) |
+| `service-area-hobby-airport-1280/800.webp` | future `/silver-buyer-hobby-airport` | Hobby Airport card | - (this city is not on `main` yet; no live card) |
+| `service-area-south-houston-1280/800.webp` | future `/silver-buyer-south-houston` | South Houston card | - (not on `main` yet) |
+| `service-area-clear-lake-1280/800.webp` | future `/silver-buyer-clear-lake` | Clear Lake card | - (not on `main` yet) |
 
 ### Guide, FAQ, and process stills
 
@@ -86,34 +86,34 @@ Guide and FAQ pages have no unique art today. Process stills are a proposed 3-st
 
 | v2 file | Page | Slot | Replaces |
 |---|---|---|---|
-| `guide-sterling-vs-plate-1600.webp` | `/guides/sterling-vs-silver-plate` | Guide header, 16:9 | — (OG falls back to `ag-silver-social.webp`) |
-| `guide-how-valued-1600.webp` | `/guides/how-silver-is-valued` | Guide header | — |
-| `guide-xray-privacy-1600.webp` | `/guides/x-ray-film-privacy-checklist` | Guide header | — |
-| `guide-which-coins-1600.webp` | `/guides/which-us-coins-are-silver` | Guide header | — |
-| `guide-id-to-sell-1600.webp` | `/guides/id-to-sell-silver-texas` | Guide header | — |
-| `guide-bars-rounds-1600.webp` | `/guides/selling-silver-bars-and-rounds-houston` | Guide header | — |
-| `guide-commercial-1600.webp` | `/guides/commercial-dental-industrial-silver-houston` | Guide header | — |
-| `guide-inherited-flatware-1600.webp` | `/guides/inherited-sterling-flatware-tea-sets-houston` | Guide header | — |
-| `guide-price-scrap-1600.webp` | `/guides/how-silver-buyers-price-scrap-houston` | Guide header | — |
-| `guide-refiner-vs-pawn-1600.webp` | `/guides/selling-silver-refiner-vs-pawn-shop-vs-online` | Guide header | — |
-| `faq-1600.webp` | `/faq` | FAQ header | — (OG falls back to `ag-silver-social.webp`) |
-| `process-weigh-1600.webp` | `/`, `/how-it-works` | Process step: weigh | Optional still stand-in for `images/ag-refining-process-05-weigh-poster.webp` (that poster is 1920×1080 film art, not this 16:9 still) |
+| `guide-sterling-vs-plate-1600.webp` | `/guides/sterling-vs-silver-plate` | Guide header, 16:9 | - (OG falls back to `ag-silver-social.webp`) |
+| `guide-how-valued-1600.webp` | `/guides/how-silver-is-valued` | Guide header | - |
+| `guide-xray-privacy-1600.webp` | `/guides/x-ray-film-privacy-checklist` | Guide header | - |
+| `guide-which-coins-1600.webp` | `/guides/which-us-coins-are-silver` | Guide header | - |
+| `guide-id-to-sell-1600.webp` | `/guides/id-to-sell-silver-texas` | Guide header | - |
+| `guide-bars-rounds-1600.webp` | `/guides/selling-silver-bars-and-rounds-houston` | Guide header | - |
+| `guide-commercial-1600.webp` | `/guides/commercial-dental-industrial-silver-houston` | Guide header | - |
+| `guide-inherited-flatware-1600.webp` | `/guides/inherited-sterling-flatware-tea-sets-houston` | Guide header | - |
+| `guide-price-scrap-1600.webp` | `/guides/how-silver-buyers-price-scrap-houston` | Guide header | - |
+| `guide-refiner-vs-pawn-1600.webp` | `/guides/selling-silver-refiner-vs-pawn-shop-vs-online` | Guide header | - |
+| `faq-1600.webp` | `/faq` | FAQ header | - (OG falls back to `ag-silver-social.webp`) |
+| `process-weigh-1600.webp` | `/`, `/how-it-works` | Process step: weigh | Optional still stand-in for `images/ag-refining-process-05-weigh-poster.webp` (that poster is 1920x1080 film art, not this 16:9 still) |
 | `process-test-1600.webp` | `/`, `/how-it-works` | Process step: test | Optional still stand-in for `images/ag-refining-process-03-acid-test-poster.webp` or `-04-xrf-poster.webp` |
-| `process-pay-1600.webp` | `/`, `/how-it-works` | Process step: pay | — (no pay-step still or film on the site) |
+| `process-pay-1600.webp` | `/`, `/how-it-works` | Process step: pay | - (no pay-step still or film on the site) |
 
 ### Portal, email, and Open Graph
 
 | v2 file | Page / surface | Slot | Replaces |
 |---|---|---|---|
-| `portal-9x16.webp` (1080×1920) | `/sell`, `/vender` | Portal backdrop, portrait | — (the portal has no background image today) |
-| `portal-4x5.webp` (1080×1350) | `/sell`, `/vender` | Portal backdrop, tall | — |
-| `email-header-1200x400.jpg` | Lead emails in `api/leads.js` | Email header, 3:1 | — (emails currently use a typeset “Ag” mark, no header image) |
-| `email-header-2400x800.jpg` | Lead emails | Email header, 2× | — |
-| `og-default-1200x630.jpg` | Sitewide default, plus Organization schema | Open Graph / Twitter | `assets/ag-silver-social.jpg` and `assets/ag-silver-social.webp` (those are 1200×675, not 1200×630). `ogSize()` in `build.mjs` currently assumes 1200×675 for the default, so wiring this file also needs that helper updated. |
-| `og-materials-1200x630.jpg` | Materials section pages | Section OG | — (those pages currently share the default social card, or a material 4:3 image) |
-| `og-industries-1200x630.jpg` | Industry pages | Section OG | — (same) |
-| `og-areas-1200x630.jpg` | `/service-areas` and city pages | Section OG | — (same) |
-| `og-guides-1200x630.jpg` | `/guides` and individual guides | Section OG | — (same) |
+| `portal-9x16.webp` (1080x1920) | `/sell`, `/vender` | Portal backdrop, portrait | - (the portal has no background image today) |
+| `portal-4x5.webp` (1080x1350) | `/sell`, `/vender` | Portal backdrop, tall | - |
+| `email-header-1200x400.jpg` | Lead emails in `api/leads.js` | Email header, 3:1 | - (emails currently use a typeset "Ag" mark, no header image) |
+| `email-header-2400x800.jpg` | Lead emails | Email header, 2x | - |
+| `og-default-1200x630.jpg` | Sitewide default, plus Organization schema | Open Graph / Twitter | `assets/ag-silver-social.jpg` and `assets/ag-silver-social.webp` (those are 1200x675, not 1200x630). `ogSize()` in `build.mjs` currently assumes 1200x675 for the default, so wiring this file also needs that helper updated. |
+| `og-materials-1200x630.jpg` | Materials section pages | Section OG | - (those pages currently share the default social card, or a material 4:3 image) |
+| `og-industries-1200x630.jpg` | Industry pages | Section OG | - (same) |
+| `og-areas-1200x630.jpg` | `/service-areas` and city pages | Section OG | - (same) |
+| `og-guides-1200x630.jpg` | `/guides` and individual guides | Section OG | - (same) |
 
 ## Slots with no v2 stand-in
 
@@ -130,7 +130,7 @@ These live assets were not in the top-pick set, so they have no file in this fol
 ## Wiring notes
 
 - Do not overwrite the live files in place on the first pass. Point markup at `/assets/v2/...`, then delete the old files once the pages look right.
-- Material and area cards can drop in at the current width/height (1280×960 and 800×600).
-- If the default OG file changes from 1200×675 to 1200×630, update `ogSize()` in `scripts/build.mjs`.
+- Material and area cards can drop in at the current width/height (1280x960 and 800x600).
+- If the default OG file changes from 1200x675 to 1200x630, update `ogSize()` in `scripts/build.mjs`.
 - Email header is already cropped to 3:1. Host it on a public HTTPS URL; many clients will not load WebP.
-- Nothing in this folder is gold, has typography, or pretends to be Dennis’s shop. The how-it-works v2 stills use the clean scale (not the flagged Walking Liberty coin). The process stills are the clean regens.
+- Nothing in this folder is gold, has typography, or pretends to be Dennis's shop. The how-it-works v2 stills use the clean scale (not the flagged Walking Liberty coin). The process stills are the clean regens.

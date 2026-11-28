@@ -513,6 +513,8 @@ test("every email shares one quiet layout with Title Case labels and a plain-tex
     }
     assert.doesNotMatch(email.html, /text-transform/, "labels are Title Case text, never an uppercase transform");
     assert.doesNotMatch(email.html, /width:40%/, "labels stack above their values instead of sharing a narrow column");
+    assert.match(email.html, /<img src="https:\/\/www\.agrefining\.com\/assets\/v2\/email-header-1200x400\.jpg" width="520" height="173" alt="AG Refining"/, "the header image is an absolute https JPEG with alt text");
+    assert.match(email.html, /<td bgcolor="#102a43"[^>]*><img /, "a navy cell stands in when images are off");
     assert.match(email.html, />Ag<\/td>/, "the Ag mark sits in the header");
     assert.match(email.html, />AG Refining<\/td>/);
   }

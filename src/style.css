@@ -3245,6 +3245,33 @@ html[data-loader-state="ready"] .home-loader {
 }
 
 /* In the portal the progress bar, the reward line, the question and its answer keep one rhythm. */
+/* A quiet dark backdrop fills the screen; the questions stay on a cream card so every field reads
+   exactly as it does on the rest of the site. */
+.portal-backdrop,
+.portal-backdrop img {
+  display: block;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+}
+
+.portal-backdrop {
+  pointer-events: none;
+  z-index: -1;
+}
+
+.portal .portal-close {
+  color: rgba(250, 248, 242, 0.86);
+}
+
+.portal-card {
+  background: var(--canvas);
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.35);
+  padding: clamp(1.25rem, 4vw, 2.25rem) clamp(1.1rem, 4vw, 2.25rem);
+}
+
 .portal-body .review-form {
   gap: 1.5rem;
 }
@@ -3369,12 +3396,14 @@ html[data-loader-state="ready"] .home-loader {
 
 /* Standalone sell portal: only the questions, a Close link and a slim map strip at the bottom. */
 .portal-page {
-  background: var(--canvas);
+  background: #060d1c;
 }
 
 .portal {
+  background: #060d1c;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
+  isolation: isolate;
   min-height: 100svh;
   position: relative;
 }
@@ -3473,7 +3502,16 @@ html.portal-locked .portal.is-typing .portal-body {
 /* Short screens need every pixel for the question, so the balancing space is given back. */
 @media (max-height: 700px) {
   .portal-body {
-    padding-bottom: calc(1rem + var(--safe-bottom));
+    padding-bottom: calc(0.75rem + var(--safe-bottom));
+    padding-top: 0.25rem;
+  }
+
+  .portal-card {
+    padding-block: 0.9rem;
+  }
+
+  .portal-body .flow-call {
+    margin-top: 0.5rem;
   }
 }
 
@@ -4974,5 +5012,125 @@ html.portal-locked .portal.is-typing .portal-body {
 @media print {
   .get-paid-dock {
     display: none !important;
+  }
+}
+
+/* Media v2: short dark page heroes (about, how it works, contact, espanol). The still sits behind a
+   scrim so the words stay readable at every width. */
+.page-hero-art {
+  align-content: end;
+  background: #060d1c;
+  border-bottom: 0;
+  color: #faf8f2;
+  display: grid;
+  isolation: isolate;
+  min-height: clamp(21rem, 46vh, 30rem);
+  overflow: hidden;
+  padding-block: clamp(2rem, 4vw, 3.5rem) clamp(2.5rem, 5vw, 4rem);
+  position: relative;
+}
+
+.page-hero-backdrop,
+.page-hero-backdrop img {
+  display: block;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+}
+
+.page-hero-backdrop {
+  z-index: -2;
+}
+
+.page-hero-art::before {
+  background: linear-gradient(90deg, rgba(4, 10, 22, 0.9) 0%, rgba(4, 10, 22, 0.66) 46%, rgba(4, 10, 22, 0.16) 100%);
+  content: "";
+  inset: 0;
+  position: absolute;
+  z-index: -1;
+}
+
+.page-hero-art .breadcrumbs {
+  color: rgba(250, 248, 242, 0.8);
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.page-hero-art .breadcrumbs li + li::before {
+  color: rgba(250, 248, 242, 0.55);
+}
+
+.page-hero-art .eyebrow {
+  color: rgba(250, 248, 242, 0.86);
+}
+
+/* One column on the dark side of the still, so no line of text ever crosses the lit subject. */
+.page-hero-art .page-intro-grid {
+  gap: 1.25rem;
+  grid-template-columns: minmax(0, 34rem);
+}
+
+.page-hero-art .page-intro-grid h1 {
+  color: #faf8f2;
+  font-size: clamp(2.4rem, 4.6vw, 4.2rem);
+}
+
+.page-hero-art .page-intro-grid > p {
+  border-top-color: rgba(250, 248, 242, 0.4);
+  color: rgba(250, 248, 242, 0.92);
+}
+
+/* One 16:9 still under a page intro (guides, FAQ) and at the pay step. Width and height are set on
+   the image, so the space is held before it loads. */
+.page-header-art-shell {
+  padding-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.page-header-art,
+.process-still {
+  background: #0b1730;
+  margin: 0;
+  overflow: hidden;
+}
+
+.page-header-art img,
+.process-still img {
+  aspect-ratio: 16 / 9;
+  display: block;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+.process-still {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+}
+
+@media (min-width: 900px) {
+  .page-header-art img,
+  .process-still img {
+    aspect-ratio: 21 / 9;
+  }
+}
+
+@media (max-width: 700px) {
+  .page-hero-art {
+    min-height: 23rem;
+  }
+
+  .page-hero-art::before {
+    background: linear-gradient(180deg, rgba(4, 10, 22, 0.72) 0%, rgba(4, 10, 22, 0.62) 45%, rgba(4, 10, 22, 0.86) 100%);
+  }
+
+  .industrial-feature-media {
+    min-height: 28rem;
+  }
+}
+
+/* The wide still has its subject on the right; keep the spoon and bar in the tall desktop frame. */
+@media (min-width: 701px) {
+  .industrial-feature-picture img {
+    object-position: 82% 50%;
   }
 }

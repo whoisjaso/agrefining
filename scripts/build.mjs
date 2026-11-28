@@ -13,7 +13,7 @@ mkdirSync(join(out, "assets"), { recursive: true });
 const sourceMasters = join(root, "assets", "material-masters");
 cpSync(join(root, "assets"), join(out, "assets"), {
   recursive: true,
-  filter: (source) => source !== sourceMasters && !source.startsWith(`${sourceMasters}/`)
+  filter: (source) => source !== sourceMasters && !source.startsWith(`${sourceMasters}/`) && !source.endsWith(".md")
 });
 mkdirSync(join(out, "videos"), { recursive: true });
 cpSync(join(root, "videos"), join(out, "videos"), { recursive: true });
@@ -186,13 +186,97 @@ const responsiveFourByThreeFiles = new Set([
   "service-area-conroe-1280.webp"
 ]);
 
+// Media v2 (assets/v2, see assets/v2/MAP.md): the approved stills for each card slot, keyed by the
+// basename the page used before. A slot with no v2 file keeps its earlier image.
+const v2CardImages = {
+  "material-coins": ["material-coins", "Worn silver coins stacked on dark blue velvet"],
+  "material-silver-coins": ["material-coins", "Worn silver coins stacked on dark blue velvet"],
+  "material-dental": ["material-dental-scrap", "Silver-colored dental crowns in a cream ceramic dish"],
+  "material-dental-scrap": ["material-dental-scrap", "Silver-colored dental crowns in a cream ceramic dish"],
+  "material-electronics": ["material-electronics", "Silver-bearing relay contacts beside a circuit board on dark blue cloth"],
+  "material-industrial-ndt": ["material-industrial-ndt", "A stack of industrial radiographic film sheets on a cream cloth"],
+  "material-industrial-silver": ["material-industrial-silver", "Silver strip, sheet and cut silver pieces on a dark surface"],
+  "material-industrial-xray": ["material-industrial-xray", "A radiograph of a pipe elbow on a light box"],
+  "material-lab-silver": ["material-lab-silver", "A silver crucible, spatula and foil beside a glass beaker on a cream tray"],
+  "material-laboratory-silver": ["material-lab-silver", "A silver crucible, spatula and foil beside a glass beaker on a cream tray"],
+  "material-medical-xray": ["material-medical-xray", "Medical X-ray films of a hand on dark blue cloth"],
+  "material-scrap-jewelry": ["material-scrap-jewelry", "A silver chain, ring, earring and locket in a cream dish"],
+  "material-silver-jewelry": ["material-scrap-jewelry", "A silver chain, ring, earring and locket in a cream dish"],
+  "material-scrap-silver": ["material-scrap-silver", "Silver nuggets and small silver grains on dark blue velvet"],
+  "material-silver-bars": ["material-silver-bars", "Stacked silver bars on a cream cloth"],
+  "material-silver-flake": ["material-silver-flake", "Silver flake pouring from a scoop onto dark blue velvet"],
+  "material-silver-plated": ["material-silver-plated", "A silver-plated serving tray and teapot on dark blue velvet"],
+  "material-silver-solder": ["material-silver-solder", "Silver solder rods and a coil of silver wire beside a cream dish"],
+  "material-sterling-flatware": ["material-sterling-flatware", "Ornate sterling forks and spoons fanned on dark blue velvet"],
+  "material-watch-batteries": ["material-watch-batteries", "Silver oxide button cell batteries on dark blue velvet"],
+  "material-watch-batteries-real": ["material-watch-batteries", "Silver oxide button cell batteries on dark blue velvet"],
+  "service-area-houston": ["service-area-houston", "Illustrative twilight skyline reflected in water for the Houston service area"],
+  "service-area-pearland": ["service-area-pearland", "Illustrative lakeside path at dusk for the Pearland service area"],
+  "service-area-pasadena": ["service-area-pasadena", "Illustrative industrial waterfront at dusk for the Pasadena service area"],
+  "service-area-sugar-land": ["service-area-sugar-land", "Illustrative town square reflected in water at dusk for the Sugar Land service area"],
+  "service-area-katy": ["service-area-katy", "Illustrative water tower over wet prairie at dusk for the Katy service area"],
+  "service-area-the-woodlands": ["service-area-the-woodlands", "Illustrative pine-lined waterway at dusk for The Woodlands service area"],
+  "service-area-conroe": ["service-area-conroe", "Illustrative lake pier at dusk for the Conroe service area"]
+};
+
 function withMaterialImage(page) {
   const materialImage = materialImageManifest[page.path];
-  if (!materialImage) return page;
-  page.imageBase = materialImage.basename;
-  page.imageFocus = materialImage.focus;
-  page.image = `${materialImage.basename}-1280.webp`;
+  if (materialImage) {
+    page.imageBase = materialImage.basename;
+    page.imageFocus = materialImage.focus;
+    page.image = `${materialImage.basename}-1280.webp`;
+  }
+  const v2 = v2CardImages[page.imageBase || String(page.image || "").replace(/-1280\.webp$/, "")];
+  if (v2) {
+    const [basename, alt] = v2;
+    page.imageBase = `v2/${basename}`;
+    page.image = `v2/${basename}-1280.webp`;
+    page.imageFocus = "50% 50%";
+    page.imageAlt = alt;
+  }
   return page;
+}
+
+// Page art from Media v2. "hero" pages get a short dark hero behind the page intro (the only image a
+// page preloads); "header" pages get one 16:9 still under the intro, lazy-loaded.
+const pageArt = {
+  about: { kind: "hero", base: "hero-about" },
+  "how-it-works": { kind: "hero", base: "hero-how-it-works" },
+  contact: { kind: "hero", base: "hero-contact" },
+  espanol: { kind: "hero", base: "hero-espanol" },
+  faq: { kind: "header", base: "faq", alt: "A silver spoon and a loupe resting on an open blank notebook" },
+  "guides/sterling-vs-silver-plate": { kind: "header", base: "guide-sterling-vs-plate", alt: "Two ornate silver spoons and a jeweler's loupe on dark blue cloth" },
+  "guides/how-silver-is-valued": { kind: "header", base: "guide-how-valued", alt: "A silver bowl on a digital scale beside a loupe and a notebook" },
+  "guides/x-ray-film-privacy-checklist": { kind: "header", base: "guide-xray-privacy", alt: "Sealed cream envelopes stacked under a silver paperweight" },
+  "guides/which-us-coins-are-silver": { kind: "header", base: "guide-which-coins", alt: "A row of worn silver coins beside a jeweler's loupe" },
+  "guides/id-to-sell-silver-texas": { kind: "header", base: "guide-id-to-sell", alt: "A leather wallet, a blank card and a small silver tin on a dark surface" },
+  "guides/selling-silver-bars-and-rounds-houston": { kind: "header", base: "guide-bars-rounds", alt: "Stacked silver bars beside a stack of silver rounds" },
+  "guides/commercial-dental-industrial-silver-houston": { kind: "header", base: "guide-commercial", alt: "A clear bin of sorted silver scrap beside a digital scale" },
+  "guides/inherited-sterling-flatware-tea-sets-houston": { kind: "header", base: "guide-inherited-flatware", alt: "A wooden chest of sterling flatware beside a folded cloth" },
+  "guides/how-silver-buyers-price-scrap-houston": { kind: "header", base: "guide-price-scrap", alt: "A bowl of mixed silver scrap on a digital scale" },
+  "guides/selling-silver-refiner-vs-pawn-shop-vs-online": { kind: "header", base: "guide-refiner-vs-pawn", alt: "A silver bar on a digital scale beside a touchstone and a loupe" }
+};
+
+// The dark backdrop for a page hero. Decorative (the words carry the page), so the alt is empty.
+function pageHeroBackdrop(path) {
+  const { base } = pageArt[path];
+  return `<picture class="page-hero-backdrop"><source media="(max-width: 700px)" srcset="/assets/v2/${base}-mobile-720.webp 720w, /assets/v2/${base}-mobile.webp 1080w" sizes="100vw" width="1080" height="1920"><img src="/assets/v2/${base}-1600.webp" srcset="/assets/v2/${base}-1600.webp 1600w, /assets/v2/${base}-2400.webp 2400w" sizes="100vw" alt="" width="1600" height="900" fetchpriority="high" decoding="async"></picture>`;
+}
+
+function pageHeroPreload(path) {
+  const { base } = pageArt[path];
+  return `<link rel="preload" as="image" href="/assets/v2/${base}-mobile.webp" imagesrcset="/assets/v2/${base}-mobile-720.webp 720w, /assets/v2/${base}-mobile.webp 1080w" imagesizes="100vw" media="(max-width: 700px)" fetchpriority="high">
+    <link rel="preload" as="image" href="/assets/v2/${base}-1600.webp" imagesrcset="/assets/v2/${base}-1600.webp 1600w, /assets/v2/${base}-2400.webp 2400w" imagesizes="100vw" media="(min-width: 701px)" fetchpriority="high">`;
+}
+
+// One lazy 16:9 still under a page intro (guides, FAQ) or inside a section (the pay step).
+function renderStill(base, alt, className = "page-header-art") {
+  return `<figure class="${className}"><img src="/assets/v2/${base}-1600.webp" srcset="/assets/v2/${base}-800.webp 800w, /assets/v2/${base}-1600.webp 1600w" sizes="(max-width: 700px) calc(100vw - 2rem), min(72rem, calc(100vw - 4rem))" alt="${alt}" width="1600" height="900" loading="lazy" decoding="async"></figure>`;
+}
+
+function pageHeaderArt(path) {
+  const art = pageArt[path];
+  return art?.kind === "header" ? `<div class="shell page-header-art-shell">${renderStill(art.base, art.alt)}</div>` : "";
 }
 
 function renderMaterialPicture({
@@ -849,7 +933,7 @@ Object.assign(industryPages.find((page) => page.path === "hospital-silver-recycl
 });
 
 const locationPages = [
-  ["houston-silver-buyer", "Houston", "the City of Houston", "service-area-houston", "city-houston", "A refinery corridor and downtown skyline mark Houston's commercial silver route.", "major", "50% 50%", "Houston refinery corridor and skyline prepared for commercial silver pickup service"],
+  ["houston-silver-buyer", "Houston", "the City of Houston", "service-area-houston", "city-houston", "A downtown skyline marks Houston's commercial silver route.", "major", "50% 50%", "Houston refinery corridor and skyline prepared for commercial silver pickup service"],
   ["silver-buyer-pearland", "Pearland", "Pearland and nearby south Houston businesses", "service-area-pearland", "city-pearland", "Pearland service supports qualifying south-metro silver pickups with clear scheduling.", "minor", "50% 50%", "Pearland commercial corridor prepared for qualifying silver pickup service"],
   ["silver-buyer-pasadena", "Pasadena", "Pasadena, Deer Park, and nearby industrial areas", "service-area-pasadena", "city-pasadena", "Pasadena route coverage includes refinery-adjacent industrial silver pickups.", "minor", "50% 50%", "Pasadena industrial skyline prepared for commercial silver pickup service"],
   ["silver-buyer-sugar-land", "Sugar Land", "Sugar Land, Stafford, and nearby southwest Houston businesses", "service-area-sugar-land", "city-sugar-land", "Sugar Land route planning supports commercial silver review before pickup.", "major", "50% 50%", "Sugar Land commercial district prepared for qualifying silver pickup service"],
@@ -1271,7 +1355,7 @@ const organizationSchema = {
   slogan: "Houston Silver Buyer, Valued Precisely.",
   url: `${siteUrl}/`,
   logo: { "@type": "ImageObject", url: `${siteUrl}/assets/ag-mark-path.svg` },
-  image: [`${siteUrl}/assets/ag-silver-social.jpg`, `${siteUrl}/assets/ag-silver-hero-1600.webp`],
+  image: [`${siteUrl}/assets/v2/og-default-1200x630.jpg`, `${siteUrl}/assets/v2/hero-home-1600.webp`],
   telephone: phoneHref,
   email,
   address: {
@@ -1399,9 +1483,21 @@ function webPageSchema({ canonical, title, description, lang, pageType, image, d
 // scripts/optimize-asset.mjs.
 function ogSize(image) {
   if (image.endsWith("-1600.webp")) return { w: 1600, h: 900 };
+  if (/^v2\/(?:material|service-area)-.*-1280\.webp$/.test(image)) return { w: 1280, h: 960 };
   if (responsiveFourByThreeFiles.has(image)) return { w: 1280, h: 960 };
   if (image.endsWith("-1280.webp")) return { w: 1280, h: 819 };
-  return { w: 1200, h: 675 };
+  if (image.startsWith("ag-silver-social")) return { w: 1200, h: 675 };
+  return { w: 1200, h: 630 };
+}
+
+// The link-preview card for each section of the site (Media v2, 1200x630 JPEG).
+const defaultSocialImage = "v2/og-default-1200x630.jpg";
+function sectionSocialImage(path) {
+  if (path === "accepted-materials" || materialPages.some((page) => page.path === path)) return "v2/og-materials-1200x630.jpg";
+  if (path === "industries" || industryPages.some((page) => page.path === path)) return "v2/og-industries-1200x630.jpg";
+  if (path === "service-areas" || locationPages.some((page) => page.path === path) || areaPages.some((page) => page.path === path)) return "v2/og-areas-1200x630.jpg";
+  if (path === "guides" || path.startsWith("guides/")) return "v2/og-guides-1200x630.jpg";
+  return defaultSocialImage;
 }
 
 function document({
@@ -1412,7 +1508,8 @@ function document({
   lang = "en",
   bodyClass = "",
   pageSchema = [],
-  image = "ag-silver-social.webp",
+  image,
+  social,
   robots = "index,follow,max-image-preview:large",
   materialGuide = true,
   chrome = true,
@@ -1423,6 +1520,10 @@ function document({
 }) {
   const locale = lang === "es" ? "es" : "en";
   const canonical = path ? `${siteUrl}/${path}` : `${siteUrl}/`;
+  const art = pageArt[path];
+  social ||= sectionSocialImage(path);
+  image ||= art ? `v2/${art.base}-1600.webp` : social;
+  const portalPage = bodyClass.split(/\s+/).includes("portal-page");
   const indexable = !robots.includes("noindex");
   const breadcrumb = indexable ? breadcrumbSchema(content, canonical) : null;
   const schema = [
@@ -1446,7 +1547,7 @@ function document({
     bingSiteVerification ? `<meta name="msvalidate.01" content="${bingSiteVerification}">` : ""
   ].filter(Boolean).join("\n    ");
   const homepage = bodyClass.split(/\s+/).includes("home-page");
-  const themeColor = homepage ? "#000000" : "#f1ede4";
+  const themeColor = homepage ? "#000000" : portalPage ? "#060d1c" : "#f1ede4";
   return withFormAnchor(normalizeTitleCaseMarkup(`<!DOCTYPE html>
 <html lang="${lang}"${homepage ? ' class="home-document"' : ""}>
   <head>
@@ -1465,15 +1566,15 @@ function document({
     <meta property="og:title" content="${title}">
     <meta property="og:description" content="${description}">
     <meta property="og:url" content="${canonical}">
-    <meta property="og:image" content="${siteUrl}/assets/${image}">
-    <meta property="og:image:width" content="${ogSize(image).w}">
-    <meta property="og:image:height" content="${ogSize(image).h}">
+    <meta property="og:image" content="${siteUrl}/assets/${social}">
+    <meta property="og:image:width" content="${ogSize(social).w}">
+    <meta property="og:image:height" content="${ogSize(social).h}">
     <meta property="og:image:alt" content="${siteName}: Houston silver buyer with free qualifying pickup and on-site weighing">
     <meta property="og:locale" content="${locale === "es" ? "es_US" : "en_US"}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="${title}">
     <meta name="twitter:description" content="${description}">
-    <meta name="twitter:image" content="${siteUrl}/assets/${image}">
+    <meta name="twitter:image" content="${siteUrl}/assets/${social}">
     <meta name="author" content="${siteName}">
     <meta name="geo.region" content="US-TX">
     <meta name="geo.placename" content="Houston, Texas">
@@ -1483,7 +1584,8 @@ function document({
     <link rel="icon" href="/assets/ag-mark-path.svg" type="image/svg+xml">
     <link rel="preload" href="/assets/fonts/newsreader-latin-opsz.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/assets/fonts/manrope-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/style.css?v=20260804-hero-v2">
+    ${art?.kind === "hero" ? pageHeroPreload(path) : ""}
+    <link rel="stylesheet" href="/style.css?v=20261128-media-v2">
     ${homepage ? '<script>document.documentElement.classList.add("home-header-pending");window.__agHeaderFailOpen=setTimeout(function(){document.documentElement.classList.remove("home-header-pending","home-header-ready","home-header-revealed");document.documentElement.classList.add("home-header-solid")},1500);if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.dataset.loaderState="ready"}else{document.documentElement.dataset.loaderState="loading";window.__agLoaderFailOpen=setTimeout(function(){document.documentElement.dataset.loaderState="ready";var loader=document.querySelector("[data-home-loader]");if(loader){loader.dataset.loaderState="ready";loader.setAttribute("aria-hidden","true");loader.setAttribute("inert","");loader.inert=true}},1200)}</script>' : ""}
     ${schemaTag({ "@context": "https://schema.org", "@graph": schema })}
   </head>
@@ -1495,7 +1597,7 @@ function document({
     ${chrome ? renderMobileActions(locale, content) : ""}
     ${chrome ? renderFooter(locale) : ""}
     ${chrome && materialGuide ? renderMaterialGuide(locale) : ""}
-    <script src="/site.js?v=20260804-hero-v2" defer></script>
+    <script src="/site.js?v=20261128-media-v2" defer></script>
     ${homepage ? '<script src="/home-header-reveal.js?v=20261126-header" defer></script>' : ""}
     ${homepage ? '<script type="module" src="/home-loader.js?v=20260813-loader"></script>' : ""}
     ${chrome ? '<script type="module" src="/materials-disclosure.js?v=20260810-materials"></script>' : ""}
@@ -1545,11 +1647,14 @@ function renderMapBand() {
 function renderPortal(locale = "en") {
   const es = locale === "es";
   return `<section class="portal" data-portal>
+    <picture class="portal-backdrop"><source media="(min-aspect-ratio: 3/4)" srcset="/assets/v2/portal-4x5.webp" width="1080" height="1350"><img src="/assets/v2/portal-9x16.webp" alt="" width="1080" height="1920" decoding="async"></picture>
     <a class="portal-close" href="${es ? "/espanol" : "/"}"${es ? "" : ""} aria-label="${es ? "Cerrar y volver al sitio" : "Close and go back to the site"}">${es ? "Cerrar" : "Close"}<span aria-hidden="true"></span></a>
     <div id="${es ? "solicitud" : "get-paid"}" class="portal-body">
       <h1 class="visually-hidden">${es ? "Venda Su Plata a AG Refining" : "Sell Your Silver to AG Refining"}</h1>
+      <div class="portal-card">
       ${renderReviewForm({ locale })}
       <p class="flow-call"><a class="phone-link" href="tel:${phoneHref}">${es ? `O llame al ${phoneDisplay}` : `Or call ${phoneDisplay}`}</a></p>
+      </div>
     </div>
   </section>`;
 }
@@ -1722,7 +1827,7 @@ const home = `
   <section class="facility-feature">
     <div class="industrial-feature-grid">
       <div class="industrial-feature-media">
-        <picture class="industrial-feature-picture"><source media="(max-width: 700px)" srcset="/assets/ag-silver-hero-mobile.webp"><img src="/assets/ag-silver-hero-1600.webp" alt="Industrial silver material prepared for pickup and weighing" width="1600" height="900" loading="lazy"></picture>
+        <picture class="industrial-feature-picture"><source media="(max-width: 700px)" srcset="/assets/v2/hero-home-mobile-720.webp 720w, /assets/v2/hero-home-mobile.webp 1080w" sizes="100vw" width="1080" height="1920"><img src="/assets/v2/hero-home-1600.webp" srcset="/assets/v2/hero-home-800.webp 800w, /assets/v2/hero-home-1600.webp 1600w, /assets/v2/hero-home-2400.webp 2400w" sizes="100vw" alt="A sterling spoon resting on a silver bar over dark blue velvet" width="1600" height="900" loading="lazy" decoding="async"></picture>
       </div>
       <div class="industrial-feature-copy" data-reveal>
         <p class="eyebrow">Why Businesses Choose AG Refining</p>
@@ -2542,7 +2647,7 @@ taxonomyPage({
 serviceAreasPage();
 
 const howItWorks = `
-  <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["How it works", null]])}<div class="page-intro-grid"><div><p class="eyebrow">How it works</p><h1>Six simple steps from silver to cash.</h1></div><p>You know what happens before the material moves.</p></div></div></section>
+  <section class="page-hero page-hero-art page-intro">${pageHeroBackdrop("how-it-works")}<div class="shell">${breadcrumbs([["Home", "/"], ["How it works", null]])}<div class="page-intro-grid"><div><p class="eyebrow">How it works</p><h1>Six simple steps from silver to cash.</h1></div><p>You know what happens before the material moves.</p></div></div></section>
   <section class="section process-page"><div class="shell"><ol class="assay-process process-rail">
     <li><span>01</span><div><h2>Tell us what you have.</h2><p>Call or use the form. Share the material type, amount, condition, location, and whether it is a one-time or repeat lot.</p></div></li>
     <li><span>02</span><div><h2>We review the details.</h2><p>We may ask for markings, weights, photos, box counts, or other simple facts needed to understand the lot.</p></div></li>
@@ -2550,7 +2655,7 @@ const howItWorks = `
     <li><span>04</span><div><h2>We weigh on-site.</h2><p>You can see the material weight before payment. This keeps the process clear.</p></div></li>
     <li><span>05</span><div><h2>Review the offer.</h2><p>The offer depends on the confirmed material, recoverable silver, weight, condition, and current silver market values.</p></div></li>
     <li><span>06</span><div><h2>Get paid.</h2><p>Fast payment is available for qualifying transactions. Timing depends on the material and agreed terms.</p></div></li>
-  </ol></div></section>
+  </ol>${renderStill("process-pay", "A sealed cream envelope on a dark blue surface", "process-still")}</div></section>
   <section class="conversion-band"><div class="shell"><p class="eyebrow">Start now</p><h2>Schedule a free pickup.</h2><p>Tell us what silver you have and where it is.</p><a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></div></section>`;
 mkdirSync(join(out, "how-it-works"), { recursive: true });
 writeFileSync(join(out, "how-it-works", "index.html"), document({
@@ -2561,7 +2666,7 @@ writeFileSync(join(out, "how-it-works", "index.html"), document({
 }));
 
 const about = `
-  <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["Our story", null]])}<div class="page-intro-grid"><div><p class="eyebrow">The Stevens family</p><h1>Built on fairness and hard work.</h1></div><p>AG Refining is a Houston-based family business with a direct promise: treat people fairly and make the silver-selling process clear.</p></div></div></section>
+  <section class="page-hero page-hero-art page-intro">${pageHeroBackdrop("about")}<div class="shell">${breadcrumbs([["Home", "/"], ["Our story", null]])}<div class="page-intro-grid"><div><p class="eyebrow">The Stevens family</p><h1>Built on fairness and hard work.</h1></div><p>AG Refining is a Houston-based family business with a direct promise: treat people fairly and make the silver-selling process clear.</p></div></div></section>
   <section class="section provenance-story about-story"><div class="shell legacy-editorial"><div><p class="legacy-number">Ag</p><p class="legacy-caption">Silver, atomic number 47</p></div><div><p class="eyebrow">The family story</p><blockquote>“My father taught us the importance of honesty, hard work, and respect.”</blockquote><cite>Dennis Stevens</cite><p>John Stevens built his reputation by working hard and treating customers fairly. Years later, Dennis returned to silver refining after his youngest son asked him to melt a small amount of old silver. The work felt familiar. It also showed him what the family could build next.</p><p>Today, AG Refining helps Houston businesses turn silver-bearing material into cash through clear pickup, weighing, pricing, and payment.</p></div></div></section>
   <section class="conversion-band"><div class="shell"><p class="eyebrow">Work with AG Refining</p><h2>Let us earn your business.</h2><p>Start with a clear review of your material.</p><a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a></div></section>`;
 mkdirSync(join(out, "about"), { recursive: true });
@@ -2575,7 +2680,7 @@ writeFileSync(join(out, "about", "index.html"), document({
 }));
 
 const contact = `
-  <section class="page-hero page-intro page-intro-contact"><div class="shell">${breadcrumbs([["Home", "/"], ["Contact", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Contact</p><h1>Talk to AG Refining.</h1></div><p>Call, write, or answer a few quick questions and Dennis will call you back.</p></div></div></section>
+  <section class="page-hero page-hero-art page-intro page-intro-contact">${pageHeroBackdrop("contact")}<div class="shell">${breadcrumbs([["Home", "/"], ["Contact", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Contact</p><h1>Talk to AG Refining.</h1></div><p>Call, write, or answer a few quick questions and Dennis will call you back.</p></div></div></section>
   <section class="section contact-section"><div class="shell contact-grid contact-grid-solo">
     <div class="contact-card">
       <a class="contact-line" href="tel:${phoneHref}"><span>Phone</span><strong>${phoneDisplay}</strong></a>
@@ -2614,7 +2719,7 @@ writeFileSync(join(out, "contact", "index.html"), document({
 }));
 
 const spanish = `
-  <section class="page-hero page-intro"><div class="shell"><nav class="breadcrumbs" aria-label="Migas de pan"><ol><li><a href="/" hreflang="en">Inicio ${languageNote}</a></li><li>Español</li></ol></nav><div class="page-intro-grid"><div><p class="eyebrow">Servicio en español</p><h1>Venda su plata en Houston.</h1></div><p>AG Refining ofrece recogida gratis para cuentas comerciales que califican, pesaje en su local y precios claros.</p></div></div></section>
+  <section class="page-hero page-hero-art page-intro">${pageHeroBackdrop("espanol")}<div class="shell"><nav class="breadcrumbs" aria-label="Migas de pan"><ol><li><a href="/" hreflang="en">Inicio ${languageNote}</a></li><li>Español</li></ol></nav><div class="page-intro-grid"><div><p class="eyebrow">Servicio en español</p><h1>Venda su plata en Houston.</h1></div><p>AG Refining ofrece recogida gratis para cuentas comerciales que califican, pesaje en su local y precios claros.</p></div></div></section>
   <section class="section"><div class="shell spanish-materials">
     <article><h2>Recogida</h2><p>Cuéntenos qué material tiene, cuánto pesa y dónde está. Confirmaremos si la recogida califica.</p></article>
     <article><h2>Pesaje</h2><p>Pesamos el material en su presencia para que pueda ver el peso antes del pago.</p></article>
@@ -2679,6 +2784,7 @@ const quickFacts = [
 
 const faqContent = `
   <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["FAQ", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Frequently asked questions</p><h1>Answers about selling silver in Houston.</h1></div><p>Every question AG Refining answers across the site, gathered in one place. If your question is not here, call ${phoneDisplay}.</p></div></div></section>
+  ${pageHeaderArt("faq")}
   <section class="section detail-section"><div class="shell detail-grid">
     <aside class="detail-rail"><p class="eyebrow">Quick facts</p><h2>AG Refining at a glance.</h2><a class="text-link" href="/about">Meet the family ${arrow}</a></aside>
     <div class="detail-copy">${quickFacts.map(([heading, text]) => `<article><h3>${heading}</h3><p>${text}</p></article>`).join("")}</div>
@@ -2723,6 +2829,7 @@ function renderLongform(page, crumbs) {
   const confirmed = (page.confirmable || []).filter(([flag]) => dennisConfirmed[flag]).map(([, text]) => text);
   return `
   <section class="page-hero page-intro"><div class="shell">${breadcrumbs(crumbs)}<div class="page-intro-grid"><div><p class="eyebrow">${page.eyebrow}</p><h1>${page.heading}</h1></div><p class="answer-box">${page.answer}</p></div></div></section>
+  ${pageHeaderArt(page.path)}
   <section class="section"><div class="shell legal-grid"><nav aria-label="On this page">${page.sections.map(([h], i) => `<a href="#s${i + 1}">${h}</a>`).join("")}<a href="#questions">Common Questions</a><a href="#sources">Sources</a></nav><div>
     ${confirmed.length ? `<section id="confirmed"><h2>How We Handle It</h2><ul>${confirmed.map((t) => `<li>${t}</li>`).join("")}</ul></section>` : ""}
     ${page.sections.map(([h, body], i) => `<section id="s${i + 1}"><h2>${h}</h2>${body}</section>`).join("")}

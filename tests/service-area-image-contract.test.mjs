@@ -11,13 +11,13 @@ const assets = join(root, "assets");
 const css = readFileSync(join(root, "src", "style.css"), "utf8");
 
 const serviceAreaManifest = [
-  ["Houston", "/houston-silver-buyer", "service-area-houston"],
-  ["Pearland", "/silver-buyer-pearland", "service-area-pearland"],
-  ["Pasadena", "/silver-buyer-pasadena", "service-area-pasadena"],
-  ["Sugar Land", "/silver-buyer-sugar-land", "service-area-sugar-land"],
-  ["Katy", "/silver-buyer-katy", "service-area-katy"],
-  ["The Woodlands", "/silver-buyer-the-woodlands", "service-area-the-woodlands"],
-  ["Conroe", "/silver-buyer-conroe", "service-area-conroe"]
+  ["Houston", "/houston-silver-buyer", "v2/service-area-houston"],
+  ["Pearland", "/silver-buyer-pearland", "v2/service-area-pearland"],
+  ["Pasadena", "/silver-buyer-pasadena", "v2/service-area-pasadena"],
+  ["Sugar Land", "/silver-buyer-sugar-land", "v2/service-area-sugar-land"],
+  ["Katy", "/silver-buyer-katy", "v2/service-area-katy"],
+  ["The Woodlands", "/silver-buyer-the-woodlands", "v2/service-area-the-woodlands"],
+  ["Conroe", "/silver-buyer-conroe", "v2/service-area-conroe"]
 ];
 
 const coverageLinks = [

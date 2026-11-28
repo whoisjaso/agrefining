@@ -77,7 +77,8 @@ for (const path of htmlFiles) {
   if (h1s.length !== 1) failures.push(`${displayPath}: expected one h1`);
   if (/\b(?:undefined|NaN)\b/.test(source)) failures.push(`${displayPath}: contains unresolved output`);
   if (!source.includes('data-design="silver-atelier"')) failures.push(`${displayPath}: missing Silver Atelier document marker`);
-  const expectedThemeColor = displayPath === "index.html" ? "#000000" : "#f1ede4";
+  // The home film is black, the sell portal sits on its dark backdrop, everything else is cream.
+  const expectedThemeColor = displayPath === "index.html" ? "#000000" : /class="portal-page"/.test(source) ? "#060d1c" : "#f1ede4";
   if (!source.includes(`<meta name="theme-color" content="${expectedThemeColor}">`)) failures.push(`${displayPath}: missing expected browser chrome ${expectedThemeColor}`);
   // The standalone sell portal carries no site chrome at all.
   const portal = /class="portal-page"/.test(source);
@@ -164,7 +165,7 @@ else {
     if (!trustLedger.includes(proof)) failures.push(`Homepage trust band below the hero is missing ${proof}`);
   }
 }
-if (!home.includes("ag-silver-hero-1600.webp")) failures.push("Homepage must retain the lower industrial proof image");
+if (!home.includes("/assets/v2/hero-home-1600.webp")) failures.push("Homepage must retain the lower industrial proof image");
 if (!home.includes('class="intake-panel"')) failures.push("Homepage is missing the separate material intake panel");
 const closingHero = heroSection?.end ?? -1;
 const intakeStart = home.indexOf('<form class="intake-panel"');

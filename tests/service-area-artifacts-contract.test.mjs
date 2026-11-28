@@ -45,13 +45,13 @@ const coverageLinks = [
 ];
 
 const operationalImages = {
-  "houston-silver-buyer": "service-area-houston-1280.webp",
-  "silver-buyer-pearland": "service-area-pearland-1280.webp",
-  "silver-buyer-pasadena": "service-area-pasadena-1280.webp",
-  "silver-buyer-sugar-land": "service-area-sugar-land-1280.webp",
-  "silver-buyer-katy": "service-area-katy-1280.webp",
-  "silver-buyer-the-woodlands": "service-area-the-woodlands-1280.webp",
-  "silver-buyer-conroe": "service-area-conroe-1280.webp"
+  "houston-silver-buyer": "v2/service-area-houston-1280.webp",
+  "silver-buyer-pearland": "v2/service-area-pearland-1280.webp",
+  "silver-buyer-pasadena": "v2/service-area-pasadena-1280.webp",
+  "silver-buyer-sugar-land": "v2/service-area-sugar-land-1280.webp",
+  "silver-buyer-katy": "v2/service-area-katy-1280.webp",
+  "silver-buyer-the-woodlands": "v2/service-area-the-woodlands-1280.webp",
+  "silver-buyer-conroe": "v2/service-area-conroe-1280.webp"
 };
 
 function htmlFor(route) {

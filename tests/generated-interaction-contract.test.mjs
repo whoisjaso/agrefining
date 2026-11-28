@@ -422,8 +422,11 @@ test("the sell portal is a standalone page with no site chrome", () => {
     assert.match(page, new RegExp(`<div id="${anchor}" class="portal-body">`));
     assert.match(page, /<form id="review-form"[^>]*data-review-form/);
     assert.match(page, /<a class="portal-close" href="\/(?:espanol)?"/, `${slug}: one way back to the site`);
-    assert.doesNotMatch(page, /portal-map|data-directions|map-band|OpenStreetMap|<picture/, `${slug}: no map, address chip or directions link`);
+    assert.doesNotMatch(page, /portal-map|data-directions|map-band|OpenStreetMap/, `${slug}: no map, address chip or directions link`);
     assert.match(page, /<p class="flow-call"><a class="phone-link" href="tel:/, `${slug}: the call link stays`);
+    assert.match(page, /<picture class="portal-backdrop"><source media="\(min-aspect-ratio: 3\/4\)" srcset="\/assets\/v2\/portal-4x5\.webp" width="1080" height="1350"><img src="\/assets\/v2\/portal-9x16\.webp" alt="" width="1080" height="1920"/, `${slug}: a decorative dark backdrop with explicit sizes`);
+    assert.match(page, /<div class="portal-card">\s*<form id="review-form"/, `${slug}: the questions sit on a cream card over the backdrop`);
+    assert.match(page, /<meta name="theme-color" content="#060d1c">/);
     assert.match(page, /<meta name="robots" content="noindex,follow">/);
   }
   const sitemap = readFileSync(join(dist, "sitemap.xml"), "utf8");

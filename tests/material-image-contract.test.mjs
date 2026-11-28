@@ -10,33 +10,35 @@ const dist = join(root, "dist");
 const assets = join(root, "assets");
 const css = readFileSync(join(root, "src", "style.css"), "utf8");
 
+// Media v2: every card slot with an approved still reads from assets/v2. The X-ray film slot has no
+// v2 file, so it keeps its earlier image.
 const materialManifest = {
-  "silver-oxide-watch-battery-recycling-houston": "material-watch-batteries",
-  "scrap-silver-buyer-houston": "material-scrap-silver",
-  "scrap-silver-jewelry": "material-scrap-jewelry",
-  "sell-silver-coins-houston": "material-coins",
-  "sell-silver-bars-houston": "material-silver-bars",
-  "silver-flatware-buyer-houston": "material-sterling-flatware",
-  "silver-plated-materials-buyer-houston": "material-silver-plated",
-  "industrial-silver-scrap": "material-industrial-silver",
-  "electronics-silver-recovery": "material-electronics",
-  "silver-flake-buyer-houston": "material-silver-flake",
-  "silver-solder-buyer-houston": "material-silver-solder",
-  "laboratory-silver-buyer-houston": "material-lab-silver",
-  "industrial-x-ray-silver-recycling": "material-industrial-ndt",
-  "medical-x-ray-recycling": "material-medical-xray",
-  "dental-scrap-buyer-houston": "material-dental",
+  "silver-oxide-watch-battery-recycling-houston": "v2/material-watch-batteries",
+  "scrap-silver-buyer-houston": "v2/material-scrap-silver",
+  "scrap-silver-jewelry": "v2/material-scrap-jewelry",
+  "sell-silver-coins-houston": "v2/material-coins",
+  "sell-silver-bars-houston": "v2/material-silver-bars",
+  "silver-flatware-buyer-houston": "v2/material-sterling-flatware",
+  "silver-plated-materials-buyer-houston": "v2/material-silver-plated",
+  "industrial-silver-scrap": "v2/material-industrial-silver",
+  "electronics-silver-recovery": "v2/material-electronics",
+  "silver-flake-buyer-houston": "v2/material-silver-flake",
+  "silver-solder-buyer-houston": "v2/material-silver-solder",
+  "laboratory-silver-buyer-houston": "v2/material-lab-silver",
+  "industrial-x-ray-silver-recycling": "v2/material-industrial-ndt",
+  "medical-x-ray-recycling": "v2/material-medical-xray",
+  "dental-scrap-buyer-houston": "v2/material-dental-scrap",
   "x-ray-recycling-services-houston": "material-xray-film",
-  "jewelry-store-silver-recycling-houston": "material-scrap-jewelry"
+  "jewelry-store-silver-recycling-houston": "v2/material-scrap-jewelry"
 };
 
 const homeMaterials = [
-  ["scrap-silver-jewelry", "material-scrap-jewelry"],
-  ["industrial-x-ray-silver-recycling", "material-industrial-ndt"],
-  ["sell-silver-coins-houston", "material-coins"],
-  ["silver-oxide-watch-battery-recycling-houston", "material-watch-batteries"],
-  ["medical-x-ray-recycling", "material-medical-xray"],
-  ["silver-flatware-buyer-houston", "material-sterling-flatware"]
+  ["scrap-silver-jewelry", "v2/material-scrap-jewelry"],
+  ["industrial-x-ray-silver-recycling", "v2/material-industrial-ndt"],
+  ["sell-silver-coins-houston", "v2/material-coins"],
+  ["silver-oxide-watch-battery-recycling-houston", "v2/material-watch-batteries"],
+  ["medical-x-ray-recycling", "v2/material-medical-xray"],
+  ["silver-flatware-buyer-houston", "v2/material-sterling-flatware"]
 ];
 
 function routeHtml(route) {
@@ -125,7 +127,6 @@ test("material routes do not consume obsolete filenames", () => {
     /material-silver-jewelry-/,
     /material-sterling-hollowware-/,
     /material-watch-batteries-real-/,
-    /material-dental-scrap-/,
     /width="1280" height="819"/
   ];
   for (const pattern of obsolete) assert.doesNotMatch(materialHtml, pattern);

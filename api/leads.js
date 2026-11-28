@@ -165,6 +165,9 @@ function label(value) {
   return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+// The header band is a JPEG at an absolute https URL on the live site (mail clients cannot load a
+// relative path or rely on WebP). With images off, the navy cell and the alt text stand in for it.
+const EMAIL_HEADER_IMAGE = "https://www.agrefining.com/assets/v2/email-header-1200x400.jpg";
 const ADDRESS_LINE = "9125 Airport Blvd., Suite B-1, Houston, TX 77061";
 
 // One quiet layout for every email the site sends: the wordmark, one Title Case heading, a short
@@ -200,7 +203,10 @@ function emailShell({ lang = "en", preheader = "", heading, summary, rows = [], 
     <td align="center" style="padding:32px 16px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background:#faf8f2;border:1px solid #e3ddd0">
         <tr>
-          <td style="padding:32px 32px 0">
+          <td bgcolor="#102a43" style="background:#102a43;font-size:0;line-height:0"><img src="${EMAIL_HEADER_IMAGE}" width="520" height="173" alt="AG Refining" style="display:block;width:100%;max-width:520px;height:auto;border:0;background:#102a43;color:#faf8f2;font-family:${font};font-size:16px;line-height:60px;text-align:center"></td>
+        </tr>
+        <tr>
+          <td style="padding:28px 32px 0">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td width="40" height="40" align="center" valign="middle" bgcolor="#102a43" style="width:40px;height:40px;background:#102a43;font-family:Georgia,'Times New Roman',serif;font-size:19px;line-height:40px;color:#faf8f2">Ag</td>
