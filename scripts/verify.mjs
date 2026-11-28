@@ -79,8 +79,14 @@ for (const path of htmlFiles) {
   if (!source.includes('data-design="silver-atelier"')) failures.push(`${displayPath}: missing Silver Atelier document marker`);
   const expectedThemeColor = displayPath === "index.html" ? "#000000" : "#f1ede4";
   if (!source.includes(`<meta name="theme-color" content="${expectedThemeColor}">`)) failures.push(`${displayPath}: missing expected browser chrome ${expectedThemeColor}`);
-  if ((source.match(/class="site-header"/g) || []).length !== 1) failures.push(`${displayPath}: expected one shared header`);
-  if ((source.match(/class="footer"/g) || []).length !== 1) failures.push(`${displayPath}: expected one shared footer`);
+  // The standalone sell portal carries no site chrome at all.
+  const portal = /class="portal-page"/.test(source);
+  if (portal) {
+    if (/class="site-header"|class="footer"|mobile-actions|data-nav-toggle/.test(source)) failures.push(`${displayPath}: the portal must not carry the site header, menu, footer or pill`);
+  } else {
+    if ((source.match(/class="site-header"/g) || []).length !== 1) failures.push(`${displayPath}: expected one shared header`);
+    if ((source.match(/class="footer"/g) || []).length !== 1) failures.push(`${displayPath}: expected one shared footer`);
+  }
 
   const ids = [...source.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
   const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
@@ -143,8 +149,8 @@ else {
   if (/\/assets\/ag-refining-hero-v2-[^"']+\.webp/.test(hero)) failures.push("Homepage hero still references retired V2 artwork");
   if (/class="hero-kicker"/.test(hero)) failures.push("Homepage hero must not restore the retired kicker line");
   const heroAnchors = anchorsIn(hero);
-  const primaryAction = heroAnchors.find((anchor) => anchor.href === "/contact?intent=pickup#get-paid");
-  if (!primaryAction) failures.push("Homepage hero must provide a primary pickup anchor that lands on the form (/contact?intent=pickup#get-paid)");
+  const primaryAction = heroAnchors.find((anchor) => anchor.href === "/sell?intent=pickup");
+  if (!primaryAction) failures.push("Homepage hero must provide a primary pickup anchor that opens the sell portal (/sell?intent=pickup)");
   else {
     if (!primaryAction.classes.includes("button") || !primaryAction.classes.includes("button-primary")) {
       failures.push("Homepage hero pickup anchor must use button button-primary classes");
@@ -293,7 +299,7 @@ const atelierFamilies = [
   ["accepted-materials", ["page-hero", "editorial-index", "conversion-band"]],
   ["how-it-works", ["page-hero", "assay-process", "conversion-band"]],
   ["about", ["page-hero", "provenance-story", "conversion-band"]],
-  ["contact", ["page-hero", "review-form", "map-band"]],
+  ["contact", ["page-hero", "contact-card", "map-band"]],
   ["espanol", ["page-hero", "conversion-band"]],
   ["privacy", ["page-hero", "legal-grid"]]
 ];
@@ -379,7 +385,8 @@ if (!/inventory and volume details[\s\S]{0,240}privacy notice/i.test(jewelryStor
   failures.push("Jewelry-store page must qualify inventory handling against the privacy notice");
 }
 
-const contactPage = readFileSync(join(out, "contact", "index.html"), "utf8");
+// The pickup form and its notice now live on the standalone sell portal.
+const contactPage = readFileSync(join(out, "sell", "index.html"), "utf8");
 const privacyPage = readFileSync(join(out, "privacy", "index.html"), "utf8");
 const attributionDisclosureTerms = ["form page", "first landing page", "referring page", "campaign or ad identifiers"];
 for (const term of attributionDisclosureTerms) {
@@ -398,7 +405,7 @@ const hospitalHero = hospitalHeroStart >= 0 && hospitalHeroEnd > hospitalHeroSta
   ? hospital.slice(hospitalHeroStart, hospitalHeroEnd)
   : "";
 const hospitalGuardrailPosition = hospitalHero.indexOf("Do not upload patient information");
-const hospitalActionPosition = hospitalHero.indexOf('href="/contact?intent=pickup');
+const hospitalActionPosition = hospitalHero.indexOf('href="/sell?intent=pickup');
 if (hospitalGuardrailPosition < 0 || hospitalActionPosition < 0 || hospitalGuardrailPosition > hospitalActionPosition) {
   failures.push("Hospital hero must show the protected-record guardrail before its pickup action");
 }

@@ -25,13 +25,13 @@ test("the Get Paid pill is one localized link that routes to the right form", ()
   const englishDock = mobileDock(home);
   const spanishDock = mobileDock(spanish);
   assert.equal((englishDock.match(/<a\b/g) || []).length, 1);
-  assert.match(englishDock, /<a class="get-paid-pill" href="\/contact\?intent=pickup#get-paid">[\s\S]*Get Paid/, "the pill lands on the form itself");
+  assert.match(englishDock, /<a class="get-paid-pill" href="\/sell\?intent=pickup">[\s\S]*Get Paid/, "the pill opens the sell portal");
   assert.doesNotMatch(englishDock, /tel:|>Call</);
   assert.equal((spanishDock.match(/<a\b/g) || []).length, 1);
-  assert.match(spanishDock, /<a class="get-paid-pill" href="#solicitud">[\s\S]*Reciba Su Pago/);
+  assert.match(spanishDock, /<a class="get-paid-pill" href="\/vender">[\s\S]*Reciba Su Pago/);
   const coins = readFileSync(join(dist, "sell-silver-coins-houston", "index.html"), "utf8");
-  assert.match(mobileDock(coins), /href="\/contact\?intent=pickup&material=silver_coins#get-paid"/, "material pages open the form with their material chosen");
-  assert.match(contact, /<div id="get-paid" class="contact-form-column">/, "the contact page carries the form anchor");
+  assert.match(mobileDock(coins), /href="\/sell\?intent=pickup&material=silver_coins"/, "material pages open the portal with their material chosen");
+  assert.match(readFileSync(join(dist, "sell", "index.html"), "utf8"), /<div id="get-paid" class="portal-body">/, "the portal carries the form");
 });
 
 test("the pill is centered, hidden on the first screen, safe-area aware, and suppressed by navigation, forms and the footer", () => {

@@ -252,7 +252,7 @@ function generatedDisplayAtWidth(selector, width, inputProfile, defaultDisplay) 
 }
 
 test("the generated contract covers every published HTML document", () => {
-  assert.equal(htmlDocuments.length, 56);
+  assert.equal(htmlDocuments.length, 58);
 });
 
 test("every generated route authors eyebrow, small-label, H2, and H3 copy in Title Case", () => {
@@ -316,7 +316,7 @@ test("the Get Paid pill is available at every width while the desktop material g
 });
 
 test("static forms keep native validation before enhancement", () => {
-  const contactForm = contact.match(/<form[^>]*data-review-form[^>]*>[\s\S]*?<\/form>/)?.[0] || "";
+  const contactForm = readFileSync(join(dist, "sell", "index.html"), "utf8").match(/<form[^>]*data-review-form[^>]*>[\s\S]*?<\/form>/)?.[0] || "";
   assert.match(contactForm, /action="\/api\/leads"/);
   assert.match(contactForm, /method="post"/);
   assert.doesNotMatch(contactForm, /\bnovalidate\b/i);
@@ -325,6 +325,8 @@ test("static forms keep native validation before enhancement", () => {
 
 test("all static headers expose navigation when site.js is unavailable", () => {
   for (const [name, html] of htmlDocuments) {
+    // The standalone sell portal has no header by design.
+    if (/class="portal-page"/.test(html)) continue;
     const header = html.match(/<header class="site-header"[\s\S]*?<\/header>/)?.[0] || "";
     const menu = header.match(/<div class="nav-links"[^>]*>/)?.[0] || "";
     const materialsPanel = header.match(/<div class="materials-panel"[^>]*>/)?.[0] || "";
@@ -347,10 +349,13 @@ test("static CSS exposes the one materials panel to keyboard and fine-pointer us
 test("Spanish stays Spanish through the lead form", () => {
   assert.match(spanish, /<html lang="es">/);
   assert.match(spanish, />Saltar al contenido<\/a>/);
-  assert.match(spanish, /id="solicitud"/);
-  assert.match(spanish, /<form[^>]*data-review-form[^>]*>/);
-  assert.match(spanish, /name="locale" value="es"/);
-  assert.match(spanish, />Enviar solicitud/);
+  const vender = readFileSync(join(dist, "vender", "index.html"), "utf8");
+  assert.match(spanish, /href="\/vender"/, "the Spanish page sends visitors to the Spanish portal");
+  assert.match(vender, /<html lang="es">/);
+  assert.match(vender, /id="solicitud"/);
+  assert.match(vender, /<form[^>]*data-review-form[^>]*>/);
+  assert.match(vender, /name="locale" value="es"/);
+  assert.match(vender, /¿Cuál Es Su Nombre Completo\?/);
   assert.doesNotMatch(spanish, /href="\/contact\?intent=pickup"/);
 });
 
@@ -395,48 +400,89 @@ test("coarse pointers receive radio-label targets at least 44px in both dimensio
   }
 });
 
-test("every pickup call to action lands on the pickup form", () => {
+test("every pickup call to action opens the standalone sell portal", () => {
   for (const [name, html] of htmlDocuments) {
-    const stray = html.match(/href="\/contact\?intent=pickup[^"#]*"/);
-    assert.equal(stray, null, `${name}: ${stray?.[0]} must carry #get-paid`);
+    const stray = html.match(/href="\/contact\?intent=(?:pickup|quote)[^"]*"/);
+    assert.equal(stray, null, `${name}: ${stray?.[0]} must point at the portal`);
   }
-  const contactPage = readFileSync(join(dist, "contact", "index.html"), "utf8");
-  assert.match(contactPage, /<div id="get-paid" class="contact-form-column">/);
+  const homePage = readFileSync(join(dist, "index.html"), "utf8");
+  assert.match(homePage, /href="\/sell\?intent=pickup">Schedule a Free Pickup<\/a>/);
+  assert.match(homePage, /<form class="intake-panel" action="\/sell" method="get"/);
+  const coins = readFileSync(join(dist, "sell-silver-coins-houston", "index.html"), "utf8");
+  assert.match(coins, /href="\/sell\?intent=pickup&(?:amp;)?material=silver_coins"/, "material pages carry their material into the portal");
 });
 
-test("the pickup form is a one-field-per-screen flow that still works as a plain form", () => {
+test("the sell portal is a standalone page with no site chrome", () => {
+  for (const [slug, lang, anchor] of [["sell", "en", "get-paid"], ["vender", "es", "solicitud"]]) {
+    const page = readFileSync(join(dist, slug, "index.html"), "utf8");
+    assert.match(page, new RegExp(`<html lang="${lang}">`));
+    assert.match(page, /<body[^>]*class="portal-page"/);
+    assert.doesNotMatch(page, /<header|<footer|site-header|class="brand"|mobile-actions|material-guide|data-nav-toggle/, `${slug}: no header, menu, logo, footer or pill`);
+    assert.equal((page.match(/<section\b/g) || []).length, 1, `${slug}: the portal is the only section`);
+    assert.equal((page.match(/<h1\b/g) || []).length, 1);
+    assert.match(page, new RegExp(`<div id="${anchor}" class="portal-body">`));
+    assert.match(page, /<form id="review-form"[^>]*data-review-form/);
+    assert.match(page, /<a class="portal-close" href="\/(?:espanol)?"/, `${slug}: one way back to the site`);
+    assert.match(page, /<a class="portal-map"[^>]*data-directions[^>]*data-destination="9125 Airport Blvd\., Suite B-1, Houston, TX 77061"/);
+    assert.match(page, /<meta name="robots" content="noindex,follow">/);
+    assert.match(page, /OpenStreetMap contributors/);
+  }
+  const sitemap = readFileSync(join(dist, "sitemap.xml"), "utf8");
+  assert.doesNotMatch(sitemap, /\/sell<|\/vender</, "the portal is a utility page, not a search landing page");
+  const css = readFileSync(join(dist, "style.css"), "utf8");
+  assert.match(css, /html\.portal-locked,\s*html\.portal-locked body \{[^}]*overflow:\s*hidden;/, "the locked portal never scrolls the page");
+  assert.match(css, /html\.portal-locked \.portal \{[^}]*height:\s*var\(--portal-height, 100svh\);[^}]*position:\s*fixed;/);
+  assert.match(css, /\.portal\.is-typing \.portal-map,/, "the map strip steps aside when the keyboard is up");
+  // Contact and Spanish pages keep their own content and hand off to the portal.
   const contactPage = readFileSync(join(dist, "contact", "index.html"), "utf8");
-  const form = contactPage.match(/<form id="review-form"[\s\S]*?<\/form>/)?.[0] || "";
+  assert.doesNotMatch(contactPage, /data-review-form/);
+  assert.match(contactPage, /href="\/sell\?intent=pickup"/);
+  assert.match(contactPage, /href="tel:\+12818982719"/);
+});
+
+test("the pickup form is one question per screen and still works as a plain form", () => {
+  const sellPage = readFileSync(join(dist, "sell", "index.html"), "utf8");
+  const form = sellPage.match(/<form id="review-form"[\s\S]*?<\/form>/)?.[0] || "";
   const steps = [...form.matchAll(/<fieldset class="flow-step field-wide" data-flow-step="([a-z_]+)">\s*<legend tabindex="-1">(?:<label for="[a-z_]+">)?([^<]+)</g)].map((match) => [match[1], match[2]]);
   assert.deepEqual(steps, [
-    ["first_name", "What Is Your First Name?"],
-    ["last_name", "And Your Last Name?"],
+    ["name", "What Is Your Full Name?"],
     ["phone", "Where Should Dennis Call You?"],
     ["material", "What Are You Bringing?"],
     ["quantity", "About How Much?"],
-    ["location", "Pickup Or Drop-Off?"],
+    ["location", "How Would You Like To Sell?"],
     ["email", "Want A Confirmation By Email?"]
-  ]);
+  ], "phone comes right after the name so a drop-off still leaves a number");
   const tiles = (name) => [...form.matchAll(new RegExp(`<input id="[^"]+" type="radio" name="${name}" value="([^"]+)"`, "g"))].map((match) => match[1]);
   assert.deepEqual(tiles("material"), ["scrap_silver", "silver_coins", "dental_material", "industrial_silver", "unknown"], "tiles post the endpoint's own material values");
   assert.deepEqual(tiles("quantity"), ["A few pieces", "A box or bag", "Business volume"]);
-  assert.deepEqual(tiles("location"), ["Pickup", "Drop-off"]);
+  // The seller chooses how to complete the sale; the shop is the buyer.
+  assert.deepEqual(tiles("location"), ["Bring it to the shop", "Dennis comes to me"]);
+  assert.match(form, />Bring It To The Shop<small>9125 Airport Blvd\.<\/small>/);
+  assert.match(form, />Dennis Comes To Me<small>For larger lots<\/small>/);
+  assert.doesNotMatch(form, /Pickup Or Drop-Off|Drop-off/i);
   assert.doesNotMatch(form, />\s*Gold\s*</, "no gold tile until the owner confirms gold in writing");
-  const typed = [...form.matchAll(/<input id="(first_name|last_name|phone|email)"[^>]*>/g)].map((match) => match[0]);
-  assert.equal(typed.length, 4, "one typed field per screen");
-  assert.match(typed[0], /name="first_name"[^>]*autocomplete="given-name"[^>]*required/);
-  assert.match(typed[1], /name="last_name"[^>]*autocomplete="family-name"[^>]*required/);
-  assert.match(typed[2], /name="phone"[^>]*type="tel"[^>]*required/);
-  assert.doesNotMatch(typed[3], /required/);
+  const nameStep = form.match(/data-flow-step="name">[\s\S]*?<\/fieldset>/)?.[0] || "";
+  assert.match(nameStep, /<input id="first_name" name="first_name"[^>]*autocomplete="given-name"[^>]*required/);
+  assert.match(nameStep, /<input id="last_name" name="last_name"[^>]*autocomplete="family-name"[^>]*required/);
+  const phone = form.match(/<input id="phone"[^>]*>/)?.[0] || "";
+  assert.match(phone, /type="tel"/);
+  assert.match(phone, /inputmode="tel"/);
+  assert.match(phone, /autocomplete="tel"/);
+  assert.match(phone, /maxlength="14"/, "(281) 898-2719 is fourteen characters");
+  assert.match(phone, /pattern="[^"]+"/, "the plain form also insists on a full US number");
+  assert.match(phone, /required/);
+  assert.doesNotMatch(form.match(/<input id="email"[^>]*>/)[0], /required/);
   assert.doesNotMatch(form, /<textarea|name="business"|name="pickup_date"|name="frequency"/);
   assert.doesNotMatch(form, />Required</, "nothing is labelled Required");
   assert.match(form, /No obligation\. Dennis calls you back\. Your number is saved as you go\./, "the visitor is told the number is saved before finishing");
   assert.doesNotMatch(form, /same day/i, "no response-time promise");
   assert.match(form, /data-submit-button>Get My Offer Call/);
   // Progress and step controls stay hidden until the script takes over, so the plain form is complete.
-  assert.match(form, /data-flow-progress[^>]*aria-valuenow="12"[^>]*hidden/);
+  assert.match(form, /data-flow-progress[^>]*aria-valuenow="14"[^>]*hidden/);
   assert.match(form, /data-flow-nav hidden/);
   assert.match(form, /action="\/api\/leads" method="post"/);
+  assert.match(form, /<div class="flow-stage field-wide" data-flow-stage>/);
+  assert.match(form, /privacy notice<\/a>/, "the privacy notice stays on the form");
 
   const privacyPage = readFileSync(join(dist, "privacy", "index.html"), "utf8");
   assert.match(privacyPage, /sent to AG Refining as you go, even if you do not finish/, "the privacy page discloses unfinished leads");
@@ -444,20 +490,14 @@ test("the pickup form is a one-field-per-screen flow that still works as a plain
   const css = readFileSync(join(dist, "style.css"), "utf8");
   // The old screen slides out while the new one slides in, about half a second, with a soft ease.
   assert.match(css, /@keyframes flow-step-in \{[\s\S]*?filter:\s*blur\(8px\);[\s\S]*?transform:\s*translateX\(3rem\)/);
-  assert.match(css, /@keyframes flow-step-out \{[\s\S]*?to \{[\s\S]*?filter:\s*blur\(8px\);\s*opacity:\s*0;\s*transform:\s*translateX\(-3rem\)/);
   assert.match(css, /\.flow-step\.is-entering \{\s*animation:\s*flow-step-in 500ms cubic-bezier\(0\.22, 1, 0\.36, 1\)/);
   assert.match(css, /\.flow-step\.is-leaving \{\s*animation:\s*flow-step-out 500ms cubic-bezier\(0\.22, 1, 0\.36, 1\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.review-form\[data-flow="ready"\] \.flow-step\.is-entering,[\s\S]*?\.flow-step\.is-leaving-back \{\s*animation:\s*none;/);
-  assert.match(form, /<div class="flow-stage field-wide" data-flow-stage>/);
 
-  // The form stands alone: no contact block beside or under it, one quiet call link at most.
-  for (const page of [contactPage, readFileSync(join(dist, "espanol", "index.html"), "utf8")]) {
-    const section = page.match(/<section class="section contact-section"[\s\S]*?<\/section>/)?.[0] || "";
-    assert.doesNotMatch(section, /contact-aside|expectation-rail|Prefer to Talk|Prefiere Hablar/i);
-    assert.equal((section.match(/href="tel:/g) || []).length, 1);
-    assert.match(section, /<p class="flow-call">/);
-  }
-  assert.match(css, /\.contact-form-column\.flow-portal \{[^}]*min-height:\s*calc\(100svh - var\(--header-height\) - 1\.5rem\)/, "on phones the question fills the screen");
+  const script = readFileSync(join(dist, "site.js"), "utf8");
+  assert.match(script, /function validPhone\(value\) \{\s*return \/\^\[2-9\]\\d\{2\}\[2-9\]\\d\{6\}\$\/\.test\(phoneDigits\(value\)\);/, "ten digits with a real area code and exchange");
+  assert.match(script, /next\.disabled = blocked;/, "Next stays off until the phone number is complete");
+  assert.match(script, /prefers-reduced-motion: reduce[\s\S]{0,400}AudioContext/, "sounds stay silent under reduced motion");
 });
 
 test("the map band is one static image with a directions link and no map service", () => {

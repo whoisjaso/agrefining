@@ -172,7 +172,7 @@ test("native success uses a private 303 receipt and GET does not redeliver", { c
   assert.match(receipt.body, /data-lead-result="success"/);
   assert.match(receipt.body, /<meta name="robots" content="noindex,nofollow">/);
   assert.match(receipt.body, /request (?:was )?received/i);
-  assert.match(receipt.body, /href="\/contact"/);
+  assert.match(receipt.body, /href="\/sell"/);
   assert.match(receipt.body, /href="tel:\+12818982719"/);
 });
 
@@ -188,7 +188,7 @@ test("Spanish native validation and delivery failure stay Spanish", { concurrenc
   assert.match(invalid.body, /<html lang="es">/);
   assert.match(invalid.body, /Revise los campos indicados/);
   assert.match(invalid.body, /correo electr[oó]nico v[aá]lido/i);
-  assert.match(invalid.body, /href="\/espanol#solicitud"/);
+  assert.match(invalid.body, /href="\/vender"/);
   assert.doesNotMatch(invalid.body, /Please review the highlighted fields/);
 
   const unavailable = await withDelivery({ apiKey: undefined }, () => invoke({
@@ -201,7 +201,7 @@ test("Spanish native validation and delivery failure stay Spanish", { concurrenc
   assert.equal(unavailable.statusCode, 503);
   assert.match(unavailable.body, /<html lang="es">/);
   assert.match(unavailable.body, /Enviar estos datos por correo/);
-  assert.match(unavailable.body, /href="\/espanol#solicitud"/);
+  assert.match(unavailable.body, /href="\/vender"/);
   assert.doesNotMatch(unavailable.body, /Online delivery is being set up/);
 });
 
@@ -257,7 +257,7 @@ test("content negotiation selects safe browser and JSON defaults", { concurrency
   });
   assert.equal(browserGet.statusCode, 405);
   assert.equal(browserGet.headers["content-type"], "text/html; charset=utf-8");
-  assert.match(browserGet.body, /href="\/espanol#solicitud"/);
+  assert.match(browserGet.body, /href="\/vender"/);
 
   const jsonGet = await invoke({ method: "GET", headers: { accept: "application/json" } });
   assert.equal(jsonGet.statusCode, 405);
@@ -275,7 +275,7 @@ test("oversized and malformed bodies stay recoverable", { concurrency: false }, 
   });
   assert.equal(oversizedHtml.statusCode, 413);
   assert.match(oversizedHtml.body, /href="tel:\+12818982719"/);
-  assert.match(oversizedHtml.body, /href="\/contact"/);
+  assert.match(oversizedHtml.body, /href="\/sell"/);
 
   const oversizedJson = await invoke({
     headers: { accept: "application/json", "content-type": "application/json", "content-length": "32001" },
@@ -290,7 +290,7 @@ test("oversized and malformed bodies stay recoverable", { concurrency: false }, 
   });
   assert.equal(malformedHtml.statusCode, 400);
   assert.match(malformedHtml.body, /href="tel:\+12818982719"/);
-  assert.match(malformedHtml.body, /href="\/contact"/);
+  assert.match(malformedHtml.body, /href="\/sell"/);
 
   const malformedJson = await invoke({
     headers: { accept: "application/json", "content-type": "application/json" },
@@ -471,13 +471,13 @@ test("an unfinished lead sends one Partial email and never a courtesy email", { 
   assert.match(sent[1].text, /Bringing: Silver Coins/);
   assert.match(sent[1].text, /Amount: A few pieces/);
 
-  const complete = await deliver({ ...base, material: "silver_coins", quantity: "A few pieces", location: "Drop-off" });
+  const complete = await deliver({ ...base, material: "silver_coins", quantity: "A few pieces", location: "Bring it to the shop" });
   assert.equal(complete.statusCode, 200);
   assert.equal(sent.length, 3, "the finished lead sends the normal owner email");
   assert.equal(keys[2], "session-abc");
   assert.match(sent[2].subject, /^Pickup request: Silver Coins from Maria Lopez$/);
   assert.match(sent[2].text, /Status: Complete/);
-  assert.match(sent[2].text, /Pickup or drop-off: Drop-off/);
+  assert.match(sent[2].text, /How they want to sell: Bring it to the shop/);
 });
 
 test("an unfinished lead without a usable phone is refused and sends nothing", { concurrency: false }, async () => {

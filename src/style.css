@@ -3299,42 +3299,199 @@ html[data-loader-state="ready"] .home-loader {
   min-height: 44px;
 }
 
-/* Phones: while the flow is active the question is the whole screen. */
-@media (max-width: 700px) {
-  .contact-form-column.flow-portal {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: calc(100svh - var(--header-height) - 1.5rem);
-    padding-bottom: 1.5rem;
-  }
+/* Tiles can carry a short second line. */
+.flow-tile span {
+  flex-direction: column;
+  gap: 0.2rem;
+}
 
-  .contact-form-column.flow-portal > .eyebrow,
-  .contact-form-column.flow-portal > h2 {
-    border: 0;
-    clip: rect(0 0 0 0);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    white-space: nowrap;
-    width: 1px;
-  }
+.flow-tile small {
+  font-size: 0.74rem;
+  font-weight: 520;
+  opacity: 0.72;
+}
 
-  .contact-form-column.flow-portal .review-form {
-    margin-top: 0;
-  }
+/* Two short fields side by side on the name screen. */
+.flow-pair {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 
-  .contact-form-column.flow-portal .flow-call {
-    margin-top: 1.5rem;
-    text-align: center;
-  }
+.flow-pair .field > label {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 620;
+}
 
-  /* Nothing follows the question on its screen: the section ends where the screen ends. */
-  .contact-section:has(.flow-portal) {
-    padding-bottom: 0;
+.flow-pair .field input {
+  font-size: 1.15rem;
+  min-height: 3.75rem;
+}
+
+.flow-next:disabled {
+  cursor: default;
+  opacity: 0.38;
+}
+
+/* Standalone sell portal: only the questions, a Close link and a slim map strip at the bottom. */
+.portal-page {
+  background: var(--canvas);
+}
+
+.portal {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 100svh;
+  position: relative;
+}
+
+.portal-close {
+  align-items: center;
+  color: var(--ink-soft);
+  display: inline-flex;
+  font-size: 0.72rem;
+  font-weight: 700;
+  gap: 0.55rem;
+  justify-self: end;
+  letter-spacing: 0.08em;
+  min-height: 44px;
+  margin: calc(0.5rem + var(--safe-top)) var(--gutter) 0;
+  text-transform: uppercase;
+}
+
+.portal-close span {
+  height: 0.8rem;
+  position: relative;
+  width: 0.8rem;
+}
+
+.portal-close span::before,
+.portal-close span::after {
+  background: currentColor;
+  content: "";
+  height: 1px;
+  left: 0;
+  position: absolute;
+  top: 50%;
+  width: 100%;
+}
+
+.portal-close span::before {
+  transform: rotate(45deg);
+}
+
+.portal-close span::after {
+  transform: rotate(-45deg);
+}
+
+.portal-body {
+  align-content: center;
+  display: grid;
+  margin: 0 auto;
+  max-width: 34rem;
+  min-height: 0;
+  padding: 1rem var(--gutter) 1.5rem;
+  width: 100%;
+}
+
+.portal-body .review-form {
+  margin-top: 0;
+}
+
+.portal-body .flow-call {
+  margin-top: 1.25rem;
+  text-align: center;
+}
+
+.portal-map {
+  display: block;
+  height: clamp(5.5rem, 15svh, 8.5rem);
+  overflow: hidden;
+  position: relative;
+}
+
+.portal-map picture,
+.portal-map img {
+  display: block;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  object-position: 50% 50%;
+  position: absolute;
+  width: 100%;
+}
+
+.portal-map-label {
+  align-items: center;
+  background: var(--paper);
+  bottom: calc(1.5rem + var(--safe-bottom));
+  box-shadow: var(--shadow-soft);
+  color: var(--navy);
+  display: flex;
+  font-size: 0.74rem;
+  gap: 0.75rem;
+  left: var(--gutter);
+  padding: 0.5rem 0.75rem;
+  position: absolute;
+}
+
+.portal-map-label b {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+}
+
+.portal .map-band-credit {
+  bottom: 0;
+  top: auto;
+}
+
+/* Locked to the screen (set by the script once the flow is running): the page itself never scrolls.
+   If a screen is ever taller than the space, only the question area scrolls. */
+html.portal-locked,
+html.portal-locked body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html.portal-locked .portal {
+  height: var(--portal-height, 100svh);
+  left: 0;
+  min-height: 0;
+  position: fixed;
+  top: var(--portal-top, 0px);
+  width: 100%;
+}
+
+html.portal-locked .portal-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Keyboard up, or a short screen: the map strip and the call link step aside for the question. */
+html.portal-locked .portal.is-typing .portal-map,
+html.portal-locked .portal.is-typing .map-band-credit,
+html.portal-locked .portal.is-typing .flow-call {
+  display: none;
+}
+
+@media (max-height: 640px) {
+  html.portal-locked .portal-map,
+  html.portal-locked .portal .map-band-credit {
+    display: none;
   }
+}
+
+/* Contact page: details and one action. */
+.contact-card {
+  display: grid;
+  gap: 0;
+}
+
+.contact-card .button {
+  margin-top: 2rem;
 }
 
 .flow-done {

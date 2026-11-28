@@ -71,7 +71,7 @@ const footerGroups = [
     ["Our Story", "/about"],
     ["How It Works", "/how-it-works"],
     ["Contact AG Refining", "/contact"],
-    ["Schedule a Free Pickup", "/contact?intent=pickup#get-paid"],
+    ["Schedule a Free Pickup", "/sell?intent=pickup"],
     ["(281) 898-2719", "tel:+12818982719"],
     ["dennis@agrefining.com", "mailto:dennis@agrefining.com"],
     ["FAQ", "/faq"],
@@ -113,7 +113,8 @@ const documents = walk(dist)
   .filter((path) => path.endsWith(".html") && !isPrivateApp(path))
   .sort()
   .map((path) => [relative(dist, path), readFileSync(path, "utf8")]);
-const englishDocuments = documents.filter(([, html]) => /<html lang="en">/.test(html));
+// The standalone sell portal has no header or footer by design.
+const englishDocuments = documents.filter(([, html]) => /<html lang="en">/.test(html) && !/class="portal-page"/.test(html));
 const expectedLinks = [["AG Refining", "/"], ...footerGroups.flatMap(([, links]) => links)];
 
 test("every English footer exposes the exhaustive canonical destination inventory exactly once", () => {
@@ -221,7 +222,7 @@ test("Spanish footer preserves localized contact actions and identifies English 
     ]
   );
   assert.match(footer, />Programar Una Recogida Gratis<\/a>/);
-  assert.match(footer, /href="#solicitud"/);
+  assert.match(footer, /href="\/vender"/);
   assert.doesNotMatch(footer, /href="\/contact\?intent=pickup"/);
   for (const anchor of footer.matchAll(/<a\b([^>]*)>/g)) {
     const attributes = anchor[1];

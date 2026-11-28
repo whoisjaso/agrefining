@@ -266,6 +266,35 @@ async function verifyMobileChrome(browser, baseUrl) {
     root: "rgb(241, 237, 228)",
     body: "rgb(241, 237, 228)"
   });
+
+  // The sell portal: no site chrome, locked to the screen, strict phone field.
+  await page.evaluate(() => { try { window.localStorage.clear(); } catch { /* storage may be blocked */ } });
+  await page.goto(`${baseUrl}/sell/?intent=pickup`, { waitUntil: "load" });
+  await page.waitForFunction(() => document.documentElement.classList.contains("portal-locked"));
+  const portal = await page.evaluate(() => ({
+    chrome: Boolean(document.querySelector("header, footer, [data-site-header], .mobile-actions, .brand")),
+    overflow: getComputedStyle(document.body).overflow,
+    scrollable: document.documentElement.scrollHeight - window.innerHeight,
+    height: Math.round(document.querySelector(".portal").getBoundingClientRect().height),
+    visible: [...document.querySelectorAll("[data-flow-step]")].filter((step) => !step.hidden).map((step) => step.dataset.flowStep)
+  }));
+  assert.deepEqual(portal, { chrome: false, overflow: "hidden", scrollable: 0, height: 844, visible: ["name"] });
+  await page.evaluate(() => window.scrollTo(0, 400));
+  assert.equal(await page.evaluate(() => window.scrollY), 0, "the portal page must not scroll");
+  await page.fill("#first_name", "Test");
+  await page.press("#first_name", "Enter");
+  assert.equal(await page.evaluate(() => document.activeElement.id), "last_name", "Enter moves from first to last name");
+  await page.fill("#last_name", "Person");
+  await page.press("#last_name", "Enter");
+  await page.waitForFunction(() => !document.querySelector("[data-flow-step='phone']").hidden);
+  assert.equal(await page.locator("[data-flow-next]").isDisabled(), true, "Next stays off until the phone is complete");
+  await page.locator("#phone").pressSequentially("+1 (281) 55x5-01");
+  assert.equal(await page.inputValue("#phone"), "(281) 555-01", "letters are blocked and +1 is stripped");
+  assert.equal(await page.locator("[data-flow-next]").isDisabled(), true);
+  await page.locator("#phone").pressSequentially("449999");
+  assert.equal(await page.inputValue("#phone"), "(281) 555-0144", "the number stops at ten digits");
+  assert.equal(await page.locator("[data-flow-next]").isDisabled(), false);
+  await page.evaluate(() => { try { window.localStorage.clear(); } catch { /* storage may be blocked */ } });
   await context.close();
 }
 

@@ -62,9 +62,12 @@ const COPY = {
     optional: "Optional",
     stepMaterial: "What Are You Bringing?",
     stepAmount: "About How Much?",
-    stepPickup: "Pickup Or Drop-Off?",
-    stepFirst: "What Is Your First Name?",
-    stepLast: "And Your Last Name?",
+    stepSale: "How Would You Like To Sell?",
+    saleLabels: ["Bring It To The Shop", "Dennis Comes To Me"],
+    saleNotes: ["9125 Airport Blvd.", "For larger lots"],
+    firstShort: "First",
+    lastShort: "Last",
+    stepName: "What Is Your Full Name?",
     stepPhone: "Where Should Dennis Call You?",
     stepEmail: "Want A Confirmation By Email?",
     firstName: "First name",
@@ -107,9 +110,12 @@ const COPY = {
     optional: "Opcional",
     stepMaterial: "¿Qué Va A Traer?",
     stepAmount: "¿Cuánto, Más O Menos?",
-    stepPickup: "¿Recogida O Entrega?",
-    stepFirst: "¿Cuál Es Su Nombre?",
-    stepLast: "¿Y Su Apellido?",
+    stepSale: "¿Cómo Prefiere Vender?",
+    saleLabels: ["Llevarlo A La Tienda", "Dennis Viene A Mí"],
+    saleNotes: ["9125 Airport Blvd.", "Para lotes grandes"],
+    firstShort: "Nombre",
+    lastShort: "Apellido",
+    stepName: "¿Cuál Es Su Nombre Completo?",
     stepPhone: "¿A Dónde Le Llama Dennis?",
     stepEmail: "¿Quiere Confirmación Por Correo?",
     firstName: "Nombre",
@@ -249,7 +255,8 @@ export function renderReviewForm({
     return tile("material", exact, copy.tiles[key], group.includes(material), `material-${key}`, `${index === 0 ? " required" : ""} data-tile="${key}" data-default="${fallback}"${materialState.attrs && index === 0 ? materialState.attrs : ""}`);
   }).join("");
   const amountTiles = copy.amounts.map((value, index) => tile("quantity", value, copy.amountLabels[index], clean.quantity === value, `quantity-${index + 1}`, ` data-tile="amount-${index + 1}"`)).join("");
-  const pickupTiles = ["Pickup", "Drop-off"].map((value, index) => tile("location", value, copy.pickupLabels[index], clean.location === value, `location-${index + 1}`, ` data-tile="${index === 0 ? "pickup" : "dropoff"}"`)).join("");
+  // The seller chooses how to complete the sale: bring it in, or have the buyer come out for a larger lot.
+  const pickupTiles = ["Bring it to the shop", "Dennis comes to me"].map((value, index) => tile("location", value, `${copy.saleLabels[index]}<small>${copy.saleNotes[index]}</small>`, clean.location === value, `location-${index + 1}`, ` data-tile="${index === 0 ? "shop" : "visit"}"`)).join("");
   const nameParts = String(clean.name || "").trim().split(/\s+/).filter(Boolean);
   const firstName = clean.first_name || nameParts[0] || "";
   const lastName = clean.last_name || nameParts.slice(1).join(" ");
@@ -261,20 +268,19 @@ export function renderReviewForm({
     <input type="hidden" name="intent" value="${escapeHtml(intent)}">
     <input type="hidden" name="form_started" value="${escapeHtml(clean.form_started || "")}">
     <input type="hidden" name="submission_key" value="${escapeHtml(clean.submission_key || "")}">
-    <div class="flow-progress field-wide" data-flow-progress role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="12" aria-label="${language === "es" ? "Progreso" : "Progress"}" hidden><span data-flow-bar style="width:12%"></span></div>
+    <div class="flow-progress field-wide" data-flow-progress role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="14" aria-label="${language === "es" ? "Progreso" : "Progress"}" hidden><span data-flow-bar style="width:14%"></span></div>
     <p class="flow-affirm field-wide" data-flow-affirm aria-live="polite" hidden></p>
     <div class="flow-stage field-wide" data-flow-stage>
-    <fieldset class="flow-step field-wide" data-flow-step="first_name">
-      <legend tabindex="-1"><label for="first_name">${copy.stepFirst}</label></legend>
-      <div class="field"><input id="first_name" name="first_name" type="text" autocomplete="given-name" autocapitalize="words" aria-label="${copy.firstName}" value="${escapeHtml(firstName)}" required${nameState.attrs}>${nameState.error}</div>
-    </fieldset>
-    <fieldset class="flow-step field-wide" data-flow-step="last_name">
-      <legend tabindex="-1"><label for="last_name">${copy.stepLast}</label></legend>
-      <div class="field"><input id="last_name" name="last_name" type="text" autocomplete="family-name" autocapitalize="words" aria-label="${copy.lastName}" value="${escapeHtml(lastName)}" required></div>
+    <fieldset class="flow-step field-wide" data-flow-step="name">
+      <legend tabindex="-1">${copy.stepName}</legend>
+      <div class="flow-pair">
+        <div class="field"><label for="first_name">${copy.firstShort}</label><input id="first_name" name="first_name" type="text" autocomplete="given-name" autocapitalize="words" enterkeyhint="next" value="${escapeHtml(firstName)}" required${nameState.attrs}>${nameState.error}</div>
+        <div class="field"><label for="last_name">${copy.lastShort}</label><input id="last_name" name="last_name" type="text" autocomplete="family-name" autocapitalize="words" enterkeyhint="next" value="${escapeHtml(lastName)}" required></div>
+      </div>
     </fieldset>
     <fieldset class="flow-step field-wide" data-flow-step="phone">
       <legend tabindex="-1"><label for="phone">${copy.stepPhone}</label></legend>
-      <div class="field"><input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" aria-label="${copy.phone}" value="${escapeHtml(clean.phone || "")}" required${phoneState.attrs}>${phoneState.error}</div>
+      <div class="field"><input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" enterkeyhint="next" maxlength="14" placeholder="(281) 000-0000" pattern="\\(?[2-9][0-9]{2}\\)?[ .\\-]?[2-9][0-9]{2}[ .\\-]?[0-9]{4}" aria-label="${copy.phone}" value="${escapeHtml(clean.phone || "")}" required${phoneState.attrs}>${phoneState.error}</div>
       <p class="flow-reassure">${copy.reassure}</p>
     </fieldset>
     <fieldset class="flow-step field-wide" data-flow-step="material">
@@ -287,7 +293,7 @@ export function renderReviewForm({
       <div class="flow-tiles">${amountTiles}</div>
     </fieldset>
     <fieldset class="flow-step field-wide" data-flow-step="location">
-      <legend tabindex="-1">${copy.stepPickup}</legend>
+      <legend tabindex="-1">${copy.stepSale}</legend>
       <div class="flow-tiles flow-tiles-two">${pickupTiles}</div>
     </fieldset>
     <fieldset class="flow-step field-wide" data-flow-step="email">

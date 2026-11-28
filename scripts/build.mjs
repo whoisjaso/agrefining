@@ -973,7 +973,7 @@ function renderNav(locale = "en", homepage = false) {
         <a href="/service-areas" hreflang="en">Áreas de servicio ${languageNote}</a>
         <a href="/how-it-works" hreflang="en">Cómo funciona ${languageNote}</a>
         <a href="/about" hreflang="en">Nuestra historia ${languageNote}</a>
-        <a class="button button-primary nav-review" href="#solicitud">${spanishPrimaryCta} ${arrow}</a>
+        <a class="button button-primary nav-review" href="/vender">${spanishPrimaryCta} ${arrow}</a>
         <a class="nav-call" href="tel:${phoneHref}">Llame al ${phoneDisplay}</a>`
     : `
         ${renderMaterialsDisclosure()}
@@ -1114,7 +1114,7 @@ const spanishFooterNavigationGroups = [
       [`Nuestra historia ${languageNote}`, "/about"],
       [`Cómo funciona ${languageNote}`, "/how-it-works"],
       [`Contacto AG Refining ${languageNote}`, "/contact"],
-      [spanishPrimaryCta, "#solicitud"],
+      [spanishPrimaryCta, "/vender"],
       [phoneDisplay, `tel:${phoneHref}`],
       [email, `mailto:${email}`],
       [`Preguntas Frecuentes ${languageNote}`, "/faq"],
@@ -1178,7 +1178,7 @@ function renderMaterialGuide(locale = "en") {
       <h2>Comience con el material.</h2>
       <a href="/accepted-materials" hreflang="en">Vea lo que compramos ${languageNote} ${arrow}</a>
       <a href="/how-it-works" hreflang="en">Vea cómo funciona la recogida ${languageNote} ${arrow}</a>
-      <a href="#solicitud">Solicite una revisión ${arrow}</a>
+      <a href="/vender">Solicite una revisión ${arrow}</a>
       <a href="tel:${phoneHref}">Llame al ${phoneDisplay}</a>
     </div>
   </details>`;
@@ -1201,8 +1201,8 @@ function renderMaterialGuide(locale = "en") {
 function renderMobileActions(locale = "en", content = "") {
   const spanishPage = locale === "es";
   const pageLink = content.match(/href="(\/contact\?intent=pickup(?:&(?:amp;)?material=[a-z_]+)?)"/)?.[1];
-  // "#get-paid" opens the contact page already scrolled to the form, so visitors never hunt for it.
-  const href = spanishPage ? "#solicitud" : `${pageLink || "/contact?intent=pickup"}#get-paid`;
+  // The pill opens the standalone portal, with the page's material already chosen.
+  const href = spanishPage ? "/vender" : (pageLink || "/contact?intent=pickup").replace("/contact?", "/sell?");
   const label = spanishPage ? "Reciba Su Pago" : "Get Paid";
   return `<nav class="mobile-actions get-paid-dock" aria-label="${spanishPage ? "Acciones rápidas" : "Quick actions"}" data-visible="false" aria-hidden="true" inert><a class="get-paid-pill" href="${href}"><span class="get-paid-sheen" aria-hidden="true"></span><span class="get-paid-label">${label}</span><span class="get-paid-arrow" aria-hidden="true"><i></i><i></i><i></i><svg viewBox="0 0 20 20" width="18" height="18"><path d="M3 10h12m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a></nav>`;
 }
@@ -1401,6 +1401,7 @@ function document({
   image = "ag-silver-social.webp",
   robots = "index,follow,max-image-preview:large",
   materialGuide = true,
+  chrome = true,
   moduleScripts = [],
   pageType = "WebPage",
   datePublished = firstPublished,
@@ -1473,29 +1474,29 @@ function document({
     ${schemaTag({ "@context": "https://schema.org", "@graph": schema })}
   </head>
   <body data-design="silver-atelier"${homepage ? ' id="top"' : ""}${bodyClass ? ` class="${bodyClass}"` : ""}>
-    <a class="skip" href="#main">${locale === "es" ? "Saltar al contenido" : "Skip to content"}</a>
+    ${chrome ? `<a class="skip" href="#main">${locale === "es" ? "Saltar al contenido" : "Skip to content"}</a>` : ""}
     ${homepage ? renderHomeLoader() : ""}
-    ${renderNav(locale, homepage)}
+    ${chrome ? renderNav(locale, homepage) : ""}
     <main id="main">${content}</main>
-    ${renderMobileActions(locale, content)}
-    ${renderFooter(locale)}
-    ${materialGuide ? renderMaterialGuide(locale) : ""}
+    ${chrome ? renderMobileActions(locale, content) : ""}
+    ${chrome ? renderFooter(locale) : ""}
+    ${chrome && materialGuide ? renderMaterialGuide(locale) : ""}
     <script src="/site.js?v=20260804-hero-v2" defer></script>
     ${homepage ? '<script src="/home-header-reveal.js?v=20261126-header" defer></script>' : ""}
     ${homepage ? '<script type="module" src="/home-loader.js?v=20260813-loader"></script>' : ""}
-    <script type="module" src="/materials-disclosure.js?v=20260810-materials"></script>
+    ${chrome ? '<script type="module" src="/materials-disclosure.js?v=20260810-materials"></script>' : ""}
     ${moduleScripts.map((src) => `<script type="module" src="${src}"></script>`).join("\n    ")}
   </body>
 </html>`, locale), locale);
 }
 
-// Every pickup call to action lands on the form itself: "/contact?intent=pickup..." gains "#get-paid"
-// (English) and the Spanish page keeps "#solicitud". site.js smooth-scrolls when already on that page.
+// Every pickup call to action opens the standalone portal: "/contact?intent=pickup..." becomes
+// "/sell?intent=pickup..." (the material, if any, rides along). Spanish pages link to "/vender".
 function withFormAnchor(html, locale = "en") {
   if (locale === "es") return html;
   return html
-    .replace(/href="(\/contact\?intent=pickup[^"#]*)"/g, 'href="$1#get-paid"')
-    .replace('<form class="intake-panel" action="/contact" method="get"', '<form class="intake-panel" action="/contact#get-paid" method="get"');
+    .replace(/href="\/contact\?(intent=(?:pickup|quote)[^"#]*)"/g, 'href="/sell?$1"')
+    .replace('<form class="intake-panel" action="/contact" method="get"', '<form class="intake-panel" action="/sell" method="get"');
 }
 
 // Full-bleed map band. One static, muted street map image kept in the repo (no map service, no key),
@@ -1521,6 +1522,31 @@ function renderMapBand() {
       <a class="phone-link map-band-call" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
       <p class="location-note">Please call before visiting.</p>
     </div>
+    <p class="map-band-credit">Map data <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a></p>
+  </section>`;
+}
+
+// Standalone sell portal: only the questions, a Close link, and a slim map strip at the very bottom.
+// No header, menu, logo bar, footer or other sections. site.js locks it to the screen on phones.
+function renderPortal(locale = "en") {
+  const es = locale === "es";
+  const destination = `${street}, ${cityLine}`;
+  const directions = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${siteName}, ${destination}`)}`;
+  return `<section class="portal" data-portal>
+    <a class="portal-close" href="${es ? "/espanol" : "/"}"${es ? "" : ""} aria-label="${es ? "Cerrar y volver al sitio" : "Close and go back to the site"}">${es ? "Cerrar" : "Close"}<span aria-hidden="true"></span></a>
+    <div id="${es ? "solicitud" : "get-paid"}" class="portal-body">
+      <h1 class="visually-hidden">${es ? "Venda Su Plata a AG Refining" : "Sell Your Silver to AG Refining"}</h1>
+      ${renderReviewForm({ locale })}
+      <p class="flow-call"><a class="phone-link" href="tel:${phoneHref}">${es ? `O llame al ${phoneDisplay}` : `Or call ${phoneDisplay}`}</a></p>
+    </div>
+    <a class="portal-map" href="${directions}" target="_blank" rel="noopener" data-directions data-destination="${destination}" data-place="${siteName}" aria-label="${es ? "Cómo llegar a" : "Get directions to"} ${siteName}, ${destination}">
+      <picture>
+        <source media="(max-width: 700px)" srcset="/images/ag-refining-map-hobby-airport-mobile.webp" width="1100" height="1100">
+        <img src="/images/ag-refining-map-hobby-airport.webp" alt="" width="2560" height="1100" decoding="async">
+      </picture>
+      <span class="map-band-pin" aria-hidden="true"></span>
+      <span class="portal-map-label"><span>${street}</span><b>${es ? "Cómo llegar" : "Directions"}</b></span>
+    </a>
     <p class="map-band-credit">Map data <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a></p>
   </section>`;
 }
@@ -2552,11 +2578,35 @@ writeFileSync(join(out, "about", "index.html"), document({
 }));
 
 const contact = `
-  <section class="page-hero page-intro page-intro-contact"><div class="shell">${breadcrumbs([["Home", "/"], ["Contact", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Schedule pickup</p><h1>Tell us what silver you have.</h1></div><p>Share the material, amount, and location. We will confirm whether it qualifies and explain the next step.</p></div></div></section>
+  <section class="page-hero page-intro page-intro-contact"><div class="shell">${breadcrumbs([["Home", "/"], ["Contact", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Contact</p><h1>Talk to AG Refining.</h1></div><p>Call, write, or answer a few quick questions and Dennis will call you back.</p></div></div></section>
   <section class="section contact-section"><div class="shell contact-grid contact-grid-solo">
-    <div id="get-paid" class="contact-form-column"><p class="eyebrow">A few quick questions</p><h2>Start with a few details.</h2>${renderReviewForm({ locale: "en" })}<p class="flow-call"><a class="phone-link" href="tel:${phoneHref}">Or call ${phoneDisplay}</a></p></div>
+    <div class="contact-card">
+      <a class="contact-line" href="tel:${phoneHref}"><span>Phone</span><strong>${phoneDisplay}</strong></a>
+      <a class="contact-line" href="mailto:${email}"><span>Email</span><strong>${email}</strong></a>
+      <div class="contact-line"><span>Address</span><strong>${street}<br>${cityLine}</strong></div>
+      <div class="contact-line"><span>Hours</span><strong>${openingHours.map((row) => `${row.label} ${row.display}`).join("<br>")}<br>Sunday closed</strong></div>
+      <a class="button button-primary" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
+    </div>
   </div></section>
   ${renderMapBand()}`;
+for (const [slug, lang, title, description] of [
+  ["sell", "en", "Sell Your Silver | AG Refining", "Answer a few quick questions and Dennis at AG Refining in Houston will call you back about your silver."],
+  ["vender", "es", "Venda Su Plata | AG Refining", "Responda unas preguntas rápidas y Dennis de AG Refining en Houston le devuelve la llamada sobre su plata."]
+]) {
+  mkdirSync(join(out, slug), { recursive: true });
+  writeFileSync(join(out, slug, "index.html"), document({
+    title,
+    description,
+    path: slug,
+    lang,
+    content: renderPortal(lang),
+    bodyClass: "portal-page",
+    chrome: false,
+    // A utility page for visitors already on the site; search engines should land on real pages.
+    robots: "noindex,follow"
+  }));
+}
+
 mkdirSync(join(out, "contact"), { recursive: true });
 writeFileSync(join(out, "contact", "index.html"), document({
   title: "Schedule Silver Pickup in Houston | Contact AG Refining",
@@ -2574,10 +2624,7 @@ const spanish = `
     <article><h2>Condiciones de pago</h2><p>El plazo de pago se confirma con la oferta y depende del material aprobado y de la transacción.</p></article>
     <article><h2>Llame primero</h2><p>No envíe material ni visite sin confirmar el siguiente paso. Llame al ${phoneDisplay}.</p></article>
   </div></section>
-  <section class="conversion-band"><div class="shell"><p class="eyebrow">Comience hoy</p><h2>Solicite una recogida.</h2><a class="button button-inverse" href="#solicitud">Enviar solicitud ${arrow}</a></div></section>
-  <section class="section contact-section"><div class="shell contact-grid contact-grid-solo">
-    <div id="solicitud" class="contact-form-column"><p class="eyebrow">Unas preguntas rápidas</p><h2>Comience con algunos datos.</h2>${renderReviewForm({ locale: "es" })}<p class="flow-call"><a class="phone-link" href="tel:${phoneHref}">O llame al ${phoneDisplay}</a></p></div>
-  </div></section>`;
+  <section class="conversion-band"><div class="shell"><p class="eyebrow">Comience hoy</p><h2>Solicite una recogida.</h2><p>Unas preguntas rápidas y Dennis le devuelve la llamada.</p><a class="button button-inverse" href="/vender">${spanishPrimaryCta} ${arrow}</a></div></section>`;
 mkdirSync(join(out, "espanol"), { recursive: true });
 writeFileSync(join(out, "espanol", "index.html"), document({
   title: "Comprador de Plata en Houston | AG Refining",
@@ -2590,7 +2637,7 @@ writeFileSync(join(out, "espanol", "index.html"), document({
 const privacy = `
   <section class="page-hero page-intro"><div class="shell">${breadcrumbs([["Home", "/"], ["Privacy", null]])}<div class="page-intro-grid"><div><p class="eyebrow">Privacy</p><h1>How we handle website requests.</h1></div><p>This page explains the information collected through the AG Refining website.</p></div></div></section>
   <section class="section"><div class="shell legal-grid"><nav aria-label="Privacy sections"><a href="#collect">What we collect</a><a href="#use">How we use it</a><a href="#avoid">What not to send</a><a href="#contact-privacy">Contact</a></nav><div>
-    <section id="collect"><h2>What we collect</h2><p>The pickup form asks for your first and last name, phone, what you are bringing, about how much, whether you want pickup or drop-off, and an optional email. Your answers are kept in your own browser so you can pick up where you left off. Once you enter a phone number, your answers so far are sent to AG Refining as you go, even if you do not finish, so we can call you back. The site also attaches the form page, first landing page, referring page, and supported campaign or ad identifiers to your form details. These website attribution fields are sent with your request to help AG Refining understand how you found the site.</p></section>
+    <section id="collect"><h2>What we collect</h2><p>The pickup form asks for your first and last name, phone, what you are bringing, about how much, how you would like to sell, and an optional email. Your answers are kept in your own browser so you can pick up where you left off. Once you enter a phone number, your answers so far are sent to AG Refining as you go, even if you do not finish, so we can call you back. The site also attaches the form page, first landing page, referring page, and supported campaign or ad identifiers to your form details. These website attribution fields are sent with your request to help AG Refining understand how you found the site.</p></section>
     <section id="use"><h2>How we use it</h2><p>AG Refining uses the information to review your request, contact you, plan a possible pickup, and improve the website. When you finish the form and gave an email, we send you one confirmation that your request was received. We do not promise a quote or pickup from a form submission alone.</p></section>
     <section id="avoid"><h2>What not to send</h2><p>Do not send patient records, passwords, financial account data, identity documents, controlled records, or other sensitive information through the public form.</p></section>
     <section id="contact-privacy"><h2>Contact</h2><p>Questions can be sent to <a href="mailto:${email}">${email}</a> or discussed by phone at <a href="tel:${phoneHref}">${phoneDisplay}</a>.</p></section>

@@ -213,12 +213,10 @@ const formUi = {
     networkError: "The request could not be sent. Please call (281) 898-2719 or try again.",
     submit: "Get My Offer Call",
     flowBlank: "Please type your answer to continue.",
-    flowPhone: "Please add a phone number Dennis can call.",
+    flowPhone: "Please enter a complete 10-digit phone number.",
     flowPick: "Please pick one to continue.",
     affirmFirst: (name) => (name ? `Nice to meet you, ${name}.` : ""),
     affirm: {
-      first_name: "",
-      last_name: "Thank you.",
       phone: "Got it. Dennis can reach you now.",
       silver: "Nice. Silver is our specialty.",
       coins: "Good. We buy coins and bullion.",
@@ -228,11 +226,11 @@ const formUi = {
       "amount-1": "Perfect. Small lots are welcome.",
       "amount-2": "Perfect. We handle that size.",
       "amount-3": "Perfect. We handle business volume.",
-      pickup: "Good. We will confirm pickup on the call.",
-      dropoff: "Good. Dennis will set a time with you."
+      shop: "Good. Dennis will set a time for your visit.",
+      visit: "Good. Dennis will confirm the details on the call."
     },
     doneHeading: "Thank You. Your Request Is In.",
-    doneSteps: ["Dennis calls the number you gave.", "You tell him what you have.", "He confirms a pickup or a time to come by."],
+    doneSteps: ["Dennis calls the number you gave.", "You tell him what you have.", "He sets a time for your visit or comes to you."],
     doneCall: "Call (281) 898-2719",
     doneNote: "No obligation.",
     subject: (intent) => `AG Refining ${intent === "quote" ? "quote" : "pickup"} request`,
@@ -253,12 +251,10 @@ const formUi = {
     networkError: "No se pudo enviar la solicitud. Llame al (281) 898-2719 o inténtelo de nuevo.",
     submit: "Reciba Mi Llamada",
     flowBlank: "Escriba su respuesta para continuar.",
-    flowPhone: "Agregue un teléfono al que Dennis pueda llamar.",
+    flowPhone: "Escriba un teléfono completo de 10 dígitos.",
     flowPick: "Elija una opción para continuar.",
     affirmFirst: (name) => (name ? `Mucho gusto, ${name}.` : ""),
     affirm: {
-      first_name: "",
-      last_name: "Gracias.",
       phone: "Listo. Dennis ya puede llamarle.",
       silver: "Muy bien. La plata es nuestra especialidad.",
       coins: "Bien. Compramos monedas y lingotes.",
@@ -268,11 +264,11 @@ const formUi = {
       "amount-1": "Perfecto. Los lotes pequeños son bienvenidos.",
       "amount-2": "Perfecto. Manejamos ese tamaño.",
       "amount-3": "Perfecto. Manejamos volumen de negocio.",
-      pickup: "Bien. Confirmamos la recogida en la llamada.",
-      dropoff: "Bien. Dennis acordará una hora con usted."
+      shop: "Bien. Dennis acordará una hora para su visita.",
+      visit: "Bien. Dennis confirma los detalles en la llamada."
     },
     doneHeading: "Gracias. Recibimos Su Solicitud.",
-    doneSteps: ["Dennis llama al número que nos dio.", "Usted le cuenta qué tiene.", "Él confirma una recogida o una hora para venir."],
+    doneSteps: ["Dennis llama al número que nos dio.", "Usted le cuenta qué tiene.", "Él acuerda una hora para su visita o va a usted."],
     doneCall: "Llame al (281) 898-2719",
     doneNote: "Sin compromiso.",
     subject: () => "Solicitud de recogida de AG Refining",
@@ -488,7 +484,128 @@ function clearFlowStore() {
   try { window.localStorage.removeItem(FLOW_STORE); } catch { /* storage can be blocked; the form still works */ }
 }
 
-// One-field-per-screen flow. Without this script the form is a plain stacked form.
+// Strict US phone: digits only, ten of them, shown as (281) 898-2719 while typing.
+function phoneDigits(value) {
+  let digits = String(value || "").replace(/\D/g, "");
+  // Drop a leading country code: +1 or 1.
+  if (digits.length > 10 && digits.startsWith("1")) digits = digits.slice(1);
+  else if (digits.startsWith("1")) digits = digits.slice(1);
+  return digits.slice(0, 10);
+}
+
+function formatPhone(digits) {
+  if (digits.length === 0) return "";
+  if (digits.length < 4) return `(${digits}`;
+  if (digits.length < 7) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
+// Complete and plausible: ten digits, area code and exchange both starting 2 to 9.
+function validPhone(value) {
+  return /^[2-9]\d{2}[2-9]\d{6}$/.test(phoneDigits(value));
+}
+
+function bindPhoneInput(input) {
+  if (!input) return;
+  const apply = () => {
+    const before = input.value;
+    const caret = input.selectionStart ?? before.length;
+    const digitsBeforeCaret = before.slice(0, caret).replace(/\D/g, "").length;
+    const formatted = formatPhone(phoneDigits(before));
+    if (formatted === before) return;
+    input.value = formatted;
+    // Keep the cursor after the same digit it was after before formatting.
+    let position = 0;
+    let seen = 0;
+    while (position < formatted.length && seen < digitsBeforeCaret) {
+      if (/\d/.test(formatted[position])) seen += 1;
+      position += 1;
+    }
+    if (digitsBeforeCaret >= formatted.replace(/\D/g, "").length) position = formatted.length;
+    try { input.setSelectionRange(position, position); } catch { /* some keyboards do not allow it */ }
+  };
+  input.addEventListener("beforeinput", (event) => {
+    // Block anything that is not a digit; pasted text is cleaned by the input handler.
+    if (event.inputType === "insertText" && event.data && /\D/.test(event.data)) event.preventDefault();
+  });
+  input.addEventListener("input", apply);
+  apply();
+}
+
+// Quiet interface sounds, built with Web Audio: a soft tick on Next, a fuller chime on submit.
+// They only ever play after a tap or key press, stay silent under reduced motion, follow the phone's
+// silent switch (Web Audio is muted by it), and any failure is swallowed.
+const flowSound = (() => {
+  let context = null;
+  const quiet = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function ready() {
+    if (quiet()) return null;
+    try {
+      const AudioCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtor) return null;
+      if (!context) context = new AudioCtor();
+      if (context.state === "suspended") context.resume().catch(() => {});
+      return context;
+    } catch {
+      return null;
+    }
+  }
+  function tone(audio, { frequency, start, length, peak, type = "sine", glide = 0 }) {
+    const oscillator = audio.createOscillator();
+    const gain = audio.createGain();
+    const at = audio.currentTime + start;
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, at);
+    if (glide) oscillator.frequency.exponentialRampToValueAtTime(frequency * glide, at + length);
+    gain.gain.setValueAtTime(0.0001, at);
+    gain.gain.exponentialRampToValueAtTime(peak, at + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, at + length);
+    oscillator.connect(gain).connect(audio.destination);
+    oscillator.start(at);
+    oscillator.stop(at + length + 0.02);
+  }
+  return {
+    tick() {
+      try {
+        const audio = ready();
+        if (audio) tone(audio, { frequency: 1250, start: 0, length: 0.07, peak: 0.035, type: "triangle", glide: 0.7 });
+      } catch { /* sound is optional */ }
+    },
+    chime() {
+      try {
+        const audio = ready();
+        if (!audio) return;
+        tone(audio, { frequency: 659.25, start: 0, length: 0.5, peak: 0.05 });
+        tone(audio, { frequency: 987.77, start: 0.11, length: 0.7, peak: 0.045 });
+      } catch { /* sound is optional */ }
+    }
+  };
+})();
+
+// Standalone portal: on phones the page is locked to the visible screen and never scrolls. When the
+// keyboard opens, the portal shrinks to the space above it and the map strip steps aside.
+function lockPortal(portal) {
+  if (!portal) return;
+  const root = document.documentElement;
+  root.classList.add("portal-locked");
+  const viewport = window.visualViewport;
+  let tallest = viewport ? viewport.height : window.innerHeight;
+  const fit = () => {
+    const height = viewport ? viewport.height : window.innerHeight;
+    tallest = Math.max(tallest, height);
+    root.style.setProperty("--portal-height", `${Math.round(height)}px`);
+    root.style.setProperty("--portal-top", `${Math.round(viewport ? viewport.offsetTop : 0)}px`);
+    // Much shorter than the full screen means the keyboard is up.
+    portal.classList.toggle("is-typing", height < tallest * 0.78);
+    if (window.scrollY !== 0) window.scrollTo(0, 0);
+  };
+  fit();
+  viewport?.addEventListener("resize", fit);
+  viewport?.addEventListener("scroll", fit);
+  window.addEventListener("orientationchange", () => { tallest = 0; window.setTimeout(fit, 250); });
+}
+
+// One-question-per-screen flow. Without this script the form is a plain stacked form.
 // Answers are kept in this browser so a returning visitor resumes where they stopped. Once a valid
 // phone is in, an unfinished lead is posted so the shop can call people who stop part way.
 function initializeFormFlow(form) {
@@ -505,22 +622,30 @@ function initializeFormFlow(form) {
   const names = steps.map((step) => step.dataset.flowStep);
   const phoneIndex = names.indexOf("phone");
   const last = steps.length - 1;
-  const textInput = (step) => step.querySelector("input[type='text'], input[type='tel'], input[type='email']");
+  const typedSelector = "input[type='text'], input[type='tel'], input[type='email']";
+  // The spam trap is a text field too; it is never one of the visitor's answers.
+  const textInputs = (step) => Array.from(step.querySelectorAll(typedSelector)).filter((input) => input.name !== "company_url");
+  const textInput = (step) => textInputs(step)[0];
+  const phoneInput = form.elements.namedItem("phone");
   let current = 0;
   let furthest = 0;
   let partialSent = false;
   let leftSent = false;
   let leaveTimer = 0;
 
-  const digits = (value) => String(value || "").replace(/\D/g, "").length;
+  bindPhoneInput(phoneInput);
+
   function stepProblem(index) {
     const step = steps[index];
-    const input = textInput(step);
-    if (!input) return step.querySelector("input[type='radio']:checked") ? "" : formUi.flowPick;
-    const value = input.value.trim();
-    if (input.name === "phone") return digits(value) >= 7 ? "" : formUi.flowPhone;
-    if (input.name === "email") return !value || input.checkValidity() ? "" : formUi.invalidEmail;
-    return value ? "" : formUi.flowBlank;
+    const inputs = textInputs(step);
+    if (!inputs.length) return step.querySelector("input[type='radio']:checked") ? "" : formUi.flowPick;
+    for (const input of inputs) {
+      const value = input.value.trim();
+      if (input.name === "phone") { if (!validPhone(value)) return formUi.flowPhone; }
+      else if (input.name === "email") { if (value && !input.checkValidity()) return formUi.invalidEmail; }
+      else if (!value) return formUi.flowBlank;
+    }
+    return "";
   }
 
   function reward(index) {
@@ -528,9 +653,15 @@ function initializeFormFlow(form) {
     if (!step) return "";
     const picked = step.querySelector("input[type='radio']:checked");
     if (picked) return formUi.affirm[picked.dataset.tile] || "";
-    const input = textInput(step);
-    if (input?.name === "first_name") return formUi.affirmFirst(input.value.trim());
-    return formUi.affirm[input?.name] || "";
+    if (names[index] === "name") return formUi.affirmFirst(form.elements.namedItem("first_name")?.value.trim() || "");
+    return formUi.affirm[names[index]] || "";
+  }
+
+  // The phone screen only lets Next through once the number is complete.
+  function syncNext() {
+    const blocked = names[current] === "phone" && !validPhone(phoneInput?.value);
+    next.disabled = blocked;
+    next.setAttribute("aria-disabled", String(blocked));
   }
 
   function save() {
@@ -539,7 +670,7 @@ function initializeFormFlow(form) {
       ["first_name", "last_name", "phone", "email"].forEach((name) => { values[name] = form.elements.namedItem(name)?.value || ""; });
       ["material", "quantity", "location"].forEach((name) => { values[name] = form.querySelector(`input[name='${name}']:checked`)?.value || ""; });
       window.localStorage.setItem(FLOW_STORE, JSON.stringify({
-        values, step: current, furthest, partialSent, leftSent,
+        values, stepName: names[current], furthestName: names[furthest], partialSent, leftSent,
         session: sessionField?.value || "", locale: formLocale, savedAt: Date.now()
       }));
     } catch { /* storage can be blocked; the form still works */ }
@@ -553,6 +684,7 @@ function initializeFormFlow(form) {
       const field = form.elements.namedItem(name);
       if (field && typeof values[name] === "string" && !field.value) field.value = values[name].slice(0, 254);
     });
+    if (phoneInput) phoneInput.value = formatPhone(phoneDigits(phoneInput.value));
     if (!form.querySelector("input[name='material']:checked") && values.material) {
       const group = MATERIAL_GROUPS.find(([, list]) => list.includes(values.material));
       const tile = group && form.querySelector(`input[name='material'][data-tile='${group[0]}']`);
@@ -565,12 +697,14 @@ function initializeFormFlow(form) {
     if (sessionField && typeof saved.session === "string" && saved.session) sessionField.value = saved.session.slice(0, 100);
     partialSent = Boolean(saved.partialSent);
     leftSent = Boolean(saved.leftSent);
-    furthest = Math.max(0, Math.min(last, Number(saved.furthest) || 0));
-    current = Math.max(0, Math.min(last, Number(saved.step) || 0));
+    // Screens are remembered by name, so a saved visit still resumes correctly if the order changes.
+    furthest = Math.max(0, names.indexOf(saved.furthestName));
+    current = Math.max(0, names.indexOf(saved.stepName));
     // Never resume past a screen that still needs an answer.
     for (let index = 0; index < current; index += 1) {
       if (stepProblem(index)) { current = index; break; }
     }
+    furthest = Math.max(furthest, current);
   }
 
   function post(status, { beacon = false } = {}) {
@@ -603,12 +737,12 @@ function initializeFormFlow(form) {
     });
     if (animate) {
       const leaving = steps[previous];
-      const back = direction === "back";
+      const goingBack = direction === "back";
       leaving.setAttribute("aria-hidden", "true");
-      leaving.classList.add(back ? "is-leaving-back" : "is-leaving");
+      leaving.classList.add(goingBack ? "is-leaving-back" : "is-leaving");
       // Restart the entrance animation on the new screen.
       void steps[current].offsetWidth;
-      steps[current].classList.add(back ? "is-entering-back" : "is-entering");
+      steps[current].classList.add(goingBack ? "is-entering-back" : "is-entering");
       leaveTimer = window.setTimeout(() => {
         leaving.hidden = true;
         leaving.classList.remove("is-leaving", "is-leaving-back");
@@ -625,13 +759,16 @@ function initializeFormFlow(form) {
     nav.hidden = false;
     back.hidden = current === 0;
     next.hidden = current === last;
+    syncNext();
     if (focus) {
-      const input = textInput(steps[current]);
+      const input = textInputs(steps[current]).find((field) => !field.value.trim()) || textInput(steps[current]);
       (input || steps[current].querySelector("legend"))?.focus({ preventScroll: true });
-      // Each new question starts at the same place on screen, just under the header.
-      const anchor = form.closest("[id]") || form;
-      const top = anchor.getBoundingClientRect().top;
-      if (top < 0 || top > window.innerHeight * 0.4) anchor.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+      // Outside the locked portal, each new question starts just under the header.
+      if (!document.documentElement.classList.contains("portal-locked")) {
+        const anchor = form.closest("[id]") || form;
+        const top = anchor.getBoundingClientRect().top;
+        if (top < 0 || top > window.innerHeight * 0.4) anchor.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+      }
     }
     save();
   }
@@ -642,11 +779,13 @@ function initializeFormFlow(form) {
       affirm.textContent = problem;
       affirm.hidden = false;
       affirm.dataset.state = "prompt";
-      textInput(steps[current])?.focus({ preventScroll: true });
+      const inputs = textInputs(steps[current]);
+      (inputs.find((field) => !field.value.trim()) || inputs[0])?.focus({ preventScroll: true });
       return;
     }
     if (current === last) return;
     const leaving = current;
+    flowSound.tick();
     show(current + 1);
     if (phoneIndex >= 0 && leaving >= phoneIndex) {
       // First valid phone: one partial lead. After that, quiet progress updates for the same session.
@@ -658,19 +797,21 @@ function initializeFormFlow(form) {
 
   form.dataset.flow = "ready";
   progress.hidden = false;
-  // On phones the question takes the whole screen (see .flow-portal).
-  form.closest(".contact-form-column")?.classList.add("flow-portal");
+  lockPortal(form.closest("[data-portal]"));
   restore();
   show(current, { focus: false });
-  if (window.location.hash === "#get-paid" || window.location.hash === "#solicitud") {
-    // After the browser has finished its own jump to the anchor, put the cursor in the question.
-    const focusFirst = () => window.setTimeout(() => textInput(steps[current])?.focus({ preventScroll: true }), 60);
+  if (form.closest("[data-portal]")) {
+    // The portal is only the form, so the cursor starts in the question.
+    const focusFirst = () => window.setTimeout(() => {
+      const inputs = textInputs(steps[current]);
+      (inputs.find((field) => !field.value.trim()) || inputs[0])?.focus({ preventScroll: true });
+    }, 60);
     if (document.readyState === "complete") focusFirst();
     else window.addEventListener("load", focusFirst, { once: true });
   }
 
   steps.forEach((step, index) => {
-    step.addEventListener("input", save);
+    step.addEventListener("input", () => { syncNext(); save(); });
     step.addEventListener("change", save);
     // A tap or click on a tile moves on by itself. Keyboard choices use Next, so arrow keys never jump ahead.
     step.addEventListener("click", (event) => {
@@ -680,16 +821,22 @@ function initializeFormFlow(form) {
     });
   });
   next.addEventListener("click", advance);
-  // Enter in a text field moves on. Handled directly so it never depends on the browser's own
-  // submit rules for forms with several fields.
+  // Enter moves on: to the next field on the same screen first, then to the next screen.
   form.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" || event.isComposing || !event.target.matches?.("input[type='text'], input[type='tel'], input[type='email']")) return;
+    if (event.key !== "Enter" || event.isComposing || !event.target.matches?.(typedSelector)) return;
+    const inputs = textInputs(steps[current]);
+    const position = inputs.indexOf(event.target);
+    if (position >= 0 && position < inputs.length - 1) {
+      event.preventDefault();
+      inputs[position + 1].focus({ preventScroll: true });
+      return;
+    }
     if (current === last && !stepProblem(current)) return;
     event.preventDefault();
     advance();
   });
   back.addEventListener("click", () => show(current - 1, { direction: "back" }));
-  // Enter moves to the next screen; only the last screen submits.
+  // Only the last screen submits.
   form.addEventListener("submit", (event) => {
     if (form.dataset.flowDone === "true") return;
     const problem = stepProblem(current);
@@ -849,6 +996,7 @@ if (reviewForm) {
       window.turnstile?.reset?.();
       showFormIssues(form, []);
       setFormStatus(form, "");
+      flowSound.chime();
       showFormDone(form);
     } catch {
       setFormStatus(form, responseErrorMessage || formUi.networkError, "error");

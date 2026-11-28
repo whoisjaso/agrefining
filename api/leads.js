@@ -124,7 +124,7 @@ function queryValue(req, name) {
 }
 
 function formPath(locale) {
-  return locale === "es" ? "/espanol#solicitud" : "/contact";
+  return locale === "es" ? "/vender" : "/sell";
 }
 
 function validate(payload) {
@@ -175,7 +175,7 @@ function emailContent(payload) {
     ["Request", label(payload.intent)],
     ["Material", label(payload.material)],
     ["Amount", payload.quantity || "Not provided"],
-    ["Pickup or drop-off", payload.location || "Not provided"],
+    ["How they want to sell", payload.location || "Not provided"],
     ["Frequency", label(payload.frequency)],
     ["Preferred pickup", pickupSummary(payload) || "Flexible"],
     ["Preferred contact", label(payload.preferred_contact)],
@@ -205,7 +205,7 @@ const CONFIRMATION_COPY = {
     requested: "You asked for",
     summary: "Your request",
     material: "Material",
-    location: "Pickup or drop-off",
+    location: "How you want to sell",
     next: "If anything changes, simply reply to this email or call us.",
     sign: "Dennis Stevens, AG Refining"
   },
@@ -216,7 +216,7 @@ const CONFIRMATION_COPY = {
     requested: "Usted pidió",
     summary: "Su solicitud",
     material: "Material",
-    location: "Recogida o entrega",
+    location: "Cómo prefiere vender",
     next: "Si algo cambia, responda a este correo o llámenos.",
     sign: "Dennis Stevens, AG Refining"
   }
@@ -294,12 +294,13 @@ function leadBcc() {
 
 const LEAD_STAGES = new Set(["partial", "progress", "left", "complete"]);
 const STEP_LABELS = {
+  name: "Name",
   first_name: "First name",
   last_name: "Last name",
   phone: "Phone",
   material: "What they are bringing",
   quantity: "How much",
-  location: "Pickup or drop-off",
+  location: "How they want to sell",
   email: "Email"
 };
 
@@ -327,7 +328,7 @@ export function partialContent(payload) {
     ["Phone", payload.phone],
     ["Bringing", MATERIALS.has(payload.material) ? label(payload.material) : "Not answered yet"],
     ["Amount", payload.quantity || "Not answered yet"],
-    ["Pickup or drop-off", payload.location || "Not answered yet"],
+    ["How they want to sell", payload.location || "Not answered yet"],
     ["Email", payload.email || "Not answered yet"]
   ];
   const note = "This person has not finished the form. If a full pickup request arrives from the same name and number, use that one.";

@@ -92,6 +92,8 @@ async function chromiumExecutable() {
 
 const sitemap = readFileSync(join(dist, "sitemap.xml"), "utf8");
 const routes = [...sitemap.matchAll(/<loc>https:\/\/www\.agrefining\.com([^<]*)<\/loc>/g)].map((match) => match[1] || "/");
+// The sell portal is kept out of the sitemap on purpose, so it is added here by hand.
+routes.push("/sell", "/vender");
 const viewports = [
   { name: "phone", width: 390, height: 844 },
   { name: "desktop", width: 1440, height: 960 }

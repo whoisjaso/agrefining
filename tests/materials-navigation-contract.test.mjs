@@ -51,7 +51,8 @@ function walk(directory) {
 const htmlDocuments = walk(dist)
   .filter((path) => path.endsWith(".html") && !isPrivateApp(path))
   .map((path) => readFileSync(path, "utf8"));
-const englishDocuments = htmlDocuments.filter((html) => /<html lang="en">/.test(html));
+// The standalone sell portal has no header by design.
+const englishDocuments = htmlDocuments.filter((html) => /<html lang="en">/.test(html) && !/class="portal-page"/.test(html));
 const home = readFileSync(join(dist, "index.html"), "utf8");
 const accepted = readFileSync(join(dist, "accepted-materials", "index.html"), "utf8");
 const industrial = readFileSync(join(dist, "industrial-x-ray-silver-recycling", "index.html"), "utf8");
