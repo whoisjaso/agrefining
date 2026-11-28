@@ -422,16 +422,17 @@ test("the sell portal is a standalone page with no site chrome", () => {
     assert.match(page, new RegExp(`<div id="${anchor}" class="portal-body">`));
     assert.match(page, /<form id="review-form"[^>]*data-review-form/);
     assert.match(page, /<a class="portal-close" href="\/(?:espanol)?"/, `${slug}: one way back to the site`);
-    assert.match(page, /<a class="portal-map"[^>]*data-directions[^>]*data-destination="9125 Airport Blvd\., Suite B-1, Houston, TX 77061"/);
+    assert.doesNotMatch(page, /portal-map|data-directions|map-band|OpenStreetMap|<picture/, `${slug}: no map, address chip or directions link`);
+    assert.match(page, /<p class="flow-call"><a class="phone-link" href="tel:/, `${slug}: the call link stays`);
     assert.match(page, /<meta name="robots" content="noindex,follow">/);
-    assert.match(page, /OpenStreetMap contributors/);
   }
   const sitemap = readFileSync(join(dist, "sitemap.xml"), "utf8");
   assert.doesNotMatch(sitemap, /\/sell<|\/vender</, "the portal is a utility page, not a search landing page");
   const css = readFileSync(join(dist, "style.css"), "utf8");
   assert.match(css, /html\.portal-locked,\s*html\.portal-locked body \{[^}]*overflow:\s*hidden;/, "the locked portal never scrolls the page");
   assert.match(css, /html\.portal-locked \.portal \{[^}]*height:\s*var\(--portal-height, 100svh\);[^}]*position:\s*fixed;/);
-  assert.match(css, /\.portal\.is-typing \.portal-map,/, "the map strip steps aside when the keyboard is up");
+  assert.doesNotMatch(css, /\.portal-map/, "the portal has no map strip");
+  assert.match(css, /\.portal\.is-typing \.flow-call \{[^}]*display:\s*none;/, "the call link steps aside when the keyboard is up");
   // Contact and Spanish pages keep their own content and hand off to the portal.
   const contactPage = readFileSync(join(dist, "contact", "index.html"), "utf8");
   assert.doesNotMatch(contactPage, /data-review-form/);

@@ -1544,8 +1544,6 @@ function renderMapBand() {
 // No header, menu, logo bar, footer or other sections. site.js locks it to the screen on phones.
 function renderPortal(locale = "en") {
   const es = locale === "es";
-  const destination = `${street}, ${cityLine}`;
-  const directions = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${siteName}, ${destination}`)}`;
   return `<section class="portal" data-portal>
     <a class="portal-close" href="${es ? "/espanol" : "/"}"${es ? "" : ""} aria-label="${es ? "Cerrar y volver al sitio" : "Close and go back to the site"}">${es ? "Cerrar" : "Close"}<span aria-hidden="true"></span></a>
     <div id="${es ? "solicitud" : "get-paid"}" class="portal-body">
@@ -1553,15 +1551,6 @@ function renderPortal(locale = "en") {
       ${renderReviewForm({ locale })}
       <p class="flow-call"><a class="phone-link" href="tel:${phoneHref}">${es ? `O llame al ${phoneDisplay}` : `Or call ${phoneDisplay}`}</a></p>
     </div>
-    <a class="portal-map" href="${directions}" target="_blank" rel="noopener" data-directions data-destination="${destination}" data-place="${siteName}" aria-label="${es ? "Cómo llegar a" : "Get directions to"} ${siteName}, ${destination}">
-      <picture>
-        <source media="(max-width: 700px)" srcset="/images/ag-refining-map-hobby-airport-mobile.webp" width="1100" height="1100">
-        <img src="/images/ag-refining-map-hobby-airport.webp" alt="" width="2560" height="1100" decoding="async">
-      </picture>
-      <span class="map-band-pin" aria-hidden="true"></span>
-      <span class="portal-map-label"><span>${street}</span><b>${es ? "Cómo llegar" : "Directions"}</b></span>
-    </a>
-    <p class="map-band-credit">Map data <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a></p>
   </section>`;
 }
 
