@@ -161,6 +161,9 @@ function updateChrome() {
   siteHeader?.setAttribute("data-stuck", offset > 12 ? "true" : "false");
   if (!actionDock) return;
   const footerTop = footer ? footer.getBoundingClientRect().top : Number.POSITIVE_INFINITY;
+  // On phones the cream header steps aside as soon as the dark footer comes into view, so a
+  // light bar never sits over the dark close of the page (see html.at-footer).
+  document.documentElement.classList.toggle("at-footer", footerTop < (window.visualViewport?.height || window.innerHeight) - 40);
   const viewportHeight = window.visualViewport?.height || window.innerHeight;
   const navOpen = document.body.classList.contains("nav-open");
   const typing = document.activeElement?.matches?.("input, select, textarea") ?? false;
@@ -206,7 +209,7 @@ const formUi = {
     invalidEmail: "Enter a valid email.",
     invalidField: (label) => `Enter a valid ${label.toLowerCase()}.`,
     shortDetails: "Add a little more detail so the material can be reviewed.",
-    sendingButton: "Sending request...",
+    sendingButton: "Sending Request...",
     sendingStatus: "Sending your material review request.",
     success: "Your request was received. AG Refining will review the details and follow up using your preferred contact method.",
     emailDetails: "Email these details",
@@ -244,7 +247,7 @@ const formUi = {
     invalidEmail: "Escriba un correo electrónico válido.",
     invalidField: (label) => `Escriba un ${label.toLowerCase()} válido.`,
     shortDetails: "Añada un poco más de información para revisar el material.",
-    sendingButton: "Enviando solicitud...",
+    sendingButton: "Enviando Solicitud...",
     sendingStatus: "Enviando su solicitud de revisión del material.",
     success: "Recibimos su solicitud. AG Refining revisará los detalles y se comunicará por el medio que prefirió.",
     emailDetails: "Enviar estos datos por correo",
@@ -495,7 +498,8 @@ function phoneDigits(value) {
 
 function formatPhone(digits) {
   if (digits.length === 0) return "";
-  if (digits.length < 4) return `(${digits}`;
+  if (digits.length < 3) return `(${digits}`;
+  if (digits.length === 3) return `(${digits}) `;
   if (digits.length < 7) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
   return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
 }
@@ -507,8 +511,15 @@ function validPhone(value) {
 
 function bindPhoneInput(input) {
   if (!input) return;
+  let deleting = false;
   const apply = () => {
     const before = input.value;
+    // Backspacing over the ") " after the area code must not put it straight back.
+    if (deleting && phoneDigits(before).length <= 3) {
+      const digits = phoneDigits(before);
+      input.value = digits ? `(${digits}` : "";
+      return;
+    }
     const caret = input.selectionStart ?? before.length;
     const digitsBeforeCaret = before.slice(0, caret).replace(/\D/g, "").length;
     const formatted = formatPhone(phoneDigits(before));
@@ -525,6 +536,7 @@ function bindPhoneInput(input) {
     try { input.setSelectionRange(position, position); } catch { /* some keyboards do not allow it */ }
   };
   input.addEventListener("beforeinput", (event) => {
+    deleting = String(event.inputType || "").startsWith("delete");
     // Block anything that is not a digit; pasted text is cleaned by the input handler.
     if (event.inputType === "insertText" && event.data && /\D/.test(event.data)) event.preventDefault();
   });
@@ -800,8 +812,9 @@ function initializeFormFlow(form) {
   lockPortal(form.closest("[data-portal]"));
   restore();
   show(current, { focus: false });
-  if (form.closest("[data-portal]")) {
-    // The portal is only the form, so the cursor starts in the question.
+  if (form.closest("[data-portal]") && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    // With a mouse and keyboard the cursor starts in the question. On a phone it waits for a tap,
+    // so the first screen opens calm and uncrowded.
     const focusFirst = () => window.setTimeout(() => {
       const inputs = textInputs(steps[current]);
       (inputs.find((field) => !field.value.trim()) || inputs[0])?.focus({ preventScroll: true });

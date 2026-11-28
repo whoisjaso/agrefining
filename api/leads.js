@@ -165,95 +165,176 @@ function label(value) {
   return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function emailContent(payload) {
-  const rows = [
-    ["Status", "Complete"],
-    ["Name", payload.name],
-    ["Business", payload.business || "Not provided"],
-    ["Phone", payload.phone],
-    ["Email", payload.email || "Not provided"],
-    ["Request", label(payload.intent)],
-    ["Material", label(payload.material)],
-    ["Amount", payload.quantity || "Not provided"],
-    ["How they want to sell", payload.location || "Not provided"],
-    ["Frequency", label(payload.frequency)],
-    ["Preferred pickup", pickupSummary(payload) || "Flexible"],
-    ["Preferred contact", label(payload.preferred_contact)],
-    ["Note", payload.details || "Not provided"]
-  ];
-  const attribution = Object.entries(payload.attribution);
-  const plainRows = rows.map(([name, value]) => `${name}: ${value}`).join("\n");
-  const plainAttribution = attribution.length
-    ? `\n\nWebsite attribution:\n${attribution.map(([name, value]) => `${name}: ${value}`).join("\n")}`
-    : "";
-  const htmlRows = rows.map(([name, value]) => `<tr><th align="left" style="padding:8px 12px 8px 0;vertical-align:top">${escapeHtml(name)}</th><td style="padding:8px 0;white-space:pre-wrap">${escapeHtml(value)}</td></tr>`).join("");
-  const htmlAttribution = attribution.length
-    ? `<h2 style="font-size:16px;margin:28px 0 8px">Website attribution</h2><table>${attribution.map(([name, value]) => `<tr><th align="left" style="padding:6px 12px 6px 0">${escapeHtml(name)}</th><td style="padding:6px 0">${escapeHtml(value)}</td></tr>`).join("")}</table>`
-    : "";
+const ADDRESS_LINE = "9125 Airport Blvd., Suite B-1, Houston, TX 77061";
 
-  return {
-    text: `New AG Refining pickup request\n\n${plainRows}${plainAttribution}`,
-    html: `<div style="font-family:Arial,sans-serif;color:#14232c;line-height:1.5"><h1 style="color:#061724">New pickup request</h1><p style="margin:0 0 18px"><a href="tel:${escapeHtml(payload.phone.replace(/[^\d+]/g, ""))}" style="display:inline-block;background:#102a43;color:#faf8f2;padding:10px 18px;border-radius:3px;text-decoration:none;font-weight:bold">Call ${escapeHtml(payload.name)}</a> &nbsp; <a href="mailto:${escapeHtml(payload.email)}" style="color:#1d5e96">Reply by email</a></p><table>${htmlRows}</table>${htmlAttribution}</div>`
+// One quiet layout for every email the site sends: the wordmark, one Title Case heading, a short
+// summary, one button, a few labeled details, and a footer with the address and phone. Tables and
+// inline styles only, so it holds up in Gmail and Apple Mail on a phone.
+function emailShell({ lang = "en", preheader = "", heading, summary, rows = [], button, secondary = [], secondaryTitle = "", note = "" }) {
+  const font = "'Helvetica Neue',Helvetica,Arial,sans-serif";
+  const detail = ([name, value]) => `
+              <tr>
+                <td style="padding:14px 12px 14px 0;border-top:1px solid #e3ddd0;font-family:${font};font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#6b7c8d;width:40%;vertical-align:top">${escapeHtml(name)}</td>
+                <td style="padding:14px 0;border-top:1px solid #e3ddd0;font-family:${font};font-size:16px;line-height:1.45;color:#102a43;vertical-align:top">${escapeHtml(value)}</td>
+              </tr>`;
+  const quiet = ([name, value]) => `
+              <tr>
+                <td style="padding:4px 12px 4px 0;font-family:${font};font-size:12px;color:#6b7c8d;vertical-align:top">${escapeHtml(name)}</td>
+                <td style="padding:4px 0;font-family:${font};font-size:12px;line-height:1.5;color:#40566d;vertical-align:top;word-break:break-word">${escapeHtml(value)}</td>
+              </tr>`;
+  return `<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>${escapeHtml(heading)}</title>
+</head>
+<body style="margin:0;padding:0;background:#f1ede4">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0">${escapeHtml(preheader)}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f1ede4">
+  <tr>
+    <td align="center" style="padding:32px 16px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background:#faf8f2;border:1px solid #e3ddd0">
+        <tr>
+          <td style="padding:36px 32px 0;font-family:${font};font-size:12px;letter-spacing:2.4px;text-transform:uppercase;color:#102a43"><strong>AG</strong> Refining</td>
+        </tr>
+        <tr>
+          <td style="padding:28px 32px 0;font-family:${font};font-size:28px;line-height:1.2;font-weight:400;letter-spacing:-0.4px;color:#102a43">${escapeHtml(heading)}</td>
+        </tr>
+        <tr>
+          <td style="padding:14px 32px 0;font-family:${font};font-size:16px;line-height:1.6;color:#40566d">${escapeHtml(summary)}</td>
+        </tr>${button ? `
+        <tr>
+          <td style="padding:28px 32px 0">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" bgcolor="#102a43" style="background:#102a43"><a href="${escapeHtml(button.href)}" style="display:block;padding:18px 20px;font-family:${font};font-size:16px;font-weight:600;letter-spacing:0.3px;color:#faf8f2;text-decoration:none">${escapeHtml(button.label)}</a></td>
+              </tr>
+            </table>
+          </td>
+        </tr>` : ""}${rows.length ? `
+        <tr>
+          <td style="padding:28px 32px 0">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px solid #e3ddd0">${rows.map(detail).join("")}
+            </table>
+          </td>
+        </tr>` : ""}${note ? `
+        <tr>
+          <td style="padding:22px 32px 0;font-family:${font};font-size:14px;line-height:1.6;color:#40566d">${escapeHtml(note)}</td>
+        </tr>` : ""}${secondary.length ? `
+        <tr>
+          <td style="padding:26px 32px 0">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr><td colspan="2" style="padding:0 0 6px;font-family:${font};font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#6b7c8d">${escapeHtml(secondaryTitle)}</td></tr>${secondary.map(quiet).join("")}
+            </table>
+          </td>
+        </tr>` : ""}
+        <tr>
+          <td style="padding:36px 32px 32px;font-family:${font};font-size:12px;line-height:1.7;color:#6b7c8d">AG Refining<br>${ADDRESS_LINE}<br><a href="tel:${PHONE_HREF}" style="color:#6b7c8d;text-decoration:none">${PHONE_DISPLAY}</a></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>`;
+}
+
+// The same content as plain text, for mail clients that do not show HTML.
+function emailPlain({ heading, summary, rows = [], button, secondary = [], secondaryTitle = "", note = "" }) {
+  const action = button ? (button.label.includes(button.plain) ? button.label : `${button.label}: ${button.plain || button.href}`) : "";
+  return [
+    `${heading}\n`,
+    summary,
+    action ? `\n${action}` : "",
+    rows.length ? `\n${rows.map(([name, value]) => `${name}: ${value}`).join("\n")}` : "",
+    note ? `\n${note}` : "",
+    secondary.length ? `\n${secondaryTitle}\n${secondary.map(([name, value]) => `${name}: ${value}`).join("\n")}` : "",
+    `\nAG Refining\n${ADDRESS_LINE}\n${PHONE_DISPLAY}`
+  ].filter(Boolean).join("\n");
+}
+
+// Answers arrive as plain phrases ("A box or bag"); in an email every value reads as Title Case.
+const titled = (value) => String(value || "").replace(/(^|[\s/(-])([a-záéíóúñ])/g, (_, lead, letter) => `${lead}${letter.toUpperCase()}`);
+const telHref = (phone) => `tel:${String(phone || "").replace(/[^\d+]/g, "")}`;
+const firstNameOf = (name) => String(name || "").trim().split(/\s+/)[0] || "Them";
+// Only the rows the visitor actually answered. Empty and default values are left out.
+const filled = (rows) => rows.filter(([, value]) => value);
+
+function emailContent(payload) {
+  const parts = {
+    lang: "en",
+    preheader: `${payload.name}, ${payload.phone}`,
+    heading: "New Pickup Request",
+    summary: `${payload.name} finished the form and is waiting for your call.`,
+    button: { label: `Call ${firstNameOf(payload.name)}`, href: telHref(payload.phone), plain: payload.phone },
+    rows: [
+      ["Status", "Complete"],
+      ...filled([
+        ["Name", payload.name],
+        ["Phone", payload.phone],
+        ["Bringing", label(payload.material)],
+        ["Amount", titled(payload.quantity)],
+        ["How They Want To Sell", titled(payload.location)],
+        ["Email", payload.email],
+        ["Business", payload.business],
+        ["Request", payload.intent === "quote" ? "Quote" : ""],
+        ["Frequency", payload.frequency === "recurring" ? "Recurring" : ""],
+        ["Preferred Day", pickupSummary(payload)],
+        ["Preferred Contact", payload.preferred_contact === "email" ? "Email" : ""],
+        ["Note", payload.details]
+      ])
+    ],
+    secondary: Object.entries(payload.attribution || {}),
+    secondaryTitle: "How They Found Us"
   };
+  return { text: emailPlain(parts), html: emailShell(parts) };
 }
 
 const CONFIRMATION_COPY = {
   en: {
-    subject: "We received your AG Refining pickup request",
-    hello: (name) => `Hello ${name},`,
-    body: "Thank you for reaching out to AG Refining. We received your pickup request and will contact you to confirm the details and a time.",
-    requested: "You asked for",
-    summary: "Your request",
-    material: "Material",
-    location: "How you want to sell",
-    next: "If anything changes, simply reply to this email or call us.",
-    sign: "Dennis Stevens, AG Refining"
+    subject: "We Received Your Request | AG Refining",
+    heading: (name) => `Thank You, ${name}`,
+    body: "We received your request. Dennis will call you to confirm the details and a time.",
+    call: `Call ${PHONE_DISPLAY}`,
+    requested: "You Asked For",
+    material: "Bringing",
+    amount: "Amount",
+    location: "How You Want To Sell",
+    next: "If anything changes, reply to this email or call us."
   },
   es: {
-    subject: "Recibimos su solicitud de recogida de AG Refining",
-    hello: (name) => `Hola ${name}:`,
-    body: "Gracias por comunicarse con AG Refining. Recibimos su solicitud de recogida y nos comunicaremos con usted para confirmar los detalles y la hora.",
-    requested: "Usted pidió",
-    summary: "Su solicitud",
+    subject: "Recibimos Su Solicitud | AG Refining",
+    heading: (name) => `Gracias, ${name}`,
+    body: "Recibimos su solicitud. Dennis le llamará para confirmar los detalles y la hora.",
+    call: `Llame al ${PHONE_DISPLAY}`,
+    requested: "Usted Pidió",
     material: "Material",
-    location: "Cómo prefiere vender",
-    next: "Si algo cambia, responda a este correo o llámenos.",
-    sign: "Dennis Stevens, AG Refining"
+    amount: "Cantidad",
+    location: "Cómo Prefiere Vender",
+    next: "Si algo cambia, responda a este correo o llámenos."
   }
 };
 
 export function confirmationContent(payload) {
   const copy = CONFIRMATION_COPY[payload.locale];
   const first = payload.name.split(/\s+/)[0] || payload.name;
-  const schedule = pickupSummary(payload, payload.locale);
-  const material = materialLabel(payload.material, payload.locale);
-  const lines = [
-    copy.hello(first),
-    "",
-    copy.body,
-    schedule ? `${copy.requested}: ${schedule}.` : "",
-    "",
-    `${copy.material}: ${material}`,
-    `${copy.location}: ${payload.location}`,
-    "",
-    copy.next,
-    "",
-    copy.sign,
-    `${PHONE_DISPLAY} · ${DEFAULT_TO_EMAIL}`
-  ].filter((line, index, all) => line !== "" || all[index - 1] !== "");
-  return {
-    subject: copy.subject,
-    text: lines.join("\n"),
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;color:#20354c;line-height:1.6;max-width:560px">
-  <p style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#416b94;margin:0 0 18px">AG Refining · Houston</p>
-  <p>${escapeHtml(copy.hello(first))}</p>
-  <p>${escapeHtml(copy.body)}</p>
-  ${schedule ? `<p><strong>${escapeHtml(copy.requested)}:</strong> ${escapeHtml(schedule)}</p>` : ""}
-  <table style="border-collapse:collapse;margin:18px 0"><tr><th align="left" style="padding:4px 14px 4px 0;color:#586b7e;font-weight:normal">${escapeHtml(copy.material)}</th><td>${escapeHtml(material)}</td></tr><tr><th align="left" style="padding:4px 14px 4px 0;color:#586b7e;font-weight:normal">${escapeHtml(copy.location)}</th><td>${escapeHtml(payload.location)}</td></tr></table>
-  <p>${escapeHtml(copy.next)}</p>
-  <p style="margin-top:26px">${escapeHtml(copy.sign)}<br><a href="tel:${PHONE_HREF}" style="color:#1d5e96">${PHONE_DISPLAY}</a> · <a href="mailto:${DEFAULT_TO_EMAIL}" style="color:#1d5e96">${DEFAULT_TO_EMAIL}</a></p>
-</div>`
+  const parts = {
+    lang: payload.locale,
+    preheader: copy.body,
+    heading: copy.heading(first),
+    summary: copy.body,
+    button: { label: copy.call, href: `tel:${PHONE_HREF}`, plain: PHONE_DISPLAY },
+    rows: filled([
+      [copy.material, titled(materialLabel(payload.material, payload.locale))],
+      [copy.amount, titled(payload.quantity)],
+      [copy.location, titled(payload.location)],
+      [copy.requested, pickupSummary(payload, payload.locale)]
+    ]),
+    note: copy.next
   };
+  return { subject: copy.subject, text: emailPlain(parts), html: emailShell(parts) };
 }
 
 // Courtesy confirmation to the visitor. Never blocks or fails the lead itself.
@@ -295,12 +376,12 @@ function leadBcc() {
 const LEAD_STAGES = new Set(["partial", "progress", "left", "complete"]);
 const STEP_LABELS = {
   name: "Name",
-  first_name: "First name",
-  last_name: "Last name",
+  first_name: "First Name",
+  last_name: "Last Name",
   phone: "Phone",
-  material: "What they are bringing",
-  quantity: "How much",
-  location: "How they want to sell",
+  material: "What They Are Bringing",
+  quantity: "How Much",
+  location: "How They Want To Sell",
   email: "Email"
 };
 
@@ -320,26 +401,33 @@ function logLeadProgress(payload) {
 
 export function partialContent(payload) {
   const left = payload.lead_status === "left";
-  const reached = STEP_LABELS[payload.lead_step] || payload.lead_step || "Phone";
-  const rows = [
-    ["Status", left ? "Partial: left before finishing" : "Partial: still filling in the form"],
-    ["Stopped at", reached],
-    ["Name", payload.name],
-    ["Phone", payload.phone],
-    ["Bringing", MATERIALS.has(payload.material) ? label(payload.material) : "Not answered yet"],
-    ["Amount", payload.quantity || "Not answered yet"],
-    ["How they want to sell", payload.location || "Not answered yet"],
-    ["Email", payload.email || "Not answered yet"]
-  ];
-  const note = "This person has not finished the form. If a full pickup request arrives from the same name and number, use that one.";
-  return {
-    subject: `${left ? "Partial lead update" : "Partial lead"}: ${payload.name}, ${payload.phone}`,
-    text: `${left ? "Partial lead update" : "Partial lead"}\n\n${rows.map(([name, value]) => `${name}: ${value}`).join("\n")}\n\n${note}`,
-    html: `<div style="font-family:Arial,sans-serif;color:#14232c;line-height:1.5"><h1 style="color:#061724">${left ? "Partial lead update" : "Partial lead"}</h1><p style="margin:0 0 18px"><a href="tel:${escapeHtml(payload.phone.replace(/[^\d+]/g, ""))}" style="display:inline-block;background:#102a43;color:#ffffff;padding:12px 18px;text-decoration:none;border-radius:4px">Call ${escapeHtml(payload.name)}</a></p><table>${rows.map(([name, value]) => `<tr><th align="left" style="padding:8px 12px 8px 0;vertical-align:top">${escapeHtml(name)}</th><td style="padding:8px 0">${escapeHtml(value)}</td></tr>`).join("")}</table><p style="color:#586b7e">${note}</p></div>`
+  const heading = left ? "Partial Lead Update" : "Partial Lead";
+  const parts = {
+    lang: "en",
+    preheader: `${payload.name}, ${payload.phone}`,
+    heading,
+    summary: left
+      ? `${payload.name} left before finishing. Here is what they answered.`
+      : `${payload.name} started the form and gave a number. They have not finished yet.`,
+    button: { label: `Call ${firstNameOf(payload.name)}`, href: telHref(payload.phone), plain: payload.phone },
+    rows: [
+      ["Status", left ? "Left Before Finishing" : "Still Filling In The Form"],
+      ["Stopped At", STEP_LABELS[payload.lead_step] || payload.lead_step || "Phone"],
+      ...filled([
+        ["Name", payload.name],
+        ["Phone", payload.phone],
+        ["Bringing", MATERIALS.has(payload.material) ? label(payload.material) : ""],
+        ["Amount", titled(payload.quantity)],
+        ["How They Want To Sell", titled(payload.location)],
+        ["Email", payload.email]
+      ])
+    ],
+    note: "If a full request arrives from the same name and number, use that one."
   };
+  return { subject: `${heading}: ${payload.name}, ${payload.phone}`, text: emailPlain(parts), html: emailShell(parts) };
 }
 
-// One "Partial lead" email when a valid phone first arrives, and at most one "Partial lead update"
+// One "Partial Lead" email when a valid phone first arrives, and at most one "Partial lead update"
 // if the visitor leaves later without finishing. Same sender, recipient and copy list as full leads.
 async function sendPartial(payload) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -382,7 +470,7 @@ async function sendResend(payload) {
       to: [process.env.AG_LEAD_TO_EMAIL || DEFAULT_TO_EMAIL],
       ...(leadBcc().length ? { bcc: leadBcc() } : {}),
       ...(payload.email ? { reply_to: payload.email } : {}),
-      subject: `Pickup request: ${label(payload.material)} from ${payload.name}`,
+      subject: `Pickup Request: ${label(payload.material)} From ${payload.name}`,
       text: content.text,
       html: content.html
     })

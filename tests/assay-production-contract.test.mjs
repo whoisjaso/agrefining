@@ -73,7 +73,7 @@ test("the hero boundary includes nested sections before locating the following i
 test("the deployable homepage hero states the approved V2 value proposition", () => {
   const { hero } = homepageHero();
 
-  assert.match(hero, /<h1>Houston Silver Buyer, Valued Precisely\.<\/h1>/);
+  assert.match(hero, /<h1 class="visually-hidden">Houston Silver Buyer, Valued Precisely\.<\/h1>/);
 });
 
 test("the deployable homepage hero presents its single approved action", () => {
@@ -84,7 +84,7 @@ test("the deployable homepage hero presents its single approved action", () => {
   assert.ok(primary, "the primary pickup CTA must be an anchor that lands on the pickup form");
   assert.ok(primary.classes.includes("button"), "the primary pickup CTA must use the shared button class");
   assert.ok(primary.classes.includes("button-primary"), "the primary pickup CTA must use the primary button class");
-  assert.equal(primary.text, "Schedule a Free Pickup");
+  assert.equal(primary.text, "Get Paid For Your Silver");
   assert.equal(anchors.length, 1, "the minimal hero carries exactly one action");
 });
 
@@ -110,7 +110,7 @@ test("the deployable homepage hero uses a permanent cinematic poster and two def
 
 test("the deployable homepage keeps its supported proof points in the band below the hero", () => {
   const { hero } = homepageHero();
-  const requiredProof = ["Houston-based", "Free qualifying pickup", "On-site weighing", "Confirmed payment terms"];
+  const requiredProof = ["Houston-Based", "Free Qualifying Pickup", "On-Site Weighing", "Confirmed Payment Terms"];
   const ledger = readFileSync(join(dist, "index.html"), "utf8").match(/<div class="trust-ledger">[\s\S]*?<\/div>\s*<\/div>/)?.[0] || "";
 
   assert.doesNotMatch(hero, /hero-proof-rail/, "the hero stays minimal");

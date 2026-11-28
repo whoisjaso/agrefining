@@ -48,7 +48,8 @@ const phoneHref = "+12818982719";
 const email = "dennis@agrefining.com";
 const street = "9125 Airport Blvd., Suite B-1";
 const cityLine = "Houston, TX 77061";
-const primaryCta = "Schedule a Free Pickup";
+// One call to action site-wide: direct, and it says what the visitor gets.
+const primaryCta = "Get Paid For Your Silver";
 // Hours match the verified Google Business Profile (set Nov 2026).
 const openingHours = [
   { days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], label: "Monday to Friday", opens: "09:00", closes: "17:00", display: "9:00 AM to 5:00 PM" },
@@ -66,12 +67,10 @@ const sameAsProfiles = [
 const googleReviewUrl = (process.env.GOOGLE_REVIEW_URL || "").trim();
 // Pending pages describe services Dennis has not confirmed in writing yet.
 const includePending = process.env.AG_INCLUDE_PENDING === "1";
-const spanishPrimaryCta = "Programar Una Recogida Gratis";
+const spanishPrimaryCta = "Reciba Pago Por Su Plata";
 const arrow = '<span class="icon-arrow" aria-hidden="true"></span>';
-const titleCaseMinorWords = {
-  en: new Set(["a", "an", "and", "as", "at", "but", "by", "for", "from", "in", "nor", "of", "on", "or", "per", "so", "the", "to", "vs", "via", "with", "yet"]),
-  es: new Set(["a", "al", "ante", "bajo", "cabe", "con", "contra", "de", "del", "desde", "durante", "e", "el", "en", "entre", "hacia", "hasta", "la", "las", "lo", "los", "o", "para", "por", "según", "sin", "so", "sobre", "tras", "u", "un", "una", "unas", "unos", "y"])
-};
+// Owner rule: Title Case means every word starts with a capital, small words included.
+const titleCaseMinorWords = { en: new Set(), es: new Set() };
 
 function capitalizeTitleToken(token, locale) {
   const lower = token.toLocaleLowerCase(locale);
@@ -137,6 +136,21 @@ function normalizeTitleCaseMarkup(markup, locale = "en") {
   normalized = apply(/(<h3\b[^>]*>)([\s\S]*?)(<\/h3>)/g, normalized);
   normalized = apply(/(<details class="material-guide">[\s\S]*?<summary>[\s\S]*?<span>)([\s\S]*?)(<\/span><\/summary>)/g, normalized);
   normalized = apply(/(<a\b[^>]*>\s*<span(?:\s[^>]*)?>)([^<]+)(<\/span>\s*<h[23]\b)/g, normalized);
+  // Labels count too: buttons, form labels and legends, tiles, options, table and list labels,
+  // breadcrumbs, FAQ questions and arrow links.
+  normalized = apply(/(<h4\b[^>]*>)([\s\S]*?)(<\/h4>)/g, normalized);
+  normalized = apply(/(<a\b[^>]*class="(?:button|text-link|phone-link)\b[^"]*"[^>]*>)([\s\S]*?)(<\/a>)/g, normalized);
+  normalized = apply(/(<button\b[^>]*>)([\s\S]*?)(<\/button>)/g, normalized);
+  normalized = apply(/(<label\b[^>]*>)([\s\S]*?)(<\/label>)/g, normalized);
+  normalized = apply(/(<legend\b[^>]*>)([\s\S]*?)(<\/legend>)/g, normalized);
+  normalized = apply(/(<option\b[^>]*>)([^<]*)(<\/option>)/g, normalized);
+  normalized = apply(/(<dt\b[^>]*>)([\s\S]*?)(<\/dt>)/g, normalized);
+  normalized = apply(/(<th\b[^>]*>)([\s\S]*?)(<\/th>)/g, normalized);
+  normalized = apply(/(<summary\b[^>]*>)([\s\S]*?)(<\/summary>)/g, normalized);
+  normalized = apply(/(<nav class="breadcrumbs"[^>]*>)([\s\S]*?)(<\/nav>)/g, normalized);
+  normalized = apply(/(<div class="shell trust-line-inner[^"]*">)([\s\S]*?)(<\/div>)/g, normalized);
+  normalized = apply(/(<(?:a|div) class="contact-line"[^>]*><span>)([^<]*)(<\/span>)/g, normalized);
+  normalized = apply(/(<strong>)([^<]+)(\s*<span class="icon-arrow")/g, normalized);
   return normalized;
 }
 
@@ -1618,8 +1632,7 @@ const home = `
     <div class="cinematic-hero-overlay" aria-hidden="true"></div>
     <div class="shell hero-commercial-grid">
       <div class="hero-copy">
-        <h1>Houston Silver Buyer, Valued Precisely.</h1>
-        <p class="hero-lede">See the weight. You decide.</p>
+        <h1 class="visually-hidden">Houston Silver Buyer, Valued Precisely.</h1>
         <div class="hero-actions">
           <a class="button button-primary" href="/contact?intent=pickup">${primaryCta}</a>
         </div>
@@ -1794,7 +1807,6 @@ const home = `
       <p>Tell us what you have, how much there is, and where it is located. We will confirm whether the lot qualifies for free pickup.</p>
       <div class="hero-actions hero-actions-center">
         <a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
-        <a class="phone-link phone-link-inverse" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
       </div>
     </div>
   </section>`;
@@ -2016,7 +2028,6 @@ function coinServicePage(page) {
         <p>Tell us what coins you have. We will confirm the right next step before you travel or move the collection.</p>
         <div class="hero-actions hero-actions-center">
           <a class="button button-inverse" href="/contact?intent=pickup&material=silver_coins">${primaryCta} ${arrow}</a>
-          <a class="phone-link phone-link-inverse" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
         </div>
       </div>
     </section>`;
@@ -2149,7 +2160,6 @@ function longMaterialPage(page) {
         <p>${page.ctaText}</p>
         <div class="hero-actions hero-actions-center">
           <a class="button button-inverse" href="/contact?intent=pickup&material=${page.materialQuery}">${primaryCta} ${arrow}</a>
-          <a class="phone-link phone-link-inverse" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
         </div>
       </div>
     </section>`;
@@ -2282,7 +2292,6 @@ function xrayHubPage(page) {
         <p>Tell us the film type, box count or weight, date range, storage method, location, and security needs. Do not send private records.</p>
         <div class="hero-actions hero-actions-center">
           <a class="button button-inverse" href="/contact?intent=pickup&material=xray_film">${primaryCta} ${arrow}</a>
-          <a class="phone-link phone-link-inverse" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
         </div>
       </div>
     </section>`;
@@ -2414,7 +2423,6 @@ function houstonHubPage(page) {
         <p>Tell us what you have and where it is. We will confirm the right next step.</p>
         <div class="hero-actions hero-actions-center">
           <a class="button button-inverse" href="/contact?intent=pickup">${primaryCta} ${arrow}</a>
-          <a class="phone-link phone-link-inverse" href="tel:${phoneHref}">Call ${phoneDisplay}</a>
         </div>
       </div>
     </section>`;

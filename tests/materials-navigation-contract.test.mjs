@@ -146,7 +146,7 @@ test("the disclosure groups exactly 17 unique destinations with ordinary list se
 
     let cursor = 0;
     for (const [group, items] of taxonomy) {
-      const headingPosition = panel.indexOf(`>${group}</h`);
+      const headingPosition = panel.toLowerCase().indexOf(`>${group.toLowerCase()}</h`);
       assert.ok(headingPosition >= cursor, `${group} must appear in the approved order`);
       cursor = headingPosition;
       for (const [label] of items) {
@@ -178,7 +178,7 @@ test("the sitemap contains every public route once", () => {
 });
 
 test("homepage material labels use the approved purchase taxonomy", () => {
-  assert.match(home, />Sterling and Flatware<\/h3>/);
+  assert.match(home, />Sterling And Flatware<\/h3>/);
   assert.match(home, />Industrial NDT Film<\/h3>/);
   assert.doesNotMatch(home, />Sterling and hollowware<\/h3>/);
 });
@@ -187,7 +187,7 @@ test("the industrial film page explains NDT consistently and expands the term on
   assert.match(industrial, /<title>Industrial NDT Film Silver Recycling in Houston \| AG Refining<\/title>/);
   assert.match(industrial, /<meta name="description" content="[^"]*industrial NDT film[^"]*">/);
   assert.match(industrial, /<p class="eyebrow">Industrial NDT Film<\/p>/);
-  assert.match(industrial, /<h1>Recover Silver from Industrial NDT Film\.<\/h1>/);
+  assert.match(industrial, /<h1>Recover Silver From Industrial NDT Film\.<\/h1>/);
   assert.match(industrial, /AG Refining works with Houston companies that have qualifying industrial NDT film/);
   assert.ok((customerFacingText(industrial).match(/Industrial NDT film/gi) || []).length >= 5);
   assert.equal((customerFacingText(industrial).match(/Industrial Non-Destructive Testing film/g) || []).length, 1);
@@ -210,9 +210,9 @@ test("medical and general X-ray terminology remains accurate", () => {
   assert.match(medical, /<p class="eyebrow">Medical X-Ray Film<\/p>/);
   assert.match(customerFacingText(medical), /silver-bearing X-ray film/);
   assert.match(xrayHub, /<title>X-Ray Recycling Services Houston \| X-Ray Film Recycling \| AG Refining<\/title>/);
-  assert.match(xrayHub, /<h1>Secure X-Ray Film Recycling in Houston\.<\/h1>/);
+  assert.match(xrayHub, /<h1>Secure X-Ray Film Recycling In Houston\.<\/h1>/);
 });
 
 test("How It Works opens with the exact six-step promise", () => {
-  assert.match(howItWorks, /<h1>Six Simple Steps from Silver to Cash\.<\/h1>/);
+  assert.match(howItWorks, /<h1>Six Simple Steps From Silver To Cash\.<\/h1>/);
 });

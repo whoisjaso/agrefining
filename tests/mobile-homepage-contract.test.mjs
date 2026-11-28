@@ -158,3 +158,27 @@ test("the production-only hidden header behavior is now part of the repository b
   assert.match(headerController, /const threshold = 96/);
   assert.match(headerController, /window\.scrollY >= threshold/);
 });
+
+test("on phones the cream header steps aside when the dark footer comes into view", () => {
+  const script = readFileSync(join(dist, "site.js"), "utf8");
+  assert.match(script, /classList\.toggle\("at-footer", footerTop < /);
+  assert.match(css, /html\.at-footer body:not\(\.nav-open\) \.site-header \{[^}]*transform:\s*translateY\(-101%\);/);
+});
+
+test("the homepage hero is the film and one button, with the headline kept for search only", () => {
+  const hero = home.match(/<section class="atelier-hero">[\s\S]*?<\/section>/)?.[0] || "";
+  assert.match(hero, /<h1 class="visually-hidden">Houston Silver Buyer, Valued Precisely\.<\/h1>/);
+  assert.doesNotMatch(hero, /hero-lede|See the weight/);
+  assert.equal((hero.match(/<a\b/g) || []).length, 1);
+  assert.match(hero, />Get Paid For Your Silver<\/a>/);
+});
+
+test("every closing band carries exactly one white button and no second action", () => {
+  for (const page of [home, contact, spanish]) {
+    for (const band of page.match(/<section class="conversion-band[^"]*">[\s\S]*?<\/section>/g) || []) {
+      assert.equal((band.match(/<a\b/g) || []).length, 1);
+      assert.match(band, /class="button button-inverse"/);
+      assert.doesNotMatch(band, /href="tel:/);
+    }
+  }
+});

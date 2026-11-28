@@ -155,7 +155,7 @@ test("native success uses a private 303 receipt and GET does not redeliver", { c
   assert.equal(ownerEmail.reply_to, "maria@example.com");
   assert.deepEqual(confirmation.to, ["maria@example.com"]);
   assert.equal(confirmation.reply_to, "dennis@agrefining.com");
-  assert.match(confirmation.subject, /received your AG Refining pickup request/);
+  assert.equal(confirmation.subject, "We Received Your Request | AG Refining");
   assert.notEqual(calls[0][1].headers["Idempotency-Key"], calls[1][1].headers["Idempotency-Key"]);
   assert.equal(post.statusCode, 303);
   assert.equal(post.headers.location, "/api/leads?status=received&lang=en");
@@ -342,12 +342,12 @@ test("preferred pickup day and time reach the owner and the visitor", { concurre
     body: JSON.stringify({ ...validLead, submission_key: "test-schedule-001", pickup_date: future, pickup_window: "afternoon" })
   }));
   assert.equal(response.statusCode, 200);
-  assert.match(sent[0].text, /Preferred pickup: \w+day, \w+ \d+, in the afternoon/);
+  assert.match(sent[0].text, /Preferred Day: \w+day, \w+ \d+, in the afternoon/);
   assert.match(sent[0].html, /href="tel:2815550144"/, "owner email has a one-tap call button");
-  assert.match(sent[1].text, /You asked for: \w+day, \w+ \d+, in the afternoon\./);
-  assert.match(sent[1].text, /contact you to confirm/, "confirmation never promises a booked time");
+  assert.match(sent[1].text, /You Asked For: \w+day, \w+ \d+, in the afternoon/);
+  assert.match(sent[1].text, /call you to confirm/, "confirmation never promises a booked time");
   assert.doesNotMatch(sent[1].text, /guarantee|confirmed for/i);
-  assert.match(sent[1].text, /Material: X-ray film/, "visitors see the form's own material name");
+  assert.match(sent[1].text, /Bringing: X-Ray Film/, "visitors see the form's own material name");
 });
 
 test("a failed confirmation email never fails the lead", { concurrency: false }, async () => {
@@ -379,10 +379,11 @@ test("Spanish visitors get a Spanish confirmation", { concurrency: false }, asyn
     headers: { accept: "application/json", "content-type": "application/json" },
     body: JSON.stringify({ ...validLead, locale: "es", submission_key: "test-es-confirm", pickup_window: "morning" })
   }));
-  assert.match(sent[1].subject, /Recibimos su solicitud/);
-  assert.match(sent[1].text, /^Hola Maria:/);
-  assert.match(sent[1].text, /Usted pidió: por la mañana\./);
-  assert.match(sent[1].text, /Material: Película de rayos X/);
+  assert.equal(sent[1].subject, "Recibimos Su Solicitud | AG Refining");
+  assert.match(sent[1].text, /^Gracias, Maria/);
+  assert.match(sent[1].text, /Usted Pidió: por la mañana/);
+  assert.match(sent[1].text, /Material: Película De Rayos X/);
+  assert.match(sent[1].html, /<html lang="es">/);
 });
 
 test("delivery health check reports configuration without exposing secrets", { concurrency: false }, async () => {
@@ -432,8 +433,9 @@ test("the short form delivers with only a name, phone and material", { concurren
   assert.equal(response.statusCode, 200);
   assert.equal(sent.length, 1, "the owner gets the lead; no courtesy email goes out without an address");
   assert.equal("reply_to" in sent[0], false, "no reply-to header when the visitor gave no email");
-  assert.match(sent[0].text, /Email: Not provided/);
-  assert.match(sent[0].text, /Note: Not provided/);
+  assert.doesNotMatch(sent[0].text, /Not provided|Email:|Note:/, "unanswered fields are left out, not padded");
+  assert.match(sent[0].text, /^New Pickup Request\n/);
+  assert.match(sent[0].text, /Status: Complete/);
   assert.match(sent[0].html, /href="tel:/, "the owner email keeps its one-tap call button");
 });
 
@@ -454,9 +456,9 @@ test("an unfinished lead sends one Partial email and never a courtesy email", { 
   assert.equal(partial.statusCode, 200);
   assert.equal(sent.length, 1);
   assert.equal(keys[0], "session-abc-partial", "one person is one lead: the session id dedupes the notice");
-  assert.equal(sent[0].subject, "Partial lead: Maria Lopez, 281 555 0144");
-  assert.match(sent[0].text, /Status: Partial: still filling in the form/);
-  assert.match(sent[0].text, /Stopped at: What they are bringing/);
+  assert.equal(sent[0].subject, "Partial Lead: Maria Lopez, 281 555 0144");
+  assert.match(sent[0].text, /Status: Still Filling In The Form/);
+  assert.match(sent[0].text, /Stopped At: What They Are Bringing/);
   assert.match(sent[0].html, /href="tel:2815550144"/);
 
   const progress = await deliver({ ...base, lead_status: "progress", lead_step: "quantity", material: "silver_coins" });
@@ -467,17 +469,17 @@ test("an unfinished lead sends one Partial email and never a courtesy email", { 
   assert.equal(left.statusCode, 200);
   assert.equal(sent.length, 2);
   assert.equal(keys[1], "session-abc-left");
-  assert.equal(sent[1].subject, "Partial lead update: Maria Lopez, 281 555 0144");
+  assert.equal(sent[1].subject, "Partial Lead Update: Maria Lopez, 281 555 0144");
   assert.match(sent[1].text, /Bringing: Silver Coins/);
-  assert.match(sent[1].text, /Amount: A few pieces/);
+  assert.match(sent[1].text, /Amount: A Few Pieces/);
 
   const complete = await deliver({ ...base, material: "silver_coins", quantity: "A few pieces", location: "Bring it to the shop" });
   assert.equal(complete.statusCode, 200);
   assert.equal(sent.length, 3, "the finished lead sends the normal owner email");
   assert.equal(keys[2], "session-abc");
-  assert.match(sent[2].subject, /^Pickup request: Silver Coins from Maria Lopez$/);
+  assert.match(sent[2].subject, /^Pickup Request: Silver Coins From Maria Lopez$/);
   assert.match(sent[2].text, /Status: Complete/);
-  assert.match(sent[2].text, /How they want to sell: Bring it to the shop/);
+  assert.match(sent[2].text, /How They Want To Sell: Bring It To The Shop/);
 });
 
 test("an unfinished lead without a usable phone is refused and sends nothing", { concurrency: false }, async () => {
@@ -491,4 +493,23 @@ test("an unfinished lead without a usable phone is refused and sends nothing", {
   }));
   assert.equal(response.statusCode, 422);
   assert.equal(sent.length, 0);
+});
+
+test("every email shares one quiet layout with Title Case labels and a plain-text twin", { concurrency: false }, async () => {
+  const { partialContent, confirmationContent } = await import("../api/leads.js");
+  const lead = { name: "Maria Lopez", phone: "(281) 555-0144", material: "silver_coins", quantity: "A box or bag", location: "Bring it to the shop", email: "maria@example.com", lead_status: "partial", lead_step: "material", locale: "en", pickup_window: "any", pickup_date: "" };
+  for (const email of [partialContent(lead), partialContent({ ...lead, lead_status: "left" }), confirmationContent(lead)]) {
+    assert.match(email.html, /^<!DOCTYPE html>/);
+    assert.match(email.html, /<table role="presentation"/, "table layout for mail clients");
+    assert.doesNotMatch(email.html, /<style|class="/, "inline styles only");
+    assert.equal((email.html.match(/<a href="tel:[^"]*" style="display:block/g) || []).length, 1, "one button");
+    assert.match(email.html, /9125 Airport Blvd\., Suite B-1, Houston, TX 77061/, "quiet footer with the address");
+    assert.match(email.html, /\(281\) 898-2719/);
+    assert.match(email.text, /9125 Airport Blvd\., Suite B-1, Houston, TX 77061/, "plain text carries the same footer");
+    const labels = [...email.text.matchAll(/^([A-Za-z][A-Za-z ]+): /gm)].map((match) => match[1]).filter((label) => !/^Call /.test(label));
+    assert.ok(labels.length >= 3);
+    for (const label of labels) {
+      assert.doesNotMatch(label, /(?:^| )[a-z]/, `"${label}" must be Title Case`);
+    }
+  }
 });

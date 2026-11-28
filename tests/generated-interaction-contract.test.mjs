@@ -42,10 +42,9 @@ function titleCaseLocale(html) {
   return /<html lang="es">/.test(html) ? "es" : "en";
 }
 
-function titleCaseWords(locale) {
-  return locale === "es"
-    ? new Set(["a", "al", "ante", "bajo", "cabe", "con", "contra", "de", "del", "desde", "durante", "e", "el", "en", "entre", "hacia", "hasta", "la", "las", "lo", "los", "o", "para", "por", "según", "sin", "so", "sobre", "tras", "u", "un", "una", "unas", "unos", "y"])
-    : new Set(["a", "an", "and", "as", "at", "but", "by", "for", "from", "in", "nor", "of", "on", "or", "per", "so", "the", "to", "vs", "via", "with", "yet"]);
+// Owner rule: every word starts with a capital, small words included.
+function titleCaseWords() {
+  return new Set();
 }
 
 function capitalizeToken(token, locale) {
@@ -272,19 +271,19 @@ test("every generated route authors eyebrow, small-label, H2, and H3 copy in Tit
 test("interior routes keep the approved Title Case exemplars outside the homepage", () => {
   const acceptedMaterials = readFileSync(join(dist, "accepted-materials", "index.html"), "utf8");
   assert.match(acceptedMaterials, />Silver-Plated Materials<\/p>/);
-  assert.match(acceptedMaterials, />Sell Silver-Plated Materials in Houston\.<\/h2>/);
+  assert.match(acceptedMaterials, />Sell Silver-Plated Materials In Houston\.<\/h2>/);
   assert.match(acceptedMaterials, />Tell Us What You Have\.<\/h2>/);
-  assert.match(acceptedMaterials, />Start with the Material\.<\/h2>/);
+  assert.match(acceptedMaterials, />Start With The Material\.<\/h2>/);
 
   const hospital = readFileSync(join(dist, "hospital-silver-recycling", "index.html"), "utf8");
   assert.match(hospital, />Simple Next Steps<\/p>/);
   assert.match(hospital, />Know What Happens Next\.<\/h2>/);
-  assert.match(hospital, />Start with the Material<\/h3>/);
+  assert.match(hospital, />Start With The Material<\/h3>/);
   assert.match(hospital, />Scrap Silver Jewelry<\/span>/);
 
-  assert.match(spanish, />Servicio en Español<\/p>/);
+  assert.match(spanish, />Servicio En Español<\/p>/);
   assert.match(spanish, />Comience Hoy<\/p>/);
-  assert.match(spanish, />Solicite una Recogida\.<\/h2>/);
+  assert.match(spanish, />Solicite Una Recogida\.<\/h2>/);
 });
 
 test("Title Case normalization preserves nested inline heading markup", () => {
@@ -367,7 +366,7 @@ test("Spanish shared chrome does not masquerade English labels as Spanish", () =
     spanish.match(/<details class="material-guide"[\s\S]*?<\/details>/)?.[0] || ""
   ].join("\n");
   const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  for (const englishLabel of ["Materials", "Industries", "Service areas", "How it works", "Our story", "Schedule a Free Pickup", "Quick actions", "Identify your material", "Request a review"]) {
+  for (const englishLabel of ["Materials", "Industries", "Service areas", "How it works", "Our story", "Get Paid For Your Silver", "Quick actions", "Identify your material", "Request a review"]) {
     assert.doesNotMatch(chrome, new RegExp(`>${escapeRegex(englishLabel)}<`), `unexpected English control: ${englishLabel}`);
   }
   assert.match(chrome, /hreflang="en"/);
@@ -406,7 +405,7 @@ test("every pickup call to action opens the standalone sell portal", () => {
     assert.equal(stray, null, `${name}: ${stray?.[0]} must point at the portal`);
   }
   const homePage = readFileSync(join(dist, "index.html"), "utf8");
-  assert.match(homePage, /href="\/sell\?intent=pickup">Schedule a Free Pickup<\/a>/);
+  assert.match(homePage, /href="\/sell\?intent=pickup">Get Paid For Your Silver<\/a>/);
   assert.match(homePage, /<form class="intake-panel" action="\/sell" method="get"/);
   const coins = readFileSync(join(dist, "sell-silver-coins-houston", "index.html"), "utf8");
   assert.match(coins, /href="\/sell\?intent=pickup&(?:amp;)?material=silver_coins"/, "material pages carry their material into the portal");
@@ -458,7 +457,7 @@ test("the pickup form is one question per screen and still works as a plain form
   // The seller chooses how to complete the sale; the shop is the buyer.
   assert.deepEqual(tiles("location"), ["Bring it to the shop", "Dennis comes to me"]);
   assert.match(form, />Bring It To The Shop<small>9125 Airport Blvd\.<\/small>/);
-  assert.match(form, />Dennis Comes To Me<small>For larger lots<\/small>/);
+  assert.match(form, />Dennis Comes To Me<small>For Larger Lots<\/small>/);
   assert.doesNotMatch(form, /Pickup Or Drop-Off|Drop-off/i);
   assert.doesNotMatch(form, />\s*Gold\s*</, "no gold tile until the owner confirms gold in writing");
   const nameStep = form.match(/data-flow-step="name">[\s\S]*?<\/fieldset>/)?.[0] || "";

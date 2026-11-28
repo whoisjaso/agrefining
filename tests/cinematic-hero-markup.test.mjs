@@ -128,15 +128,15 @@ test("the generated hero keeps the stable overlay behind the streamlined commerc
   assert.ok(hero.indexOf('class="cinematic-hero-media"') < hero.indexOf('class="cinematic-hero-overlay"'));
   assert.ok(hero.indexOf('class="cinematic-hero-overlay"') < hero.indexOf('class="shell hero-commercial-grid"'));
   assert.equal((hero.match(/<h1(?:\s[^>]*)?>/g) || []).length, 1);
-  assert.match(hero, /<h1>Houston Silver Buyer, Valued Precisely\.<\/h1>/);
+  assert.match(hero, /<h1 class="visually-hidden">Houston Silver Buyer, Valued Precisely\.<\/h1>/);
   assert.doesNotMatch(hero, /class="hero-kicker"/, "the hero kicker should be removed to keep the first screen quieter");
-  // Minimal hero: one headline, one short line, one button. Nothing else competes with the film.
-  assert.match(hero, /<p class="hero-lede">See the weight\. You decide\.<\/p>/);
-  assert.match(hero, /href="\/sell\?intent=pickup">Schedule a Free Pickup<\/a>/);
+  // The film and one button. The headline is kept for search and screen readers only.
+  assert.doesNotMatch(hero, /hero-lede|See the weight/, "no tagline over the film");
+  assert.match(hero, /href="\/sell\?intent=pickup">Get Paid For Your Silver<\/a>/);
   assert.equal((hero.match(/<a\b/g) || []).length, 1, "the hero must carry exactly one action");
   assert.doesNotMatch(hero, /href="tel:/, "the call link lives in the menu and lower on the page, not in the hero");
   assert.doesNotMatch(hero, /hero-proof-rail/, "the proof points live in the band below the hero");
-  assert.match(home.slice(heroEnd), /class="trust-ledger"[\s\S]*?Houston-based[\s\S]*?Free qualifying pickup[\s\S]*?On-site weighing[\s\S]*?Confirmed payment terms/, "the four proof points must stay on the page below the hero");
+  assert.match(home.slice(heroEnd), /class="trust-ledger"[\s\S]*?Houston-Based[\s\S]*?Free Qualifying Pickup[\s\S]*?On-Site Weighing[\s\S]*?Confirmed Payment Terms/, "the four proof points must stay on the page below the hero");
   assert.ok(home.indexOf('<form class="intake-panel"') > heroEnd, "the material intake form must begin after the closing hero");
 });
 
