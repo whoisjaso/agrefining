@@ -145,6 +145,8 @@ initializeNav();
 
 const actionDock = document.querySelector(".mobile-actions");
 const footer = document.querySelector(".footer");
+const closingBand = document.querySelector("main > .conversion-band:last-child");
+const dockClear = [...document.querySelectorAll(".trust-ledger")];
 const firstSection = document.querySelector("main > section");
 const reviewFormZone = document.querySelector("[data-review-form]");
 let chromeTicking = false;
@@ -160,15 +162,22 @@ function updateChrome() {
   const offset = window.scrollY;
   siteHeader?.setAttribute("data-stuck", offset > 12 ? "true" : "false");
   if (!actionDock) return;
-  const footerTop = footer ? footer.getBoundingClientRect().top : Number.POSITIVE_INFINITY;
-  // On phones the cream header steps aside as soon as the dark footer comes into view, so a
-  // light bar never sits over the dark close of the page (see html.at-footer).
-  document.documentElement.classList.toggle("at-footer", footerTop < (window.visualViewport?.height || window.innerHeight) - 40);
   const viewportHeight = window.visualViewport?.height || window.innerHeight;
+  const footerTop = footer ? footer.getBoundingClientRect().top : Number.POSITIVE_INFINITY;
+  // On phones the cream header steps aside as soon as the dark close of the page (the closing
+  // band, then the footer) comes into view, so a light bar never sits over it (see html.at-footer).
+  const darkCloseTop = Math.min(footerTop, closingBand ? closingBand.getBoundingClientRect().top : Number.POSITIVE_INFINITY);
+  document.documentElement.classList.toggle("at-footer", darkCloseTop < viewportHeight - 40);
   const navOpen = document.body.classList.contains("nav-open");
   const typing = document.activeElement?.matches?.("input, select, textarea") ?? false;
   const formOnScreen = reviewFormZone ? reviewFormZone.getBoundingClientRect().top < viewportHeight && reviewFormZone.getBoundingClientRect().bottom > 0 : false;
-  const visible = offset > revealOffset() && !navOpen && !typing && !formOnScreen && footerTop > viewportHeight + 24;
+  // The pill never sits on top of the trust ledger: it steps aside while that grid is under it.
+  const dockZone = viewportHeight - 112;
+  const overLedger = dockClear.some((element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.top < viewportHeight && rect.bottom > dockZone;
+  });
+  const visible = offset > revealOffset() && !navOpen && !typing && !formOnScreen && !overLedger && darkCloseTop > viewportHeight + 24;
   actionDock.setAttribute("data-visible", visible ? "true" : "false");
   actionDock.setAttribute("aria-hidden", visible ? "false" : "true");
   actionDock.inert = !visible;

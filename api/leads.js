@@ -172,10 +172,13 @@ const ADDRESS_LINE = "9125 Airport Blvd., Suite B-1, Houston, TX 77061";
 // inline styles only, so it holds up in Gmail and Apple Mail on a phone.
 function emailShell({ lang = "en", preheader = "", heading, summary, rows = [], button, secondary = [], secondaryTitle = "", note = "" }) {
   const font = "'Helvetica Neue',Helvetica,Arial,sans-serif";
+  // Each label sits above its value in one column, so nothing wraps into a narrow cell on a phone.
   const detail = ([name, value]) => `
               <tr>
-                <td style="padding:14px 12px 14px 0;border-top:1px solid #e3ddd0;font-family:${font};font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#6b7c8d;width:40%;vertical-align:top">${escapeHtml(name)}</td>
-                <td style="padding:14px 0;border-top:1px solid #e3ddd0;font-family:${font};font-size:16px;line-height:1.45;color:#102a43;vertical-align:top">${escapeHtml(value)}</td>
+                <td style="padding:14px 0;border-top:1px solid #e3ddd0;font-family:${font}">
+                  <div style="font-size:13px;line-height:1.4;color:#6b7c8d">${escapeHtml(name)}</div>
+                  <div style="padding-top:3px;font-size:17px;line-height:1.45;color:#102a43;word-break:break-word">${escapeHtml(value)}</div>
+                </td>
               </tr>`;
   const quiet = ([name, value]) => `
               <tr>
@@ -197,7 +200,14 @@ function emailShell({ lang = "en", preheader = "", heading, summary, rows = [], 
     <td align="center" style="padding:32px 16px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background:#faf8f2;border:1px solid #e3ddd0">
         <tr>
-          <td style="padding:36px 32px 0;font-family:${font};font-size:12px;letter-spacing:2.4px;text-transform:uppercase;color:#102a43"><strong>AG</strong> Refining</td>
+          <td style="padding:32px 32px 0">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td width="40" height="40" align="center" valign="middle" bgcolor="#102a43" style="width:40px;height:40px;background:#102a43;font-family:Georgia,'Times New Roman',serif;font-size:19px;line-height:40px;color:#faf8f2">Ag</td>
+                <td valign="middle" style="padding-left:12px;font-family:${font};font-size:17px;font-weight:600;letter-spacing:0.2px;color:#102a43">AG Refining</td>
+              </tr>
+            </table>
+          </td>
         </tr>
         <tr>
           <td style="padding:28px 32px 0;font-family:${font};font-size:28px;line-height:1.2;font-weight:400;letter-spacing:-0.4px;color:#102a43">${escapeHtml(heading)}</td>
@@ -226,7 +236,7 @@ function emailShell({ lang = "en", preheader = "", heading, summary, rows = [], 
         <tr>
           <td style="padding:26px 32px 0">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-              <tr><td colspan="2" style="padding:0 0 6px;font-family:${font};font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#6b7c8d">${escapeHtml(secondaryTitle)}</td></tr>${secondary.map(quiet).join("")}
+              <tr><td colspan="2" style="padding:0 0 6px;font-family:${font};font-size:13px;font-weight:600;color:#6b7c8d">${escapeHtml(secondaryTitle)}</td></tr>${secondary.map(quiet).join("")}
             </table>
           </td>
         </tr>` : ""}
@@ -317,6 +327,16 @@ const CONFIRMATION_COPY = {
   }
 };
 
+// The form posts its answers as the English phrases; the Spanish confirmation shows them in Spanish.
+const SPANISH_ANSWERS = {
+  "a few pieces": "Unas Pocas Piezas",
+  "a box or bag": "Una Caja O Bolsa",
+  "business volume": "Volumen De Negocio",
+  "bring it to the shop": "Llevarlo A La Tienda",
+  "dennis comes to me": "Dennis Viene A M\u00ed"
+};
+const answerLabel = (value, locale) => (locale === "es" && SPANISH_ANSWERS[String(value || "").trim().toLowerCase()]) || titled(value);
+
 export function confirmationContent(payload) {
   const copy = CONFIRMATION_COPY[payload.locale];
   const first = payload.name.split(/\s+/)[0] || payload.name;
@@ -328,8 +348,8 @@ export function confirmationContent(payload) {
     button: { label: copy.call, href: `tel:${PHONE_HREF}`, plain: PHONE_DISPLAY },
     rows: filled([
       [copy.material, titled(materialLabel(payload.material, payload.locale))],
-      [copy.amount, titled(payload.quantity)],
-      [copy.location, titled(payload.location)],
+      [copy.amount, answerLabel(payload.quantity, payload.locale)],
+      [copy.location, answerLabel(payload.location, payload.locale)],
       [copy.requested, pickupSummary(payload, payload.locale)]
     ]),
     note: copy.next
@@ -413,10 +433,11 @@ export function partialContent(payload) {
     rows: [
       ["Status", left ? "Left Before Finishing" : "Still Filling In The Form"],
       ["Stopped At", STEP_LABELS[payload.lead_step] || payload.lead_step || "Phone"],
+      // Always shown, even when the visitor has not picked a material yet.
+      ["Bringing", MATERIALS.has(payload.material) ? label(payload.material) : titled(String(payload.material || "").replaceAll("_", " ")) || "Not Answered Yet"],
       ...filled([
         ["Name", payload.name],
         ["Phone", payload.phone],
-        ["Bringing", MATERIALS.has(payload.material) ? label(payload.material) : ""],
         ["Amount", titled(payload.quantity)],
         ["How They Want To Sell", titled(payload.location)],
         ["Email", payload.email]

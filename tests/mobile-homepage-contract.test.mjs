@@ -161,7 +161,10 @@ test("the production-only hidden header behavior is now part of the repository b
 
 test("on phones the cream header steps aside when the dark footer comes into view", () => {
   const script = readFileSync(join(dist, "site.js"), "utf8");
-  assert.match(script, /classList\.toggle\("at-footer", footerTop < /);
+  assert.match(script, /const darkCloseTop = Math\.min\(footerTop, closingBand \? /, "the closing band counts as the dark close of the page");
+  assert.match(script, /classList\.toggle\("at-footer", darkCloseTop < /);
+  assert.match(script, /&& !overLedger &&/, "the Get Paid pill steps aside over the trust ledger");
+  assert.doesNotMatch(css.match(/\.atelier-hero \.hero-actions \.button \{[^}]*\}/)[0], /text-transform/, "the hero button is Title Case like every other button");
   assert.match(css, /html\.at-footer body:not\(\.nav-open\) \.site-header \{[^}]*transform:\s*translateY\(-101%\);/);
 });
 

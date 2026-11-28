@@ -511,5 +511,31 @@ test("every email shares one quiet layout with Title Case labels and a plain-tex
     for (const label of labels) {
       assert.doesNotMatch(label, /(?:^| )[a-z]/, `"${label}" must be Title Case`);
     }
+    assert.doesNotMatch(email.html, /text-transform/, "labels are Title Case text, never an uppercase transform");
+    assert.doesNotMatch(email.html, /width:40%/, "labels stack above their values instead of sharing a narrow column");
+    assert.match(email.html, />Ag<\/td>/, "the Ag mark sits in the header");
+    assert.match(email.html, />AG Refining<\/td>/);
   }
+});
+
+test("partial lead emails always carry the Bringing row", { concurrency: false }, async () => {
+  const { partialContent } = await import("../api/leads.js");
+  const base = { name: "Maria Lopez", phone: "(281) 555-0144", quantity: "", location: "", email: "", lead_status: "partial", lead_step: "phone", locale: "en" };
+  assert.match(partialContent({ ...base, material: "" }).text, /Bringing: Not Answered Yet/);
+  assert.match(partialContent({ ...base, material: "old_trays", lead_status: "left" }).text, /Bringing: Old Trays/);
+  assert.match(partialContent({ ...base, material: "silver_coins" }).text, /Bringing: Silver Coins/);
+});
+
+test("the Spanish confirmation shows the answers in Spanish", { concurrency: false }, async () => {
+  const { confirmationContent } = await import("../api/leads.js");
+  const lead = { name: "Maria Lopez", phone: "(281) 555-0144", material: "silver_coins", email: "maria@example.com", locale: "es", pickup_window: "any", pickup_date: "" };
+  const cases = [["A few pieces", "Unas Pocas Piezas"], ["A box or bag", "Una Caja O Bolsa"], ["Business volume", "Volumen De Negocio"]];
+  for (const [value, spanish] of cases) {
+    assert.match(confirmationContent({ ...lead, quantity: value, location: "Bring it to the shop" }).text, new RegExp(`Cantidad: ${spanish}`));
+  }
+  const email = confirmationContent({ ...lead, quantity: "A few pieces", location: "Dennis comes to me" });
+  assert.match(email.text, /Cómo Prefiere Vender: Dennis Viene A Mí/);
+  assert.match(confirmationContent({ ...lead, quantity: "A few pieces", location: "Bring it to the shop" }).html, /Llevarlo A La Tienda/);
+  assert.doesNotMatch(email.text, /A Few Pieces|Dennis Comes To Me/);
+  assert.match(confirmationContent({ ...lead, locale: "en", quantity: "A few pieces", location: "Dennis comes to me" }).text, /Amount: A Few Pieces/);
 });
